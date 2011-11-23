@@ -1,0 +1,19 @@
+* 2011-11-22
+** Add js sortable
+** Changed
+   common.js
+   uploaders.php
+   styles/THEMES/theme.css
+** Added
+   js/jquery.tablesorter
+
+* 2011-11-21
+** Fixed confliction because of jQuery
+** Changed
+   common.js
+
+* 2011-11-11
+** Fixed full-screen show of images
+** Changed
+   curtain_imageresizer.js
+   
