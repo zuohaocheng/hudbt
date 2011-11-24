@@ -138,6 +138,11 @@ elseif ($inclbookmarked == 2)		//not bookmarked
 // if (!isset($CURUSER) || get_user_class() < $seebanned_class)
 if (!isset($CURUSER))
 	$wherea[] = "banned != 'yes'";
+
+if ($_GET["swaph"]) {
+  $addparam .= "swaph=1&";
+}
+
 // ----------------- start include dead ---------------------//
 if (isset($_GET["incldead"]))
 	$include_dead = 0 + $_GET["incldead"];
@@ -874,10 +879,10 @@ if ($allsec != 1 || $enablespecial != 'yes'){ //do not print searchbox if showin
 ?>
 <form method="get" name="searchbox" action="?">
 	<table border="1" class="searchbox" cellspacing="0" cellpadding="5" width="100%">
-		<tbody>
+		<thead>
 		<tr>
-		<td class="colhead" align="center" colspan="2"><a href="javascript: klappe_news('searchboxmain')"><img class="plus" src="pic/trans.gif" id="picsearchboxmain" alt="Show/Hide" /><?php echo $lang_torrents['text_search_box'] ?></a></td>
-		</tr></tbody>
+		<th class="colhead" align="center" colspan="2"><a href="javascript: klappe_news('searchboxmain')"><img class="plus" src="pic/trans.gif" id="picsearchboxmain" alt="Show/Hide" /><?php echo $lang_torrents['text_search_box'] ?></a></th>
+		</tr></thead>
 		<tbody id="ksearchboxmain" style="display: none;" >
 		<tr>
 			<td class="rowfollow" align="left">
@@ -926,7 +931,7 @@ if ($allsec != 1 || $enablespecial != 'yes'){ //do not print searchbox if showin
 				<table>
 					<tr>
 						<td class="bottom" style="padding: 1px;padding-left: 10px">
-							<font class="medium"><?php echo $lang_torrents['text_show_dead_active'] ?></font>
+							<span class="medium"><?php echo $lang_torrents['text_show_dead_active'] ?></span>
 						</td>
 				 	</tr>				
 					<tr>
@@ -1040,14 +1045,14 @@ if (!$Cache->get_page()){
 	$hotsearch = "";
 	while ($searchrow = mysql_fetch_assoc($searchres))
 	{
-		$hotsearch .= "<a href=\"".htmlspecialchars("?search=" . rawurlencode($searchrow["keywords"]) . "&notnewword=1")."\"><u>" . $searchrow["keywords"] . "</u></a>&nbsp;&nbsp;";
+		$hotsearch .= "<li><a href=\"".htmlspecialchars("?search=" . rawurlencode($searchrow["keywords"]) . "&notnewword=1")."\">" . $searchrow["keywords"] . '</a></li>';
 		$hotcount += mb_strlen($searchrow["keywords"],"UTF-8");
 		if ($hotcount > 60)
 			break;
 	}
 	$Cache->add_whole_row();
 	if ($hotsearch)
-	print("<tr><td class=\"embedded\" colspan=\"3\">&nbsp;&nbsp;".$hotsearch."</td></tr>");
+	print('<tr><td class="embedded" colspan="3"><div class="minor-list"><ul>'.$hotsearch.'</ul></div></td></tr>');
 	$Cache->end_whole_row();
 	$Cache->cache_page();
 }
@@ -1088,8 +1093,11 @@ elseif($inclbookmarked == 2)
 
 if ($count) {
 	print($pagertop);
+
+	$swap_headings = $_GET["swaph"];
+
 	if ($sectiontype == $browsecatmode)
-		torrenttable($res, "torrents");
+		torrenttable($res, "torrents", $swap_headings);
 	elseif ($sectiontype == $specialcatmode) 
 		torrenttable($res, "music");
 	else 
@@ -1117,16 +1125,15 @@ print("</td></tr></table>");
 stdfoot();
 
 function hotmenu(){
-   print("<table width=\"940\" class=\"torrents\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\"><tr align=left><td class=\"text\">");
-	print(" <B><a href=torrents2.php><U>显示中文为主标题</U></a><B></br></br>");
-	print(" 热门资源: <B><a href=hot.php?cat=><U>最多做种</U></a>&nbsp;&nbsp;<a href=hot.php?cat=1><U> 电 影 </U></a>&nbsp;&nbsp;<a href=hot.php?cat=2><U>剧 &nbsp;集 </U></a>&nbsp;&nbsp;<a href=hot.php?cat=3><U> 动 漫 </U></a>&nbsp;&nbsp;<a href=hot.php?cat=4><U> 游 戏 </U></a>&nbsp;&nbsp;<a href=hot.php?cat=5><U> 综 艺 </U></a></B>");
-	print("&nbsp;&nbsp;<B><a href=hot.php?cat=6><U> 资 料 </U></a>&nbsp;&nbsp;<a href=hot.php?cat=7><U> 体 育 </U></a>&nbsp;&nbsp;<a href=hot.php?cat=8><U> 音 乐  </U></a>&nbsp;&nbsp;<a href=hot.php?cat=9><U> 纪录片 </U></a>&nbsp;&nbsp;<a href=hot.php?cat=10><U> 软 件 </U></a>&nbsp;&nbsp;<a href=hot.php?cat=11><U> MTV </U></a></B>");
-	print("</br>");
-	print("最近热门: <B><a href=hot.php?time=1><U>3天</U></a>&nbsp;&nbsp;<a href=hot.php?time=2><U>1个月</U></a>&nbsp;&nbsp;<a href=hot.php?time=3><U>3个月</U></a>&nbsp;&nbsp;</B>");
-	print("</br>");
-	print("促&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;销:<B><a href=hot.php?sp=2><font class='free'><U> 免 费 </U></font></a>&nbsp;&nbsp;<a href=hot.php?sp=3><font class='twoup'><U>2x上传</U></font></a>&nbsp;&nbsp;<a href=hot.php?sp=4><font class='twoupfree'><U>免费&2x上传</U> </font></a>&nbsp;&nbsp;<a href=hot.php?sp=5><font class='halfdown'><U>50%下载</U></font></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href=hot.php?sp=6><font class='twouphalfdown'><U>50%下载&2x上传</U></font></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href=hot.php?sp=7><font class='thirtypercent'><U>30%下载</U></font></a></B>");
-	print("</td></tr>");
-	print("</table>");
+   print('<div class="table td text biglink">');
+	print('<div style="margin-bottom:1em;"><a class="biglink" href="torrents.php?swaph=1">显示中文为主标题</a></div>');
+	print('<div class="minor-list"><span class="title"><span class="align">热门资源</span>:</span><ul><li><a class="biglink" href=hot.php?cat=>最多做种</a></li><li><a class="biglink" href=hot.php?cat=1>电影</a></li><li><a class="biglink" href=hot.php?cat=2>剧集</a></li><li><a class="biglink" href=hot.php?cat=3>动漫</a></li><li><a class="biglink" href=hot.php?cat=4>游戏</a></li><li><a class="biglink" href=hot.php?cat=5>综艺</a></li>');
+	print('<li><a class="biglink" href=hot.php?cat=6>资料</a></li><li><a class="biglink" href=hot.php?cat=7>体育</a></li><li><a class="biglink" href=hot.php?cat=8>音乐</a></li><li><a class="biglink" href=hot.php?cat=9>纪录片</a></li><li><a class="biglink" href=hot.php?cat=10>软件</a></li><li><a class="biglink" href=hot.php?cat=11>MTV</a>');
+	print('</ul></div>');
+	print('<div class="minor-list"><span class="title">最近热门:</span><ul><li><a class="biglink" href=hot.php?time=1>3天</a></li><li><a class="biglink" href=hot.php?time=2>1个月</a></li><li><a class="biglink" href=hot.php?time=3>3个月</a></li></ul></div>');
+
+	print('<div class="minor-list"><span class="title"><span class="align">促&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;销</span>:</span><ul><li><a href=hot.php?sp=2><span class="free">免费</span></a></li><li><a href=hot.php?sp=3><span class="twoup">2x上传</span></a></li><li><a href=hot.php?sp=4><span class="twoupfree">免费&2x上传 </span></a></li><li><a href=hot.php?sp=5><span class="halfdown">50%下载</span></a></li><li><a href=hot.php?sp=6><span class="twouphalfdown">50%下载&2x上传</span></a></li><li><a href=hot.php?sp=7><span class="thirtypercent">30%下载</span></a></ul></div>');
+	print("</div>");
 }
 
 ?>

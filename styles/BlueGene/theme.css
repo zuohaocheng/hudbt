@@ -11,7 +11,7 @@ body.inframe
 	background-image: none;
 	background-color: #bccad6
 }
-table
+table, .table
 {
 	border-right: medium none;
 	border-top: medium none;
@@ -101,6 +101,7 @@ h2
 	padding-bottom: 3px;
 	padding-top: 3px;
 	background-color: #2f4879;
+	color: white;
 	background-repeat: repeat;
 }
 h2.transparentbg
@@ -115,7 +116,7 @@ p.sub
 {
 	margin-bottom: 4pt
 }
-td
+td, .td
 {
 	border-right: #000000 1px solid;
 	border-top: #000000 1px solid;
@@ -179,7 +180,7 @@ td.heading
 {
 	font-weight: bold
 }
-td.text
+.text
 {
 	padding-right: 10pt;
 	padding-left: 10pt;
@@ -201,6 +202,10 @@ td.colhead, th.colhead
 	color: #ffffff;
 	background-color: #2f4879
 }
+td.colhead a:link, th.colhead a:link {
+    color: white;
+}
+
 .nowrap
 {
 	white-space:nowrap;

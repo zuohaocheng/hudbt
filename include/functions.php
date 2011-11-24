@@ -2774,28 +2774,30 @@ function pager($rpp, $count, $href, $opts = array(), $pagename = "page") {
 	else
 	$page = $pagedefault;
 
-	$pager = "";
+	$pager = "<ul>";
 	$mp = $pages - 1;
 
 	//Opera (Presto) doesn't know about event.altKey
 	$is_presto = strpos($_SERVER['HTTP_USER_AGENT'], 'Presto');
-	$as = "<b title=\"".($is_presto ? $lang_functions['text_shift_pageup_shortcut'] : $lang_functions['text_alt_pageup_shortcut'])."\">&lt;&lt;&nbsp;".$lang_functions['text_prev']."</b>";
+	$as = "&lt;&lt;&nbsp;".$lang_functions['text_prev'];
 	if ($page >= 1) {
-		$pager .= "<a href=\"".htmlspecialchars($href.$pagename."=" . ($page - 1) ). "\">";
+		$pager .= "<li><a href=\"".htmlspecialchars($href.$pagename."=" . ($page - 1) ). "\" title=\"".($is_presto ? $lang_functions['text_shift_pageup_shortcut'] : $lang_functions['text_alt_pageup_shortcut'])."\">";
 		$pager .= $as;
-		$pager .= "</a>";
+		$pager .= "</a></li>";
 	}
 	else
-	$pager .= "<font class=\"gray\">".$as."</font>";
-	$pager .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-	$as = "<b title=\"".($is_presto ? $lang_functions['text_shift_pagedown_shortcut'] : $lang_functions['text_alt_pagedown_shortcut'])."\">".$lang_functions['text_next']."&nbsp;&gt;&gt;</b>";
+	$pager .= "<li class=\"gray\">".$as."</li>";
+#	$pager .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+	$as = $lang_functions['text_next']."&nbsp;&gt;&gt;";
 	if ($page < $mp && $mp >= 0) {
-		$pager .= "<a href=\"".htmlspecialchars($href.$pagename."=" . ($page + 1) ). "\">";
+		$pager .= "<li><a href=\"".htmlspecialchars($href.$pagename."=" . ($page + 1) ). "\" title=\"".($is_presto ? $lang_functions['text_shift_pagedown_shortcut'] : $lang_functions['text_alt_pagedown_shortcut'])."\">";
 		$pager .= $as;
-		$pager .= "</a>";
+		$pager .= "</a></li>";
 	}
-	else
-	$pager .= "<font class=\"gray\">".$as."</font>";
+	else {
+	     $pager .= "<li class=\"gray\">".$as."</li>";
+	}
+	$pager .= '</ul>';
 
 	if ($count) {
 		$pagerarr = array();
@@ -2818,17 +2820,17 @@ function pager($rpp, $count, $href, $opts = array(), $pagename = "page") {
 			$end = $count;
 			$text = "$start&nbsp;-&nbsp;$end";
 			if ($i != $page)
-			$pagerarr[] = "<a href=\"".htmlspecialchars($href.$pagename."=".$i)."\"><b>$text</b></a>";
+			$pagerarr[] = "<a class=\"pagenumber\" href=\"".htmlspecialchars($href.$pagename."=".$i)."\">$text</a>";
 			else
-			$pagerarr[] = "<font class=\"gray\"><b>$text</b></font>";
+			$pagerarr[] = "<span class=\"gray\">$text</span>";
 		}
-		$pagerstr = join(" | ", $pagerarr);
-		$pagertop = "<p align=\"center\">$pager<br />$pagerstr</p>\n";
-		$pagerbottom = "<p align=\"center\">$pagerstr<br />$pager</p>\n";
+		$pagerstr = '<ul><li>'.join("</li><li>", $pagerarr).'</li></ul>';
+		$pagertop = "<div id='pagertop' class=\"pages\"><div class=\"minor-list\" style=\"margin-bottom:0.6em;\">$pager</div><div class=\"minor-list list-seperator\">$pagerstr</div></div>\n";
+		$pagerbottom = "<div id='pagerbottom' class=\"pages\"><div class=\"minor-list list-seperator\" style=\"margin-bottom:0.6em;\">$pagerstr</div><div class=\"minor-list\">$pager</div></div>\n";
 	}
 	else {
-		$pagertop = "<p align=\"center\">$pager</p>\n";
-		$pagerbottom = $pagertop;
+		$pagertop = "<div id='pagertop' class=\"pages minor-list\"><div class=\"\">$pager</div>\n";
+		$pagerbottom = "<div id='pagerbottom' class=\"pages minor-list\"><div class=\"\">$pager</div>\n";
 	}
 
 	$start = $page * $rpp;
@@ -2980,7 +2982,7 @@ function get_torrent_bookmark_state($userid, $torrentid, $text = false)
 	return $act;
 }
 
-function torrenttable($res, $variant = "torrent") {
+function torrenttable($res, $variant = "torrent", $swap_headings = false) {
 	global $Cache;
 	global $lang_functions;
 	global $CURUSER, $waitsystem;
@@ -3023,8 +3025,8 @@ function torrenttable($res, $variant = "torrent") {
 		else $wait = 0;
 	}
 ?>
-<table class="torrents" cellspacing="0" cellpadding="5" width="100%">
-<tr>
+<table id="torrents" class="torrents" cellspacing="0" cellpadding="5" width="100%">
+<thead><tr>
 <?php
 $count_get = 0;
 $oldlink = "";
@@ -3053,29 +3055,31 @@ for ($i=1; $i<=9; $i++){
 	else $link[$i] = ($i == 1 ? "asc" : "desc");
 }
 ?>
-<td class="colhead" style="padding: 0px"><?php echo $lang_functions['col_type'] ?></td>
-<td class="colhead"><a href="?<?php echo $oldlink?>sort=1&amp;type=<?php echo $link[1]?>"><?php echo $lang_functions['col_name'] ?></a></td>
+<th class="colhead" style="padding: 0px"><?php echo $lang_functions['col_type'] ?></th>
+<th class="colhead"><a href="?<?php echo $oldlink?>sort=1&amp;type=<?php echo $link[1]?>"><?php echo $lang_functions['col_name'] ?></a></th>
 <?php
 
 if ($wait)
 {
-	print("<td class=\"colhead\">".$lang_functions['col_wait']."</td>\n");
+	print("<th class=\"colhead\">".$lang_functions['col_wait']."</th>\n");
 }
 if ($CURUSER['showcomnum'] != 'no') { ?>
-<td class="colhead"><a href="?<?php echo $oldlink?>sort=3&amp;type=<?php echo $link[3]?>"><img class="comments" src="pic/trans.gif" alt="comments" title="<?php echo $lang_functions['title_number_of_comments'] ?>" /></a></td>
+<th class="colhead"><a href="?<?php echo $oldlink?>sort=3&amp;type=<?php echo $link[3]?>"><img class="comments" src="pic/trans.gif" alt="comments" title="<?php echo $lang_functions['title_number_of_comments'] ?>" /></a></th>
 <?php } ?>
 
-<td class="colhead"><a href="?<?php echo $oldlink?>sort=4&amp;type=<?php echo $link[4]?>"><img class="time" src="pic/trans.gif" alt="time" title="<?php echo ($CURUSER['timetype'] != 'timealive' ? $lang_functions['title_time_added'] : $lang_functions['title_time_alive'])?>" /></a></td>
-<td class="colhead"><a href="?<?php echo $oldlink?>sort=5&amp;type=<?php echo $link[5]?>"><img class="size" src="pic/trans.gif" alt="size" title="<?php echo $lang_functions['title_size'] ?>" /></a></td>
-<td class="colhead"><a href="?<?php echo $oldlink?>sort=7&amp;type=<?php echo $link[7]?>"><img class="seeders" src="pic/trans.gif" alt="seeders" title="<?php echo $lang_functions['title_number_of_seeders'] ?>" /></a></td>
-<td class="colhead"><a href="?<?php echo $oldlink?>sort=8&amp;type=<?php echo $link[8]?>"><img class="leechers" src="pic/trans.gif" alt="leechers" title="<?php echo $lang_functions['title_number_of_leechers'] ?>" /></a></td>
-<td class="colhead"><a href="?<?php echo $oldlink?>sort=6&amp;type=<?php echo $link[6]?>"><img class="snatched" src="pic/trans.gif" alt="snatched" title="<?php echo $lang_functions['title_number_of_snatched']?>" /></a></td>
-<td class="colhead"><a href="?<?php echo $oldlink?>sort=9&amp;type=<?php echo $link[9]?>"><?php echo $lang_functions['col_uploader']?></a></td>
+<th class="colhead"><a href="?<?php echo $oldlink?>sort=4&amp;type=<?php echo $link[4]?>"><img class="time" src="pic/trans.gif" alt="time" title="<?php echo ($CURUSER['timetype'] != 'timealive' ? $lang_functions['title_time_added'] : $lang_functions['title_time_alive'])?>" /></a></th>
+<th class="colhead"><a href="?<?php echo $oldlink?>sort=5&amp;type=<?php echo $link[5]?>"><img class="size" src="pic/trans.gif" alt="size" title="<?php echo $lang_functions['title_size'] ?>" /></a></th>
+<th class="colhead"><a href="?<?php echo $oldlink?>sort=7&amp;type=<?php echo $link[7]?>"><img class="seeders" src="pic/trans.gif" alt="seeders" title="<?php echo $lang_functions['title_number_of_seeders'] ?>" /></a></th>
+<th class="colhead"><a href="?<?php echo $oldlink?>sort=8&amp;type=<?php echo $link[8]?>"><img class="leechers" src="pic/trans.gif" alt="leechers" title="<?php echo $lang_functions['title_number_of_leechers'] ?>" /></a></th>
+<th class="colhead"><a href="?<?php echo $oldlink?>sort=6&amp;type=<?php echo $link[6]?>"><img class="snatched" src="pic/trans.gif" alt="snatched" title="<?php echo $lang_functions['title_number_of_snatched']?>" /></a></th>
+<th class="colhead"><a href="?<?php echo $oldlink?>sort=9&amp;type=<?php echo $link[9]?>"><?php echo $lang_functions['col_uploader']?></a></th>
 <?php
 if (get_user_class() >= $torrentmanage_class) { ?>
-	<td class="colhead"><?php echo $lang_functions['col_action'] ?></td>
+	<th class="colhead"><?php echo $lang_functions['col_action'] ?></th>
 <?php } ?>
 </tr>
+</thead>
+<tbody>
 <?php
 $caticonrow = get_category_icon_row($CURUSER['caticon']);
 if ($caticonrow['secondicon'] == 'yes')
@@ -3163,7 +3167,22 @@ while ($row = mysql_fetch_assoc($res))
 			$stickyicon = "<img class=\"sticky\" src=\"pic/trans.gif\" alt=\"Sticky\" title=\"".$lang_functions['title_sticky']."\" />&nbsp;";
 		else $stickyicon = "";
 		
-		print("<td class=\"rowfollow\" width=\"100%\" align=\"left\"><table class=\"torrentname\" width=\"100%\"><tr" . $sphighlight . "><td class=\"embedded\">".$stickyicon."<a $short_torrent_name_alt $mouseovertorrent href=\"details.php?id=".$id."&amp;hit=1\"><b>".htmlspecialchars($dispname)."</b></a>");
+		if ($displaysmalldescr) {
+			$dissmall_descr = trim($row["small_descr"]);
+			$count_dissmall_descr=mb_strlen($dissmall_descr,"UTF-8");
+			$max_lenght_of_small_descr=$max_length_of_torrent_name; // maximum length
+			if($count_dissmall_descr > $max_lenght_of_small_descr)
+			{
+				$dissmall_descr=mb_substr($dissmall_descr, 0, $max_lenght_of_small_descr-2,"UTF-8") . "..";
+			}
+
+		if ($swap_headings) {
+		   $buf = $dispname;
+		   $dispname = $dissmall_descr;
+		   $dissmall_descr = $buf;
+		}
+		}
+		print("<td class=\"rowfollow\" width=\"100%\" align=\"left\"><table class=\"torrentname\" width=\"100%\"><tr" . $sphighlight . "><td class=\"embedded\">".$stickyicon."<a $short_torrent_name_alt $mouseovertorrent href=\"details.php?id=".$id."&amp;hit=1\">".htmlspecialchars($dispname)."</a>");
 		$sp_torrent = get_torrent_promotion_append($row['sp_state'],"",true,$row["added"], $row['promotion_time_type'], $row['promotion_until']);
 		$sp_torrent_sub = get_torrent_promotion_append_sub($row['sp_state'],"",true,$row["added"], $row['promotion_time_type'], $row['promotion_until']);
 		$picked_torrent = "";
@@ -3182,24 +3201,17 @@ while ($row = mysql_fetch_assoc($res))
 			$sp_torrent.="    <img src=\"pic/ico_0day.gif\" border=0 alt=\"0day\" title=\"".$lang_functions['text_oday']."\" />&nbsp;";
 			}
 			elseif (($CURUSER['appendpromotion'] == 'word' && $forcemode == "") || $forcemode == 'word'){
-			$sp_torrent.= " <b>[<font class='oday' ".$onmouseover.">".$lang_functions['text_oday']."</font>]</b>";
+			$sp_torrent.= " <b>[<span class='oday' ".$onmouseover.">".$lang_functions['text_oday']."</span>]</b>";
 			}
 		}
 		}
 		if ($CURUSER['appendnew'] != 'no' && strtotime($row["added"]) >= $last_browse)
-			print("<b> (<font class='new'>".$lang_functions['text_new_uppercase']."</font>)</b>");
+			print("<b> (<span class='new'>".$lang_functions['text_new_uppercase']."</span>)</b>");
 
-		$banned_torrent = ($row["banned"] == 'yes' ? " <b>(<font class=\"striking\">".$lang_functions['text_banned']."</font>)</b>" : "");
+		$banned_torrent = ($row["banned"] == 'yes' ? " <b>(<span class=\"striking\">".$lang_functions['text_banned']."</span>)</b>" : "");
 		print($banned_torrent.$picked_torrent.$sp_torrent);
 		if ($displaysmalldescr){
 			//small descr
-			$dissmall_descr = trim($row["small_descr"]);
-			$count_dissmall_descr=mb_strlen($dissmall_descr,"UTF-8");
-			$max_lenght_of_small_descr=$max_length_of_torrent_name; // maximum length
-			if($count_dissmall_descr > $max_lenght_of_small_descr)
-			{
-				$dissmall_descr=mb_substr($dissmall_descr, 0, $max_lenght_of_small_descr-2,"UTF-8") . "..";
-			}
 			print($dissmall_descr == "" ? "" : "<br />".htmlspecialchars($dissmall_descr));
 		}
 		print($sp_torrent_sub."</td>");
@@ -3214,7 +3226,7 @@ while ($row = mysql_fetch_assoc($res))
 
 		print("<td width=\"20\" class=\"embedded\" style=\"text-align: right; \" valign=\"middle\">".$act."</td>\n");
 
-		print("</tr></table></td>");
+		print("</tr></tbody></table></td>");
 		if ($wait)
 		{
 			$elapsed = floor((TIMENOW - strtotime($row["added"])) / 3600);

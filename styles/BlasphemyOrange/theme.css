@@ -10,7 +10,7 @@ body.inframe
 {
 	background: transparent none;
 }
-table
+table, .table
 {
 	border-right: medium none;
 	border-top: medium none;
@@ -115,7 +115,7 @@ p.sub
 {
 	margin-bottom: 4pt
 }
-td
+td, th, .td
 {
 	border-right: #cccccc 1px solid;
 	border-top: #cccccc 1px solid;
@@ -180,7 +180,7 @@ td.heading
 {
 	font-weight: bold
 }
-td.text
+.text
 {
 	padding-right: 10pt;
 	padding-left: 10pt;
@@ -228,7 +228,7 @@ td.colfollow
 {
 text-align: center;
 }
-table.torrents
+table.torrents td.colhead, table.torrents th.colhead
 {
 text-align: center;
 }
@@ -280,11 +280,22 @@ form
 	font-weight: normal;
 	font-style: italic
 }
-font.gray
+.gray
 {
 	color: #aca899;
 	text-decoration: underline;
 }
+
+.pages {
+    margin-top: 1.2em;
+    margin-bottom: 1.2em;
+    text-align:center;
+}
+
+.pagenumber {
+    font-weight: bold;
+}
+
 .attach img
 {
 	border: 0;
@@ -318,10 +329,13 @@ a.index
 {
 	font-weight: bold
 }
-a.biglink
+.biglink a, a.biglink
 {
 	font-weight: bold;
 	text-decoration: none
+}
+.torrentname a {
+    font-weight: bold;
 }
 a.altlink:link
 {
@@ -662,6 +676,40 @@ A.Peasant_Name:visited{color: #708090}
 {
 	color: #de9332;
 	font-family: tahoma, arial, helvetica, sans-serif;
+}
+
+
+.minor-list ul {
+    display:inline;
+    margin: 0px;
+    padding: 0px;
+    list-style: none;
+    list-style-type: none;
+    list-style-image: none;
+    vertical-align: middle !ie;
+    }
+
+.minor-list li {
+    display:inline-block;
+    line-height: 1.35em;
+    padding: 0 .5em;
+    /* border-left: 1px solid #AAA; */
+    margin: 0.3em 0;
+    zoom: 1;
+    display:inline !ie;
+    }
+
+.minor-list.list-seperator li {
+    border-left: 1px solid #AAA;
+}
+
+.minor-list li:first-child {
+    padding-left: .4em;
+    border-left: none;
+    }
+
+.minor-list .title {
+    padding-right: .5em;
 }
 
 .free{color:#0c70e1}
