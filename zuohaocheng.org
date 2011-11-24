@@ -1,3 +1,15 @@
+* 2011-11-24
+** Changed appearance of pagers
+** Changed appearance of bottom module in torrent.php
+** Changed
+   styles/THEMES/theme.css
+   styles/FONTS.css
+   torrents.php
+   include/functions.php
+
+** Deleted
+   torrents2.php Integrated into torrents.php, with param `swaph'
+
 * 2011-11-22
 ** Add js sortable
 ** Changed
