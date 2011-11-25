@@ -2528,7 +2528,7 @@ function js_hd_config() {
   global $torrentmanage_class;
 
   $class = get_user_class();
-  $out = 'hd = {config : {user : {class : ' . $class . ', ';
+  $out = 'hb = {config : {user : {class : ' . $class . ', ';
   $out .= 'canonicalClass : "' . get_user_class_name($class,false) . '"';
   
   $out .= '}, const : {';
@@ -2775,6 +2775,7 @@ function deletetorrent($id) {
 
 function pager($rpp, $count, $href, $opts = array(), $pagename = "page") {
 	global $lang_functions,$add_key_shortcut;
+	$next_page_href = '';
 	$pages = ceil($count / $rpp);
 
 	if (!$opts["lastpagedefault"])
@@ -2809,7 +2810,8 @@ function pager($rpp, $count, $href, $opts = array(), $pagename = "page") {
 #	$pager .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 	$as = $lang_functions['text_next']."&nbsp;&gt;&gt;";
 	if ($page < $mp && $mp >= 0) {
-		$pager .= "<li><a href=\"".htmlspecialchars($href.$pagename."=" . ($page + 1) ). "\" title=\"".($is_presto ? $lang_functions['text_shift_pagedown_shortcut'] : $lang_functions['text_alt_pagedown_shortcut'])."\">";
+	  $next_page_href = $href.$pagename."=" . ($page + 1);
+		$pager .= "<li><a href=\"".htmlspecialchars($next_page_href). "\" title=\"".($is_presto ? $lang_functions['text_shift_pagedown_shortcut'] : $lang_functions['text_alt_pagedown_shortcut'])."\">";
 		$pager .= $as;
 		$pager .= "</a></li>";
 	}
@@ -2854,7 +2856,7 @@ function pager($rpp, $count, $href, $opts = array(), $pagename = "page") {
 
 	$start = $page * $rpp;
 	$add_key_shortcut = key_shortcut($page,$pages-1);
-	return array($pagertop, $pagerbottom, "LIMIT $start,$rpp");
+	return array($pagertop, $pagerbottom, "LIMIT $start,$rpp", $next_page_href);
 }
 
 function commenttable($rows, $type, $parent_id, $review = false)
