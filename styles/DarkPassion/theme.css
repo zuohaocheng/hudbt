@@ -543,8 +543,8 @@ ul.menu li.selected a
 	background-image: url(./shadeactive.gif);
 	background-color: #ffffff;
 	border-bottom-color: white;
-	font: bold 11px verdana;
-	position: relative;
+	/* font: bold 11px verdana; */
+	/* position: relative; */
 	top: 1px;
 }
 ul.menu li.selected a:hover
