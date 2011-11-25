@@ -1,5 +1,6 @@
 <?php
 header('Content-type: text/xml');
+print('<?xml version="1.0"?>');
 
 function get_user_prop($id) {
   $user = get_user_row($id);
@@ -168,10 +169,7 @@ function torrenttable_api($res, $variant = "torrent", $swap_headings = false) {
 	}
 
 
-	$sp_torrent = get_torrent_promotion_append($row['sp_state'],"",true,$row["added"], $row['promotion_time_type'], $row['promotion_until']);
-	$sp_torrent_sub = get_torrent_promotion_append_sub($row['sp_state'],"",true,$row["added"], $row['promotion_time_type'], $row['promotion_until']);
-	$picked_torrent = "";
-	if ($CURUSER['appendpicked'] != 'no'){
+	if ($CURUSER['appendpicked'] != 'no' && $row['picktype'] != 'normal'){
 	  print('<picktype>' . $row['picktype'] . '</picktype>');
 
 	  //Added by bluemonster 20111026
@@ -187,7 +185,26 @@ function torrenttable_api($res, $variant = "torrent", $swap_headings = false) {
 	  print('<banned>true</banned>');
 	}
 
-	/* print($sp_torrent_sub."</td>"); */
+	if ($row['sp_state'] != 1) {
+	  print('<pr state="' . $row['sp_state'] . '">');
+
+	  if ( $row['promotion_time_type'] != 1) {
+	    global $expirefree_torrent;
+	    if ( $row['promotion_time_type'] == 2) {
+	      $futuretime = strtotime( $row['promotion_until']);
+	    } else {
+	      $futuretime = strtotime($row["added"]) + $expirefree_torrent * 86400;
+	    }
+
+	    print('<until>' . date("Y-m-d H:i:s", $futuretime) . '</until>');
+	  }
+	  print('</pr>');
+
+	}
+
+	  
+
+
 
 	/* if ($wait) */
 	/*   { */
@@ -257,8 +274,7 @@ function torrenttable_api($res, $variant = "torrent", $swap_headings = false) {
 	  print('>');
 
 	  print(get_user_prop($row["owner"]));
-#	    print("<td class=\"rowfollow\">" . (isset($row["owner"]) ? get_username($row["owner"]) : "<i>".$lang_functions['text_orphaned']."</i>") . "</td>\n");
-	  }
+	}
 	print('</owner>');
 
 

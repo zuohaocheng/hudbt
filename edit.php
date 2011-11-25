@@ -143,9 +143,9 @@ else {
 			                "<option" . (($row["promotion_time_type"] == "2") ? " selected=\"selected\"" : "" ) . " value=\"2\">".$lang_edit['select_until']."</option>" ."</select>&nbsp;&nbsp;&nbsp;";
 			$pickcontent .= "<b>截止日期:&nbsp;</b><input type=\"text\" name=\"promotionuntil\" id=\"promotionuntil\" style=\"width: 120px;\" value=\"". (($row["promotion_time_type"]!=2)? date("Y-m-d H:i:s") :$row["promotion_until"]) . "\" />".$lang_edit['text_promotion_until_note']. "<br />";
 			$pickcontent .=<<<EOT
-<b>延长促销时间</b><select id="time_select_day">
+<div id="expand-pr"><span style="font-weight: bold;">延长促销时间</span><select id="time_select_day">
 	<option value="0">0</option>
-	<option value="1">1</option>
+	<option value="1" selected="selected">1</option>
 	<option value="2">2</option>
 	<option value="3">3</option>
 	<option value="5">5</option>
@@ -185,51 +185,7 @@ else {
 	<option value="45">45</option>
 </select>分钟
 <input type="button" value="延长" id="delay_promotion_time" />
-<script type="text/javascript">
-function str2date(string) {
-
-	var default_date = new Date();
-	
-	date_part = string.split(' ')[0].split('-');
-	time_part = string.split(' ')[1].split(':');
-	
-	default_date.setFullYear(date_part[0]);
-	default_date.setMonth(date_part[1] - 1);
-	default_date.setDate(date_part[2]);
-	default_date.setHours(time_part[0]);
-	default_date.setMinutes(time_part[1]);
-	default_date.setSeconds(time_part[2]);
-	
-	return default_date;
-}
-
-var timeBox = document.getElementById('promotionuntil');
-var default_unixtime = str2date(timeBox.value);
-
-document.getElementById('delay_promotion_time').onclick = function() {
-	var new_date = new Date();
-
-	var day = document.getElementById('time_select_day').value;
-	var hour = document.getElementById('time_select_hour').value;
-	var minute = document.getElementById('time_select_minute').value;
-
-	// 换算成毫秒
-	var time_period = (day * 24 * 3600 + hour * 3600 + minute * 60) * 1000;
-	
-	new_date.setTime(default_unixtime.valueOf() + time_period);
-
-	timeBox.value = new_date.getFullYear() 
-	                + '-' + (new_date.getMonth() + 1) 
-	                + '-' + new_date.getDate() 
-	                + ' ' + new_date.getHours() 
-	                + ':' + new_date.getMinutes() 
-	                + ':' + new_date.getSeconds();
-
-	return false;
-};
-
-</script>
-<br />
+</div>
 EOT;
 			// End
 			
@@ -283,5 +239,9 @@ EOT;
 	print("<tr><td class=\"toolbox\" colspan=\"2\" align=\"center\"><input type=\"submit\" style='height: 25px' value=\"".$lang_edit['submit_delete_it']."\" /></td></tr>\n");
 	print("</table>");
 	print("</form>\n");
-}
+}?>
+<script type="text/javascript" src="js/edit.js"></script><!-- Added by bluemonster 20111031-->
+
+<?php
 stdfoot();
+?>

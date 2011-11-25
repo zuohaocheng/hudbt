@@ -2257,8 +2257,14 @@ if ($CURUSER){
 <script type="text/javascript" src="domTT.js<?php echo $cssupdatedate?>"></script>
 <script type="text/javascript" src="domTT_drag.js<?php echo $cssupdatedate?>"></script>
 <script type="text/javascript" src="fadomatic.js<?php echo $cssupdatedate?>"></script>
-<script type="text/javascript" src="jquery/jquery-1.6.4.min.js"></script><!-- Added by bluemonster 20111031-->
-<script type="text/javascript" src="jquery/0day.js"></script><!-- Added by bluemonster 20111031-->
+<script type="text/javascript" src="js/jquery-1.6.4.min.js"></script><!-- Added by bluemonster 20111031-->
+<script type="text/javascript">
+//<![CDATA[
+<?php
+print(js_hd_config());
+?>
+//]]>
+</script>
 </head>
 <body>
 <table class="head" cellspacing="0" cellpadding="0" align="center">
@@ -2518,6 +2524,18 @@ if ($msgalert)
 }
 }
 
+function js_hd_config() {
+  global $torrentmanage_class;
+
+  $class = get_user_class();
+  $out = 'hd = {config : {user : {class : ' . $class . ', ';
+  $out .= 'canonicalClass : "' . get_user_class_name($class,false) . '"';
+  
+  $out .= '}, const : {';
+  $out .= 'torrentmanage_class : ' . $torrentmanage_class;
+  $out .= '}}}';
+  return $out;
+}
 
 function stdfoot() {
 	global $SITENAME,$BASEURL,$Cache,$datefounded,$tstart,$icplicense_main,$add_key_shortcut,$query_name, $USERUPDATESET, $CURUSER, $enablesqldebug_tweak, $sqldebug_tweak, $Advertisement, $analyticscode_tweak;
@@ -2568,6 +2586,7 @@ function stdfoot() {
 		print("\n".$analyticscode_tweak."\n");
 	if ($cnzz)
       print("\n".$cnzz."\n");
+
 	print("</body></html>");
 
 	//echo replacePngTags(ob_get_clean());
@@ -5054,6 +5073,7 @@ function get_torrent_promotion_append_sub($promotion = 1,$forcemode = "",$showti
 				} else {
 					$futuretime = strtotime($added) + $expirefree_torrent * 86400;
 				}
+
 				$timeout = gettime(date("Y-m-d H:i:s", $futuretime), false, false, true, false, true);
 				if ($timeout)
 				$onmouseover = "<font color='#0000FF'>".$lang_functions['text_will_end_in'].$timeout."</font>";
@@ -5179,3 +5199,4 @@ function get_torrent_promotion_append_sub($promotion = 1,$forcemode = "",$showti
 
 
 ?>
+

@@ -1,3 +1,9 @@
+For details from 2011-11-25, see log in svn (svn log)
+
+* 2011-11-25
+** Added xml format for torrents.php(api.php)
+** Fixed a bug in ul.menu, theme Darkpassion
+
 * 2011-11-24
 ** Changed appearance of pagers
 ** Changed appearance of bottom module in torrent.php
