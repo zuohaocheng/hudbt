@@ -22,7 +22,7 @@ table.torrents td.rowfollow
 {
 font-size: 9pt
 }
-table.torrentname td.embedded
+table.torrentname td.embedded, #torrents h2, #torrents h3
 {
 font-size: 9.5pt
 }
