@@ -229,17 +229,17 @@ window.attachEvent("onkeydown",changepage,false);
 }
 
 // bookmark.js
-function bookmark(torrentid,counter)
+function bookmark(torrentid)
 {
 var result=ajax.gets('bookmark.php?torrentid='+torrentid);
-bmicon(result,counter);
+bmicon(result,torrentid);
 }
-function bmicon(status,counter)
+function bmicon(status,torrentid)
 {
 	if (status=="added")
-		document.getElementById("bookmark"+counter).innerHTML="<img class=\"bookmark\" src=\"pic/trans.gif\" alt=\"Bookmarked\" />";
+		document.getElementById("bookmark"+torrentid).innerHTML="<img class=\"bookmark\" src=\"pic/trans.gif\" alt=\"Bookmarked\" />";
 	else if (status=="deleted")
-		document.getElementById("bookmark"+counter).innerHTML="<img class=\"delbookmark\" src=\"pic/trans.gif\" src=\"pic/trans.gif\" alt=\"Unbookmarked\" />";
+		document.getElementById("bookmark"+torrentid).innerHTML="<img class=\"delbookmark\" src=\"pic/trans.gif\" src=\"pic/trans.gif\" alt=\"Unbookmarked\" />";
 }
 
 // check.js

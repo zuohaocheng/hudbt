@@ -251,7 +251,8 @@ function torrenttable_api($res, $variant = "torrent", $swap_headings = false) {
 
 
 	//size
-	print('<size>' . $row['size'] . '</size>');
+	print('<size>' . $row['size'] . '<canonical>' . htmlspecialchars(mksize_compact($row["size"])) . '</canonical></size>');
+
 
 	print('<seeders>' . $row['seeders'] . '</seeders>');
 	print('<leechers>' . $row['leechers'] . '</leechers>');
@@ -271,6 +272,9 @@ function torrenttable_api($res, $variant = "torrent", $swap_headings = false) {
 	}
 	print('</owner>');
 
+	if (get_is_torrent_bookmarked($CURUSER['id'], $id)) {
+	  print('<bookmarked>true</bookmarked>');
+	}
 
 	if (get_user_class() >= $torrentmanage_class) {
 	  }

@@ -556,8 +556,12 @@ ul.menu li.selected a:hover
 	margin-right: 5px
 }
 
-.no-seeder {
+.no-seeders {
     color: red;
+}
+
+.username {
+    font-weight: bold;
 }
 
 .StaffLeader_Name{color: #8b0000}
