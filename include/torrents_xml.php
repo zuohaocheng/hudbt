@@ -192,7 +192,7 @@ function torrenttable_api($res, $variant = "torrent", $swap_headings = false) {
 
 	    $expire = date("Y-m-d H:i:s", $futuretime);
 	    $cexpire = gettime($expire, false, false, true, false, true);
-	    print('<expire>' . $expire . '<canonical>' .htmlspecialchars($cexpire) .'</canonical></expire>');
+	    print('<expire><raw>' . $expire . '</raw><canonical>' .htmlspecialchars($cexpire) .'</canonical></expire>');
 	  }
 	  print('</pr>');
 
@@ -253,7 +253,7 @@ function torrenttable_api($res, $variant = "torrent", $swap_headings = false) {
 
 
 	//size
-	print('<size>' . $row['size'] . '<canonical>' . htmlspecialchars(mksize_compact($row["size"])) . '</canonical></size>');
+	print('<size><raw>' . $row['size'] . '</raw><canonical>' . htmlspecialchars(mksize_compact($row["size"])) . '</canonical></size>');
 
 
 	print('<seeders>' . $row['seeders'] . '</seeders>');

@@ -5,6 +5,7 @@ $(function() {
     var lang = hb.constant.lang;
 
     var get_func = function(res_x) {
+	console.log((new Date()).getTime());
 	$("#pagerbottom").after($('<div></div>').addClass('pages')).hide();
 
 	var res = $(res_x);
@@ -17,21 +18,20 @@ $(function() {
 
 	    var catid = torrent.find('catid').text();
 	    var catProp = catDict[catid];
-	    var cat = $('<td></td>').addClass("nowrap").css({
-		'vertical-align': 'middle',
-		'padding': '0px'
-	    }).append($('<a></a>', {
-		href : '?cat=' + catid
-	    }).append($('<img />', {
-		src : "pic/cattrans.gif",
-		alt : catProp.name,
-		title : catProp.name,
-	    }).addClass(catProp.class_name)));
-
+	    var cat = $('<td></td>');
+	    if (catProp) {
+		cat.addClass("nowrap category-icon").append($('<a></a>', {
+		    href : '?cat=' + catid
+		}).append($('<img />', {
+		    src : "pic/cattrans.gif",
+		    alt : catProp.name,
+		    title : catProp.name,
+		}).addClass(catProp.class_name)));
+	    }
 	    tr.append(cat);
 
-	    var title_td = $('<td></td>').css('align', 'left');
-	    var title = $('<div></div>').css('position', 'relative');
+	    var title_td = $('<td></td>').addClass('torrent');
+	    var title = $('<div></div>');
 	    var bookmarked = (torrent.find('bookmarked').length !== 0);
 	    var bookmarkClass = bookmarked ? 'bookmark' : 'delbookmark';
 
@@ -45,7 +45,7 @@ $(function() {
 		text : torrent.find('desc').text()
 	    });
 
-	    title.append($('<div></div>').append(mainTitle)).append($('<div></div>').append(desc));
+	    title.append($('<div></div>').addClass('limit-width').append(mainTitle)).append($('<div></div>').addClass('limit-width').append(desc));
 
 	    if (torrent.find('oday').length !== 0) {
 		var oday = $('<img></img>', {
@@ -81,7 +81,7 @@ $(function() {
 		var $expire = $('<span></span>', {text : '['});
 		var $time = $('<span></span>', {text : lang.text_will_end_in});
 		if (expire.length !== 0) {
-		    $time.attr('title', expire.text());
+		    $time.attr('title', expire.find('raw').text());
 		    $time.append(decodeURIComponent(expire.find('canonical').text()));
 		    $time.addClass('pr-limit');
 		}
@@ -91,6 +91,16 @@ $(function() {
 		}
 		$expire.append($time).append(']');
 		desc.after($expire);
+	    }
+
+	    var picktype = torrent.find('picktype');
+	    if (picktype.length !== 0) {
+		var ptype = picktype.text()
+		var $ptype = $('<span></span>', {text : '['}).append($('<span></span>', {
+		    text : lang['text_' + ptype],
+		    'class' : ptype
+		})).append(']');
+		mainTitle.after($ptype);
 	    }
 
 
@@ -224,6 +234,7 @@ $(function() {
 		}
 	    });
 	}
+	console.log((new Date()).getTime());
     }
 
     if (hb.nextpage !== '') {
@@ -231,6 +242,7 @@ $(function() {
             var loc = $(document).scrollTop() + $(window).height();
             if(loc > targetH) {
 		var uri = hb.nextpage + surfix;
+		uri = 'http://211.69.198.67/hudbt/torrents.php?inclbookmarked=0&incldead=0&spstate=0&page=0&format=xml'
 
 		$.get(uri, get_func);
 		$(document).unbind('scroll');

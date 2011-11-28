@@ -3173,10 +3173,10 @@ while ($row = mysql_fetch_assoc($res))
 	      && (get_user_class() >= $seebanned_class 
 	          || $CURUSER['id'] == $row['owner']))) {
 		$id = $row["id"];
-		$sphighlight = get_torrent_bg_color($row['sp_state']);
-		print("<tr" . $sphighlight . ">\n");
+#		$sphighlight = get_torrent_bg_color($row['sp_state']);
+#		print("<tr" . $sphighlight . ">\n");
 
-		print("<td class=\"rowfollow nowrap\" valign=\"middle\" style='padding: 0px'>");
+		print('<td class="rowfollow nowrap category-icon">');
 		if (isset($row["category"])) {
 			print(return_category_image($row["category"], "?"));
 			if ($has_secondicon){
@@ -3241,7 +3241,7 @@ while ($row = mysql_fetch_assoc($res))
 			$dispname=mb_substr($dispname, 0, $max_length_of_torrent_name-2,"UTF-8") . "..";
 
 		if ($row['pos_state'] == 'sticky' && $CURUSER['appendsticky'] == 'yes')
-			$stickyicon = "<img class=\"sticky\" src=\"pic/trans.gif\" alt=\"Sticky\" title=\"".$lang_functions['title_sticky']."\" />&nbsp;";
+			$stickyicon = "<img class=\"sticky\" src=\"pic/trans.gif\" alt=\"Sticky\" title=\"".$lang_functions['title_sticky']."\" />";
 		else $stickyicon = "";
 		
 		if ($displaysmalldescr) {
@@ -3259,17 +3259,17 @@ while ($row = mysql_fetch_assoc($res))
 		   $dissmall_descr = $buf;
 		}
 		}
-		print("<td class=\"rowfollow\" width=\"100%\" align=\"left\"><table class=\"torrentname\" width=\"100%\"><tr" . $sphighlight . "><td class=\"embedded\">".$stickyicon."<a $short_torrent_name_alt $mouseovertorrent href=\"details.php?id=".$id."&amp;hit=1\">".htmlspecialchars($dispname)."</a>");
+		print('<td class="torrent"><div><div class="limit-width">'.$stickyicon."<h2><a $short_torrent_name_alt $mouseovertorrent href=\"details.php?id=".$id."&amp;hit=1\">".htmlspecialchars($dispname)."</a></h2>");
 		$sp_torrent = get_torrent_promotion_append($row['sp_state'],"",true,$row["added"], $row['promotion_time_type'], $row['promotion_until']);
 		$sp_torrent_sub = get_torrent_promotion_append_sub($row['sp_state'],"",true,$row["added"], $row['promotion_time_type'], $row['promotion_until']);
 		$picked_torrent = "";
 		if ($CURUSER['appendpicked'] != 'no'){
 		if($row['picktype']=="hot")
-		$picked_torrent = " <b>[<font class='hot'>".$lang_functions['text_hot']."</font>]</b>";
+		$picked_torrent = "[<span class='hot'>".$lang_functions['text_hot']."</span>]";
 		elseif($row['picktype']=="classic")
-		$picked_torrent = " <b>[<font class='classic'>".$lang_functions['text_classic']."</font>]</b>";
+		$picked_torrent = "[<span class='classic'>".$lang_functions['text_classic']."</span>]";
 		elseif($row['picktype']=="recommended")
-		$picked_torrent = " <b>[<font class='recommended'>".$lang_functions['text_recommended']."</font>]</b>";
+		$picked_torrent = "[<span class='recommended'>".$lang_functions['text_recommended']."</span>]";
 		//Added by bluemonster 20111026
 		if($row['oday']=="yes")
 		{
@@ -3278,7 +3278,7 @@ while ($row = mysql_fetch_assoc($res))
 			$sp_torrent.="    <img src=\"pic/ico_0day.gif\" border=0 alt=\"0day\" title=\"".$lang_functions['text_oday']."\" />&nbsp;";
 			}
 			elseif (($CURUSER['appendpromotion'] == 'word' && $forcemode == "") || $forcemode == 'word'){
-			$sp_torrent.= " <b>[<span class='oday' ".$onmouseover.">".$lang_functions['text_oday']."</span>]</b>";
+			$sp_torrent.= " [<span class='oday' ".$onmouseover.">".$lang_functions['text_oday']."</span>]";
 			}
 		}
 		}
@@ -3286,24 +3286,24 @@ while ($row = mysql_fetch_assoc($res))
 			print("<b> (<span class='new'>".$lang_functions['text_new_uppercase']."</span>)</b>");
 
 		$banned_torrent = ($row["banned"] == 'yes' ? " <b>(<span class=\"striking\">".$lang_functions['text_banned']."</span>)</b>" : "");
-		print($banned_torrent.$picked_torrent.$sp_torrent);
+		print($banned_torrent.$picked_torrent.$sp_torrent .'</div><div class="limit-width">' );
 		if ($displaysmalldescr){
 			//small descr
-			print($dissmall_descr == "" ? "" : "<br />".htmlspecialchars($dissmall_descr));
+			print($dissmall_descr == "" ? "" : "<h3>".htmlspecialchars($dissmall_descr)) . '</h3>';
 		}
-		print($sp_torrent_sub."</td>");
+		print($sp_torrent_sub . '</div>');
 
 			$act = "";
 			if ($CURUSER["dlicon"] != 'no' && $CURUSER["downloadpos"] != "no")
-			$act .= "<a href=\"download.php?id=".$id."\"><img class=\"download\" src=\"pic/trans.gif\" style='padding-bottom: 2px;' alt=\"download\" title=\"".$lang_functions['title_download_torrent']."\" /></a>" ;
+			$act .= "<li><a href=\"download.php?id=".$id."\"><img class=\"download\" src=\"pic/trans.gif\" style='padding-bottom: 2px;' alt=\"download\" title=\"".$lang_functions['title_download_torrent']."\" /></a></li>" ;
 			if ($CURUSER["bmicon"] == 'yes'){
 				$bookmark = " href=\"javascript: bookmark(".$id.");\"";
-				$act .= ($act ? "<br />" : "")."<a id=\"bookmark".$id."\" ".$bookmark." >".get_torrent_bookmark_state($CURUSER['id'], $id)."</a>";
+				$act .= "<li><a id=\"bookmark".$id."\" ".$bookmark." >".get_torrent_bookmark_state($CURUSER['id'], $id)."</a></li>";
 			}
 
-		print("<td width=\"20\" class=\"embedded\" style=\"text-align: right; \" valign=\"middle\">".$act."</td>\n");
+		print('<div class="torrent-utilty-icons minor-list-vertical"><ul>'.$act."</ul></div>\n");
 
-		print("</tr></tbody></table></td>");
+		print('</td>');
 		if ($wait)
 		{
 			$elapsed = floor((TIMENOW - strtotime($row["added"])) / 3600);
