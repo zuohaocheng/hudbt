@@ -287,7 +287,7 @@ function torrenttable_api($res, $variant = "torrent", $swap_headings = false) {
 <?php
 
 header('Content-type: text/xml');
-# print('<?xml version="1.0"? >');
+print('<?xml version="1.0"?>');
 
 ?>
 <api><query><torrents>

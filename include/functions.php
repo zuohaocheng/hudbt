@@ -2261,7 +2261,7 @@ if ($CURUSER){
 <script type="text/javascript">
 //<![CDATA[
 <?php
-print(js_hd_config());
+print(js_hb_config());
 ?>
 //]]>
 </script>
@@ -2524,23 +2524,23 @@ if ($msgalert)
 }
 }
 
-function js_hd_config() {
-  global $torrentmanage_class;
+function js_hb_config() {
+    global $torrentmanage_class;
 
-  $class = get_user_class();
-  if ($class) {
-    $out = 'hb = {config : {user : {class : ' . $class . ', ';
-    $out .= 'canonicalClass : "' . get_user_class_name($class,false) . '"';
-    
-    $out .= '}, const : {';
-    $out .= 'torrentmanage_class : ' . $torrentmanage_class;
-    $out .= '}}}';
-  }
-  else {
-    $out = '';
-  }
+    $class = get_user_class();
+    if ($class) {
+      $out = 'hb = {config : {user : {class : ' . $class . ', ';
+      $out .= 'canonicalClass : "' . get_user_class_name($class,false) . '"';
+      
+      $out .= '}, const : {';
+      $out .= 'torrentmanage_class : ' . $torrentmanage_class;
+      $out .= '}}}';
+    }
+    else {
+      $out = '';
+    }
 
-  return $out;
+    return $out;
 }
 
 function stdfoot() {
@@ -5207,4 +5207,3 @@ function get_torrent_promotion_append_sub($promotion = 1,$forcemode = "",$showti
 
 
 ?>
-
