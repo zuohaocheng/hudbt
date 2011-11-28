@@ -4,7 +4,7 @@ $(function() {
     var surfix = '&format=xml';
 
     var get_func = function(res_x) {
-	$("#pagerbottom").hide();
+	$("#pagerbottom").after($('<div></div>').addClass('pages')).hide();
 
 	var res = $(res_x);
 
@@ -129,7 +129,7 @@ $(function() {
 
 	    var targetH = target.height();
 	    $(document).scroll(function() {
-		var loc = $(document).scrollTop();
+		var loc = $(document).scrollTop() + $(window).height();
 		if(loc > targetH) {
 		    $.get(uri, get_func);
 		    $(document).unbind('scroll');
@@ -139,7 +139,7 @@ $(function() {
     }
 
     $(document).scroll(function(){
-        var loc = $(document).scrollTop();
+        var loc = $(document).scrollTop() + $(window).height();
         if(loc > targetH) {
 	    var uri = hb.nextpage + surfix;
 

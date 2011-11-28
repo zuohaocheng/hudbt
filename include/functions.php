@@ -2135,7 +2135,7 @@ function get_style_addicode()
 	return $cssRow['addicode'];
 }
 
-function get_cat_folder($cat = 101)
+function get_cat_folder($cat = 401)
 {
 	static $catPath = array();
 	if (!$catPath[$cat]) {
@@ -2239,6 +2239,7 @@ $cssupdatedate=($cssupdatedate ? "?".htmlspecialchars($cssupdatedate) : "");
 <link rel="stylesheet" href="<?php echo $css_uri."theme.css".$cssupdatedate?>" type="text/css" />
 <link rel="stylesheet" href="<?php echo $css_uri."DomTT.css".$cssupdatedate?>" type="text/css" />
 <link rel="stylesheet" href="styles/curtain_imageresizer.css<?php echo $cssupdatedate?>" type="text/css" />
+<link rel="stylesheet" href="<?php echo 'pic/' . get_cat_folder() . "sprite.css"?>" type="text/css" />
 <?php
 if ($CURUSER){
 	$caticonrow = get_category_icon_row($CURUSER['caticon']);
@@ -3830,6 +3831,7 @@ function get_category_row($catid = NULL)
 		}
 		$Cache->cache_value('category_content', $rows, 126400);
 	}
+
 	if ($catid) {
 		return $rows[$catid];
 	} else {
@@ -4445,7 +4447,8 @@ function return_category_image($categoryid, $link="")
 	} else {
 		$categoryrow = get_category_row($categoryid);
 		$catimgurl = get_cat_folder($categoryid);
-		$catImg[$categoryid] = $catimg = "<img".($categoryrow['class_name'] ? " class=\"".$categoryrow['class_name']."\"" : "")." src=\"pic/cattrans.gif\" alt=\"" . $categoryrow["name"] . "\" title=\"" .$categoryrow["name"]. "\" style=\"background-image: url(pic/" . $catimgurl . $categoryrow["image"].");\" />";
+#		$catImg[$categoryid] = $catimg = "<img".($categoryrow['class_name'] ? " class=\"".$categoryrow['class_name']."\"" : "")." src=\"pic/cattrans.gif\" alt=\"" . $categoryrow["name"] . "\" title=\"" .$categoryrow["name"]. "\" style=\"background-image: url(pic/" . $catimgurl . $categoryrow["image"].");\" />";
+		$catImg[$categoryid] = $catimg = "<img".($categoryrow['class_name'] ? " class=\"".$categoryrow['class_name']."\"" : "")." src=\"pic/cattrans.gif\" alt=\"" . $categoryrow["name"] . "\" title=\"" .$categoryrow["name"]. "\" />";
 	}
 	if ($link) {
 		$catimg = "<a href=\"".$link."cat=" . $categoryid . "\">".$catimg."</a>";
