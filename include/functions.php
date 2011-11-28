@@ -2528,12 +2528,18 @@ function js_hd_config() {
   global $torrentmanage_class;
 
   $class = get_user_class();
-  $out = 'hb = {config : {user : {class : ' . $class . ', ';
-  $out .= 'canonicalClass : "' . get_user_class_name($class,false) . '"';
-  
-  $out .= '}, const : {';
-  $out .= 'torrentmanage_class : ' . $torrentmanage_class;
-  $out .= '}}}';
+  if ($class) {
+    $out = 'hb = {config : {user : {class : ' . $class . ', ';
+    $out .= 'canonicalClass : "' . get_user_class_name($class,false) . '"';
+    
+    $out .= '}, const : {';
+    $out .= 'torrentmanage_class : ' . $torrentmanage_class;
+    $out .= '}}}';
+  }
+  else {
+    $out = '';
+  }
+
   return $out;
 }
 
