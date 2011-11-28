@@ -2573,7 +2573,9 @@ function js_hb_config() {
       $config = array('user' => $user);
 
       if (!$const) {
-	$const = php_json_encode(array('torrentmanage_class' => $torrentmanage_class, 'cat_class' => get_category_row(), 'lang' => $lang_functions));
+	$pr = array('', array('name' => 'pro_free', 'lang' => 'text_free'), array('name'=>'pro_2up', 'lang'=>'text_two_times_up'), array('name' => 'pro_free2up', 'lang'=> 'text_free_two_times_up'), array('name' => 'pro_50pctdown', 'lang' => 'text_half_down'), array('name' => 'pro_50pctdown2up','lang' => 'text_half_down_two_up'), array('name' => 'pro_30pctdown', 'lang' => 'text_thirty_percent_down'));
+
+	$const = php_json_encode(array('torrentmanage_class' => $torrentmanage_class, 'cat_class' => get_category_row(), 'lang' => $lang_functions, 'pr' => $pr));
       }
       $out = 'hb = {config : ' . php_json_encode($config) . ', constant : ' . $const . '}';
     }
@@ -4743,7 +4745,7 @@ function get_torrent_promotion_append_sub($promotion = 1,$forcemode = "",$showti
 
 				$timeout = gettime(date("Y-m-d H:i:s", $futuretime), false, false, true, false, true);
 				if ($timeout)
-				$onmouseover = "<font color='#0000FF'>".$lang_functions['text_will_end_in'].$timeout."</font>";
+				$onmouseover = "<span class='pr-limit'>".$lang_functions['text_will_end_in'].$timeout."</span>";
 				else $promotion = 1;
 			}
 			break;
@@ -4760,7 +4762,7 @@ function get_torrent_promotion_append_sub($promotion = 1,$forcemode = "",$showti
 				}
 				$timeout = gettime(date("Y-m-d H:i:s", $futuretime), false, false, true, false, true);
 				if ($timeout)
-				$onmouseover = "<font color='#0000FF'>".$lang_functions['text_will_end_in'].$timeout."</font>";
+				$onmouseover = "<span class='pr-limit'>".$lang_functions['text_will_end_in'].$timeout."</span>";
 				else $promotion = 1;
 			}
 			break;
@@ -4777,7 +4779,7 @@ function get_torrent_promotion_append_sub($promotion = 1,$forcemode = "",$showti
 				}
 				$timeout = gettime(date("Y-m-d H:i:s", $futuretime), false, false, true, false, true);
 				if ($timeout)
-				$onmouseover = "<font color='#0000FF'>".$lang_functions['text_will_end_in'].$timeout."</font>";
+				$onmouseover = "<span class='pr-limit'>".$lang_functions['text_will_end_in'].$timeout."</span>";
 				else $promotion = 1;
 			}
 			break;
@@ -4794,7 +4796,7 @@ function get_torrent_promotion_append_sub($promotion = 1,$forcemode = "",$showti
 				}
 				$timeout = gettime(date("Y-m-d H:i:s", $futuretime), false, false, true, false, true);
 				if ($timeout)
-				$onmouseover = "<font color='#0000FF'>".$lang_functions['text_will_end_in'].$timeout."</font>";
+				$onmouseover = "<span class='pr-limit'>".$lang_functions['text_will_end_in'].$timeout."</span>";
 				else $promotion = 1;
 			}
 			break;
@@ -4811,7 +4813,7 @@ function get_torrent_promotion_append_sub($promotion = 1,$forcemode = "",$showti
 				}
 				$timeout = gettime(date("Y-m-d H:i:s", $futuretime), false, false, true, false, true);
 				if ($timeout)
-				$onmouseover = "<font color='#0000FF'>".$lang_functions['text_will_end_in'].$timeout."</font>";
+				$onmouseover = "<span class='pr-limit'>".$lang_functions['text_will_end_in'].$timeout."</span>";
 				else $promotion = 1;
 			}
 			break;
@@ -4828,7 +4830,7 @@ function get_torrent_promotion_append_sub($promotion = 1,$forcemode = "",$showti
 				}
 				$timeout = gettime(date("Y-m-d H:i:s", $futuretime), false, false, true, false, true);
 				if ($timeout)
-				$onmouseover = "<font color='#0000FF'>".$lang_functions['text_will_end_in'].$timeout."</font>";
+				$onmouseover = "<span class='pr-limit'>".$lang_functions['text_will_end_in'].$timeout."</span>";
 				else $promotion = 1;
 			}
 			break;
@@ -4859,7 +4861,7 @@ function get_torrent_promotion_append_sub($promotion = 1,$forcemode = "",$showti
 	}
 	*/
 	if((get_global_sp_state() == 1 && $promotion > 1) || get_global_sp_state() > 1) {
-		$sp_torrent = $onmouseover ? " [".$onmouseover."]" : " [<font color='#22cc22'>".$lang_functions['text_will_end_in'].$lang_functions['text_forever']."</font>]";
+		$sp_torrent = $onmouseover ? " [".$onmouseover."]" : " [<span class='pr-eternal'>".$lang_functions['text_will_end_in'].$lang_functions['text_forever']."</span>]";
 	}
 	return $sp_torrent;
 }

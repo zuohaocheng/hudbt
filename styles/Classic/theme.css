@@ -704,22 +704,16 @@ A.Peasant_Name:visited{color: #708090}
     padding: 0;
     margin:  0;
     zoom: 1;
-    display:inline !ie;
     }
 
 #torrents h2, #torrents h3 {
-    margin: 0 0;
+    margin: 0 0.5em 0 0;
+    display: inline-block;
+    display:inline !ie;
 }
 
 #torrents h3{
     font-weight: normal;
-}
-
-.c_tvseries {
-    background-image: url('pic/category/chd/iphone/tvseries_cn.png');
-    background-repeat: no-repeat;
-    width: 45px;
-    height: 46px;
 }
 
 .torrent-utilty-icons {
@@ -728,7 +722,13 @@ A.Peasant_Name:visited{color: #708090}
     right: 0;
 }
 
+.pr-eternal {
+    color: #2C2;
+}
 
+.pr-limit {
+    color: blue;
+}
 
 .free{color:#0c70e1}
 .twoup{color:#d2b8b8}
@@ -748,4 +748,4 @@ A.Peasant_Name:visited{color: #708090}
 .classic{color:#77b300}
 .recommended{color:#820084}
 .new{color:#ff0000}
-.striking{color:#ff0000}
+.striking{color:#ff0000;font-weight: bold;}

@@ -165,9 +165,9 @@ function torrenttable_api($res, $variant = "torrent", $swap_headings = false) {
 
 	if ($CURUSER['appendpicked'] != 'no' && $row['picktype'] != 'normal'){
 	  print('<picktype>' . $row['picktype'] . '</picktype>');
+	}
 
-	  //Added by bluemonster 20111026
-	  if($row['oday']=="yes")
+	if($row['oday']=="yes") {
 	    print('<oday>true</oday>');
 	}
 
@@ -190,7 +190,9 @@ function torrenttable_api($res, $variant = "torrent", $swap_headings = false) {
 	      $futuretime = strtotime($row["added"]) + $expirefree_torrent * 86400;
 	    }
 
-	    print('<until>' . date("Y-m-d H:i:s", $futuretime) . '</until>');
+	    $expire = date("Y-m-d H:i:s", $futuretime);
+	    $cexpire = gettime($expire, false, false, true, false, true);
+	    print('<expire>' . $expire . '<canonical>' .htmlspecialchars($cexpire) .'</canonical></expire>');
 	  }
 	  print('</pr>');
 
@@ -247,7 +249,7 @@ function torrenttable_api($res, $variant = "torrent", $swap_headings = false) {
 
 	$time = $row["added"];
 	print('<added>' . $time . '</added>');
-	$time = gettime($time,false,true);
+#	$time = gettime($time,false,true);
 
 
 	//size

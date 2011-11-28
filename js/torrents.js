@@ -35,13 +35,66 @@ $(function() {
 	    var bookmarked = (torrent.find('bookmarked').length !== 0);
 	    var bookmarkClass = bookmarked ? 'bookmark' : 'delbookmark';
 
-	    title.append($('<h2></h2>').append($('<a></a>', {
+	    var mainTitle = $('<h2></h2>').append($('<a></a>', {
 		href : 'details.php?id=' + id + '&hit=1',
 		title : torrent.find('name').text(),
 		text : torrent.find('name').text()
-	    }))).append($('<h3></h3>', {
+	    }));
+
+	    var desc = $('<h3></h3>', {
 		text : torrent.find('desc').text()
-	    })).append($('<div></div>').addClass('torrent-utilty-icons minor-list-vertical').append($('<ul></ul>').append($('<li></li>').append($('<a></a>', {
+	    });
+
+	    title.append($('<div></div>').append(mainTitle)).append($('<div></div>').append(desc));
+
+	    if (torrent.find('oday').length !== 0) {
+		var oday = $('<img></img>', {
+		    src : 'pic/ico_0day.gif',
+		    alt : lang.text_oday,
+		    title : lang.text_oday
+		});
+		mainTitle.after(oday);
+	    }
+
+	    if (torrent.find('banned').length !== 0) {
+		var oday = $('<span></span>', {
+		    text : '('
+		}).append($('<span></span>', {
+		    text : lang.text_banned,
+		    'class' : 'striking'
+		})).append(')');
+		mainTitle.after(oday);
+	    }
+
+	    var pr = torrent.find('pr');
+	    if (pr.length !== 0) {
+		var state = pr.attr('state');
+		var prDict = hb.constant.pr[state - 1];
+		var prLabel = $('<img></img>', {
+		    'class' : prDict.name,
+		    alt : lang[prDict.lang],
+		    src : 'pic/trans.gif'
+		});
+		mainTitle.after(prLabel);
+
+		var expire = pr.find('expire');
+		var $expire = $('<span></span>', {text : '['});
+		var $time = $('<span></span>', {text : lang.text_will_end_in});
+		if (expire.length !== 0) {
+		    $time.attr('title', expire.text());
+		    $time.append(decodeURIComponent(expire.find('canonical').text()));
+		    $time.addClass('pr-limit');
+		}
+		else {
+		    $time.append(lang.text_forever);
+		    $time.addClass('pr-eternal');
+		}
+		$expire.append($time).append(']');
+		desc.after($expire);
+	    }
+
+
+	    title.append($('<div></div>').addClass('torrent-utilty-icons minor-list-vertical').append($('<ul></ul>').append($('<li></li>').append($('<a></a>', {
 		href : 'download.php?id=' + id + '&hit=1',
 	    }).append($('<img></img>', {
 		src : "pic/trans.gif",
@@ -126,9 +179,12 @@ $(function() {
 	    var user = owner.find('user');
 	    if (user.length !== 0) {
 		if (owner.attr('anonymous') === 'true') {
-		    towner.append('<br />');
+		    towner.append('<br />(');
 		}
 		towner.append(user_out(user));
+		if (owner.attr('anonymous') === 'true') {
+		    towner.append(')');
+		}
 	    }
 	    tr.append(towner);
 
@@ -141,7 +197,7 @@ $(function() {
 		    title : lang.text_delete,
 		    src : 'pic/trans.gif'
 		}).addClass('staff_delete')))).append($('<li></li>').append($('<a></a>', {
-		    href : 'edit.php?id=' + id/* + '&returnto=' + encodeURIComponent*/
+		    href : 'edit.php?id=' + id + '&returnto=' + encodeURIComponent(document.location.pathname + document.location.search)
 		}).append($('<img></img>', {
 		    alt : 'E',
 		    title : lang.text_edit,
