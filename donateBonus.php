@@ -1,5 +1,6 @@
 <?php
 ob_start(); //Do not delete this line
+header('Content-type: application/json');
 require_once("include/bittorrent.php");
 dbconn();
 $amount = (int) $_GET['amount'];

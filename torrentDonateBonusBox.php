@@ -12,9 +12,9 @@
 }
 #to_donate a {
 	width: 42px;
-	display: block;
 }
 .donate {
+	display: block;
 	float: left;
 	height: 22px;
 	margin: 6px;
@@ -82,7 +82,7 @@ if($doanterCount) {
 	$donateListHTML = '';
 	foreach($donaterRecodes as $donateInfo) {
 		$amount += $donateInfo['amount'];
-		$donateListHTML .= "<div id=\"donater_{$donateInfo['donater_id']}\"  class=\"donate{$donateInfo['amount']} donate\" title=\"{$donateInfo['message']} \n[{$donateInfo['amount']} 魔力值] {$donateInfo['action_date']}\">{$donateInfo['donater']}</div>";
+		$donateListHTML .= "<a id=\"donater_{$donateInfo['donater_id']}\"  class=\"donate{$donateInfo['amount']} donate\" title=\"{$donateInfo['message']} \n[{$donateInfo['amount']} 魔力值] {$donateInfo['action_date']}\" href='userdetails.php?id=" . $donateInfo['donater_id'] . "'>{$donateInfo['donater']}</a>";
 	}
 	
 	if($CURUSER['id'] == $row['owner']) {
@@ -112,7 +112,7 @@ $('#to_donate a').each(function() {
 	if(bonus < to_donate) {
 	    alert('你的魔力值不足，谢谢你的好心，继续努力吧~');
 	} else if(confirm('确认向种子发布者捐赠 ' + to_donate +' 魔力值吗？')) {
-	    var url = '/donateBonus.php';
+	    var url = 'donateBonus.php';
 	    var data = {amount: to_donate, torrent_id : torrent_id, type: 'torrent'};
 	    $.getJSON(url, data, function(data) {
 		if(data.status == 9) {
