@@ -227,11 +227,18 @@ if ($count) {
 	$swap_headings = $_GET["swaph"];
 
 	if ($sectiontype == $browsecatmode)
-		torrenttable($res, "torrents", $swap_headings);
+	  torrenttable($res, "torrents", $swap_headings);
 	elseif ($sectiontype == $specialcatmode) 
-		torrenttable($res, "music");
+	  torrenttable($res, "music", $swap_headings);
 	else 
-		torrenttable($res, "bookmarks");
+	  torrenttable($res, "bookmarks", $swap_headings);
+
+	if ($swap_headings) {
+	  ?><script type="text/javascript">
+	  hb.config.swaph = true;
+	  </script>
+	  <?php
+	}
 	
 	print($pagerbottom);
 	hotmenu();

@@ -642,7 +642,6 @@ A.Peasant_Name:visited{color: #708090}
 	font-family: tahoma, arial, helvetica, sans-serif;
 }
 
-
 .minor-list ul {
     display:inline;
     margin: 0px;
@@ -692,20 +691,51 @@ A.Peasant_Name:visited{color: #708090}
     }
 
 #torrents h2, #torrents h3 {
-    margin: 0 0.5em 0 0;
+    padding: 0;
+    margin: 0 0.5em;
     display: inline-block;
     display:inline !ie;
+    white-space: nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
 }
 
 #torrents h3{
     font-weight: normal;
 }
 
+td.torrent>div {
+    width: 500px;
+}
+
+td.torrent .limit-width {
+    width: 95%;
+}
+
+td.torrent>div, .torrent-title {
+    position: relative; 
+    zoom:1;
+}
+
+
 .torrent-utilty-icons {
     position: absolute;
     top: 0;
     right: 0;
 }
+
+ul.prs {
+    display:inline-block;
+    position:absolute;
+    right:0;
+    display:inline !ie;
+}
+
+ul.prs li {
+    padding: 0 0.2em;
+    margin: 0;
+}
+
 
 .pr-eternal {
     color: #2C2;
@@ -715,22 +745,37 @@ A.Peasant_Name:visited{color: #708090}
     color: blue;
 }
 
+#expand-pr {
+    margin-left: 1.5em;
+    margin-bottom: 0.5em;
+}
+
+td.category-icon {
+    padding: 0;
+    vertical-align: middle;
+}
+
 .free{color:#0c70e1}
 .twoup{color:#aaaaaa}
 .twoupfree{color:#99cc66}
 .halfdown{color:#7c7ff6}
 .twouphalfdown{color:#7ad6ea}
 .thirtypercent{color:#70328d}
-.oday{color:#009933}//Added by bluemonster 20111031 
+.oday{color:#009933}/*Added by bluemonster 20111031 */
 .free_bg{background-color:#cae8f6}
 .twoup_bg{background-color:#dddddd}
 .twoupfree_bg{background-color:#ccff99}
 .halfdown_bg{background-color:#cccdf8}
 .twouphalfdown_bg{background-color: #96dbea}
 .thirtypercentdown_bg{background-color:#ddc3ea}
-.oday_bg{color:#dddddd}//Added by bluemonster 20111031 
+.oday_bg{color:#dddddd}/*Added by bluemonster 20111031 */
 .hot{color:#e78d0f}
 .classic{color:#77b300}
 .recommended{color:#820084}
 .new{color:#ff0000}
-.striking{color:#ff0000;font-weight: bold;}
+.striking{color:#ff0000;}
+
+.torrent-label, .pr-eternal, .pr-limit, .free, .twoup, .twoupfree, .halfdown, .twouphalfdown, .thirtypercent, .oday, .free_bg, .twoup_bg, .twoupfree_bg, .halfdown_bg, .twouphalfdown_bg, .thirtypercentdown_bg, .oday_bg, .hot, .classic, .recommended, .new, .striking {
+    font-weight: bold;
+    white-space: nowrap;
+}

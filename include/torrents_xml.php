@@ -179,17 +179,11 @@ function torrenttable_api($res, $variant = "torrent", $swap_headings = false) {
 	  print('<banned>true</banned>');
 	}
 
-	if ($row['sp_state'] != 1) {
-	  print('<pr state="' . $row['sp_state'] . '">');
+	list($pr_state, $futuretime) = get_pr_state($row['sp_state'], $row['added'], $row['promotion_time_type'], $row['promotion_until']);
+	if ($pr_state != 1) {
+	  print('<pr state="' . $pr_state . '">');
 
-	  if ( $row['promotion_time_type'] != 1) {
-	    global $expirefree_torrent;
-	    if ( $row['promotion_time_type'] == 2) {
-	      $futuretime = strtotime( $row['promotion_until']);
-	    } else {
-	      $futuretime = strtotime($row["added"]) + $expirefree_torrent * 86400;
-	    }
-
+	  if ($futuretime != NULL) {
 	    $expire = date("Y-m-d H:i:s", $futuretime);
 	    $cexpire = gettime($expire, false, false, true, false, true);
 	    print('<expire><raw>' . $expire . '</raw><canonical>' .htmlspecialchars($cexpire) .'</canonical></expire>');
@@ -197,10 +191,6 @@ function torrenttable_api($res, $variant = "torrent", $swap_headings = false) {
 	  print('</pr>');
 
 	}
-
-	  
-
-
 
 	/* if ($wait) */
 	/*   { */

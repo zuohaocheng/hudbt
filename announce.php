@@ -230,91 +230,91 @@ else // continue an existing session
 		}
 	}
 
-	if (!$is_cheater && ($trueupthis > 0 || $truedownthis > 0))
-	{
-		$global_promotion_state = get_global_sp_state();
-		if($global_promotion_state == 1)// Normal, see individual torrent
-		{
-			if($torrent['sp_state']==3) //2X
-			{
-				$USERUPDATESET[] = "uploaded = uploaded + 2*$trueupthis";
-				$USERUPDATESET[] = "downloaded = downloaded + $truedownthis";
-			}
-			elseif($torrent['sp_state']==4) //2X Free
-			{
-				$USERUPDATESET[] = "uploaded = uploaded + 2*$trueupthis";
-			}
-			elseif($torrent['sp_state']==6) //2X 50%
-			{
-				$USERUPDATESET[] = "uploaded = uploaded + 2*$trueupthis";
-				$USERUPDATESET[] = "downloaded = downloaded + $truedownthis/2";
-			}
-			else{
-				if ($torrent['owner'] == $userid && $uploaderdouble_torrent > 0)
-					$upthis = $trueupthis * $uploaderdouble_torrent;
+	if (!$is_cheater && ($trueupthis > 0 || $truedownthis > 0)) {
+	  /* $global_promotion_state = get_global_sp_state(); */
+	  /* if($global_promotion_state == 1)// Normal, see individual torrent */
+	  /*   { */
+	  list($pr_state) = get_pr_state($promotion, $added, $promotionTimeType, $promotionUntil);
+	  if($pr_state==3) //2X
+	    {
+	      $USERUPDATESET[] = "uploaded = uploaded + 2*$trueupthis";
+	      $USERUPDATESET[] = "downloaded = downloaded + $truedownthis";
+	    }
+	  elseif($pr_state==4) //2X Free
+	    {
+	      $USERUPDATESET[] = "uploaded = uploaded + 2*$trueupthis";
+	    }
+	  elseif($pr_state==6) //2X 50%
+	    {
+	      $USERUPDATESET[] = "uploaded = uploaded + 2*$trueupthis";
+	      $USERUPDATESET[] = "downloaded = downloaded + $truedownthis/2";
+	    }
+	  else{
+	    if ($torrent['owner'] == $userid && $uploaderdouble_torrent > 0)
+	      $upthis = $trueupthis * $uploaderdouble_torrent;
 
-				if($torrent['sp_state']==2) //Free
-				{
-					$USERUPDATESET[] = "uploaded = uploaded + $upthis";
-				}
-				elseif($torrent['sp_state']==5) //50%
-				{
-					$USERUPDATESET[] = "uploaded = uploaded + $upthis";
-					$USERUPDATESET[] = "downloaded = downloaded + $truedownthis/2";
-				}
-				elseif($torrent['sp_state']==7) //30%
-				{
-					$USERUPDATESET[] = "uploaded = uploaded + $upthis";
-					$USERUPDATESET[] = "downloaded = downloaded + $truedownthis*3/10";
-				}
-				elseif($torrent['sp_state']==1) //Normal
-				{
-					$USERUPDATESET[] = "uploaded = uploaded + $upthis";
-					$USERUPDATESET[] = "downloaded = downloaded + $truedownthis";
-				}
-			}
-		}
-		elseif($global_promotion_state == 2) //Free
-		{
-			if ($torrent['owner'] == $userid && $uploaderdouble_torrent > 0)
-				$upthis = $trueupthis * $uploaderdouble_torrent;
-			$USERUPDATESET[] = "uploaded = uploaded + $upthis";
-		}
-		elseif($global_promotion_state == 3) //2X
-		{
-			if ($uploaderdouble_torrent > 2 && $torrent['owner'] == $userid && $uploaderdouble_torrent > 0)
-				$upthis = $trueupthis * $uploaderdouble_torrent;
-			else $upthis = 2*$trueupthis;
-			$USERUPDATESET[] = "uploaded = uploaded + $upthis";
-			$USERUPDATESET[] = "downloaded = downloaded + $truedownthis";
-		}
-		elseif($global_promotion_state == 4) //2X Free
-		{
-			if ($uploaderdouble_torrent > 2 && $torrent['owner'] == $userid && $uploaderdouble_torrent > 0)
-				$upthis = $trueupthis * $uploaderdouble_torrent;
-			else $upthis = 2*$trueupthis;
-			$USERUPDATESET[] = "uploaded = uploaded + $upthis";
-		}
-		elseif($global_promotion_state == 5){ // 50%
-			if ($torrent['owner'] == $userid && $uploaderdouble_torrent > 0)
-				$upthis = $trueupthis * $uploaderdouble_torrent;
-			$USERUPDATESET[] = "uploaded = uploaded + $upthis";
-			$USERUPDATESET[] = "downloaded = downloaded + $truedownthis/2";
-		}
-		elseif($global_promotion_state == 6){ //2X 50%
-			if ($uploaderdouble_torrent > 2 && $torrent['owner'] == $userid && $uploaderdouble_torrent > 0)
-				$upthis = $trueupthis * $uploaderdouble_torrent;
-			else $upthis = 2*$trueupthis;
-			$USERUPDATESET[] = "uploaded = uploaded + $upthis";
-			$USERUPDATESET[] = "downloaded = downloaded + $truedownthis/2";
-		}
-		elseif($global_promotion_state == 7){ //30%
-			if ($torrent['owner'] == $userid && $uploaderdouble_torrent > 0)
-				$upthis = $trueupthis * $uploaderdouble_torrent;
-			$USERUPDATESET[] = "uploaded = uploaded + $upthis";
-			$USERUPDATESET[] = "downloaded = downloaded + $truedownthis*3/10";
-		}
+	    if($pr_state==2) //Free
+	      {
+		$USERUPDATESET[] = "uploaded = uploaded + $upthis";
+	      }
+	    elseif($pr_state==5) //50%
+	      {
+		$USERUPDATESET[] = "uploaded = uploaded + $upthis";
+		$USERUPDATESET[] = "downloaded = downloaded + $truedownthis/2";
+	      }
+	    elseif($pr_state==7) //30%
+	      {
+		$USERUPDATESET[] = "uploaded = uploaded + $upthis";
+		$USERUPDATESET[] = "downloaded = downloaded + $truedownthis*3/10";
+	      }
+	    elseif($pr_state==1) //Normal
+	      {
+		$USERUPDATESET[] = "uploaded = uploaded + $upthis";
+		$USERUPDATESET[] = "downloaded = downloaded + $truedownthis";
+	      }
+	  }
 	}
+	/*   elseif($global_promotion_state == 2) //Free */
+	/*     { */
+	/*       if ($torrent['owner'] == $userid && $uploaderdouble_torrent > 0) */
+	/* 	$upthis = $trueupthis * $uploaderdouble_torrent; */
+	/*       $USERUPDATESET[] = "uploaded = uploaded + $upthis"; */
+	/*     } */
+	/*   elseif($global_promotion_state == 3) //2X */
+	/*     { */
+	/*       if ($uploaderdouble_torrent > 2 && $torrent['owner'] == $userid && $uploaderdouble_torrent > 0) */
+	/* 	$upthis = $trueupthis * $uploaderdouble_torrent; */
+	/*       else $upthis = 2*$trueupthis; */
+	/*       $USERUPDATESET[] = "uploaded = uploaded + $upthis"; */
+	/*       $USERUPDATESET[] = "downloaded = downloaded + $truedownthis"; */
+	/*     } */
+	/*   elseif($global_promotion_state == 4) //2X Free */
+	/*     { */
+	/*       if ($uploaderdouble_torrent > 2 && $torrent['owner'] == $userid && $uploaderdouble_torrent > 0) */
+	/* 	$upthis = $trueupthis * $uploaderdouble_torrent; */
+	/*       else $upthis = 2*$trueupthis; */
+	/*       $USERUPDATESET[] = "uploaded = uploaded + $upthis"; */
+	/*     } */
+	/*   elseif($global_promotion_state == 5){ // 50% */
+	/*     if ($torrent['owner'] == $userid && $uploaderdouble_torrent > 0) */
+	/*       $upthis = $trueupthis * $uploaderdouble_torrent; */
+	/*     $USERUPDATESET[] = "uploaded = uploaded + $upthis"; */
+	/*     $USERUPDATESET[] = "downloaded = downloaded + $truedownthis/2"; */
+	/*   } */
+	/*   elseif($global_promotion_state == 6){ //2X 50% */
+	/*     if ($uploaderdouble_torrent > 2 && $torrent['owner'] == $userid && $uploaderdouble_torrent > 0) */
+	/*       $upthis = $trueupthis * $uploaderdouble_torrent; */
+	/*     else $upthis = 2*$trueupthis; */
+	/*     $USERUPDATESET[] = "uploaded = uploaded + $upthis"; */
+	/*     $USERUPDATESET[] = "downloaded = downloaded + $truedownthis/2"; */
+	/*   } */
+	/*   elseif($global_promotion_state == 7){ //30% */
+	/*     if ($torrent['owner'] == $userid && $uploaderdouble_torrent > 0) */
+	/*       $upthis = $trueupthis * $uploaderdouble_torrent; */
+	/*     $USERUPDATESET[] = "uploaded = uploaded + $upthis"; */
+	/*     $USERUPDATESET[] = "downloaded = downloaded + $truedownthis*3/10"; */
+	/*   } */
+	/* } */
 }
 
 $dt = sqlesc(date("Y-m-d H:i:s"));

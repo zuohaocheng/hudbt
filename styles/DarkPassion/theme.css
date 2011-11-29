@@ -658,7 +658,6 @@ A.Peasant_Name:visited{color: #708090}
 	font-family: tahoma, arial, helvetica, sans-serif;
 }
 
-
 .minor-list ul {
     display:inline;
     margin: 0px;
@@ -708,30 +707,48 @@ A.Peasant_Name:visited{color: #708090}
     }
 
 #torrents h2, #torrents h3 {
+    padding: 0;
     margin: 0 0.5em;
     display: inline-block;
     display:inline !ie;
-    /* white-space: nowrap; */
-    /* overflow:hidden;  */
-    /* text-overflow:ellipsis; */
+    white-space: nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
 }
 
 #torrents h3{
     font-weight: normal;
 }
 
-td.torrent .limit-width {
-    width: 97%;
+td.torrent>div {
+    width: 500px;
 }
 
-td.torrent>div {
+td.torrent .limit-width {
+    width: 95%;
+}
+
+td.torrent>div, .torrent-title {
     position: relative; 
+    zoom:1;
 }
 
 .torrent-utilty-icons {
     position: absolute;
     top: 0;
     right: 0;
+}
+
+ul.prs {
+    display:inline-block;
+    position:absolute;
+    right:0;
+    display:inline !ie;
+}
+
+ul.prs li {
+    padding: 0 0.2em;
+    margin: 0;
 }
 
 .pr-eternal {

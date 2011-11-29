@@ -109,6 +109,11 @@ h2.transparentbg
 	background-color: transparent;
 	background-image: none
 }
+
+.torrent-title h2 {
+    color: black;
+}
+
 p
 {
 }
@@ -200,7 +205,8 @@ td.colhead, th.colhead
 	white-space:nowrap;
 	font-weight: bold;
 	color: #ffffff;
-	background-color: #2f4879
+	background-color: #2f4879;
+	
 }
 td.colhead a:link, th.colhead a:link {
     color: white;
@@ -231,7 +237,7 @@ td.colfollow
 {
 text-align: center;
 }
-table.torrents td.colhead
+table.torrents td.colhead, table.torrents th.colhead
 {
 text-align: center;
 }
@@ -271,11 +277,22 @@ form
 	font-weight: normal;
 	font-style: italic
 }
-font.gray
+.gray
 {
 	color: #aca899;
 	text-decoration: underline
 }
+
+.pages {
+    margin-top: 1.2em;
+    margin-bottom: 1.2em;
+    text-align:center;
+}
+
+.pagenumber {
+    font-weight: bold;
+}
+
 img
 {
 	border: 0;
@@ -668,6 +685,39 @@ A.Peasant_Name:visited{color: #708090}
 	font-family: tahoma, arial, helvetica, sans-serif;
 }
 
+.minor-list ul {
+    display:inline;
+    margin: 0px;
+    padding: 0px;
+    list-style: none;
+    list-style-type: none;
+    list-style-image: none;
+    vertical-align: middle !ie;
+    }
+
+.minor-list li {
+    display:inline-block;
+    line-height: 1.35em;
+    padding: 0 .5em;
+    /* border-left: 1px solid #AAA; */
+    margin: 0.3em 0;
+    zoom: 1;
+    display:inline !ie;
+    }
+
+.minor-list.list-seperator li {
+    border-left: 1px solid #AAA;
+}
+
+.minor-list li:first-child {
+    padding-left: .4em;
+    border-left: none;
+    }
+
+.minor-list .title {
+    padding-right: .5em;
+}
+
 .minor-list-vertical ul {
     margin: 0px;
     padding: 0px;
@@ -683,20 +733,50 @@ A.Peasant_Name:visited{color: #708090}
     zoom: 1;
     }
 
+
 #torrents h2, #torrents h3 {
-    margin: 0 0.5em 0 0;
+    padding: 0;
+    margin: 0 0.5em;
     display: inline-block;
     display:inline !ie;
+    white-space: nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
 }
 
 #torrents h3{
     font-weight: normal;
 }
 
+td.torrent>div {
+    width: 500px;
+}
+
+td.torrent .limit-width {
+    width: 95%;
+}
+
+td.torrent>div, .torrent-title {
+    position: relative; 
+    zoom:1;
+}
+
 .torrent-utilty-icons {
     position: absolute;
     top: 0;
     right: 0;
+}
+
+ul.prs {
+    display:inline-block;
+    position:absolute;
+    right:0;
+    display:inline !ie;
+}
+
+ul.prs li {
+    padding: 0 0.2em;
+    margin: 0;
 }
 
 .pr-eternal {
@@ -707,22 +787,37 @@ A.Peasant_Name:visited{color: #708090}
     color: blue;
 }
 
+#expand-pr {
+    margin-left: 1.5em;
+    margin-bottom: 0.5em;
+}
+
+td.category-icon {
+    padding: 0;
+    vertical-align: middle;
+}
+
 .free{color:#0c70e1}
 .twoup{color:#d2b8b8}
 .twoupfree{color:#99cc66}
 .halfdown{color:#7c7ff6}
 .twouphalfdown{color:#7ad6ea}
 .thirtypercent{color:#70328d}
-.oday{color:#009933}//Added by bluemonster 20111031
+.oday{color:#009933}/*Added by bluemonster 201110318*/
 .free_bg{background-color:#cae8f6}
 .twoup_bg{background-color:#ffecec}
 .twoupfree_bg{background-color:#ccff99}
 .halfdown_bg{background-color:#cccdf8}
 .twouphalfdown_bg{background-color: #96dbea}
 .thirtypercentdown_bg{background-color:#ddc3ea}
-.oday_bg{color:#dddddd}//Added by bluemonster 20111031 
+.oday_bg{color:#dddddd}/*Added by bluemonster 20111031 */
 .hot{color:#e78d0f}
 .classic{color:#77b300}
 .recommended{color:#820084}
 .new{color:#ff0000}
-.striking{color:#ff0000;font-weight: bold;}
+.striking{color:#ff0000;}
+
+.torrent-label, .pr-eternal, .pr-limit, .free, .twoup, .twoupfree, .halfdown, .twouphalfdown, .thirtypercent, .oday, .free_bg, .twoup_bg, .twoupfree_bg, .halfdown_bg, .twouphalfdown_bg, .thirtypercentdown_bg, .oday_bg, .hot, .classic, .recommended, .new, .striking {
+    font-weight: bold;
+    white-space: nowrap;
+}

@@ -4,13 +4,32 @@ $(function() {
     var surfix = '&format=xml';
     var lang = hb.constant.lang;
 
+    var setTitleWidth = function(targets) {
+	$.each(targets, function(idx, val) {
+	    var $this = $(val);
+	    var wThis = $this.width();
+
+	    var modifyCss = function(target, wDecorations) {
+		var ref = wThis - wDecorations - 6;
+		if (target.width() > ref) {
+		    target.css('width', ref + 'px');
+		}
+	    }
+
+	    modifyCss($this.find('h2'), $this.find('ul.prs').width() + $this.find('img.sticky').width());
+	    modifyCss($this.find('h3'), $($this.find('ul.prs')[1]).width());
+	});
+    };
+    setTitleWidth($('td.torrent div.limit-width.minor-list'));
+
     var get_func = function(res_x) {
-	console.log((new Date()).getTime());
+//	console.log((new Date()).getTime());
 	$("#pagerbottom").after($('<div></div>').addClass('pages')).hide();
 
 	var res = $(res_x);
 
 	var catDict = hb['constant'].cat_class;
+	var targetsAppearance = [];
 	res.find('torrent').each(function() {
 	    var torrent = $(this);
 	    var id = torrent.attr('id');
@@ -31,39 +50,52 @@ $(function() {
 	    tr.append(cat);
 
 	    var title_td = $('<td></td>').addClass('torrent');
-	    var title = $('<div></div>');
+	    var title_desc = $('<div></div>', {
+		'class' : 'limit-width minor-list'
+	    });
+
+
 	    var bookmarked = (torrent.find('bookmarked').length !== 0);
 	    var bookmarkClass = bookmarked ? 'bookmark' : 'delbookmark';
 
-	    var mainTitle = $('<h2></h2>').append($('<a></a>', {
+	    var textMainTitle = torrent.find('name').text();
+	    var textSubTitle = torrent.find('desc').text();
+
+	    if (hb.config.swaph) {
+		var buf = textMainTitle;
+		textMainTitle = textSubTitle;
+		textSubTitle = buf;
+	    }
+
+	    var mainTitle = $('<h2></h2>').addClass('transparentbg').append($('<a></a>', {
 		href : 'details.php?id=' + id + '&hit=1',
-		title : torrent.find('name').text(),
-		text : torrent.find('name').text()
+		title : textMainTitle,
+		text : textMainTitle
 	    }));
 
 	    var desc = $('<h3></h3>', {
-		text : torrent.find('desc').text()
+		text : textSubTitle,
+		title : textSubTitle
 	    });
 
-	    title.append($('<div></div>').addClass('limit-width').append(mainTitle)).append($('<div></div>').addClass('limit-width').append(desc));
+	    var $div_main = $('<div></div>').addClass('torrent-title').append(mainTitle);
+	    var $div_desc = $('<div></div>').addClass('torrent-title').append(desc);
+	    title_desc.append($div_main).append($div_desc);
+	    var title = $('<div></div>');
+	    title.append(title_desc);
+	    targetsAppearance.push(title_desc);
 
-	    if (torrent.find('oday').length !== 0) {
-		var oday = $('<img></img>', {
-		    src : 'pic/ico_0day.gif',
-		    alt : lang.text_oday,
-		    title : lang.text_oday
-		});
-		mainTitle.after(oday);
-	    }
+	    var mainTitleDecorators = $('<ul></ul>').addClass('prs');
+	    $div_main.append(mainTitleDecorators);
 
-	    if (torrent.find('banned').length !== 0) {
-		var oday = $('<span></span>', {
-		    text : '('
-		}).append($('<span></span>', {
-		    text : lang.text_banned,
-		    'class' : 'striking'
-		})).append(')');
-		mainTitle.after(oday);
+	    var picktype = torrent.find('picktype');
+	    if (picktype.length !== 0) {
+		var ptype = picktype.text()
+		var $ptype = $('<span></span>', {text : '['}).append($('<span></span>', {
+		    text : lang['text_' + ptype],
+		    'class' : ptype
+		})).append(']');
+		mainTitleDecorators.append($ptype.wrap('<li></li>'));
 	    }
 
 	    var pr = torrent.find('pr');
@@ -71,11 +103,11 @@ $(function() {
 		var state = pr.attr('state');
 		var prDict = hb.constant.pr[state - 1];
 		var prLabel = $('<img></img>', {
-		    'class' : prDict.name,
+		    'class' : 'pro_' + prDict.name,
 		    alt : lang[prDict.lang],
 		    src : 'pic/trans.gif'
 		});
-		mainTitle.after(prLabel);
+		mainTitleDecorators.append(prLabel.wrap('<li></li>'));
 
 		var expire = pr.find('expire');
 		var $expire = $('<span></span>', {text : '['});
@@ -90,17 +122,28 @@ $(function() {
 		    $time.addClass('pr-eternal');
 		}
 		$expire.append($time).append(']');
-		desc.after($expire);
+		desc.after($('<ul></ul>', {
+		    'class' : 'prs'
+		}).append($expire.wrap('<li></li>')));
 	    }
 
-	    var picktype = torrent.find('picktype');
-	    if (picktype.length !== 0) {
-		var ptype = picktype.text()
-		var $ptype = $('<span></span>', {text : '['}).append($('<span></span>', {
-		    text : lang['text_' + ptype],
-		    'class' : ptype
-		})).append(']');
-		mainTitle.after($ptype);
+	    if (torrent.find('oday').length !== 0) {
+		var oday = $('<img></img>', {
+		    src : 'pic/ico_0day.gif',
+		    alt : lang.text_oday,
+		    title : lang.text_oday
+		});
+		mainTitleDecorators.append(oday.wrap('<li></li>'));
+	    }
+
+	    if (torrent.find('banned').length !== 0) {
+		var oday = $('<span></span>', {
+		    text : '('
+		}).append($('<span></span>', {
+		    text : lang.text_banned,
+		    'class' : 'striking'
+		})).append(')');
+		mainTitleDecorators.append(oday.wrap('<li></li>'));
 	    }
 
 
@@ -219,7 +262,7 @@ $(function() {
 	    target.append(tr);
 	});
 
-
+	setTitleWidth(targetsAppearance);
 
 	var cont = res.find('continue');
 	if (cont.length !== 0) {
@@ -234,7 +277,7 @@ $(function() {
 		}
 	    });
 	}
-	console.log((new Date()).getTime());
+//	console.log((new Date()).getTime());
     }
 
     if (hb.nextpage !== '') {
@@ -242,7 +285,6 @@ $(function() {
             var loc = $(document).scrollTop() + $(window).height();
             if(loc > targetH) {
 		var uri = hb.nextpage + surfix;
-		uri = 'http://211.69.198.67/hudbt/torrents.php?inclbookmarked=0&incldead=0&spstate=0&page=0&format=xml'
 
 		$.get(uri, get_func);
 		$(document).unbind('scroll');
