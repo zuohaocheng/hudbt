@@ -2291,7 +2291,7 @@ else
 		</td>
 		<td class="clear">
 		<!--Added by bluemonster 20111122-->
-			<iframe width="100%" height="64" frameborder="0" allowtransparency="true" marginwidth="0" marginheight="0" scrolling="no" border="0" src="http://widget.weibo.com/relationship/followbutton.php?language=zh_cn&width=100%&height=64&uid=2485535487&style=4&btn=red&dpc=1"></iframe>
+			<!-- <iframe width="100%" height="64" frameborder="0" allowtransparency="true" marginwidth="0" marginheight="0" scrolling="no" border="0" src="http://widget.weibo.com/relationship/followbutton.php?language=zh_cn&width=100%&height=64&uid=2485535487&style=4&btn=red&dpc=1"></iframe> -->
 		</td>
 		<td class="clear nowrap" align="right" valign="middle">
 <?php if ($Advertisement->enable_ad()){

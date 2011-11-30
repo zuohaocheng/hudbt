@@ -739,6 +739,7 @@ A.Peasant_Name:visited{color: #708090}
     padding: 0;
     margin: 0 0.5em;
     display: inline-block;
+    zoom: 1;
     display:inline !ie;
     white-space: nowrap;
     overflow:hidden;

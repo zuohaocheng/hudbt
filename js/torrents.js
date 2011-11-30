@@ -5,34 +5,73 @@ $(function() {
     var lang = hb.constant.lang;
 
     var setTitleWidth;
-    if ($.browser.msie) {
-	setTitleWidth = function(targets) {
-	    return false;
-	}
+    if ($.browser.msie && $.browser.version < 9) {
+    	setTitleWidth = function(targets) {
+    	    return false;
+    	}
     }
     else {
+	var modifyCss = function(wThis, target, wDecorations) {
+	    var ref = wThis - wDecorations - 6;
+	    if (target[0].offsetWidth > ref) {
+		target.css('width', ref + 'px');
+	    }
+	}
+
 	setTitleWidth = function(targets) {
 	$.each(targets, function(idx, val) {
 	    var $this = $(val);
-	    var wThis = $this.width();
+	    var wThis = val.offsetWidth;
 
-	    var modifyCss = function(target, wDecorations) {
-		var ref = wThis - wDecorations - 6;
-		if (target.width() > ref) {
-		    target.css('width', ref + 'px');
-		}
+	    var $prs = $this.find('ul.prs');
+	    var pr0 = $prs[0];
+	    var pr1 = $prs[1];
+	    var img = $this.find('img.sticky')[0];
+
+	    var wTitleD = 0;
+	    var wDescD = 0;
+	    if (pr0) {
+		wTitleD += pr0.offsetWidth;
+	    }
+	    if (img) {
+		wTitleD += img.offsetWidth;
+	    }
+	    if (pr1) {
+		wDescD += pr1.offsetWidth;
 	    }
 
-	    modifyCss($this.find('h2'), $this.find('ul.prs').width() + $this.find('img.sticky').width());
-	    modifyCss($this.find('h3'), $($this.find('ul.prs')[1]).width());
+	    modifyCss(wThis, $this.find('h2'), wTitleD);
+	    modifyCss(wThis, $this.find('h3'), wDescD);
 	});
 	};
 	setTitleWidth($('td.torrent div.limit-width.minor-list'));
     }
 
+    var user_out = function(user) {
+	var userClass = user.find('canonicalClass').text();
+	var userCss = userClass.replace(/\s/g, '') + '_Name username';
+	var out = $('<span></span>', {
+	    'class' : 'nowrap'
+	}).append($('<a></a>', {
+	    href : 'userdetails.php?id=' + user.attr('id'),
+	    text : user.find('username').text(),
+	    'class' : userCss
+	}));
+
+	if (user.find('donor').text() === 'true') {
+	    out.append($('<img></img>', {
+		src : "pic/trans.gif",
+		alt : 'Donor',
+		'class' : 'star'
+	    }));
+	}
+	return out;
+    };
+
     var get_func = function(res_x) {
-//	console.log((new Date()).getTime());
-	$("#pagerbottom").after($('<div></div>').addClass('pages')).hide();
+	$("#pagerbottom").after($('<div></div>', {
+	    'class' : 'pages'
+	})).hide();
 
 	var res = $(res_x);
 
@@ -53,11 +92,14 @@ $(function() {
 		    src : "pic/cattrans.gif",
 		    alt : catProp.name,
 		    title : catProp.name,
-		}).addClass(catProp.class_name)));
+		    'class' : catProp.class_name
+		})));
 	    }
 	    tr.append(cat);
 
-	    var title_td = $('<td></td>').addClass('torrent');
+	    var title_td = $('<td></td>', {
+		'class' : 'torrent'
+	    });
 	    var title_desc = $('<div></div>', {
 		'class' : 'limit-width minor-list'
 	    });
@@ -75,7 +117,9 @@ $(function() {
 		textSubTitle = buf;
 	    }
 
-	    var mainTitle = $('<h2></h2>').addClass('transparentbg').append($('<a></a>', {
+	    var mainTitle = $('<h2></h2>', {
+		'class' : 'transparentbg'
+	    }).append($('<a></a>', {
 		href : 'details.php?id=' + id + '&hit=1',
 		title : textMainTitle,
 		text : textMainTitle
@@ -85,15 +129,24 @@ $(function() {
 		text : textSubTitle,
 		title : textSubTitle
 	    });
+	    if (textSubTitle === '') {
+		desc.addClass('placeholder');
+	    }
 
-	    var $div_main = $('<div></div>').addClass('torrent-title').append(mainTitle);
-	    var $div_desc = $('<div></div>').addClass('torrent-title').append(desc);
+	    var $div_main = $('<div></div>', {
+		'class' : 'torrent-title'
+	    }).append(mainTitle);
+	    var $div_desc = $('<div></div>', {
+		'class' : 'torrent-title'
+	    }).append(desc);
 	    title_desc.append($div_main).append($div_desc);
 	    var title = $('<div></div>');
 	    title.append(title_desc);
 	    targetsAppearance.push(title_desc);
 
-	    var mainTitleDecorators = $('<ul></ul>').addClass('prs');
+	    var mainTitleDecorators = $('<ul></ul>', {
+		'class' : 'prs'
+	    });
 	    $div_main.append(mainTitleDecorators);
 
 	    var picktype = torrent.find('picktype');
@@ -155,23 +208,27 @@ $(function() {
 	    }
 
 
-	    title.append($('<div></div>').addClass('torrent-utilty-icons minor-list-vertical').append($('<ul></ul>').append($('<li></li>').append($('<a></a>', {
+	    title.append($('<div></div>', {
+		'class' : 'torrent-utilty-icons minor-list-vertical'
+	    }).append($('<ul></ul>').append($('<li></li>').append($('<a></a>', {
 		href : 'download.php?id=' + id + '&hit=1',
 	    }).append($('<img></img>', {
 		src : "pic/trans.gif",
 		alt : 'download',
-		title : 'title_download_torrent'
-	    }).addClass('download')))).append($('<li></li>').append($('<a></a>', {
+		title : 'title_download_torrent',
+		'class' : 'download'
+	    })))).append($('<li></li>').append($('<a></a>', {
 		id : 'bookmark' + id,
 		href : 'javascript: bookmark(' + id + ');'
 	    }).append($('<img></img>', {
 		src : "pic/trans.gif",
-	    }).addClass(bookmarkClass))))));
+		'class' : bookmarkClass
+	    }))))));
 	    title_td.append(title);
 	    tr.append(title_td);
 
 	    var addNumber = function(str, hrefZero, href) {
-		var comment = $('<td></td>').addClass('rowfollow');
+		var comment = $('<td></td>', {'class' : 'rowfollow'});
 		var comments_num = parseInt(str);
 		var href;
 		if (comments_num === 0) {
@@ -196,11 +253,11 @@ $(function() {
 
 	    tr.append(addNumber(torrent.find('comments').text(), 'comment.php?action=add&pid=' + id + '&type=torrent', 'details.php?id=' + id + '&hit=1&cmtpage=1#startcomments'));
 
-	    var time = $('<td></td>').addClass('rowfollow');
+	    var time = $('<td></td>', {'class' : 'rowfollow'});
 	    time.text(torrent.find('added').text());
 	    tr.append(time);
 
-	    var size = $('<td></td>').addClass('rowfollow');
+	    var size = $('<td></td>', {'class' : 'rowfollow'});
 	    size.html(decodeURIComponent(torrent.find('size canonical').text()));
 	    tr.append(size);
 
@@ -216,27 +273,12 @@ $(function() {
 	    var completed = addNumber(torrent.find('times_completed').text(), '', 'viewsnatches.php?id=' + id);
 	    tr.append(completed);
 
-	    var towner = $('<td></td>').addClass('rowfollow');
+	    var towner = $('<td></td>', {'class' : 'rowfollow'});
 	    var owner = torrent.find('owner');
 	    if (owner.attr('anonymous') === 'true') {
 		towner.append(lang.text_anonymous);
 	    }
 	    
-	    var user_out = function(user) {
-		var out = $('<span></span>').addClass('nowrap').append($('<a></a>', {
-		    href : 'userdetails.php?id=' + user.attr('id'),
-		    text : user.find('username').text()
-		}).addClass(user.find('canonicalClass').text() + '_Name').addClass('username'));
-
-		if (user.find('donor').text() === 'true') {
-		    out.append($('<img></img>', {
-			src : "pic/trans.gif",
-			alt : 'Donor'
-		    }).addClass('star'));
-		}
-		return out;
-	    };
-
 	    var user = owner.find('user');
 	    if (user.length !== 0) {
 		if (owner.attr('anonymous') === 'true') {
@@ -250,20 +292,24 @@ $(function() {
 	    tr.append(towner);
 
 	    if (hb.config.user['class'] >= hb.constant.torrentmanage_class) {
-		var edit = $('<td></td>').addClass('rowfollow');
-		edit.append($('<div></div>').addClass('minor-list-vertical').append($('<ul></ul>').append($('<li></li>').append($('<a></a>', {
+		var edit = $('<td></td>', {'class' : 'rowfollow'});
+		edit.append($('<div></div>', {
+		    'class' : 'minor-list-vertical'
+		}).append($('<ul></ul>').append($('<li></li>').append($('<a></a>', {
 		    href : 'fastdelete.php?id=' + id
 		}).append($('<img></img>', {
 		    alt : 'D',
 		    title : lang.text_delete,
-		    src : 'pic/trans.gif'
-		}).addClass('staff_delete')))).append($('<li></li>').append($('<a></a>', {
+		    src : 'pic/trans.gif',
+		    'class' : 'staff_delete'
+		})))).append($('<li></li>').append($('<a></a>', {
 		    href : 'edit.php?id=' + id + '&returnto=' + encodeURIComponent(document.location.pathname + document.location.search)
 		}).append($('<img></img>', {
 		    alt : 'E',
 		    title : lang.text_edit,
-		    src : 'pic/trans.gif'
-		}).addClass('staff_edit'))))));
+		    src : 'pic/trans.gif',
+		    'class' : 'staff_edit'
+		}))))));
 		tr.append(edit);
 	    }
 	    
@@ -285,7 +331,6 @@ $(function() {
 		}
 	    });
 	}
-//	console.log((new Date()).getTime());
     }
 
     if (hb.nextpage !== '') {
