@@ -714,14 +714,19 @@ A.Peasant_Name:visited{color: #708090}
     white-space: nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
+    width: 495px;
 }
 
 #torrents h3{
     font-weight: normal;
 }
 
-td.torrent>div {
-    width: 500px;
+h3.placeholder {
+    height:1em;
+}
+
+td.torrent, td.torrent>div {
+    width: 525px;
 }
 
 td.torrent .limit-width {
@@ -731,6 +736,7 @@ td.torrent .limit-width {
 td.torrent>div, .torrent-title {
     position: relative; 
     zoom:1;
+    white-space: nowrap;
 }
 
 .torrent-utilty-icons {

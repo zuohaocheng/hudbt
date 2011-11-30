@@ -4,7 +4,14 @@ $(function() {
     var surfix = '&format=xml';
     var lang = hb.constant.lang;
 
-    var setTitleWidth = function(targets) {
+    var setTitleWidth;
+    if ($.browser.msie) {
+	setTitleWidth = function(targets) {
+	    return false;
+	}
+    }
+    else {
+	setTitleWidth = function(targets) {
 	$.each(targets, function(idx, val) {
 	    var $this = $(val);
 	    var wThis = $this.width();
@@ -19,8 +26,9 @@ $(function() {
 	    modifyCss($this.find('h2'), $this.find('ul.prs').width() + $this.find('img.sticky').width());
 	    modifyCss($this.find('h3'), $($this.find('ul.prs')[1]).width());
 	});
-    };
-    setTitleWidth($('td.torrent div.limit-width.minor-list'));
+	};
+	setTitleWidth($('td.torrent div.limit-width.minor-list'));
+    }
 
     var get_func = function(res_x) {
 //	console.log((new Date()).getTime());
@@ -61,7 +69,7 @@ $(function() {
 	    var textMainTitle = torrent.find('name').text();
 	    var textSubTitle = torrent.find('desc').text();
 
-	    if (hb.config.swaph) {
+	    if (hb.config.swaph && textSubTitle !== '') {
 		var buf = textMainTitle;
 		textMainTitle = textSubTitle;
 		textSubTitle = buf;

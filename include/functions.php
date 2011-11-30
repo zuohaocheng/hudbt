@@ -3259,7 +3259,7 @@ while ($row = mysql_fetch_assoc($res))
 				$dissmall_descr=mb_substr($dissmall_descr, 0, $max_lenght_of_small_descr-2,"UTF-8") . "..";
 			}
 
-		if ($swap_headings) {
+		if ($swap_headings && $dissmall_descr != '') {
 		   $buf = $dispname;
 		   $dispname = $dissmall_descr;
 		   $dissmall_descr = $buf;
@@ -3302,7 +3302,8 @@ while ($row = mysql_fetch_assoc($res))
 		print($banned_torrent.$picked_torrent.$sp_torrent .'</ul></div><div class="torrent-title">' );
 		if ($displaysmalldescr){
 			//small descr
-			print($dissmall_descr == "" ? "" : "<h3>".htmlspecialchars($dissmall_descr)) . '</h3>';
+		  $escape_desc = htmlspecialchars($dissmall_descr);
+		  print($dissmall_descr == "" ? "<h3 class='placeholder'></h3>" : '<h3 title="' . $escape_desc . '">'. $escape_desc . '</h3>');
 		}
 		print('<ul class="prs">' . $sp_torrent_sub . '</ul></div></div>');
 
