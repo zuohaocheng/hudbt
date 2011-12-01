@@ -804,6 +804,28 @@ td.category-icon {
     vertical-align: middle;
 }
 
+.back-to-top {
+    height: 50px;
+    width: 50px;
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    margin-left: 10px;
+    zoom: 1;
+    background: url("../back-to-top.png") 0 0 no-repeat;
+
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    -o-border-radius: 3px;
+    border-radius: 3px;
+
+    opacity: 1; 
+}
+
+.back-to-top:hover {
+    background-position: -50px 0;
+}
+
 .free{color:#0c70e1}
 .twoup{color:#d2b8b8}
 .twoupfree{color:#99cc66}
