@@ -31,7 +31,7 @@
 .donate_note {margin: 0;}
 </style>
 <tr>
-	<td rowspan=2 id="donating">捐赠魔力值</td>
+	<td rowspan=2 id="donating">捐赠魔力值<br /><a href='bonusDonations.php' style="font-weight:normal;">[查看我的捐赠历史]</a></td>
 	<td id="to_donate">
 <?php
 $torrent_id = (int) $_GET['id'];
@@ -117,11 +117,8 @@ $('#to_donate a').each(function() {
 	    $.getJSON(url, data, function(data) {
 		if(data.status == 9) {
 		    var newDonate = '<div class="donate'+ data.amount +' donate" id="donated_successfully" title="' + data.message + '\n[' + data.amount + ' 魔力值] ' + data.date + '">' + data.donater + '</div>';
-		    if($('#donater_list div').size() == 0) {
-			$('#donater_list').html(newDonate);
-		    } else {
-			$('#donater_list').append(newDonate);
-		    }
+		    $('#donater_list').append(newDonate);
+
 		    $('#to_donate').html("你已经于 " + data.date + " 对种子发布者进行过魔力值捐赠，谢谢你！");
 		} else if(data.status == 1) {
 		    alert('谢谢你，但是你的魔力值不足，继续努力吧。');

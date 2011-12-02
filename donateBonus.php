@@ -138,7 +138,7 @@ MESSAGE;
 	
 	
 	// Send PM to donater |->
-	$sqlSendPMToDonater = 'INSERT INTO messages (sender, receiver, added, subject, msg, unread, saved, location)'
+	/*	$sqlSendPMToDonater = 'INSERT INTO messages (sender, receiver, added, subject, msg, unread, saved, location)'
 	             .' VALUES'
 	             ." (0, {$donaterId}, '{$now}', '{$donaterSubject}', '{$donaterMessage}', 'yes', 'no', 1)";
 
@@ -147,7 +147,7 @@ MESSAGE;
 	$Cache->delete_value('user_'.$donaterId.'_inbox_count');
 
 	$sqlUpdatePMStatus = 'UPDATE users SET last_pm = NOW() WHERE id = '.$donaterId;
-	sql_query($sqlUpdatePMStatus);
+	sql_query($sqlUpdatePMStatus); */
 	// End send PM to donater ||
 	
 	// Send PM to receiver |->
@@ -177,4 +177,4 @@ $response = array(
 //  'message' => $status < 9 ? '' : 'I love the movie~'
   'date' => $now
 );
-echo json_encode($response);
+echo php_json_encode($response);

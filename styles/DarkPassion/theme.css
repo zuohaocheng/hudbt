@@ -181,7 +181,7 @@ td.comment
 	padding-top: 10pt;
 	text-align: left
 }
-td.colhead, th.colhead
+td.colhead, th
 {
 	white-space:nowrap;
 	font-weight: bold;
@@ -213,7 +213,7 @@ td.colfollow
 {
 text-align: center;
 }
-table.torrents td.colhead, table.torrents th.colhead
+table.torrents td.colhead, table.torrents th
 {
 text-align: center;
 }
@@ -705,6 +705,11 @@ A.Peasant_Name:visited{color: #708090}
     margin:  0;
     zoom: 1;
     }
+
+#searchbox-right li {
+    margin: 1.5em 0;
+    
+}
 
 #torrents h2, #torrents h3 {
     padding: 0;

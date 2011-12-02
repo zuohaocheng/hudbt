@@ -16,7 +16,7 @@ if ($allsec != 1 || $enablespecial != 'yes'){ //do not print searchbox if showin
 		<tbody id="ksearchboxmain" style="display: none;" >
 		<tr>
 			<td class="rowfollow" align="left">
-				<table>
+				<table style="margin-bottom:5px;">
 					<?php
 						function printcat($name, $listarray, $cbname, $wherelistina, $btname, $showimg = false)
 						{
@@ -55,62 +55,35 @@ if ($allsec != 1 || $enablespecial != 'yes'){ //do not print searchbox if showin
 					}
 					?>
 				</table>
+<?php hotmenu() ?>
 			</td>
 			
-			<td class="rowfollow" valign="middle">
-				<table>
-					<tr>
-						<td class="bottom" style="padding: 1px;padding-left: 10px">
-							<span class="medium"><?php echo $lang_torrents['text_show_dead_active'] ?></span>
-						</td>
-				 	</tr>				
-					<tr>
-						<td class="bottom" style="padding: 1px;padding-left: 10px">
-							<select class="med" name="incldead" style="width: 100px;">
-								<option value="0"><?php echo $lang_torrents['select_including_dead'] ?></option>
-								<option value="1"<?php print($include_dead == 1 ? " selected=\"selected\"" : ""); ?>><?php echo $lang_torrents['select_active'] ?> </option>
-								<option value="2"<?php print($include_dead == 2 ? " selected=\"selected\"" : ""); ?>><?php echo $lang_torrents['select_dead'] ?></option>
-							</select>
-						</td>
-				 	</tr>
-				 	<tr>
-						<td class="bottom" style="padding: 1px;padding-left: 10px">
-							<br />
-						</td>
-				 	</tr>
-					<tr>
-						<td class="bottom" style="padding: 1px;padding-left: 10px">
-							<font class="medium"><?php echo $lang_torrents['text_show_special_torrents'] ?></font>
-						</td>
-				 	</tr>
-				 	<tr>
-						<td class="bottom" style="padding: 1px;padding-left: 10px">
-							<select class="med" name="spstate" style="width: 100px;">
-								<option value="0"><?php echo $lang_torrents['select_all'] ?></option>
-<?php echo promotion_selection($special_state, 0)?>
-							</select>
-						</td>
-					</tr>
-				 	<tr>
-						<td class="bottom" style="padding: 1px;padding-left: 10px">
-							<br />
-						</td>
-					</tr>
-					<tr>
-						<td class="bottom" style="padding: 1px;padding-left: 10px">
-							<font class="medium"><?php echo $lang_torrents['text_show_bookmarked'] ?></font>
-						</td>
-				 	</tr>
-				 	<tr>
-						<td class="bottom" style="padding: 1px;padding-left: 10px">
-							<select class="med" name="inclbookmarked" style="width: 100px;">
-								<option value="0"><?php echo $lang_torrents['select_all'] ?></option>
-								<option value="1"<?php print($inclbookmarked == 1 ? " selected=\"selected\"" : ""); ?>><?php echo $lang_torrents['select_bookmarked'] ?></option>
-								<option value="2"<?php print($inclbookmarked == 2 ? " selected=\"selected\"" : ""); ?>><?php echo $lang_torrents['select_bookmarked_exclude'] ?></option>
-							</select>
-						</td>
-					</tr>
-				</table>
+			<td class="rowfollow minor-list-vertical" id="searchbox-right" style="vertical-align: middle;">
+			  <ul><li>
+			    <span class="medium"><?php echo $lang_torrents['text_show_dead_active'] ?></span><br />
+			    <select class="med" name="incldead" style="width: 100px;">
+			      <option value="0"><?php echo $lang_torrents['select_including_dead'] ?></option>
+			      <option value="1"<?php print($include_dead == 1 ? " selected=\"selected\"" : ""); ?>><?php echo $lang_torrents['select_active'] ?> </option>
+			      <option value="2"<?php print($include_dead == 2 ? " selected=\"selected\"" : ""); ?>><?php echo $lang_torrents['select_dead'] ?></option>
+			    </select>
+			    </li><li>
+			    <span class="medium"><?php echo $lang_torrents['text_show_special_torrents'] ?></span><br />
+			    <select class="med" name="spstate" style="width: 100px;">
+			      <option value="0"><?php echo $lang_torrents['select_all'] ?></option>
+			      <?php echo promotion_selection($special_state, 0)?>
+			    </select>
+			    </li><li>
+			    <span class="medium"><?php echo $lang_torrents['text_show_bookmarked'] ?></span><br />
+			    <select class="med" name="inclbookmarked" style="width: 100px;">
+			      <option value="0"><?php echo $lang_torrents['select_all'] ?></option>
+			      <option value="1"<?php print($inclbookmarked == 1 ? " selected=\"selected\"" : ""); ?>><?php echo $lang_torrents['select_bookmarked'] ?></option>
+			      <option value="2"<?php print($inclbookmarked == 2 ? " selected=\"selected\"" : ""); ?>><?php echo $lang_torrents['select_bookmarked_exclude'] ?></option>
+			    </select>
+			    </li><li>
+					<input type="checkbox" id="swaph" name="swaph" value="1" <?php if ($_GET['swaph']){echo 'checked="checked"';}?> />
+			    <a href="?swaph=1">以中文为主标题</a>
+			  </li>
+			</ul>
 			</td>
 		</tr>
 		</tbody>
@@ -123,7 +96,7 @@ if ($allsec != 1 || $enablespecial != 'yes'){ //do not print searchbox if showin
 							<?php echo $lang_torrents['text_search'] ?>&nbsp;&nbsp;
 						</td>
 						<td class="embedded">
-							<table>
+							<table><tbody>
 								<tr>
 									<td class="embedded">
 										<input id="searchinput" name="search" type="text" value="<?php echo  $searchstr_ori ?>" autocomplete="off" style="width: 200px" ondblclick="suggest(event.keyCode,this.value);" onkeyup="suggest(event.keyCode,this.value);" onkeypress="return noenter(event.keyCode);"/>
@@ -133,7 +106,7 @@ if ($allsec != 1 || $enablespecial != 'yes'){ //do not print searchbox if showin
 										</div>
 									</td>
 								</tr>
-							</table>
+							      </tbody></table>
 						</td>
 						<td class="embedded">
 							<?php echo "&nbsp;" . $lang_torrents['text_in'] ?>
@@ -201,8 +174,6 @@ echo $Cache->next_row();
 <?php
 }
 
-hotmenu();
-
 
 	if ($Advertisement->enable_ad()){
 			$belowsearchboxad = $Advertisement->get_ad('belowsearchbox');
@@ -245,7 +216,6 @@ if ($count) {
 	}
 	
 	print($pagerbottom);
-#	hotmenu();
 }
 else {
 	if (isset($searchstr)) {
@@ -270,18 +240,13 @@ stdfoot();
 
 function hotmenu(){
 ?>
-<div id="hotboxmain" style="position:relative;border-top-width:0;">
-  <div style="border-top-width:0;text-align:center;width:77px;margin:0;padding:0.5em;position:absolute;right:0;top:0;" class="table td text biglink"><a id="show-hotbox" href="#"><img class="plus" src="pic/trans.gif" alt="Show/Hide">显示</a></div>
-
-  <div id="hotbox" style="display:none;">
-  <div style="margin-bottom:1em;"><a class="biglink" href="torrents.php?swaph=1">显示中文为主标题</a></div>
+  <div style="border-top:1px solid gray;" class="text biglink">
   <div class="minor-list"><span class="title"><span class="align">热门资源</span>:</span><ul><li><a class="biglink" href=hot.php?cat=>最多做种</a></li><li><a class="biglink" href=hot.php?cat=1>电影</a></li><li><a class="biglink" href=hot.php?cat=2>剧集</a></li><li><a class="biglink" href=hot.php?cat=3>动漫</a></li><li><a class="biglink" href=hot.php?cat=4>游戏</a></li><li><a class="biglink" href=hot.php?cat=5>综艺</a></li>
   <li><a class="biglink" href=hot.php?cat=6>资料</a></li><li><a class="biglink" href=hot.php?cat=7>体育</a></li><li><a class="biglink" href=hot.php?cat=8>音乐</a></li><li><a class="biglink" href=hot.php?cat=9>纪录片</a></li><li><a class="biglink" href=hot.php?cat=10>软件</a></li><li><a class="biglink" href=hot.php?cat=11>MTV</a>
 </ul></div>
 <div class="minor-list"><span class="title">最近热门:</span><ul><li><a class="biglink" href=hot.php?time=1>3天</a></li><li><a class="biglink" href=hot.php?time=2>1个月</a></li><li><a class="biglink" href=hot.php?time=3>3个月</a></li></ul></div>
 
 <div class="minor-list"><span class="title"><span class="align">促&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;销</span>:</span><ul><li><a href=hot.php?sp=2><span class="free">免费</span></a></li><li><a href=hot.php?sp=3><span class="twoup">2x上传</span></a></li><li><a href=hot.php?sp=4><span class="twoupfree">免费&2x上传 </span></a></li><li><a href=hot.php?sp=5><span class="halfdown">50%下载</span></a></li><li><a href=hot.php?sp=6><span class="twouphalfdown">50%下载&2x上传</span></a></li><li><a href=hot.php?sp=7><span class="thirtypercent">30%下载</span></a></ul></div>
-</div>
 </div>
 <?php
 }

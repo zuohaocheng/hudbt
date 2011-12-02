@@ -65,11 +65,11 @@ else{
 <div style="margin-top: 8px">
 <?php
 	print("<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\" align=\"center\" width=\"940\" id=\"uploaders-works\"><thead><tr>");
-	print("<th class=\"colhead\">".$lang_uploaders['col_username']."</th>");
-	print("<th class=\"colhead\">".$lang_uploaders['col_torrents_size']."</th>");
-	print("<th class=\"colhead\">".$lang_uploaders['col_torrents_num']."</th>");
-	print("<th class=\"colhead\">".$lang_uploaders['col_last_upload_time']."</th>");
-	print("<th class=\"colhead\">".$lang_uploaders['col_last_upload']."</th>");
+	print("<th>".$lang_uploaders['col_username']."</th>");
+	print("<th>".$lang_uploaders['col_torrents_size']."</th>");
+	print("<th>".$lang_uploaders['col_torrents_num']."</th>");
+	print("<th>".$lang_uploaders['col_last_upload_time']."</th>");
+	print("<th>".$lang_uploaders['col_last_upload']."</th>");
 	print("</tr></thead><tbody>");
 	$res = sql_query("SELECT users.id AS userid, users.username AS username, COUNT(torrents.id) AS torrent_count, SUM(torrents.size) AS torrent_size FROM torrents LEFT JOIN users ON torrents.owner=users.id WHERE users.class >= ".UC_UPLOADER." AND torrents.added > ".sqlesc($sqlstarttime)." AND torrents.added < ".sqlesc($sqlendtime)." GROUP BY userid ORDER BY ".$order);
 	$hasupuserid=array();
@@ -78,7 +78,7 @@ else{
 		$res2 = sql_query("SELECT torrents.id, torrents.name, torrents.added FROM torrents WHERE owner=".$row['userid']." ORDER BY id DESC LIMIT 1");
 		$row2 = mysql_fetch_array($res2);
 		print("<tr>");
-		print("<th class=\"colfollow\">".get_username($row['userid'], false, true, true, false, false, true)."</th>");
+		print("<td class=\"colfollow\">".get_username($row['userid'], false, true, true, false, false, true)."</td>");
 		print("<td class=\"colfollow\">".($row['torrent_size'] ? mksize($row['torrent_size']) : "0")."</td>");
 		print("<td class=\"colfollow\">".$row['torrent_count']."</td>");
 		print("<td class=\"colfollow\">".($row2['added'] ? gettime($row2['added']) : $lang_uploaders['text_not_available'])."</td>");
@@ -93,7 +93,7 @@ else{
 		$res2 = sql_query("SELECT torrents.id, torrents.name, torrents.added FROM torrents WHERE owner=".$row['userid']." ORDER BY id DESC LIMIT 1");
 		$row2 = mysql_fetch_array($res2);
 		print("<tr>");
-		print("<th class=\"colfollow\">".get_username($row['userid'], false, true, true, false, false, true)."</th>");
+		print("<td class=\"colfollow\">".get_username($row['userid'], false, true, true, false, false, true)."</td>");
 		print("<td class=\"colfollow\">".($row['torrent_size'] ? mksize($row['torrent_size']) : "0")."</td>");
 		print("<td class=\"colfollow\">".$row['torrent_count']."</td>");
 		print("<td class=\"colfollow\">".($row2['added'] ? gettime($row2['added']) : $lang_uploaders['text_not_available'])."</td>");
