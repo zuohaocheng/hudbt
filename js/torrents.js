@@ -74,6 +74,7 @@ $(function() {
 	var backtotop = $('<a></a>', {
 	    href : '#',
 	    'class' : 'back-to-top',
+	    title : '回到页首',
 	    style : 'display: none'
 	});
 	$('#footer').after(backtotop);
@@ -369,4 +370,27 @@ $(function() {
     	    }
 	});
     }
+
+    var showHotbox = $('#show-hotbox');
+    var hotboxInvisible = $('#hotbox').css('display') === 'none';
+
+    showHotbox.click(function(e) {
+	e.preventDefault();
+	if (hotboxInvisible) {
+	    $('#hotboxmain').addClass('table td text biglink');
+	    $('#hotbox').slideDown();
+	    showHotbox.parent().removeClass();
+	    showHotbox.attr('text', '隐藏');
+	    showHotbox.find('img').addClass('minus').removeClass('plus');
+	}
+	else {
+	    $('#hotbox').slideUp(function() {
+		$('#hotboxmain').removeClass();
+		showHotbox.parent().addClass('table td text biglink');
+		showHotbox.attr('text', '显示');
+		showHotbox.find('img').removeClass('minus').addClass('plus');
+	    });
+	}
+	hotboxInvisible = !hotboxInvisible;
+    });
 });

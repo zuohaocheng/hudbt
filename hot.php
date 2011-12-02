@@ -12,7 +12,7 @@ if ($_GET['cat']){
    	switch($_GET['cat']) {
 		case '1': $where=$where . " AND ( torrents.category=401 OR torrents.category=413 OR torrents.category=414 OR torrents.category=415 )" ; break;
 		case '2': $where=$where . " AND ( torrents.category=402 OR torrents.category=416 OR torrents.category=417 OR torrents.category=418 )" ; break;
-		case '3': $where=$where . " AND ( torrents.category=405 )" ; break;
+		case '3': $where=$where . " AND ( torrents.category=405 OR torrents.category=427 OR torrents.category=428 OR torrents.category=429 )" ; break;
 		case '4': $where=$where . " AND ( torrents.category=410  )" ; break;
 		case '5': $where=$where . " AND ( torrents.category=403 OR torrents.category=419 OR torrents.category=420 OR torrents.category=421  )" ; break;
 		case '6': $where=$where . " AND ( torrents.category=412 OR torrents.category=409 )" ; break;

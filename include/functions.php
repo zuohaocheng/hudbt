@@ -1112,13 +1112,18 @@ function get_torrent_2_user_value($user_snatched_arr)
 	return $torrent_2_user_value;
 }
 
-function cur_user_check () {
+function cur_user_check ($redir) {
 	global $lang_functions;
 	global $CURUSER;
-	if ($CURUSER)
-	{
-		sql_query("UPDATE users SET lang=" . get_langid_from_langcookie() . " WHERE id = ". $CURUSER['id']);
-		stderr ($lang_functions['std_permission_denied'], $lang_functions['std_already_logged_in']);
+	if ($CURUSER) {
+	  if ($redir) {
+	    header("Location: $redir");
+	    exit(0);
+	  }
+	  else {
+	    sql_query("UPDATE users SET lang=" . get_langid_from_langcookie() . " WHERE id = ". $CURUSER['id']);
+	    stderr ($lang_functions['std_permission_denied'], $lang_functions['std_already_logged_in']);
+	  }	
 	}
 }
 
@@ -2283,7 +2288,7 @@ else
 {
 ?>
 			
-			<div class="logo_img"><a href="/"><img src="<?php echo $logo_main?>" alt="<?php echo htmlspecialchars($SITENAME)?>" title="<?php echo htmlspecialchars($SITENAME)?> - <?php echo htmlspecialchars($SLOGAN)?>" /></a></div>	
+<div class="logo_img"><a href="<?php echo "//$BASEURL/index.php" ?>"><img src="<?php echo $logo_main?>" alt="<?php echo htmlspecialchars($SITENAME)?>" title="<?php echo htmlspecialchars($SITENAME)?> - <?php echo htmlspecialchars($SLOGAN)?>" /></a></div>	
 			
 <?php
 }

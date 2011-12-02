@@ -13,7 +13,7 @@ if ($langid)
 	}
 }
 require_once(get_langfile_path("", false, $CURLANGDIR));
-cur_user_check ();
+cur_user_check ("//$BASEURL/index.php");
 $type = $_GET['type'];
 if ($type == 'invite')
 {

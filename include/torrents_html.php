@@ -200,6 +200,10 @@ echo $Cache->next_row();
 
 <?php
 }
+
+hotmenu();
+
+
 	if ($Advertisement->enable_ad()){
 			$belowsearchboxad = $Advertisement->get_ad('belowsearchbox');
 			echo "<div align=\"center\" style=\"margin-top: 10px\" id=\"ad_belowsearchbox\">".$belowsearchboxad[0]."</div>";
@@ -241,7 +245,7 @@ if ($count) {
 	}
 	
 	print($pagerbottom);
-	hotmenu();
+#	hotmenu();
 }
 else {
 	if (isset($searchstr)) {
@@ -265,14 +269,20 @@ print('<script type="text/javascript">hb.nextpage = "'. $next_page_href .'"</scr
 stdfoot();
 
 function hotmenu(){
-   print('<div class="table td text biglink">');
-	print('<div style="margin-bottom:1em;"><a class="biglink" href="torrents.php?swaph=1">显示中文为主标题</a></div>');
-	print('<div class="minor-list"><span class="title"><span class="align">热门资源</span>:</span><ul><li><a class="biglink" href=hot.php?cat=>最多做种</a></li><li><a class="biglink" href=hot.php?cat=1>电影</a></li><li><a class="biglink" href=hot.php?cat=2>剧集</a></li><li><a class="biglink" href=hot.php?cat=3>动漫</a></li><li><a class="biglink" href=hot.php?cat=4>游戏</a></li><li><a class="biglink" href=hot.php?cat=5>综艺</a></li>');
-	print('<li><a class="biglink" href=hot.php?cat=6>资料</a></li><li><a class="biglink" href=hot.php?cat=7>体育</a></li><li><a class="biglink" href=hot.php?cat=8>音乐</a></li><li><a class="biglink" href=hot.php?cat=9>纪录片</a></li><li><a class="biglink" href=hot.php?cat=10>软件</a></li><li><a class="biglink" href=hot.php?cat=11>MTV</a>');
-	print('</ul></div>');
-	print('<div class="minor-list"><span class="title">最近热门:</span><ul><li><a class="biglink" href=hot.php?time=1>3天</a></li><li><a class="biglink" href=hot.php?time=2>1个月</a></li><li><a class="biglink" href=hot.php?time=3>3个月</a></li></ul></div>');
+?>
+<div id="hotboxmain" style="position:relative;border-top-width:0;">
+  <div style="border-top-width:0;text-align:center;width:77px;margin:0;padding:0.5em;position:absolute;right:0;top:0;" class="table td text biglink"><a id="show-hotbox" href="#"><img class="plus" src="pic/trans.gif" alt="Show/Hide">显示</a></div>
 
-	print('<div class="minor-list"><span class="title"><span class="align">促&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;销</span>:</span><ul><li><a href=hot.php?sp=2><span class="free">免费</span></a></li><li><a href=hot.php?sp=3><span class="twoup">2x上传</span></a></li><li><a href=hot.php?sp=4><span class="twoupfree">免费&2x上传 </span></a></li><li><a href=hot.php?sp=5><span class="halfdown">50%下载</span></a></li><li><a href=hot.php?sp=6><span class="twouphalfdown">50%下载&2x上传</span></a></li><li><a href=hot.php?sp=7><span class="thirtypercent">30%下载</span></a></ul></div>');
-	print("</div>");
+  <div id="hotbox" style="display:none;">
+  <div style="margin-bottom:1em;"><a class="biglink" href="torrents.php?swaph=1">显示中文为主标题</a></div>
+  <div class="minor-list"><span class="title"><span class="align">热门资源</span>:</span><ul><li><a class="biglink" href=hot.php?cat=>最多做种</a></li><li><a class="biglink" href=hot.php?cat=1>电影</a></li><li><a class="biglink" href=hot.php?cat=2>剧集</a></li><li><a class="biglink" href=hot.php?cat=3>动漫</a></li><li><a class="biglink" href=hot.php?cat=4>游戏</a></li><li><a class="biglink" href=hot.php?cat=5>综艺</a></li>
+  <li><a class="biglink" href=hot.php?cat=6>资料</a></li><li><a class="biglink" href=hot.php?cat=7>体育</a></li><li><a class="biglink" href=hot.php?cat=8>音乐</a></li><li><a class="biglink" href=hot.php?cat=9>纪录片</a></li><li><a class="biglink" href=hot.php?cat=10>软件</a></li><li><a class="biglink" href=hot.php?cat=11>MTV</a>
+</ul></div>
+<div class="minor-list"><span class="title">最近热门:</span><ul><li><a class="biglink" href=hot.php?time=1>3天</a></li><li><a class="biglink" href=hot.php?time=2>1个月</a></li><li><a class="biglink" href=hot.php?time=3>3个月</a></li></ul></div>
+
+<div class="minor-list"><span class="title"><span class="align">促&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;销</span>:</span><ul><li><a href=hot.php?sp=2><span class="free">免费</span></a></li><li><a href=hot.php?sp=3><span class="twoup">2x上传</span></a></li><li><a href=hot.php?sp=4><span class="twoupfree">免费&2x上传 </span></a></li><li><a href=hot.php?sp=5><span class="halfdown">50%下载</span></a></li><li><a href=hot.php?sp=6><span class="twouphalfdown">50%下载&2x上传</span></a></li><li><a href=hot.php?sp=7><span class="thirtypercent">30%下载</span></a></ul></div>
+</div>
+</div>
+<?php
 }
 ?>

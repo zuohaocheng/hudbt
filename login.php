@@ -13,9 +13,17 @@ if ($langid)
 	}
 }
 require_once(get_langfile_path("", false, $CURLANGDIR));
-
 failedloginscheck ();
-cur_user_check () ;
+
+unset($returnto);
+if (!empty($_GET["returnto"])) {
+  $returnto = $_GET["returnto"];
+}
+else {
+  $returnto = "//$BASEURL/index.php";
+}
+
+cur_user_check ($returnto) ;
 stdhead($lang_login['head_login']);
 
 $s = "<select name=\"sitelanguage\" onchange='submit()'>\n";
@@ -36,13 +44,14 @@ print("<div align=\"right\">".$lang_login['text_select_lang']. $s . "</div>");
 </form>
 <?php
 
-unset($returnto);
 if (!empty($_GET["returnto"])) {
-	$returnto = $_GET["returnto"];
 	if (!$_GET["nowarn"]) {
 		print("<h1>" . $lang_login['h1_not_logged_in']. "</h1>\n");
 		print("<p><b>" . $lang_login['p_error']. "</b> " . $lang_login['p_after_logged_in']. "</p>\n");
 	}
+}
+else {
+  unset($returnto);
 }
 ?>
 <form method="post" action="takelogin.php">

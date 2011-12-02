@@ -818,6 +818,8 @@ else
 	$sql = "SELECT COUNT(*), categories.mode FROM torrents LEFT JOIN categories ON category = categories.id " . ($search_area == 3 || $column == "owner" ? "LEFT JOIN users ON torrents.owner = users.id " : "") . $where." GROUP BY categories.mode";
 }
 
+
+
 $res = sql_query($sql) or die(mysql_error());
 $count = 0;
 while($row = mysql_fetch_array($res))
