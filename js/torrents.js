@@ -21,7 +21,7 @@ $(function() {
 	setTitleWidth = function(targets) {
 	$.each(targets, function(idx, val) {
 	    var $this = $(val);
-	    var wThis = val.offsetWidth;
+	    var wThis = $this.width();
 
 	    var $prs = $this.find('ul.prs');
 	    var pr0 = $prs[0];
@@ -323,7 +323,7 @@ $(function() {
 			}
 			tr.append(towner);
 
-			if (hb.config.user['class'] >= hb.constant.torrentmanage_class) {
+			if (parseInt(hb.config.user['class']) >= hb.constant.torrentmanage_class) {
 			    var edit = $('<td></td>', {'class' : 'rowfollow'});
 			    edit.append($('<div></div>', {
 				'class' : 'minor-list-vertical'
