@@ -54,6 +54,7 @@ $lang_mybonus = array
 	'text_say_thanks' => "说谢谢 = ",
 	'text_receive_thanks' => "收到感谢 = ",
 	'text_funbox_reward' => "发布的趣味盒内容获得用户较高的评价（详见规则）",
+	'text_donations_reward' => '发布的种子受到他人的捐赠，可<a href="bonusDonations.php">在此查询捐赠历史</a>' ,
 	'text_howto_get_karma_four' => "</ul>
 <h1>注意点</h1>
 <ul>",

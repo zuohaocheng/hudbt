@@ -144,7 +144,7 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 	$enabled = $user["enabled"] == 'yes';
 	$moviepicker = $user["picker"] == 'yes';
 
-	print("<h1 style='margin:0px'>" . get_username($user[id], true,false) . $country."</h1>");
+	print('<h1 id="detail-username">' . get_username($user[id], true,false) . $country."</h1>");
 
 	if (!$enabled)
 	print("<p><b>".$lang_userdetails['text_account_disabled_note']."</b></p>");

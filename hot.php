@@ -94,10 +94,10 @@ print("</br></br>");
 print("<div>促&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;销: </div><B><a href=?sp=2><font class='free'>&nbsp;&nbsp;<U> 免 费 </U></font></a>&nbsp;&nbsp;<a href=?sp=3><font class='twoup'><U>2x上传</U></font></a><div>&nbsp;&nbsp;<a href=?sp=4><font class='twoupfree'><U>免费&2x上传</U> </font></a></div>&nbsp;&nbsp;<a href=?sp=5><font class='halfdown'><U>50%下载</U></font></a>&nbsp;&nbsp;&nbsp;&nbsp;<div><a href=?sp=6><font class='twouphalfdown'>&nbsp;&nbsp;<U>50%下载&2x上传</U></font></a></div>&nbsp;&nbsp;<a href=?sp=7><font class='thirtypercent'><U>30%下载</U></font></a></B>");
 print("</td></tr>");
 print("</table></td><td width='940' valign='top'>");
-print("<table width=\"940\" class=\"main\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\"><tr><td class=\"embedded\">");
+
 torrenttable($res, "torrents");
 
-print("</td></tr></table></td></tr></table>");
+print("</td></tr></table>");
 print($pagerbottom);
 stdfoot();
 ?>

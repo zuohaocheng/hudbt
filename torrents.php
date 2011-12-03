@@ -178,29 +178,28 @@ elseif ($include_dead == 2)		//dead
 }
 // ----------------- end include dead ---------------------//
 if ($_GET)
-	$special_state = 0 + $_GET["spstate"];
+  $special_state = 0 + $_GET["spstate"];
 elseif ($CURUSER['notifs']){
-	if (strpos($CURUSER['notifs'], "[spstate=0]") !== false)
-		$special_state = 0;
-	elseif (strpos($CURUSER['notifs'], "[spstate=1]") !== false)
-		$special_state = 1;
-	elseif (strpos($CURUSER['notifs'], "[spstate=2]") !== false)
-		$special_state = 2;
-	elseif (strpos($CURUSER['notifs'], "[spstate=3]") !== false)
-		$special_state = 3;
-	elseif (strpos($CURUSER['notifs'], "[spstate=4]") !== false)
-		$special_state = 4;
-	elseif (strpos($CURUSER['notifs'], "[spstate=5]") !== false)
-		$special_state = 5;
-	elseif (strpos($CURUSER['notifs'], "[spstate=6]") !== false)
-		$special_state = 6;
-	elseif (strpos($CURUSER['notifs'], "[spstate=6]") !== false)
-		$special_state = 7;
+  if (strpos($CURUSER['notifs'], "[spstate=0]") !== false)
+    $special_state = 0;
+  elseif (strpos($CURUSER['notifs'], "[spstate=1]") !== false)
+    $special_state = 1;
+  elseif (strpos($CURUSER['notifs'], "[spstate=2]") !== false)
+    $special_state = 2;
+  elseif (strpos($CURUSER['notifs'], "[spstate=3]") !== false)
+    $special_state = 3;
+  elseif (strpos($CURUSER['notifs'], "[spstate=4]") !== false)
+    $special_state = 4;
+  elseif (strpos($CURUSER['notifs'], "[spstate=5]") !== false)
+    $special_state = 5;
+  elseif (strpos($CURUSER['notifs'], "[spstate=6]") !== false)
+    $special_state = 6;
+  elseif (strpos($CURUSER['notifs'], "[spstate=6]") !== false)
+    $special_state = 7;
 }
 else $special_state = 0;
 
-if (!in_array($special_state,array(0,1,2,3,4,5,6,7)))
-{
+if (!in_array($special_state,array(0,1,2,3,4,5,6,7))) {
 	$special_state = 0;
 	write_log("User " . $CURUSER["username"] . "," . $CURUSER["ip"] . " is hacking spstate field in " . $_SERVER['SCRIPT_NAME'], 'mod');
 }

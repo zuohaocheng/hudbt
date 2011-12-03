@@ -695,10 +695,10 @@ $res = sql_query("SELECT offers.id, offers.userid, offers.name, offers.added, of
 $num = mysql_num_rows($res);
 
 stdhead($lang_offers['head_offers']);
-begin_main_frame();
-begin_frame($lang_offers['text_offers_section'], true,10,"100%","center");
 
-print("<p align=\"left\"><b><font size=\"5\">".$lang_offers['text_rules']."</font></b></p>\n");
+print('<h1>' . $lang_offers['text_offers_section'] . '</h1>');
+print('<div class="table td" style="margin-bottom:2em;padding:10px;">');
+print("<h2>".$lang_offers['text_rules']."</h2>\n");
 print("<div align=\"left\"><ul>");
 print("<li>".$lang_offers['text_rule_one_one'].get_user_class_name($upload_class, false, true, true).$lang_offers['text_rule_one_two'].get_user_class_name($addoffer_class, false, true, true).$lang_offers['text_rule_one_three']."</li>\n");
 print("<li>".$lang_offers['text_rule_two_one']."<b>".$minoffervotes."</b>".$lang_offers['text_rule_two_two']."</li>\n");
@@ -718,8 +718,8 @@ foreach ($cats as $cat) {
 	$catdropdown .= ">" . htmlspecialchars($cat["name"]) . "</option>\n";
 }
 print("<select name=\"category\"><option value=\"0\">".$lang_offers['select_show_all']."</option>".$catdropdown."</select>&nbsp;&nbsp;<input type=\"submit\" class=\"btn\" value=\"".$lang_offers['submit_search']."\" /></form></div>");
-end_frame();
-print("<br /><br />");
+
+print('</div>');
 
 $last_offer = strtotime($CURUSER['last_offer']);
 if (!$num)

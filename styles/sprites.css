@@ -474,11 +474,3 @@ img.sltbar
 height:10px;
 background:url(bar.gif) repeat-x 0 -116px;
 }
-
-img.c_tvseries {
-    background-image: url('../pic/category/chd/iphone/tvseries_cn.png');
-    background-repeat: no-repeat;
-    width: 45px;
-    height: 46px;
-    margin:-5px 0;
-}

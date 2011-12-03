@@ -367,10 +367,14 @@ document.deluser.submit.disabled=!document.deluser.submit.checked;
 }
 
 // in mybonus.php
-function customgift()
-{
-if (document.getElementById("giftselect").value == '0'){
-document.getElementById("giftselect").disabled = true;
-document.getElementById("giftcustom").disabled = false;
-}
+function customgift() {
+    var txtCustom = document.getElementById("giftcustom");
+    if (document.getElementById("giftselect").value == '0'){
+	txtCustom.disabled = false;
+	txtCustom.focus();
+    }
+    else {
+	txtCustom.disabled = true;
+	txtCustom.value = '';
+    }
 }
