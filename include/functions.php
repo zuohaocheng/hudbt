@@ -72,9 +72,9 @@ function stdmsg($heading, $text, $htmlstrip = false)
   }
 
   if ($heading)
-    print("<h2>".$heading.'</h2><div id="stderr" class="table td frame">');
+    print('<div id="stderr"><h2>'.$heading.'</h2><div class="table td frame">');
 
-  print($text . '</div>');
+  print($text . '</div></div>');
 }
 
 function stderr($heading, $text, $htmlstrip = true, $head = true, $foot = true, $die = true)
@@ -481,17 +481,16 @@ function begin_main_frame($caption = "", $center = false, $width = 100) {
   if ($caption)
     print("<h2>".$caption."</h2>");
 
-  /* if ($center) */
-  /*   $tdextra .= " align=\"center\""; */
+  if ($center)
+    $tdextra .= 'text-align:center;';
 
-  /* $width = 940 * $width /100; */
+  $width = 940 * $width /100;
+  print('<div style="width:' . $width . 'px;' . $tdextra . '">');
 
-  /* print("<table class=\"main\" width=\"".$width."\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">" . */
-  /* 	"<tr><td class=\"embedded\" $tdextra>"); */
 }
 
 function end_main_frame() {
-#  print("</td></tr></table>\n");
+  print('</div>');
 }
 
 function begin_frame($caption = "", $center = false, $padding = 10, $width="100%", $caption_center="left") {
@@ -773,8 +772,7 @@ function doInsert(ibTag, ibClsTag, isSingle)
     return isClose;
 }
 
-function winop()
-{
+function winop() {
     windop = window.open("moresmilies.php?form=<?php echo $form?>&text=<?php echo $text?>","mywin","height=500,width=500,resizable=no,scrollbars=yes");
 }
 
@@ -992,7 +990,7 @@ function simpletag(thetag)
       print("</td></tr>");
       print("</table>\n");
       end_frame();
-      print("<p align=\"center\"><a href=\"tags.php\" target=\"_blank\">".$lang_functions['text_tags']."</a> | <a href=\"smilies.php\" target=\"_blank\">".$lang_functions['text_smilies']."</a></p>\n");
+      print('<div class="minor-list list-seperator minor-nav">编辑帮助：<ul><li><a href="tags.php" target="_blank">'.$lang_functions['text_tags'].'</a></li><li><a href="smilies.php" target="_blank">'.$lang_functions['text_smilies'].'</a></li></ul></div>');
     }
 
     function insert_suggest($keyword, $userid, $pre_escaped = true)
@@ -2254,7 +2252,7 @@ function simpletag(thetag)
       <script type="text/javascript" src="domTT.js<?php echo $cssupdatedate?>"></script>
       <script type="text/javascript" src="domTT_drag.js<?php echo $cssupdatedate?>"></script>
       <script type="text/javascript" src="fadomatic.js<?php echo $cssupdatedate?>"></script>
-      <script type="text/javascript" src="js/jquery-1.6.4.min.js"></script><!-- Added by bluemonster 20111031-->
+      <script type="text/javascript" src="js/jquery.js"></script><!-- Added by bluemonster 20111031-->
 <!--[if lte IE 6]>
 <script type="text/javascript" src="js/ie6utf8.js"></script>
 <![endif]-->
@@ -2301,7 +2299,7 @@ if ($enabledonation == 'yes'){?>
 </div></div>
 <div id="page">
 <?php if (!$CURUSER) { ?>
-			<a href="login.php"><font class="big"><b><?php echo $lang_functions['text_login'] ?></b></font></a> / <a href="signup.php"><font class="big"><b><?php echo $lang_functions['text_signup'] ?></b></font></a>
+			<div id="nav-reg-signup" class="big minor-list list-seperator minor-nav"><ul><li><a href="login.php"><?php echo $lang_functions['text_login'] ?></a></li><li><a href="signup.php"><?php echo $lang_functions['text_signup'] ?></a></li></ul></div>
 <?php } 
 else {
 	menu ();
@@ -2512,40 +2510,45 @@ if ($msgalert)
 }
 
 function php_json_encode( $data ) {
-  if( is_array($data) || is_object($data) ) {
-    $islist = is_array($data) && ( empty($data) || array_keys($data) === range(0,count($data)-1) );
-    if( $islist ) $json = '[' . implode(',', array_map('php_json_encode', $data) ) . ']';
-    else {
-      $items = Array();
-      foreach( $data as $key => $value ) $items[] = php_json_encode("$key") . ':' . php_json_encode($value);
-      $json = '{' . implode(',', $items) . '}';
-    }
-  } elseif( is_string($data) ) {
-    $string = '"' . addcslashes($data, "\\\"\n\r\t/" . chr(8) . chr(12)) . '"';
+  if ( !function_exists( 'json_encode' ) || strtolower( json_encode( "\xf0\xa0\x80\x80" ) ) != '"\ud840\udc00"' ) {
+    if( is_array($data) || is_object($data) ) {
+      $islist = is_array($data) && ( empty($data) || array_keys($data) === range(0,count($data)-1) );
+      if( $islist ) $json = '[' . implode(',', array_map('php_json_encode', $data) ) . ']';
+      else {
+	$items = Array();
+	foreach( $data as $key => $value ) $items[] = php_json_encode("$key") . ':' . php_json_encode($value);
+	$json = '{' . implode(',', $items) . '}';
+      }
+    } elseif( is_string($data) ) {
+      $string = '"' . addcslashes($data, "\\\"\n\r\t/" . chr(8) . chr(12)) . '"';
 
-    $json    = '';
-    $len    = strlen($string);
-    for( $i = 0; $i < $len; $i++ ) {
-      $char = $string[$i];
+      $json    = '';
+      $len    = strlen($string);
+      for( $i = 0; $i < $len; $i++ ) {
+	$char = $string[$i];
 
-      $c1 = ord($char);
-      if( $c1 <128 ) { $json .= ($c1 > 31) ? $char : sprintf("\\u%04x", $c1); continue; }
-      $c2 = ord($string[++$i]);
-      if ( ($c1 & 32) === 0 ) { $json .= sprintf("\\u%04x", ($c1 - 192) * 64 + $c2 - 128); continue; }
-      $c3 = ord($string[++$i]);
-      if( ($c1 & 16) === 0 ) { $json .= sprintf("\\u%04x", (($c1 - 224) <<12) + (($c2 - 128) << 6) + ($c3 - 128)); continue; }
-      $c4 = ord($string[++$i]);
-      if( ($c1 & 8 ) === 0 ) {
-	$u = (($c1 & 15) << 2) + (($c2>>4) & 3) - 1;
-	$w1 = (54<<10) + ($u<<6) + (($c2 & 15) << 2) + (($c3>>4) & 3);
-	$w2 = (55<<10) + (($c3 & 15)<<6) + ($c4-128);
-	$json .= sprintf("\\u%04x\\u%04x", $w1, $w2);
+	$c1 = ord($char);
+	if( $c1 <128 ) { $json .= ($c1 > 31) ? $char : sprintf("\\u%04x", $c1); continue; }
+	$c2 = ord($string[++$i]);
+	if ( ($c1 & 32) === 0 ) { $json .= sprintf("\\u%04x", ($c1 - 192) * 64 + $c2 - 128); continue; }
+	$c3 = ord($string[++$i]);
+	if( ($c1 & 16) === 0 ) { $json .= sprintf("\\u%04x", (($c1 - 224) <<12) + (($c2 - 128) << 6) + ($c3 - 128)); continue; }
+	$c4 = ord($string[++$i]);
+	if( ($c1 & 8 ) === 0 ) {
+	  $u = (($c1 & 15) << 2) + (($c2>>4) & 3) - 1;
+	  $w1 = (54<<10) + ($u<<6) + (($c2 & 15) << 2) + (($c3>>4) & 3);
+	  $w2 = (55<<10) + (($c3 & 15)<<6) + ($c4-128);
+	  $json .= sprintf("\\u%04x\\u%04x", $w1, $w2);
+	}
       }
     }
-  }
-  else $json = strtolower(var_export( $data, true ));
+    else $json = strtolower(var_export( $data, true ));
 
-  return $json;
+    return $json;
+  }
+  else {
+    return json_encode( $data );
+  }
 }
 
 function js_hb_config() {
@@ -3401,7 +3404,7 @@ while ($row = mysql_fetch_assoc($res))
 
 		if (get_user_class() >= $torrentmanage_class)
 		{
-			print("<td class=\"rowfollow\"><a href=\"".htmlspecialchars("fastdelete.php?id=".$row[id])."\"><img class=\"staff_delete\" src=\"pic/trans.gif\" alt=\"D\" title=\"".$lang_functions['text_delete']."\" /></a>");
+			print("<td class=\"rowfollow\"><a class=\"staff-quick-delete\" href=\"".htmlspecialchars("fastdelete.php?id=".$row[id])."\"><img class=\"staff_delete\" src=\"pic/trans.gif\" alt=\"D\" title=\"".$lang_functions['text_delete']."\" /></a>");
 			print("<br /><a href=\"edit.php?returnto=" . rawurlencode($_SERVER["REQUEST_URI"]) . "&amp;id=" . $row["id"] . "\"><img class=\"staff_edit\" src=\"pic/trans.gif\" alt=\"E\" title=\"".$lang_functions['text_edit']."\" /></a></td>\n");
 		}
 		print("</tr>\n");

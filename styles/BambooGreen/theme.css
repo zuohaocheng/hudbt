@@ -197,6 +197,7 @@ td.rowhead, tbody>tr>th
 
 table.torrents td.colhead, table.torrents th {
     text-align: center;
+    position: relative;
 }
 
 table.torrents {
@@ -737,7 +738,13 @@ td.category-icon {
 }
 
 
-.back-to-top {
+#delete-user {
+    position:absolute;
+    top: 0;
+    right:0;
+}
+
+#back-to-top {
     height: 50px;
     width: 50px;
     position: fixed;
@@ -755,18 +762,20 @@ td.category-icon {
     opacity: 1; 
 }
 
-.back-to-top:hover {
+#back-to-top:hover {
     background-position: -50px 0;
 }
 
 
 .frame {
     padding: 10px;
+    position: relative;
 }
 
 #forum-header {
     position: relative;
     margin: 1em 1.5em;
+    width: 940px;
 }
 
 #post-viewed-count {
@@ -783,6 +792,7 @@ td.category-icon {
     margin-top: 1.5em;
     margin-bottom: 0.5em;
     position: relative;
+    width: 940px;
 }
 
 .forum-floor {
@@ -795,11 +805,49 @@ td.category-icon {
     text-align: center;
     margin: 0 auto 8px auto;
     border-top-width: 0px;
+    width: 940px;
+}
+
+#forum-reply-post {
+    text-align: center;
+    padding: 0 0 1.2em 0;
+    width: 500px;
+}
+
+#forum-reply-post h2 {
+    margin: 0.5em auto;
 }
 
 #detail-username {
     margin:0;
 }
+
+#donating {
+	text-align: right;
+	font-weight: bold;
+}
+#to_donate a {
+	width: 42px;
+}
+.donate {
+	display: block;
+	float: left;
+	height: 22px;
+	margin: 6px;
+	padding: 0 6px;
+	line-height: 22px;
+	text-align: center;
+	border: 1px solid #AAA;
+
+	border-radius:3px;
+}
+
+.donate64 {background-color: #FFFF99;}
+.donate128 {background-color: #CCFF99;}
+.donate256 {background-color: #99FFFF;}
+.donate512 {background-color: #99CCFF;}
+.donate1024 {background-color: #FF9999;}
+.donate_note {margin: 0;}
 
 /* a work-around before all tables removed*/
 .main {
@@ -808,10 +856,26 @@ td.category-icon {
 
 .minor-nav {
     text-align: center;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+#nav-reg-signup {
+    margin: 0 auto;
+    padding: 0.8em;
+}
+
+#lang-choice {
+    position: absolute;
+    right:1em;
+    top:1em;
 }
 
 #stderr {
     width: 480px;
+    text-align: center;
+    margin:0 auto;
+    padding-bottom: 3em;
 }
 
 #wrap {
@@ -830,12 +894,13 @@ td.category-icon {
 }
 
 #outer {
-    padding: 10px 15px 20px 15px;
+    padding: 10px 5px 20px 5px;
     text-align: left;
 }
 
-#outer>table {
-    margin: 0 auto;
+#outer>table, #outer>div {
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #info_block {

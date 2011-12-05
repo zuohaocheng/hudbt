@@ -875,6 +875,9 @@ else
 if ($_GET['format'] == 'xml') {
   include('include/torrents_xml.php');
 }
+else if ($_GET['format'] == 'json') {
+  include('include/torrents_json.php');
+}
 else {
   include('include/torrents_html.php');
 }

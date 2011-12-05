@@ -5,31 +5,6 @@
  */
 
 ?>
-<style>
-#donating {
-	text-align: right;
-	font-weight: bold;
-}
-#to_donate a {
-	width: 42px;
-}
-.donate {
-	display: block;
-	float: left;
-	height: 22px;
-	margin: 6px;
-	padding: 0 6px;
-	line-height: 22px;
-	text-align: center;
-	border: 1px solid #AAA;
-}
-.donate64 {background-color: #FFFF99;}
-.donate128 {background-color: #CCFF99;}
-.donate256 {background-color: #99FFFF;}
-.donate512 {background-color: #99CCFF;}
-.donate1024 {background-color: #FF9999;}
-.donate_note {margin: 0;}
-</style>
 <tr>
 	<td rowspan=2 id="donating">捐赠魔力值<br /><a href='bonusDonations.php' style="font-weight:normal;">[查看我的捐赠历史]</a></td>
 	<td id="to_donate">

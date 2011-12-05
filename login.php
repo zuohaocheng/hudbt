@@ -39,7 +39,7 @@ $s .= "\n</select>";
 ?>
 <form method="get" action="<?php echo $_SERVER['PHP_SELF'] ?>">
 <?php
-print("<div align=\"right\">".$lang_login['text_select_lang']. $s . "</div>");
+print('<div id="lang-choice">'.$lang_login['text_select_lang']. $s . "</div>");
 ?>
 </form>
 <?php
@@ -55,11 +55,12 @@ else {
 }
 ?>
 <form method="post" action="takelogin.php">
-<p><center><a href="https://sp-pt.hust.edu.cn:444/Shibboleth.sso/DS?target=http://sp-pt.hust.edu.cn:81"><h2><u>联盟用户在此登录</u></h2></a></center></p>
-<p><center><b>（本校用户可使用南六楼网络中心申请的锐捷账号通过联盟认证登录）</b></center></p>
-<p><?php echo $lang_login['p_need_cookies_enables']?><br /> [<b><?php echo $maxloginattempts;?></b>] <?php echo $lang_login['p_fail_ban']?></p>
-<p><?php echo $lang_login['p_you_have']?> <b><?php echo remaining ();?></b> <?php echo $lang_login['p_remaining_tries']?></p>
-<table border="0" cellpadding="5">
+<h2><a href="https://sp-pt.hust.edu.cn:444/Shibboleth.sso/DS?target=http://sp-pt.hust.edu.cn:81">联盟用户在此登录</a></h2>
+<h3>（本校用户可使用南六楼网络中心申请的锐捷账号通过联盟认证登录）</h3>
+<div><ul style="list-style: none;list-style-type: none; list-style-image:none;"><li><?php echo $lang_login['p_need_cookies_enables']?></li>
+<li>[<b><?php echo $maxloginattempts;?></b>] <?php echo $lang_login['p_fail_ban']?></li>
+<li><?php echo $lang_login['p_you_have']?> <b><?php echo remaining ();?></b> <?php echo $lang_login['p_remaining_tries']?></li></ul></div>
+<table border="0" cellpadding="5" style="margin:0 auto;">
 <tr><td class="rowhead"><?php echo $lang_login['rowhead_username']?></td><td class="rowfollow" align="left"><input type="text" name="username" style="width: 180px; border: 1px solid gray" /></td></tr>
 <tr><td class="rowhead"><?php echo $lang_login['rowhead_password']?></td><td class="rowfollow" align="left"><input type="password" name="password" style="width: 180px; border: 1px solid gray"/></td></tr>
 <?php

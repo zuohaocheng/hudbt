@@ -70,6 +70,9 @@ overflow: auto;
 font-family: tahoma, arial, helvetica, sans-serif;
 font-size: 10.5pt;
 }
+.minor-nav {
+font-size: 11pt;
+}
 .small
 {
 font-size: 9pt

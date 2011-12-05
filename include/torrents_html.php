@@ -233,7 +233,9 @@ if ($CURUSER){
 }
 print('<script type="text/javascript">hb.nextpage = "'. $next_page_href .'"</script>');
 ?>
+<a href="#" id="back-to-top" title="回到页首" style="display:none;"></a>
 <script src="js/torrents.js" type="text/javascript"></script>
+
 <?php
 stdfoot();
 

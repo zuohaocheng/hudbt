@@ -155,15 +155,17 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 		$r = sql_query("SELECT id FROM blocks WHERE userid=$CURUSER[id] AND blockid=$id") or sqlerr(__FILE__, __LINE__);
 		$block = mysql_num_rows($r);
 
+		print('<div class="minor-list list-seperator minor-nav"><ul><li>');
 		if ($friend)
-		print("<p>(<a href=\"friends.php?action=delete&amp;type=friend&amp;targetid=".$id."\">".$lang_userdetails['text_remove_from_friends']."</a>)</p>\n");
+		print('<a href="friends.php?action=delete&amp;type=friend&amp;targetid='.$id.'">'.$lang_userdetails['text_remove_from_friends'].'</a>');
 		elseif($block)
-		print("<p>(<a href=\"friends.php?action=delete&amp;type=block&amp;targetid=".$id."\">".$lang_userdetails['text_remove_from_blocks']."</a>)</p>\n");
+		print("<a href=\"friends.php?action=delete&amp;type=block&amp;targetid=".$id."\">".$lang_userdetails['text_remove_from_blocks']."</a>");
 		else
 		{
-			print("<p>(<a href=\"friends.php?action=add&amp;type=friend&amp;targetid=".$id."\">".$lang_userdetails['text_add_to_friends']."</a>)");
-			print(" - (<a href=\"friends.php?action=add&amp;type=block&amp;targetid=".$id."\">".$lang_userdetails['text_add_to_blocks']."</a>)</p>");
+			print("<a href=\"friends.php?action=add&amp;type=friend&amp;targetid=".$id."\">".$lang_userdetails['text_add_to_friends']."</a>");
+			print("</li><li><a href=\"friends.php?action=add&amp;type=block&amp;targetid=".$id."\">".$lang_userdetails['text_add_to_blocks']."</a>");
 		}
+		print('</li></ul></div>');
 	}
 	begin_main_frame();
 	if ($CURUSER[id] == $user[id] || get_user_class() >= $cruprfmanage_class)
@@ -388,6 +390,16 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 	if (get_user_class() >= $prfmanage_class && $user["class"] < get_user_class())
 	{
 		begin_frame($lang_userdetails['text_edit_user'], true);
+		if (get_user_class() >= $cruprfmanage_class)
+		{
+		  print('<div id="delete-user">');
+		#	begin_frame($lang_userdetails['text_delete_user'], true);
+			print("<form method=\"post\" action=\"delacctadmin.php\" name=\"deluser\">
+			<input name=\"userid\" size=\"10\" type=\"hidden\" value=\"". $user["id"] ."\" />".
+			"<input name=\"delenable\" type=\"checkbox\" onclick=\"if (this.checked) {enabledel('".$lang_userdetails['js_delete_user_note']."');}else{disabledel();}\" />". $lang_userdetails['text_delete_user'] ."<input name=\"submit\" type=\"submit\" value=\"".$lang_userdetails['submit_delete']."\" disabled=\"disabled\" /></form>");
+			  print('</div>');
+		}
+
 		print("<form method=\"post\" action=\"modtask.php\">");
 		print("<input type=\"hidden\" name=\"action\" value=\"edituser\" />");
 		print("<input type=\"hidden\" name=\"userid\" value=\"".$id."\" />");
@@ -531,14 +543,6 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 		print("</table>\n");
 		print("</form>\n");
 		end_frame();
-		if (get_user_class() >= $cruprfmanage_class)
-		{
-			begin_frame($lang_userdetails['text_delete_user'], true);
-			print("<form method=\"post\" action=\"delacctadmin.php\" name=\"deluser\">
-			<input name=\"userid\" size=\"10\" type=\"hidden\" value=\"". $user["id"] ."\" />
-			<input name=\"delenable\" type=\"checkbox\" onclick=\"if (this.checked) {enabledel('".$lang_userdetails['js_delete_user_note']."');}else{disabledel();}\" /><input name=\"submit\" type=\"submit\" value=\"".$lang_userdetails['submit_delete']."\" disabled=\"disabled\" /></form>");
-			end_frame();
-		}
 	}
 	end_main_frame();
 }

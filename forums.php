@@ -575,13 +575,14 @@ if ($action == "viewtopic")
 
 	print("<h1 align=\"center\"><a class=\"faqlink\" href=\"forums.php\">".$SITENAME."&nbsp;".$lang_forums['text_forums']."</a>--><a class=\"faqlink\" href=\"".htmlspecialchars("?action=viewforum&forumid=".$forumid)."\">".$forumname."</a><b>--></b><span id=\"top\">".$subject.($locked ? "&nbsp;&nbsp;<b>[<font class=\"striking\">".$lang_forums['text_locked']."</font>]</b>" : "")."</span></h1>\n");
 	end_main_frame();
-	print($pagertop);
 
 	//------ Print table
 
 	print('<div id="forum-header"><div>');
 	print($lang_forums['there_is'].'<span id="post-viewed-count">'.$views.'</span>'.$lang_forums['hits_on_this_topic']);
 	print("</div>\n");
+
+	print($pagertop);
 
 	if ($maypost)
 	{
@@ -659,7 +660,7 @@ if ($action == "viewtopic")
 
 		print("</div>\n");
 
-		print("<table class=\"main\" width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"5\">\n");
+		print("<table class=\"main\" width=\"940\" border=\"1\" cellspacing=\"0\" cellpadding=\"5\">\n");
 
 		$body = "<div id=\"pid".$postid."body\">".format_comment($arr["body"]);
 
@@ -773,13 +774,9 @@ if ($action == "viewtopic")
 
 	print($pagerbottom);
 	if ($maypost){
-	print("<br /><table style='border:1px solid #000000;'><tr>".
-"<td class=\"text\" align=\"center\"><b>".$lang_forums['text_quick_reply']."</b><br /><br />".
-"<form id=\"compose\" name=\"compose\" method=\"post\" action=\"?action=post\" onsubmit=\"return postvalid(this);\">".
-"<input type=\"hidden\" name=\"id\" value=\"".$topicid."\" /><input type=\"hidden\" name=\"type\" value=\"reply\" /><br />");
+	print('<div id="forum-reply-post" class="table td"><h2><a class="index" href="'.htmlspecialchars('?action=reply&topicid='.$topicid).'">'.$lang_forums['text_add_reply'].'</a></h2><form id="compose" name="compose" method="post" action="?action=post" onsubmit="return postvalid(this);"><input type="hidden" name="id" value="".$topicid."" /><input type="hidden" name="type" value="reply" />');
 	quickreply('compose', 'body',$lang_forums['submit_add_reply']);
-	print("</form></td></tr></table>");
-	print("<p align=\"center\"><a class=\"index\" href=\"".htmlspecialchars("?action=reply&topicid=".$topicid)."\">".$lang_forums['text_add_reply']."</a></p>\n");
+	print("</form></div>");
 	}
 	elseif ($locked)
 		print($lang_forums['text_topic_locked_new_denied']);

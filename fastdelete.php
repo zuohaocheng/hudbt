@@ -66,5 +66,11 @@ if ($CURUSER["id"] != $row["owner"]){
 	$msg = sqlesc($lang_fastdelete_target[get_user_lang($row["owner"])]['msg_the_torrent_you_uploaded'].$row['name'].$lang_fastdelete_target[get_user_lang($row["owner"])]['msg_was_deleted_by']."[url=userdetails.php?id=".$CURUSER['id']."]".$CURUSER['username']."[/url]".$lang_fastdelete_target[get_user_lang($row["owner"])]['msg_blank']);
 	sql_query("INSERT INTO messages (sender, receiver, subject, added, msg) VALUES(0, $row[owner], $subject, $dt, $msg)") or sqlerr(__FILE__, __LINE__);
 }
-header("Refresh: 0; url=torrents.php");
+if ($_GET['format'] == 'json') {
+  header('Content-type: application/json');
+  print('{"success" : true}');
+}
+else {
+  header("Location:torrents.php");
+}
 ?>
