@@ -878,6 +878,11 @@ td.category-icon {
 .donate1024 {background-color: #FF9999;}
 .donate_note {margin: 0;}
 
+#search-subtitles {
+    text-align:center;
+    margin: 2em auto;
+}
+
 /* a work-around before all tables removed*/
 .main {
     margin: 0 auto;

@@ -249,7 +249,7 @@ if (get_user_class() >= UC_PEASANT)
 	begin_main_frame();
 
 	?>
-<div align=center>
+
 <?php
 	if (!$size = $Cache->get_value('subtitle_sum_size')){
 		$res = sql_query("SELECT SUM(size) AS size FROM subs");
@@ -258,18 +258,18 @@ if (get_user_class() >= UC_PEASANT)
 		$Cache->cache_value('subtitle_sum_size', $size, 3600);
 	}
 
-	begin_frame($lang_subtitles['text_upload_subtitles'].mksize($size)."", true,10,"100%","center");
+	print('<h2 style="text-align:center;">' . $lang_subtitles['text_upload_subtitles'].mksize($size));
 	?>
-	</div>
+	</h2>
 <?php
 
-	print("<p align=left><b><font size=5>".$lang_subtitles['text_rules']."</font></b></p>\n");
-	print("<p align=left>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp ".$lang_subtitles['text_rule_one']."</p>\n");
-	print("<p align=left>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp ".$lang_subtitles['text_rule_two']."</p>\n");
-	print("<p align=left>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp ".$lang_subtitles['text_rule_three']."</p>\n");
-	print("<p align=left>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp ".$lang_subtitles['text_rule_four']."</p>\n");
-	print("<p align=left>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp ".$lang_subtitles['text_rule_five']."</p>\n");
-	print("<p align=left>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp ".$lang_subtitles['text_rule_six']."</p>\n");
+	print("<h3>".$lang_subtitles['text_rules']."</h3>\n");
+	print('<div><ol>');
+	$hints = $lang_subtitles['text_rule'];
+	for ($i=0; $i<count($hints); ++$i) {
+	  print('<li>'.$hints[$i]."</li>\n");
+	}
+	print('</ol></div>');
 	
 	print($lang_subtitles['text_red_star_required']);
 	if($in_detail != "")
@@ -315,16 +315,16 @@ if (get_user_class() >= UC_PEASANT)
 	print("<tr><td class=toolbox colspan=2 align=center><input type=submit class=btn value=".$lang_subtitles['submit_upload_file']."> <input type=reset class=btn value=\"".$lang_subtitles['submit_reset']."\"></td></tr>\n");
 	print("</table>\n");
 	print("</form>\n");
-	end_frame();
 
 	end_main_frame();
 }
 
 if(get_user_class() >= UC_PEASANT)
 {
-		print("<form method=get action=?>\n");
-		print("<br /><br />");
-		print("<input type=text style=\"width:200px\" name=search>\n");
+?>
+<div id="search-subtitles"><form method="get" action="?">
+  <input type="text" style="width:200px" name="search">
+<?php
 
 		$s = "<select name=\"lang_id\"><option value=\"0\">".$lang_subtitles['select_all_languages']."</option>\n";
 		$langs = langlist("sub_lang");
@@ -336,8 +336,9 @@ if(get_user_class() >= UC_PEASANT)
 		print($s);
 
 		print("<input type=submit class=btn value=\"".$lang_subtitles['submit_search']."\">\n");
-		print("</form>\n");
-
+?>
+</form>
+<?php
 		for ($i = 97; $i < 123; ++$i)
 		{
 			$l = chr($i);
@@ -347,6 +348,9 @@ if(get_user_class() >= UC_PEASANT)
 			else
 				print("<a href=?letter=$l><b>$L</b></a>\n");
 		}
+?>
+</div>
+<?
 
 		$perpage = 30;
 		$query = ($query ? " WHERE ".$query : "");

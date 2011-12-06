@@ -7,7 +7,6 @@ parked();
 
 stdhead($lang_donations['head_bonusDonations']);
 
-
 function donationsForKey($key, $userid) {
   if ($key == 'donater_id') {
     $queryid = 'receiver_id';
@@ -47,8 +46,20 @@ function donationsTableFromResult($res, $queryid) {
   global $lang_donations;
   $out = '<table id="donations" cellpadding="5" style="width:750px;"><thead><tr><th>' . $lang_donations['col_time'] . '</th><th>' . $lang_donations['col_torrent'] . '</th><th>' . $lang_donations['col_username' ] . '</th><th>' . $lang_donations['col_amount'] . '</th></tr></thead><tbody>';
 
+  $count = 0;
   while ($row = mysql_fetch_assoc($res)) {
-    $out .= '<tr><td>' . $row['action_date'] . '</td><td><a href="details.php?id=' . $row['object_id'] . '" title="' . $row['name'] . '">' . $row['name'] . '</a></td><td>' . get_username($row[$queryid]) . '</td><td>' . $row['amount'] . '</td></tr>';
+    $count++;
+    if ($row['name'] == '') {
+      $torrent = $lang_donations['text_no_torrent'];
+    }
+    else {
+      $torrent = '<a href="details.php?id=' . $row['object_id'] . '" title="' . $row['name'] . '">' . $row['name'] . '</a>';
+    }
+    $out .= '<tr><td>' . $row['action_date'] . '</td><td>' . $torrent . '</td><td>' . get_username($row[$queryid]) . '</td><td>' . $row['amount'] . '</td></tr>';
+  }
+
+  if ($count == 0) {
+    return '';
   }
   
   $out .= '</tbody></table>';
@@ -58,15 +69,31 @@ function donationsTableFromResult($res, $queryid) {
 function donationsHtmlFromResult($result) {
   global $lang_donations;
   list($pagertop, $pagerbottom, $res, $queryid, $sum) = $result;
-  $out = '<h3>' . $lang_donations['text_sum_' . $queryid] . $sum . '</h3>';
+  $out = '<h3 style="text-align:center;">' . $lang_donations['text_sum_' . $queryid] . $sum . '</h3>';
   $out .= $pagertop;
-  $out .= donationsTableFromResult($res, $queryid);
+  $table = donationsTableFromResult($res, $queryid);
+  if ($table == '') {
+    return $lang_donations['text_no_record'];
+  }
+  $out .= $table;
   $out .= $pagerbottom;
   return $out;
 }
 
+if ($_GET['receiver']) {
+  $donate = '<a href="bonusDonations.php">' . $lang_donations['nav_donate'] . '</a>';
+  $receive = '<span class="selected">' . $lang_donations['nav_receive'] . '</span>';
+}
+else {
+  $receive = '<a href="bonusDonations.php?receiver=1">' . $lang_donations['nav_receive'] . '</a>';
+  $donate = '<span class="selected">' . $lang_donations['nav_donate'] . '</span>';
+}
 
-print('<h2>' . $lang_donations['head_bonusDonations'] . '</h2>');
+?>
+<div class="minor-list list-seperator minor-nav"><ul><li><?php echo $donate ?></li><li><?php echo $receive ?></li></ul></div>
+<?php
+
+print('<h2 style="text-align:center;">' . $lang_donations['head_bonusDonations'] . '</h2>');
 if ($_GET['receiver']) {
   $key = 'receiver_id';
 }
@@ -74,7 +101,7 @@ else {
   $key = 'donater_id';
 }
 
-print(donationsHtmlFromResult(donationsForKey($key, 26058)));#$CURUSER['id'])));
+print(donationsHtmlFromResult(donationsForKey($key, $CURUSER['id'])));
 
 
 
