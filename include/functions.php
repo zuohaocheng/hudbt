@@ -2245,6 +2245,7 @@ function simpletag(thetag)
 	}
       ?>
       <link rel="alternate" type="application/rss+xml" title="Latest Torrents" href="torrentrss.php" />
+      <script type="text/javascript" src="js/jquery.js"></script><!-- Added by bluemonster 20111031-->
       <script type="text/javascript" src="curtain_imageresizer.js<?php echo $cssupdatedate?>"></script>
       <script type="text/javascript" src="ajaxbasic.js<?php echo $cssupdatedate?>"></script>
       <script type="text/javascript" src="common.js<?php echo $cssupdatedate?>"></script>
@@ -2252,7 +2253,6 @@ function simpletag(thetag)
       <script type="text/javascript" src="domTT.js<?php echo $cssupdatedate?>"></script>
       <script type="text/javascript" src="domTT_drag.js<?php echo $cssupdatedate?>"></script>
       <script type="text/javascript" src="fadomatic.js<?php echo $cssupdatedate?>"></script>
-      <script type="text/javascript" src="js/jquery.js"></script><!-- Added by bluemonster 20111031-->
 <!--[if lte IE 6]>
 <script type="text/javascript" src="js/ie6utf8.js"></script>
 <![endif]-->
@@ -2298,8 +2298,25 @@ if ($enabledonation == 'yes'){?>
 ?>
 </div></div>
 <div id="page">
-<?php if (!$CURUSER) { ?>
-			<div id="nav-reg-signup" class="big minor-list list-seperator minor-nav"><ul><li><a href="login.php"><?php echo $lang_functions['text_login'] ?></a></li><li><a href="signup.php"><?php echo $lang_functions['text_signup'] ?></a></li></ul></div>
+<?php 
+if (!$CURUSER) {
+  $file = array_pop(explode('/', $_SERVER['PHP_SELF']));
+  if ($file == 'login.php') {
+    $login = '<span class="selected">' . $lang_functions['text_login'] . '</span>';
+  }
+  else {
+    $login = '<a href="login.php">' . $lang_functions['text_login'] . '</a>';
+  }
+
+  if ($file == 'signup.php') {
+    $signup = '<span class="selected">' . $lang_functions['text_signup'] . '</span>';
+  }
+  else {
+    $signup = '<a href="signup.php">' . $lang_functions['text_signup'] . '</a>';
+  }
+
+ ?>
+			<div id="nav-reg-signup" class="big minor-list list-seperator minor-nav"><ul><li><?php echo $login; ?></li><li><?php echo $signup; ?></li></ul></div>
 <?php } 
 else {
 	menu ();
@@ -2804,7 +2821,7 @@ function loggedinorreturn3($mainpage = false) {
 	}
 }
 
-function deletetorrent($id) {
+function deletetorrent($id, $deductBonus = false) {
 	global $torrent_dir;
 	sql_query("DELETE FROM torrents WHERE id = ".mysql_real_escape_string($id));
 	sql_query("DELETE FROM snatched WHERE torrentid = ".mysql_real_escape_string($id));
@@ -2812,6 +2829,10 @@ function deletetorrent($id) {
 		sql_query("DELETE FROM $x WHERE torrent = ".mysql_real_escape_string($id));
 	}
 	unlink("$torrent_dir/$id.torrent");
+
+	if ($deductBonus) {
+	  KPS("-",$uploadtorrent_bonus,$row["owner"]);
+	}
 }
 
 function pager($rpp, $count, $href, $opts = array(), $pagename = "page") {
@@ -2852,7 +2873,7 @@ function pager($rpp, $count, $href, $opts = array(), $pagename = "page") {
 		$pager .= "</a></li>";
 	}
 	else
-	$pager .= "<li class=\"gray\">".$as."</li>";
+	$pager .= "<li class=\"selected\">".$as."</li>";
 #	$pager .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 	$as = $lang_functions['text_next']."&nbsp;&gt;&gt;";
 	if ($page < $mp && $mp >= 0) {
@@ -2862,7 +2883,7 @@ function pager($rpp, $count, $href, $opts = array(), $pagename = "page") {
 		$pager .= "</a></li>";
 	}
 	else {
-	     $pager .= "<li class=\"gray\">".$as."</li>";
+	     $pager .= "<li class=\"selected\">".$as."</li>";
 	}
 	$pager .= '</ul>';
 
@@ -2889,7 +2910,7 @@ function pager($rpp, $count, $href, $opts = array(), $pagename = "page") {
 			if ($i != $page)
 			$pagerarr[] = "<a class=\"pagenumber\" href=\"".htmlspecialchars($href.$pagename."=".$i)."\">$text</a>";
 			else
-			$pagerarr[] = "<span class=\"gray\">$text</span>";
+			$pagerarr[] = "<span class=\"selected\">$text</span>";
 		}
 		$pagerstr = '<ul><li>'.join("</li><li>", $pagerarr).'</li></ul>';
 		$pagertop = "<div id='pagertop' class=\"pages\"><div class=\"minor-list\" style=\"margin-bottom:0.6em;\">$pager</div><div class=\"minor-list list-seperator\">$pagerstr</div></div>\n";
@@ -2905,13 +2926,12 @@ function pager($rpp, $count, $href, $opts = array(), $pagename = "page") {
 	return array($pagertop, $pagerbottom, "LIMIT $start,$rpp", $next_page_href, $start);
 }
 
-function commenttable($rows, $type, $parent_id, $review = false)
-{
+
+function commenttable($rows, $type, $parent_id, $review = false, $offset=0) {
 	global $lang_functions;
 	global $CURUSER, $commanage_class;
 	global $Advertisement;
 	begin_main_frame();
-	begin_frame();
 
 	$count = 0;
 	if ($Advertisement->enable_ad())
@@ -2926,10 +2946,20 @@ function commenttable($rows, $type, $parent_id, $review = false)
 				echo "<div align=\"center\" style=\"margin-top: 10px\" id=\"ad_comment_".$count."\">".$commentad[$count-1]."</div>";
 			}
 		}
-		print("<div style=\"margin-top: 8pt; margin-bottom: 8pt;\"><table id=\"cid".$row["id"]."\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" width=\"100%\"><tr><td class=\"embedded\" width=\"99%\">#" . $row["id"] . "&nbsp;&nbsp;<font color=\"gray\">".$lang_functions['text_by']."</font>");
-		print(get_username($row["user"],false,true,true,false,false,true));
-		print("&nbsp;&nbsp;<font color=\"gray\">".$lang_functions['text_at']."</font>".gettime($row["added"]).
-		($row["editedby"] && get_user_class() >= $commanage_class ? " - [<a href=\"comment.php?action=vieworiginal&amp;cid=".$row[id]."&amp;type=".$type."\">".$lang_functions['text_view_original']."</a>]" : "") . "</td><td class=\"embedded nowrap\" width=\"1%\"><a href=\"#top\"><img class=\"top\" src=\"pic/trans.gif\" alt=\"Top\" title=\"Top\" /></a>&nbsp;&nbsp;</td></tr></table></div>");
+
+		$by = get_username($row["user"],false,true,true,false,false,true);
+		$added = gettime($row["added"]);
+		
+		print('<div class="forum-author" id="cid' . $row['id']. '"><div class=" minor-list"><ul><li>#'.$row['id'].'</li><li><span class="gray">'.$lang_forums['text_by'].'</span>'.$by.'<span class="gray">'.$lang_forums['text_at']."</span></li><li>".$added);
+		if ($row["editedby"] && get_user_class() >= $commanage_class) {
+		  print("<li class=\"list-seperator\"><a href=\"comment.php?action=vieworiginal&amp;cid=".$row['id']."&amp;type=".$type."\">".$lang_functions['text_view_original']."</a></li>");
+		}
+
+		print('</li></ul></div><div class="forum-floor"><span class="big">#'.$lang_forums['text_number'].($offset+$count+1) . $lang_forums['text_lou']."&nbsp;&nbsp;</span><a href=\"#top\"><img class=\"top\" src=\"pic/trans.gif\" alt=\"Top\" title=\"TOP\" /></a></div>");
+
+		print("</div>\n");
+
+
 		$avatar = ($CURUSER["avatars"] == "yes" ? htmlspecialchars(trim($userRow["avatar"])) : "");
 		if (!$avatar)
 			$avatar = "pic/default_avatar.png";
@@ -2954,7 +2984,6 @@ function commenttable($rows, $type, $parent_id, $review = false)
 		print("</tr></table>\n");
 		$count++;
 	}
-	end_frame();
 	end_main_frame();
 }
 
@@ -4640,6 +4669,31 @@ function get_torrent_promotion_append_sub($promotion = 1,$forcemode = "",$showti
     $ret = '';
   }
   return $ret;
+}
+
+function lang_choice_before_login($extra='') {
+  global $lang_functions;
+
+$s = "<select name=\"sitelanguage\" onchange='submit()'>\n";
+
+$langs = langlist("site_lang");
+
+foreach ($langs as $row)
+{
+	if ($row["site_lang_folder"] == get_langfolder_cookie()) $se = "selected=\"selected\""; else $se = "";
+	$s .= "<option value=\"". $row["id"] ."\" ". $se. ">" . htmlspecialchars($row["lang_name"]) . "</option>\n";
+}
+$s .= "\n</select>";
+
+  ?>
+<form method="get" action="<?php echo $_SERVER['PHP_SELF'] ?>">
+<?php
+print($extra);
+print('<div id="lang-choice">'.$lang_functions['text_select_lang']. $s . "</div>");
+?>
+</form>
+<?php
+
 }
 
 ?>

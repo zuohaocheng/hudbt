@@ -19,7 +19,7 @@ $id = 0 + $id;
 int_check($id);
 $sure = $_GET["sure"];
 
-$res = sql_query("SELECT name,owner,seeders,anonymous FROM torrents WHERE id = $id");
+$res = sql_query("SELECT name,owner,seeders,anonymous, added FROM torrents WHERE id = $id");
 $row = mysql_fetch_array($res);
 if (!$row)
     die();
@@ -52,8 +52,12 @@ sql_query("INSERT INTO messages (sender, receiver, subject, added, msg) VALUES(0
 }
 }
 
-deletetorrent($id);
-KPS("-",$uploadtorrent_bonus,$row["owner"]);
+$interval_no_deduct_bonus_on_deletion = 30* 86400;
+$tadded = strtotime($row['added']);
+
+deletetorrent($id, ((TIMENOW - $tadded) > $interval_no_deduct_bonus_on_deletion));
+
+
 if ($row['anonymous'] == 'yes' && $CURUSER["id"] == $row["owner"]) {
 	write_log("Torrent $id ($row[name]) was deleted by its anonymous uploader",'normal');
 } else {

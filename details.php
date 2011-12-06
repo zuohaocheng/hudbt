@@ -577,7 +577,7 @@ if ($CURUSER['showcomment'] != 'no'){
 	{
 		print("<br /><br />");
 		print("<h1 align=\"center\" id=\"startcomments\">" .$lang_details['h1_user_comments'] . "</h1>\n");
-		list($pagertop, $pagerbottom, $limit) = pager(10, $count, "details.php?id=$id&cmtpage=1&", array(lastpagedefault => 1), "page");
+		list($pagertop, $pagerbottom, $limit,$next_page ,$offset) = pager(10, $count, "details.php?id=$id&cmtpage=1&", array('lastpagedefault' => 1), "page");
 
 		$subres = sql_query("SELECT id, text, user, added, editedby, editdate FROM comments WHERE torrent = $id ORDER BY id $limit") or sqlerr(__FILE__, __LINE__);
 		$allrows = array();
@@ -585,14 +585,13 @@ if ($CURUSER['showcomment'] != 'no'){
 			$allrows[] = $subrow;
 		}
 		print($pagertop);
-		commenttable($allrows,"torrent",$id);
+		commenttable($allrows,"torrent",$id,false, $offset);
 		print($pagerbottom);
 	}
 }
-print("<br /><br />");
-print ("<table style='border:1px solid #000000;'><tr><td class=\"text\" align=\"center\"><b>".$lang_details['text_quick_comment']."</b><br /><br /><form id=\"compose\" name=\"comment\" method=\"post\" action=\"".htmlspecialchars("comment.php?action=add&type=torrent")."\" onsubmit=\"return postvalid(this);\"><input type=\"hidden\" name=\"pid\" value=\"".$id."\" /><br />");
+
+print ('<div id="forum-reply-post" class="table td"><h2><a class="index" href="'. htmlspecialchars("comment.php?action=add&pid=".$id."&type=torrent") .'">'.$lang_details['text_quick_comment']."</a></h2><form id=\"compose\" name=\"comment\" method=\"post\" action=\"".htmlspecialchars("comment.php?action=add&type=torrent")."\" onsubmit=\"return postvalid(this);\"><input type=\"hidden\" name=\"pid\" value=\"".$id."\" /><br />");
 quickreply('comment', 'body', $lang_details['submit_add_comment']);
-print("</form></td></tr></table>");
-print("<p align=\"center\"><a class=\"index\" href=\"".htmlspecialchars("comment.php?action=add&pid=".$id."&type=torrent")."\">".$lang_details['text_add_a_comment']."</a></p>\n");
+	print("</form></div>");
 }
 stdfoot();

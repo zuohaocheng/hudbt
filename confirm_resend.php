@@ -2,6 +2,7 @@
 require "include/bittorrent.php";
 dbconn();
 failedloginscheck ("Re-send",true);
+cur_user_check ('index.php') ;
 
 $langid = 0 + $_GET['sitelanguage'];
 if ($langid)
@@ -88,23 +89,8 @@ EOD;
 else
 {
 	stdhead();
-	$s = "<select name=\"sitelanguage\" onchange='submit()'>\n";
-	
-	$langs = langlist("site_lang");
-	
-	foreach ($langs as $row)
-	{
-		if ($row["site_lang_folder"] == get_langfolder_cookie()) $se = " selected=\"selected\""; else $se = "";
-		$s .= "<option value=\"". $row["id"]."\" " . $se. ">" . htmlspecialchars($row["lang_name"]) . "</option>\n";
-	}
-	$s .= "\n</select>";
-	?>
-	<form method="get" action="<?php echo $_SERVER['PHP_SELF'] ?>">
-<?php
-	print("<div align=\"right\">".$lang_confirm_resend['text_select_lang']. $s . "</div>");
-?>
-	</form>
-	<?php echo $lang_confirm_resend['text_resend_confirmation_mail_note']?>
+	lang_choice_before_login();
+        echo $lang_confirm_resend['text_resend_confirmation_mail_note']?>
 	<p><?php echo $lang_confirm_resend['text_you_have'] ?><b><?php echo remaining ();?></b><?php echo $lang_confirm_resend['text_remaining_tries'] ?></p>
 	<form method="post" action="confirm_resend.php">
 	<table border="1" cellspacing="0" cellpadding="10">

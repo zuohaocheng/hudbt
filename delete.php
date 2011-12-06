@@ -20,7 +20,7 @@ $id = 0 + $id;
 if (!$id)
 	die();
 
-$res = sql_query("SELECT name,owner,seeders,anonymous FROM torrents WHERE id = ".sqlesc($id));
+$res = sql_query("SELECT name,owner,seeders,anonymous,added FROM torrents WHERE id = ".sqlesc($id));
 $row = mysql_fetch_array($res);
 if (!$row)
 	die();
@@ -74,7 +74,11 @@ sql_query("INSERT INTO messages (sender, receiver, subject, added, msg) VALUES(0
 }
 }
 }
-deletetorrent($id);
+
+$interval_no_deduct_bonus_on_deletion = 30* 86400;
+$tadded = strtotime($row['added']);
+
+deletetorrent($id, ((TIMENOW - $tadded) > $interval_no_deduct_bonus_on_deletion));
 
 if ($row['anonymous'] == 'yes' && $CURUSER["id"] == $row["owner"]) {
 	write_log("Torrent $id ($row[name]) was deleted by its anonymous uploader ($reasonstr)",'normal');
@@ -82,8 +86,6 @@ if ($row['anonymous'] == 'yes' && $CURUSER["id"] == $row["owner"]) {
 	write_log("Torrent $id ($row[name]) was deleted by $CURUSER[username] ($reasonstr)",'normal');
 }
 
-//===remove karma
-KPS("-",$uploadtorrent_bonus,$row["owner"]);
 
 //Send pm to torrent uploader
 if ($CURUSER["id"] != $row["owner"]){

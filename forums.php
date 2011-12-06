@@ -656,7 +656,7 @@ if ($action == "viewtopic")
 			print("<a href=\"?action=viewtopic&topicid=".$topicid."\">".$lang_forums['text_view_all_posts']."</a>");
 		else
 			print("<a href=\"".htmlspecialchars("?action=viewtopic&topicid=".$topicid."&authorid=".$posterid)."\">".$lang_forums['text_view_this_author_only']."</a>");
-		print('</li></div><div class="forum-floor"><span class="big">'.$lang_forums['text_number'].($pn+$offset) . $lang_forums['text_lou']."&nbsp;&nbsp;</span><a href=\"#top\"><img class=\"top\" src=\"pic/trans.gif\" alt=\"Top\" title=\"".$lang_forums['text_back_to_top']."\" /></a></div>");
+		print('</li></ul></div><div class="forum-floor"><span class="big">'.$lang_forums['text_number'].($pn+$offset) . $lang_forums['text_lou']."&nbsp;&nbsp;</span><a href=\"#top\"><img class=\"top\" src=\"pic/trans.gif\" alt=\"Top\" title=\"".$lang_forums['text_back_to_top']."\" /></a></div>");
 
 		print("</div>\n");
 

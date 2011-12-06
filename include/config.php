@@ -279,6 +279,7 @@ $nzero_bonus = $BONUS['nzero'];
 $bzero_bonus = $BONUS['bzero'];
 $l_bonus = $BONUS['l'];
 $uploadtorrent_bonus = $BONUS['uploadtorrent'];
+$interval_no_deduct_bonus_on_deletion = $BONUS['interval_no_deduct_bonus_on_deletion'];
 $uploadsubtitle_bonus = $BONUS['uploadsubtitle'];
 $starttopic_bonus = $BONUS['starttopic'];
 $makepost_bonus = $BONUS['makepost'];

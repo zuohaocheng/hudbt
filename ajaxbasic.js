@@ -1,4 +1,3 @@
-function $(e){if(typeof e=='string')e=document.getElementById(e);return e};
 function collect(a,f){var n=[];for(var i=0;i<a.length;i++){var v=f(a[i]);if(v!=null)n.push(v)}return n};
 
 ajax={};
@@ -9,5 +8,5 @@ ajax.get=function(url,func){ajax.send(url,func,'GET')};
 ajax.gets=function(url){var x=ajax.x();x.open('GET',url,false);x.send(null);return x.responseText};
 ajax.post=function(url,func,args){ajax.send(url,func,'POST',args)};
 ajax.posts=function(url,args){var x=ajax.x(); x.open('POST',url,false); x.setRequestHeader('Content-type','application/x-www-form-urlencoded'); x.send(args); return x.responseText};
-ajax.update=function(url,elm){var e=$(elm);var f=function(r){e.innerHTML=r};ajax.get(url,f)};
-ajax.submit=function(url,elm,frm){var e=$(elm);var f=function(r){e.innerHTML=r};ajax.post(url,f,ajax.serialize(frm))};
+ajax.update=function(url,elm){var e=$('#' + elm)[0];var f=function(r){e.innerHTML=r};ajax.get(url,f)};
+ajax.submit=function(url,elm,frm){var e=$('#' + elm)[0];var f=function(r){e.innerHTML=r};ajax.post(url,f,ajax.serialize(frm))};

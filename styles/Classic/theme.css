@@ -24,7 +24,13 @@ table {
     background-color: #f5f4ea;
     text-align: center;
     position: relative;
+    padding-bottom: 2em;
 }
+
+#page>form>table, #page>form>div {
+    margin: 0 auto;
+}
+
 table.message
 {
     border-right: #000000 1px solid;
@@ -679,7 +685,10 @@ A.Peasant_Name:visited{color: #708090}
 
 #searchbox-right li {
     margin: 1.5em 0;
-    
+}
+
+.selected {
+    color: gray;
 }
 
 #torrents h2, #torrents h3 {
@@ -878,6 +887,14 @@ td.category-icon {
     margin-bottom: 0.5em;
 }
 
+.hints ul {
+    font-size: larger;
+
+    list-style: none;
+    list-style-type: none;
+    list-style-image:none;
+}
+
 #nav-reg-signup {
     margin: 0 auto;
     padding: 0.8em;
@@ -912,11 +929,11 @@ td.category-icon {
 }
 
 #outer {
-    padding: 10px 5px 20px 5px;
+    padding: 10px 5px 0 5px;
     text-align: left;
 }
 
-#outer>table, #outer>div {
+#outer>table, #outer>div, #outer>form>table, #outer>form>div {
     margin-left: auto;
     margin-right: auto;
 }

@@ -26,23 +26,7 @@ else {
 cur_user_check ($returnto) ;
 stdhead($lang_login['head_login']);
 
-$s = "<select name=\"sitelanguage\" onchange='submit()'>\n";
-
-$langs = langlist("site_lang");
-
-foreach ($langs as $row)
-{
-	if ($row["site_lang_folder"] == get_langfolder_cookie()) $se = "selected=\"selected\""; else $se = "";
-	$s .= "<option value=\"". $row["id"] ."\" ". $se. ">" . htmlspecialchars($row["lang_name"]) . "</option>\n";
-}
-$s .= "\n</select>";
-?>
-<form method="get" action="<?php echo $_SERVER['PHP_SELF'] ?>">
-<?php
-print('<div id="lang-choice">'.$lang_login['text_select_lang']. $s . "</div>");
-?>
-</form>
-<?php
+lang_choice_before_login();
 
 if (!empty($_GET["returnto"])) {
 	if (!$_GET["nowarn"]) {
@@ -57,7 +41,7 @@ else {
 <form method="post" action="takelogin.php">
 <h2><a href="https://sp-pt.hust.edu.cn:444/Shibboleth.sso/DS?target=http://sp-pt.hust.edu.cn:81">联盟用户在此登录</a></h2>
 <h3>（本校用户可使用南六楼网络中心申请的锐捷账号通过联盟认证登录）</h3>
-<div><ul style="list-style: none;list-style-type: none; list-style-image:none;"><li><?php echo $lang_login['p_need_cookies_enables']?></li>
+<div class="hints"><ul><li><?php echo $lang_login['p_need_cookies_enables']?></li>
 <li>[<b><?php echo $maxloginattempts;?></b>] <?php echo $lang_login['p_fail_ban']?></li>
 <li><?php echo $lang_login['p_you_have']?> <b><?php echo remaining ();?></b> <?php echo $lang_login['p_remaining_tries']?></li></ul></div>
 <table border="0" cellpadding="5" style="margin:0 auto;">
@@ -92,14 +76,18 @@ if (isset($returnto))
 
 ?>
 </form>
-<p><?php echo $lang_login['p_no_account_signup']?></p>
+<div class="hints"><ul>
+<li><?php echo $lang_login['p_no_account_signup']?></li>
 <?php
 if ($smtptype != 'none'){
 ?>
-<p><?php echo $lang_login['p_forget_pass_recover']?></p>
-<p><?php echo $lang_login['p_resend_confirm']?></p>
+<li><?php echo $lang_login['p_forget_pass_recover']?></li>
+<li><?php echo $lang_login['p_resend_confirm']?></li>
 <?php
 }
+?>
+</div></ul>
+<?php
 if ($showhelpbox_main != 'no'){?>
 <table width="700" class="main" border="0" cellspacing="0" cellpadding="0"><tr><td class="embedded">
 <h2><?php echo $lang_login['text_helpbox'] ?><font class="small"> - <?php echo $lang_login['text_helpbox_note'] ?><font id= "waittime" color="red"></font></h2>

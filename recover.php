@@ -2,6 +2,7 @@
 require "include/bittorrent.php";
 dbconn();
 failedloginscheck ("Recover",true);
+cur_user_check ('index.php') ;
 
 $take_recover = !isset($_GET['sitelanguage']);
 $langid = 0 + $_GET['sitelanguage'];
@@ -111,22 +112,9 @@ EOD;
 else
 {
 	stdhead();
-	$s = "<select name=\"sitelanguage\" onchange='submit()'>\n";
-	
-	$langs = langlist("site_lang");
-	
-	foreach ($langs as $row)
-	{
-		if ($row["site_lang_folder"] == get_langfolder_cookie()) $se = " selected=\"selected\""; else $se = "";
-		$s .= "<option value=\"". $row["id"]."\"" . $se. ">" . htmlspecialchars($row["lang_name"]) . "</option>\n";
-	}
-	$s .= "\n</select>";
+	lang_choice_before_login();
 	?>
-	<form method="get" action="<?php echo $_SERVER['PHP_SELF'] ?>">
-	<?php
-	print("<div align=\"right\">".$lang_recover['text_select_lang']. $s . "</div>");
-	?>
-	</form>
+
 	<h1><?php echo $lang_recover['text_recover_user'] ?></h1>
 	<p><?php echo $lang_recover['text_use_form_below'] ?></p>
  	<p><?php echo $lang_recover['text_reply_to_confirmation_email'] ?></p>

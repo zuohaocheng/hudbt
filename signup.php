@@ -46,28 +46,16 @@ else {
 	stdhead($lang_signup['head_signup']);
 }
 
-$s = "<select name=\"sitelanguage\" onchange='submit()'>\n";
 
-$langs = langlist("site_lang");
-
-foreach ($langs as $row)
-{
-	if ($row["site_lang_folder"] == get_langfolder_cookie()) $se = " selected"; else $se = "";
-	$s .= "<option value=". $row["id"] . $se. ">" . htmlspecialchars($row["lang_name"]) . "</option>\n";
+if ($type == 'invite') {
+  $extra = ("<input type=hidden name=type value='invite'><input type=hidden name=invitenumber value='".$code."'>");
 }
-$s .= "\n</select>";
+lang_choice_before_login($extra);
 ?>
-<form method="get" action=<?php echo $_SERVER['PHP_SELF'] ?>>
-<?php
-if ($type == 'invite')
-print("<input type=hidden name=type value='invite'><input type=hidden name=invitenumber value='".$code."'>");
-print("<div align=right valign=top>".$lang_signup['text_select_lang']. $s . "</div>");
-?>
-</form>
-<p>
+
 <form method="post" action="takesignup.php">
 <?php if ($type == 'invite') print("<input type=\"hidden\" name=\"inviter\" value=\"".$inviter."\"><input type=hidden name=type value='invite'");?>
-<table border="1" cellspacing="0" cellpadding="10">
+<table border="1" cellspacing="0" cellpadding="10" style="margin: 0 auto;">
 <?php
 print("<tr><td class=text align=center colspan=2>".$lang_signup['text_cookies_note']."</td></tr>");
 ?>

@@ -183,6 +183,7 @@ $BONUS=array(	'donortimes' => '1.5',
 	'taxpercentage' => '10',
 	'prolinkpoint' => '1',
 	'prolinktime' => '600',
+	     'interval_no_deduct_bonus_on_deletion' => 30 * 86400,
 );
 $CODE=array(	'mainversion' => 'NexusPHP',
 	'subversion' => 'Standard v1.5 Beta 4',
