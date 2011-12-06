@@ -876,6 +876,51 @@ td.category-icon {
     margin: 1.5em auto;
 }
 
+#searchbox {
+    text-align:center;
+}
+
+#searchbox-header {
+    padding:0.5em;
+    font-weight:bold;
+    border-bottom: gray 1px solid;
+}
+
+#ksearchboxmain {
+    position: relative;
+}
+
+#searchbox-cats {
+    padding: 1em;
+}
+
+
+#hotbox {
+    position: absolute;
+    top:0;
+    right:0;
+    padding: 2em 2em 0 2em;
+    width: 100px;
+    text-align: left;
+    background-color: #eff1ff;
+    border-left:1px solid gray;
+}
+
+#hotbox div {
+    margin-bottom: 1.7em;
+}
+
+#hotbox li {
+    padding-bottom: 0.3em;
+}
+
+#searchbox-opts {
+    border-top:1px solid gray;
+    border-bottom:1px solid gray;
+    text-align:left;
+    padding:2em;
+}
+
 #donating {
 	text-align: right;
 	font-weight: bold;

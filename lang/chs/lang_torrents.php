@@ -3,7 +3,7 @@
 $lang_torrents = array
 (
 	'head_search_results_for' => "搜索结果 - ",
-	'text_search_box' => "点击这里展开/关闭<b>搜索箱</b>",
+	'text_search_box' => "展开/关闭搜索箱",
 	'text_category' => "类型:",
 	'text_source' => "来源:",
 	'text_codec' => "编码:",

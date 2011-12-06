@@ -108,21 +108,43 @@ else {
 }
 }
 
-function klappe_news(id) {
-    var $klappText = $('#k' + id);
-    var klappBild = document.getElementById('pic' + id);
+var klappe_news = (function() {
+    var locks = {};
+    var unlock = function (id) {
+	locks[id] = false;
+    };
 
-    if ($klappText.css('display') === 'none') {
-	$klappText.slideDown();
-	//$klappText.show();
-	klappBild.className = 'minus';
+    return function (id, noPic) {
+	if (locks[id]) {
+	    return;
+	}
+	else {
+	    locks[id] = true;
+	}
+
+	var $klappText = $('#k' + id);
+	if (!noPic) {
+	    var klappBild = document.getElementById('pic' + id);
+	}
+
+	if ($klappText.css('display') === 'none') {
+	    $klappText.slideDown('normal', function() {
+		unlock(id);
+	    });
+	    if (!noPic) {
+		klappBild.className = 'minus';
+	    }
+	}
+	else {
+	    $klappText.slideUp('normal', function() {
+		unlock(id);
+	    });
+	    if (!noPic) {
+		klappBild.className = 'plus';
+	    }
+	}
     }
-    else {
-	$klappText.slideUp();
-	//$klappText.hide();
-	klappBild.className = 'plus';
-    }
-}
+})();
 
 function klappe_ext(id)
 {

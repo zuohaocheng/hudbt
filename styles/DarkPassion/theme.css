@@ -852,6 +852,75 @@ td.category-icon {
     margin: 1.5em auto;
 }
 
+#searchbox {
+    text-align:center;
+}
+
+#searchbox-header {
+    padding:0.5em;
+    font-weight:bold;
+    border-bottom: gray 1px solid;
+}
+
+#ksearchboxmain {
+    position: relative;
+}
+
+#searchbox-cats {
+    padding: 1em;
+}
+
+
+#hotbox {
+    position: absolute;
+    top:0;
+    right:0;
+    padding: 2em 2em 0 2em;
+    width: 100px;
+    text-align: left;
+    border-left:1px solid gray;
+}
+
+#hotbox div {
+    margin-bottom: 1.7em;
+}
+
+#hotbox li {
+    padding-bottom: 0.3em;
+}
+
+#searchbox-opts {
+    border-top:1px solid gray;
+    border-bottom:1px solid gray;
+    text-align:left;
+    padding:2em;
+}
+
+#suggcontainer {
+    text-align:right;
+    position: relative;
+}
+
+#suggcontainer>ul {
+    width:204px; border: 1px solid gray; cursor: default;
+    color: black; background-color: white;text-align:left;
+    position:absolute;
+    top:0.2em;
+    right:0.5em;
+}
+
+#suggcontainer>ul>li {
+    display:block;
+    position:relative;
+    margin: 0.2em 0.5em;
+    padding: 0;
+}
+
+#suggestions .selected {
+    color: white;
+    background-color: #3366cc;
+}
+
 #donating {
 	text-align: right;
 	font-weight: bold;
