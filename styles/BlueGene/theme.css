@@ -865,8 +865,9 @@ td.category-icon {
     margin: 0.5em auto;
 }
 
-#detail-username {
-    margin:0;
+#friends, #blocks {
+    width: 880px;
+    margin: 1.5em auto;
 }
 
 #donating {

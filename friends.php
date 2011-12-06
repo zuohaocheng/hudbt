@@ -105,252 +105,81 @@ if ($action == 'delete')
 
 stdhead($lang_friends['head_personal_lists_for']. $user['username']);
 
-print("<p><table class=main border=0 cellspacing=0 cellpadding=0>".
-"<tr><td class=embedded><h1 style='margin:0px'> " . $lang_friends['text_personallist'] . " ".get_username($user[id])."</h1></td></tr></table></p>\n");
+print('<h1 id="page-title">' . $lang_friends['text_personallist'] . " ".get_username($user[id])."</h1>\n");
 
 //Start: Friends
-print("<table class=main width=737 border=0 cellspacing=0 cellpadding=0><tr><td class=embedded>");
 
-print("<br />");
-print("<h2 align=left><a name=\"friends\">" . $lang_friends['text_friendlist'] . "</a></h2>\n");
+print('<div id="friends" class="minor-list"><h2 class="transparentbg"><a name="friends">' . $lang_friends['text_friendlist'] . "</a></h2>\n");
 
-print("<table width=737 border=1 cellspacing=0 cellpadding=5><tr class=tablea><td>");
 
 $i = 0;
 
 unset($friend_id_arr);
 $res = sql_query("SELECT f.friendid as id, u.last_access, u.class, u.avatar, u.title FROM friends AS f LEFT JOIN users as u ON f.friendid = u.id WHERE userid=$userid ORDER BY id") or sqlerr(__FILE__, __LINE__);
-if(mysql_num_rows($res) == 0)
-$friends = $lang_friends['text_friends_empty'];
-else
-while ($friend = mysql_fetch_array($res))
-{
-	$friend_id_arr[] = $friend["id"];
-	$title = $friend["title"];
-	if (!$title)
-		$title = get_user_class_name($friend["class"],false,true,true);
-	$body1 = get_username($friend["id"]) .
-	" ($title)<br /><br />".$lang_friends['text_last_seen_on']. gettime($friend['last_access'],true, false);
-	$body2 = "<a href=friends.php?id=$userid&action=delete&type=friend&targetid=" . $friend['id'] . ">".$lang_friends['text_remove_from_friends']."</a>".
-	"<br /><br /><a href=sendmessage.php?receiver=" . $friend['id'] . ">".$lang_friends['text_send_pm']."</a>";
-
-	$avatar = ($CURUSER["avatars"] == "yes" ? htmlspecialchars($friend["avatar"]) : "");
-	if (!$avatar)
-	$avatar = "pic/default_avatar.png";
-	if ($i % 2 == 0)
-	print("<table width=100% style='padding: 0px'><tr><td class=bottom style='padding: 5px' width=50% align=center>");
-	else
-	print("<td class=bottom style='padding: 5px' width=50% align=center class=tablea>");
-	print("<table class=main width=100% height=75px class=tablea>");
-	print("<tr valign=top class=tableb><td width=75 align=center style='padding: 0px'>" .
-	($avatar ? "<div style='width:75px;height:75px;overflow: hidden'><img width=75px src=\"$avatar\"></div>" : ""). "</td><td>\n");
-	print("<table class=main>");
-	print("<tr><td class=embedded style='padding: 5px' width=80%>$body1</td>\n");
-	print("<td class=embedded style='padding: 5px' width=20%>$body2</td></tr>\n");
-	print("</table>");
-	print("</td></tr>");
-	print("</td></tr></table>\n");
-	if ($i % 2 == 1)
-	print("</td></tr></table>\n");
-	else
-	print("</td>\n");
-	$i++;
+if(mysql_num_rows($res) == 0) {
+  $friends = $lang_friends['text_friends_empty'];
 }
-if ($i % 2 == 1)
-print("<td class=bottom width=50%>&nbsp;</td></tr></table>\n");
-print($friends);
-print("</td></tr></table><br />\n");
+else {
+  print('<ul>');
+  while ($friend = mysql_fetch_array($res)) {
+    $friend_id_arr[] = $friend["id"];
+    $title = $friend["title"];
+    if (!$title)
+      $title = get_user_class_name($friend["class"],false,true,true);
+    $body1 = get_username($friend["id"]) .
+      " ($title)<br /><br />".$lang_friends['text_last_seen_on']. gettime($friend['last_access'],true, false);
+    $body2 = "<a href=friends.php?id=$userid&action=delete&type=friend&targetid=" . $friend['id'] . ">".$lang_friends['text_remove_from_friends']."</a>".
+      "<br /><br /><a href=sendmessage.php?receiver=" . $friend['id'] . ">".$lang_friends['text_send_pm']."</a>";
+
+    $avatar = ($CURUSER["avatars"] == "yes" ? htmlspecialchars($friend["avatar"]) : "");
+    if (!$avatar)
+      $avatar = "pic/default_avatar.png";
+
+
+
+    print('<li><table style="width:400px;height:75px;" class="tablea main">');
+    print("<tr valign=top class=tableb><td width=75 align=center style='padding: 0px'>" .
+	  ($avatar ? "<div style='width:75px;height:75px;overflow: hidden'><img width=75px src=\"$avatar\"></div>" : ""). "</td><td>\n");
+    print('<table class="main">');
+    print("<tr><td class=embedded style='padding: 5px' width=80%>$body1</td>\n");
+    print("<td class=embedded style='padding: 5px' width=20%>$body2</td></tr>\n");
+    print("</table>");
+    print("</td></tr></table>\n");
+
+    print('</li>');
+
+    $i++;
+  }
+  print('</ul>');
+}
+
+  print('</div>');
+
 //End: Friends
-
-//Start: Neighbors
-/*
-print("<table class=main width=737 border=0 cellspacing=0 cellpadding=0><tr><td class=embedded>");
-
-print("<br />");
-print("<h2 align=left><a name=\"friendsadded\">".$lang_friends['text_neighbors']."</a></h2>\n");
-
-print("<table width=737 border=1 cellspacing=0 cellpadding=5><tr class=tablea><td>");
-
-$i = 0;
-$cachefile = "cache/" . get_langfolder_cookie() . "/neighbors/" . $CURUSER['id'] . ".html";
-$cachetime = 24 * 60 * 60; // 1 day
-if (file_exists($cachefile) && (time() - $cachetime< filemtime($cachefile)))
-{
-	include($cachefile);
-}
-else
-{
-	ob_start(); // start the output buffer
-
-	$user_snatched = sql_query("SELECT * FROM snatched WHERE userid = $CURUSER[id]") or sqlerr(__FILE__, __LINE__);
-	if(mysql_num_rows($user_snatched) == 0)
-	$neighbors_info = $lang_friends['text_neighbors_empty'];
-	else
-	{
-		while ($user_snatched_arr = mysql_fetch_array($user_snatched))
-		{
-			$torrent_2_user_value = get_torrent_2_user_value($user_snatched_arr);
-
-			$user_snatched_res_target = sql_query("SELECT * FROM snatched WHERE torrentid = " . $user_snatched_arr['torrentid'] . " AND userid != " . $user_snatched_arr['userid']) or sqlerr(__FILE__, __LINE__);	//
-			if(mysql_num_rows($user_snatched_res_target)>0)	// have other peole snatched this torrent
-			{
-				while($user_snatched_arr_target = mysql_fetch_array($user_snatched_res_target))	// find target user's current analyzing torrent's snatch info
-				{
-					$torrent_2_user_value_target = get_torrent_2_user_value($user_snatched_arr_target);	//get this torrent to target user's value
-
-					if(!isset($other_user_2_curuser_value[$user_snatched_arr_target['userid']]))	// first, set to 0
-					$other_user_2_curuser_value[$user_snatched_arr_target['userid']] = 0.0;
-
-					$other_user_2_curuser_value[$user_snatched_arr_target['userid']] += $torrent_2_user_value_target * $torrent_2_user_value;
-				}
-			}
-		}
-
-		arsort($other_user_2_curuser_value,SORT_NUMERIC);
-		$counter = 0;
-		$total_user = count($other_user_2_curuser_value);
-		while(1)
-		{
-			list($other_user_2_curuser_value_key, $other_user_2_curuser_value_val) = each($other_user_2_curuser_value);
-			//print(" userid: " . $other_user_2_curuser_value_key . " value: " . $other_user_2_curuser_value_val . "<br />");
-
-
-			$neighbors_res = sql_query("SELECT * FROM users WHERE id = " . intval($other_user_2_curuser_value_key)) or sqlerr(__FILE__, __LINE__);
-			if(mysql_num_rows($neighbors_res) == 1)
-			{
-				$neighbors_arr = mysql_fetch_array($neighbors_res) or sqlerr(__FILE__, __LINE__);
-				if($neighbors_arr['enabled'] == 'yes')
-				{
-					$title = $neighbors_arr["title"];
-					if (!$title)
-					$title = get_user_class_name($neighbors_arr["class"],false,true,true);
-					$body1 = get_username($neighbors_arr["id"]) .
-					" ($title)<br /><br />".$lang_friends['text_last_seen_on']. gettime($neighbors_arr['last_access'], true, false);
-
-					
-					$body2 = ((empty($friend_id_arr)||(!in_array($neighbors_arr["id"],$friend_id_arr))) ? "<a href=friends.php?id=$userid&action=add&type=friend&targetid=" . $neighbors_arr['id'] . ">".$lang_friends['text_add_to_friends']."</a>" : "<a href=friends.php?id=$userid&action=delete&type=friend&targetid=" . $neighbors_arr['id'] . ">".$lang_friends['text_remove_from_friends']."</a>") .
-					"<br /><br /><a href=sendmessage.php?receiver=" . $neighbors_arr['id'] . ">".$lang_friends['text_send_pm']."</a>";
-					$avatar = ($CURUSER["avatars"] == "yes" ? htmlspecialchars($neighbors_arr["avatar"]) : "");
-					if (!$avatar)
-					$avatar = "pic/default_avatar.png";
-					if ($i % 2 == 0)
-					print("<table width=100% style='padding: 0px'><tr><td class=bottom style='padding: 5px' width=50% align=center>");
-					else
-					print("<td class=bottom style='padding: 5px' width=50% align=center>");
-					print("<table class=main width=100% height=75px>");
-					print("<tr valign=top><td width=75 align=center style='padding: 0px'>" .
-					($avatar ? "<div style='width:75px;height:75px;overflow: hidden'><img width=75px src=\"$avatar\"></div>" : ""). "</td><td>\n");
-					print("<table class=main>");
-					print("<tr><td class=embedded style='padding: 5px' width=80%>$body1</td>\n");
-					print("<td class=embedded style='padding: 5px' width=20%>$body2</td></tr>\n");
-					print("</table>");
-					print("</td></tr>");
-					print("</td></tr></table>\n");
-					if ($i % 2 == 1)
-					print("</td></tr></table>\n");
-					else
-					print("</td>\n");
-					$i++;
-					$counter++;
-				}
-			}
-			$total_user--;
-			if($counter == 20 || $total_user<=0)	break;	//only the largest 20
-		}
-	}
-	if ($i % 2 == 1)
-	print("<td class=bottom width=50%>&nbsp;</td></tr></table>\n");
-	print($neighbors_info);
-	print("</td></tr></table></table><br />\n");
-
-	// CACHE END //////////////////////////////////////////////////
-
-	// open the cache file for writing
-	$fp = fopen($cachefile, 'w');
-	// save the contents of output buffer to the file
-	fwrite($fp, ob_get_contents());
-	// close the file
-	fclose($fp);
-	// Send the output to the browser
-	ob_end_flush();
-
-	/////////////////////////////////////////////////////////
-}
-
-
-if(mysql_num_rows($friendadd) == 0)
-$friendsno = $lang_friends['text_friends_empty'];
-else
-while ($friend = mysql_fetch_array($friendadd))
-{
-$title = $friend["title"];
-if (!$title)
-$title = get_user_class_name($friend["class"],false,true,true);
-$body1 = get_username($friend["fuid"]) .
-" ($title)<br /><br />".$lang_friends['text_last_seen_on']. $friend['last_access'] .
-"<br />(" . get_elapsed_time(strtotime($friend[last_access])) . $lang_friends['text_ago'].")";
-$body2 = "<a href=friends.php?id=$userid&action=add&type=friend&targetid=" . $friend['fuid'] . ">".$lang_friends['text_add_to_friends']."</a>".
-"<br /><br /><a href=sendmessage.php?receiver=" . $friend['fuid'] . ">".$lang_friends['text_send_pm']."</a>";
-$avatar = ($CURUSER["avatars"] == "yes" ? htmlspecialchars($friend["avatar"]) : "");
-if (!$avatar)
-$avatar = "pic/default_avatar.png";
-if ($i % 2 == 0)
-print("<table width=100% style='padding: 0px'><tr><td class=bottom style='padding: 5px' width=50% align=center>");
-else
-print("<td class=bottom style='padding: 5px' width=50% align=center class=tablea>");
-print("<table class=main width=100% height=75px class=tablea>");
-print("<tr valign=top class=tableb><td width=75 align=center style='padding: 0px'>" .
-($avatar ? "<div style='width:75px;height:75px;overflow: hidden'><img width=75px src=\"$avatar\"></div>" : ""). "</td><td>\n");
-print("<table class=main>");
-print("<tr><td class=embedded style='padding: 5px' width=80%>$body1</td>\n");
-print("<td class=embedded style='padding: 5px' width=20%>$body2</td></tr>\n");
-print("</table>");
-print("</td></tr>");
-print("</td></tr></table>\n");
-if ($i % 2 == 1)
-print("</td></tr></table>\n");
-else
-print("</td>\n");
-$i++;
-}
-if ($i % 2 == 1)
-print("<td class=bottom width=50%>&nbsp;</td></tr></table>\n");
-print($neighbors_info);
-print("</td></tr></table></table><br />\n");
-*/
-//End: Neighbors
-
-
 
 
 $res = sql_query("SELECT blockid as id FROM blocks WHERE userid=$userid ORDER BY id") or sqlerr(__FILE__, __LINE__);
 if(mysql_num_rows($res) == 0)
 $blocks = $lang_friends['text_blocklist_empty'];
-else
-{
+else {
 	$i = 0;
-	$blocks = "<table width=100% cellspacing=0 cellpadding=0>";
-	while ($block = mysql_fetch_array($res))
-	{
+	$blocks = '<ul>';
+	while ($block = mysql_fetch_array($res)) {
 		if ($i % 6 == 0)
-		$blocks .= "<tr>";
-		$blocks .= "<td style='border: none; padding: 4px; spacing: 0px;'>[<font class=small><a href=friends.php?id=$userid&action=delete&type=block&targetid=" .
-		$block['id'] . ">D</a></font>] " . get_username($block["id"]) . "</td>";
+		$blocks .= "<li>[<font class=small><a href=friends.php?id=$userid&action=delete&type=block&targetid=" .
+		$block['id'] . ">D</a></font>] " . get_username($block["id"]) . "</li>";
 		if ($i % 6 == 5)
-		$blocks .= "</tr>";
 		$i++;
 	}
-	$blocks .= "</table>\n";
+	$blocks .= "</ul>\n";
 }
-print("<br /><br />");
-print("<table class=main width=737 border=0 cellspacing=0 cellpadding=5><tr><td class=embedded>");
-print("<h2 align=left><a name=\"blocks\">".$lang_friends['text_blocked_users']."</a></h2></td></tr>");
-print("<tr class=tableb><td style='padding: 10px;'>");
-print($blocks);
-print("</td></tr></table>\n");
 
-print("</td></tr></table>\n");
+print('<div id="blocks" class="minor-list list-seperator"><h2 class="transparentbg"><a name="blocks">'.$lang_friends['text_blocked_users']."</a></h2>");
+print($blocks);
+print('</div>');
+
+
 if (get_user_class() >= $viewuserlist_class)
-	print("<p><a href=users.php><b>".$lang_friends['text_find_user']."</b></a></p>");
+	print('<div class="minor-nav"><a href="users.php">'.$lang_friends['text_find_user']."</div>");
 stdfoot();
 ?>
