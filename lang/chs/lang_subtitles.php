@@ -17,7 +17,8 @@ $lang_subtitles = array
 	'std_failed_moving_file' => "无法移动上传的文件。请将该问题反应给管理员。",
 	'std_this_file' => "该文件名<font color=red><b>",
 	'std_is_invalid' =>"</b></font>在文件夹中无效。",
-	'text_upload_subtitles' => "上传字幕 - 总上传量",
+	'text_upload_subtitles' => "上传字幕",
+	'text_uploaded_size' => "总上传量",
 	'text_rules' => "规则：",
 	'text_rule' => array
 	("上传的文件请使用英文文件名！", 
@@ -26,7 +27,7 @@ $lang_subtitles = array
 	"如果你上传的字幕是合集，请将它们打包为zip或rar后再上传。",
 	"如果你上传的字幕是Vobsub格式(idx+sub)，请打包为zip或rar后再上传。",
 	 "如果你上传的字幕是proper(正确版本)或re-synced(重新调校)的字幕，请在字幕文件名末尾添加proper或resynced标记。"),
-	'text_red_star_required' => "<p >红星号(<font color=red>*</font>)标记的区域必须填写</p>\n",
+	'text_red_star_required' => '红星号(<span class="required-field">*</span>)标记的区域必须填写',
 	'text_uploading_subtitles_for_torrent' => "为种子上传字幕：",
 	'row_file' => "文件",
 	'text_maximum_file_size' => "文件最大限制：",

@@ -3,7 +3,7 @@
 $lang_users = array
 (
 	'head_users' => "用户",
-	'text_users' => "<h1>用户</h1>\n",
+	'text_users' => '用户',
 	'text_search' => "搜索:",
 	'select_any_class' => "(任何等级)",
 	'submit_okay' => "给我搜",
@@ -15,6 +15,7 @@ $lang_users = array
 	'col_class' => "等级",
 	'col_country' => "国家/地区",
 	'select_any_country'=> "(任何国家/地区)",
+	'text_no_found' => '未找到所需用户'
 );
 
 ?>

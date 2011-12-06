@@ -380,7 +380,11 @@ function customgift() {
 }
 
 $(function() {
-    var top = $('#top').offset().top;
+    var $top = $('#top');
+    if ($top.length === 0) {
+	return;
+    }
+    var top = $top.offset().top;
     var $document = $(document);
     $('a[href="#top"]').each(function() {
 	var $a = $(this);

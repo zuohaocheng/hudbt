@@ -16,8 +16,8 @@ function get_langfolder_cookie()
     $langfolder_array = get_langfolder_list();
     foreach($langfolder_array as $lf)
       {
-	if($lf == $_COOKIE["c_lang_folder"])
-	  return $_COOKIE["c_lang_folder"];
+  if($lf == $_COOKIE["c_lang_folder"])
+    return $_COOKIE["c_lang_folder"];
       }
     return $deflang;
   }
@@ -88,8 +88,8 @@ function stderr($heading, $text, $htmlstrip = true, $head = true, $foot = true, 
 function sqlerr($file = '', $line = '')
 {
   print("<table border=\"0\" bgcolor=\"blue\" align=\"left\" cellspacing=\"0\" cellpadding=\"10\" style=\"background: blue;\">" .
-	"<tr><td class=\"embedded\"><font color=\"white\"><h1>SQL Error</h1>\n" .
-	"<b>" . mysql_error() . ($file != '' && $line != '' ? "<p>in $file, line $line</p>" : "") . "</b></font></td></tr></table>");
+  "<tr><td class=\"embedded\"><font color=\"white\"><h1>SQL Error</h1>\n" .
+  "<b>" . mysql_error() . ($file != '' && $line != '' ? "<p>in $file, line $line</p>" : "") . "</b></font></td></tr></table>");
   die;
 }
 
@@ -147,59 +147,59 @@ function print_attachment($dlkey, $enableimage = true, $imageresizer = true)
     $id = $row['id'];
     if ($row['isimage'] == 1)
       {
-	if ($enableimage){
-	  if ($row['thumb'] == 1){
-	    $url = $httpdirectory_attachment."/".$row['location'].".thumb.jpg";
-	  }
-	  else{
-	    $url = $httpdirectory_attachment."/".$row['location'];
-	  }
-	  if($imageresizer == true)
-	    $onclick = " onclick=\"Previewurl('".$httpdirectory_attachment."/".$row['location']."')\"";
-	  else $onclick = "";
-	  $return = "<img id=\"attach".$id."\" alt=\"".htmlspecialchars($row['filename'])."\" src=\"".$url."\"". $onclick .  " onmouseover=\"domTT_activate(this, event, 'content', '".htmlspecialchars("<strong>".$lang_functions['text_size']."</strong>: ".mksize($row['filesize'])."<br />".gettime($row['added']))."', 'styleClass', 'attach', 'x', findPosition(this)[0], 'y', findPosition(this)[1]-58);\" />";
-	}
-	else $return = "";
+  if ($enableimage){
+    if ($row['thumb'] == 1){
+      $url = $httpdirectory_attachment."/".$row['location'].".thumb.jpg";
+    }
+    else{
+      $url = $httpdirectory_attachment."/".$row['location'];
+    }
+    if($imageresizer == true)
+      $onclick = " onclick=\"Previewurl('".$httpdirectory_attachment."/".$row['location']."')\"";
+    else $onclick = "";
+    $return = "<img id=\"attach".$id."\" alt=\"".htmlspecialchars($row['filename'])."\" src=\"".$url."\"". $onclick .  " onmouseover=\"domTT_activate(this, event, 'content', '".htmlspecialchars("<strong>".$lang_functions['text_size']."</strong>: ".mksize($row['filesize'])."<br />".gettime($row['added']))."', 'styleClass', 'attach', 'x', findPosition(this)[0], 'y', findPosition(this)[1]-58);\" />";
+  }
+  else $return = "";
       }
     else
       {
-	switch($row['filetype'])
-	  {
-	  case 'application/x-bittorrent': {
-	    $icon = "<img alt=\"torrent\" src=\"pic/attachicons/torrent.gif\" />";
-	    break;
-	  }
-	  case 'application/zip':{
-	    $icon = "<img alt=\"zip\" src=\"pic/attachicons/archive.gif\" />";
-	    break;
-	  }
-	  case 'application/rar':{
-	    $icon = "<img alt=\"rar\" src=\"pic/attachicons/archive.gif\" />";
-	    break;
-	  }
-	  case 'application/x-7z-compressed':{
-	    $icon = "<img alt=\"7z\" src=\"pic/attachicons/archive.gif\" />";
-	    break;
-	  }
-	  case 'application/x-gzip':{
-	    $icon = "<img alt=\"gzip\" src=\"pic/attachicons/archive.gif\" />";
-	    break;
-	  }
-	  case 'audio/mpeg':{
-	  }
-	  case 'audio/ogg':{
-	    $icon = "<img alt=\"audio\" src=\"pic/attachicons/audio.gif\" />";
-	    break;
-	  }
-	  case 'video/x-flv':{
-	    $icon = "<img alt=\"flv\" src=\"pic/attachicons/flv.gif\" />";
-	    break;
-	  }
-	  default: {
-	    $icon = "<img alt=\"other\" src=\"pic/attachicons/common.gif\" />";
-	  }
-	  }
-	$return = "<div class=\"attach\">".$icon."&nbsp;&nbsp;<a href=\"".htmlspecialchars("getattachment.php?id=".$id."&dlkey=".$dlkey)."\" target=\"_blank\" id=\"attach".$id."\" onmouseover=\"domTT_activate(this, event, 'content', '".htmlspecialchars("<strong>".$lang_functions['text_downloads']."</strong>: ".number_format($row['downloads'])."<br />".gettime($row['added']))."', 'styleClass', 'attach', 'x', findPosition(this)[0], 'y', findPosition(this)[1]-58);\">".htmlspecialchars($row['filename'])."</a>&nbsp;&nbsp;<font class=\"size\">(".mksize($row['filesize']).")</font></div>";
+  switch($row['filetype'])
+    {
+    case 'application/x-bittorrent': {
+      $icon = "<img alt=\"torrent\" src=\"pic/attachicons/torrent.gif\" />";
+      break;
+    }
+    case 'application/zip':{
+      $icon = "<img alt=\"zip\" src=\"pic/attachicons/archive.gif\" />";
+      break;
+    }
+    case 'application/rar':{
+      $icon = "<img alt=\"rar\" src=\"pic/attachicons/archive.gif\" />";
+      break;
+    }
+    case 'application/x-7z-compressed':{
+      $icon = "<img alt=\"7z\" src=\"pic/attachicons/archive.gif\" />";
+      break;
+    }
+    case 'application/x-gzip':{
+      $icon = "<img alt=\"gzip\" src=\"pic/attachicons/archive.gif\" />";
+      break;
+    }
+    case 'audio/mpeg':{
+    }
+    case 'audio/ogg':{
+      $icon = "<img alt=\"audio\" src=\"pic/attachicons/audio.gif\" />";
+      break;
+    }
+    case 'video/x-flv':{
+      $icon = "<img alt=\"flv\" src=\"pic/attachicons/flv.gif\" />";
+      break;
+    }
+    default: {
+      $icon = "<img alt=\"other\" src=\"pic/attachicons/common.gif\" />";
+    }
+    }
+  $return = "<div class=\"attach\">".$icon."&nbsp;&nbsp;<a href=\"".htmlspecialchars("getattachment.php?id=".$id."&dlkey=".$dlkey)."\" target=\"_blank\" id=\"attach".$id."\" onmouseover=\"domTT_activate(this, event, 'content', '".htmlspecialchars("<strong>".$lang_functions['text_downloads']."</strong>: ".number_format($row['downloads'])."<br />".gettime($row['added']))."', 'styleClass', 'attach', 'x', findPosition(this)[0], 'y', findPosition(this)[1]-58);\">".htmlspecialchars($row['filename'])."</a>&nbsp;&nbsp;<font class=\"size\">(".mksize($row['filesize']).")</font></div>";
       }
     return $return;
   }
@@ -252,7 +252,7 @@ function formatFlv($src, $width, $height) {
 }
 function format_urls($text, $newWindow = false) {
   return preg_replace("/((https?|ftp|gopher|news|telnet|mms|rtsp):\/\/[^()\[\]<>\s]+)/ei",
-		      "formatUrl('\\1', ".($newWindow==true ? 1 : 0).", '', 'faqlink')", $text);
+          "formatUrl('\\1', ".($newWindow==true ? 1 : 0).", '', 'faqlink')", $text);
 }
 function format_comment($text, $strip_html = true, $xssclean = false, $newtab = false, $imageresizer = true, $image_max_width = 700, $enableimage = true, $enableflash = true , $imagenum = -1, $image_max_height = 0, $adid = 0)
 {
@@ -321,7 +321,7 @@ function format_comment($text, $strip_html = true, $xssclean = false, $newtab = 
 
   // [url]http://www.example.com[/url]
   $s = preg_replace("/\[url\]([^\[\s]+?)\[\/url\]/ei",
-		    "formatUrl('\\1', ".($newtab==true ? 1 : 0).", '', 'faqlink')", $s);
+        "formatUrl('\\1', ".($newtab==true ? 1 : 0).", '', 'faqlink')", $s);
 
   $s = format_urls($s, $newtab);
   // Quotes
@@ -336,8 +336,8 @@ function format_comment($text, $strip_html = true, $xssclean = false, $newtab = 
     foreach($tempCode as $key=>$code) {
       $s = str_replace("<tempCode_$key>", $code, $s, $count);
       if ($count) {
-	unset($tempCode[$key]);
-	$i = $i+$count;
+  unset($tempCode[$key]);
+  $i = $i+$count;
       }
     }
     $j++;
@@ -448,24 +448,24 @@ function int_check($value,$stdhead = false, $stdfood = true, $die = true, $log =
   else
     {
       if (!is_valid_id($value)) {
-	$msg = "Invalid ID Attempt: Username: ".$CURUSER["username"]." - UserID: ".$CURUSER["id"]." - UserIP : ".getip();
-	if ($log)
-	  write_log($msg,'mod');
+  $msg = "Invalid ID Attempt: Username: ".$CURUSER["username"]." - UserID: ".$CURUSER["id"]." - UserIP : ".getip();
+  if ($log)
+    write_log($msg,'mod');
 
-	if ($stdhead)
-	  stderr($lang_functions['std_error'],$lang_functions['std_invalid_id']);
-	else
-	  {
-	    print ("<h2>".$lang_functions['std_error']."</h2><table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"10\"><tr><td class=\"text\">");
-	    print ($lang_functions['std_invalid_id']."</td></tr></table>");
-	  }
-	if ($stdfood)
-	  stdfoot();
-	if ($die)
-	  die;
+  if ($stdhead)
+    stderr($lang_functions['std_error'],$lang_functions['std_invalid_id']);
+  else
+    {
+      print ("<h2>".$lang_functions['std_error']."</h2><table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"10\"><tr><td class=\"text\">");
+      print ($lang_functions['std_invalid_id']."</td></tr></table>");
+    }
+  if ($stdfood)
+    stdfoot();
+  if ($die)
+    die;
       }
       else
-	return true;
+  return true;
     }
 }
 
@@ -479,7 +479,7 @@ function is_valid_id($id)
 function begin_main_frame($caption = "", $center = false, $width = 100) {
   $tdextra = "";
   if ($caption)
-    print("<h2>".$caption."</h2>");
+    print('<h2 id="page-title">'.$caption."</h2>");
 
   if ($center)
     $tdextra .= 'text-align:center;';
@@ -624,8 +624,8 @@ var myVersion = parseInt(navigator.appVersion);
 
 var is_ie = ((myAgent.indexOf("msie") != -1) && (myAgent.indexOf("opera") == -1));
 var is_nav = ((myAgent.indexOf('mozilla')!=-1) && (myAgent.indexOf('spoofer')==-1)
-	      && (myAgent.indexOf('compatible') == -1) && (myAgent.indexOf('opera')==-1)
-	      && (myAgent.indexOf('webtv') ==-1) && (myAgent.indexOf('hotjava')==-1));
+        && (myAgent.indexOf('compatible') == -1) && (myAgent.indexOf('opera')==-1)
+        && (myAgent.indexOf('webtv') ==-1) && (myAgent.indexOf('hotjava')==-1));
 
 var is_win = ((myAgent.indexOf("win")!=-1) || (myAgent.indexOf("16bit")!=-1));
 var is_mac = (myAgent.indexOf("mac")!=-1);
@@ -638,7 +638,7 @@ function cstat() {
 }
 function stacksize(thearray) {
     for (i = 0; i < thearray.length; i++ ) {
-	if ( (thearray[i] == "") || (thearray[i] == null) || (thearray == 'undefined') ) {return i;}
+  if ( (thearray[i] == "") || (thearray[i] == null) || (thearray == 'undefined') ) {return i;}
     }
     return thearray.length;
 }
@@ -659,18 +659,18 @@ function popstack(thearray) {
 }
 function closeall() {
     if (bbtags[0]) {
-	while (bbtags[0]) {
-	    tagRemove = popstack(bbtags)
-	    if ( (tagRemove != 'color') ) {
-		doInsert("[/"+tagRemove+"]", "", false);
-		eval("document.<?php echo $form?>." + tagRemove + ".value = ' " + tagRemove + " '");
-		eval(tagRemove + "_open = 0");
-	    } else {
-		doInsert("[/"+tagRemove+"]", "", false);
-	    }
-	    cstat();
-	    return;
-	}
+  while (bbtags[0]) {
+      tagRemove = popstack(bbtags)
+      if ( (tagRemove != 'color') ) {
+    doInsert("[/"+tagRemove+"]", "", false);
+    eval("document.<?php echo $form?>." + tagRemove + ".value = ' " + tagRemove + " '");
+    eval(tagRemove + "_open = 0");
+      } else {
+    doInsert("[/"+tagRemove+"]", "", false);
+      }
+      cstat();
+      return;
+  }
     }
     document.<?php echo $form?>.tagcount.value = "Close last, Open 0";
     bbtags = new Array();
@@ -709,8 +709,8 @@ function tag_image(PromptImageURL, PromptError) {
     var FoundErrors = '';
     var enterURL = prompt(PromptImageURL, "http://");
     if (!enterURL || enterURL=="http://") {
-	alert(PromptError+PromptImageURL);
-	return;
+  alert(PromptError+PromptImageURL);
+  return;
     }
     doInsert("[img]"+enterURL+"[/img]", "", false);
 }
@@ -722,8 +722,8 @@ function tag_extimage(content) {
 function tag_email(PromptEmail, PromptError) {
     var emailAddress = prompt(PromptEmail, "");
     if (!emailAddress) {
-	alert(PromptError+PromptEmail);
-	return;
+  alert(PromptError+PromptEmail);
+  return;
     }
     doInsert("[email]"+emailAddress+"[/email]", "", false);
 }
@@ -734,38 +734,38 @@ function doInsert(ibTag, ibClsTag, isSingle)
     var obj_ta = document.<?php echo $form?>.<?php echo $text?>;
     if ( (myVersion >= 4) && is_ie && is_win)
     {
-	if(obj_ta.isTextEdit)
-	{
-	    obj_ta.focus();
-	    var sel = document.selection;
-	    var rng = sel.createRange();
-	    rng.colapse;
-	    if((sel.type == "Text" || sel.type == "None") && rng != null)
-	    {
-		if(ibClsTag != "" && rng.text.length > 0)
-		    ibTag += rng.text + ibClsTag;
-		else if(isSingle) isClose = true;
-		rng.text = ibTag;
-	    }
-	}
-	else
-	{
-	    if(isSingle) isClose = true;
-	    obj_ta.value += ibTag;
-	}
+  if(obj_ta.isTextEdit)
+  {
+      obj_ta.focus();
+      var sel = document.selection;
+      var rng = sel.createRange();
+      rng.colapse;
+      if((sel.type == "Text" || sel.type == "None") && rng != null)
+      {
+    if(ibClsTag != "" && rng.text.length > 0)
+        ibTag += rng.text + ibClsTag;
+    else if(isSingle) isClose = true;
+    rng.text = ibTag;
+      }
+  }
+  else
+  {
+      if(isSingle) isClose = true;
+      obj_ta.value += ibTag;
+  }
     }
     else if (obj_ta.selectionStart || obj_ta.selectionStart == '0')
     {
-	var startPos = obj_ta.selectionStart;
-	var endPos = obj_ta.selectionEnd;
-	obj_ta.value = obj_ta.value.substring(0, startPos) + ibTag + obj_ta.value.substring(endPos, obj_ta.value.length);
-	obj_ta.selectionEnd = startPos + ibTag.length;
-	if(isSingle) isClose = true;
+  var startPos = obj_ta.selectionStart;
+  var endPos = obj_ta.selectionEnd;
+  obj_ta.value = obj_ta.value.substring(0, startPos) + ibTag + obj_ta.value.substring(endPos, obj_ta.value.length);
+  obj_ta.selectionEnd = startPos + ibTag.length;
+  if(isSingle) isClose = true;
     }
     else
     {
-	if(isSingle) isClose = true;
-	obj_ta.value += ibTag;
+  if(isSingle) isClose = true;
+  obj_ta.value += ibTag;
     }
     obj_ta.focus();
     // obj_ta.value = obj_ta.value.replace(/ /, " ");
@@ -780,31 +780,31 @@ function simpletag(thetag)
 {
     var tagOpen = eval(thetag + "_open");
     if (tagOpen == 0) {
-	if(doInsert("[" + thetag + "]", "[/" + thetag + "]", true))
-	{
-	    eval(thetag + "_open = 1");
-	    eval("document.<?php echo $form?>." + thetag + ".value += '*'");
-	    pushstack(bbtags, thetag);
-	    cstat();
-	}
+  if(doInsert("[" + thetag + "]", "[/" + thetag + "]", true))
+  {
+      eval(thetag + "_open = 1");
+      eval("document.<?php echo $form?>." + thetag + ".value += '*'");
+      pushstack(bbtags, thetag);
+      cstat();
+  }
     }
     else {
-	lastindex = 0;
-	for (i = 0; i < bbtags.length; i++ ) {
-	    if ( bbtags[i] == thetag ) {
-		lastindex = i;
-	    }
-	}
+  lastindex = 0;
+  for (i = 0; i < bbtags.length; i++ ) {
+      if ( bbtags[i] == thetag ) {
+    lastindex = i;
+      }
+  }
 
-	while (bbtags[lastindex]) {
-	    tagRemove = popstack(bbtags);
-	    doInsert("[/" + tagRemove + "]", "", false)
-	    if ((tagRemove != 'COLOR') ){
-		eval("document.<?php echo $form?>." + tagRemove + ".value = '" + tagRemove.toUpperCase() + "'");
-		eval(tagRemove + "_open = 0");
-	    }
-	}
-	cstat();
+  while (bbtags[lastindex]) {
+      tagRemove = popstack(bbtags);
+      doInsert("[/" + tagRemove + "]", "", false)
+      if ((tagRemove != 'COLOR') ){
+    eval("document.<?php echo $form?>." + tagRemove + ".value = '" + tagRemove.toUpperCase() + "'");
+    eval(tagRemove + "_open = 0");
+      }
+  }
+  cstat();
     }
 }
 //]]>
@@ -813,125 +813,125 @@ function simpletag(thetag)
   <tr><td align="left" colspan="2">
     <table cellspacing="1" cellpadding="2" border="0">
       <tr>
-	<td class="embedded"><input style="font-weight: bold;font-size:11px; margin-right:3px" type="button" name="b" value="B" onclick="javascript: simpletag('b')" /></td>
-	<td class="embedded"><input class="codebuttons" style="font-style: italic;font-size:11px;margin-right:3px" type="button" name="i" value="I" onclick="javascript: simpletag('i')" /></td>
-	<td class="embedded"><input class="codebuttons" style="text-decoration: underline;font-size:11px;margin-right:3px" type="button" name="u" value="U" onclick="javascript: simpletag('u')" /></td>
-	<?php
-	  print("<td class=\"embedded\"><input class=\"codebuttons\" style=\"font-size:11px;margin-right:3px\" type=\"button\" name='url' value='URL' onclick=\"javascript:tag_url('" . $lang_functions['js_prompt_enter_url'] . "','" . $lang_functions['js_prompt_enter_title'] . "','" . $lang_functions['js_prompt_error'] . "')\" /></td>");
-	  print("<td class=\"embedded\"><input class=\"codebuttons\" style=\"font-size:11px;margin-right:3px\" type=\"button\" name=\"IMG\" value=\"IMG\" onclick=\"javascript: tag_image('" . $lang_functions['js_prompt_enter_image_url'] . "','" . $lang_functions['js_prompt_error'] . "')\" /></td>");
-	  print("<td class=\"embedded\"><input type=\"button\" style=\"font-size:11px;margin-right:3px\" name=\"list\" value=\"List\" onclick=\"tag_list('" . addslashes($lang_functions['js_prompt_enter_item']) . "','" . $lang_functions['js_prompt_error'] . "')\" /></td>");
-	?>
-	<td class="embedded"><input class="codebuttons" style="font-size:11px;margin-right:3px" type="button" name="quote" value="QUOTE" onclick="javascript: simpletag('quote')" /></td>
-	<td class="embedded"><input style="font-size:11px;margin-right:3px" type="button" onclick='javascript:closeall();' name='tagcount' value="Close all tags" /></td>
-	<td class="embedded"><select class="med codebuttons" style="margin-right:3px" name='color' onchange="alterfont(this.options[this.selectedIndex].value, 'color')">
-	  <option value='0'>--- <?php echo $lang_functions['select_color'] ?> ---</option>
-	  <option style="background-color: black" value="Black">Black</option>
-	  <option style="background-color: sienna" value="Sienna">Sienna</option>
-	  <option style="background-color: darkolivegreen" value="DarkOliveGreen">Dark Olive Green</option>
-	  <option style="background-color: darkgreen" value="DarkGreen">Dark Green</option>
-	  <option style="background-color: darkslateblue" value="DarkSlateBlue">Dark Slate Blue</option>
-	  <option style="background-color: navy" value="Navy">Navy</option>
-	  <option style="background-color: indigo" value="Indigo">Indigo</option>
-	  <option style="background-color: darkslategray" value="DarkSlateGray">Dark Slate Gray</option>
-	  <option style="background-color: darkred" value="DarkRed">Dark Red</option>
-	  <option style="background-color: darkorange" value="DarkOrange">Dark Orange</option>
-	  <option style="background-color: olive" value="Olive">Olive</option>
-	  <option style="background-color: green" value="Green">Green</option>
-	  <option style="background-color: teal" value="Teal">Teal</option>
-	  <option style="background-color: blue" value="Blue">Blue</option>
-	  <option style="background-color: slategray" value="SlateGray">Slate Gray</option>
-	  <option style="background-color: dimgray" value="DimGray">Dim Gray</option>
-	  <option style="background-color: red" value="Red">Red</option>
-	  <option style="background-color: sandybrown" value="SandyBrown">Sandy Brown</option>
-	  <option style="background-color: yellowgreen" value="YellowGreen">Yellow Green</option>
-	  <option style="background-color: seagreen" value="SeaGreen">Sea Green</option>
-	  <option style="background-color: mediumturquoise" value="MediumTurquoise">Medium Turquoise</option>
-	  <option style="background-color: royalblue" value="RoyalBlue">Royal Blue</option>
-	  <option style="background-color: purple" value="Purple">Purple</option>
-	  <option style="background-color: gray" value="Gray">Gray</option>
-	  <option style="background-color: magenta" value="Magenta">Magenta</option>
-	  <option style="background-color: orange" value="Orange">Orange</option>
-	  <option style="background-color: yellow" value="Yellow">Yellow</option>
-	  <option style="background-color: lime" value="Lime">Lime</option>
-	  <option style="background-color: cyan" value="Cyan">Cyan</option>
-	  <option style="background-color: deepskyblue" value="DeepSkyBlue">Deep Sky Blue</option>
-	  <option style="background-color: darkorchid" value="DarkOrchid">Dark Orchid</option>
-	  <option style="background-color: silver" value="Silver">Silver</option>
-	  <option style="background-color: pink" value="Pink">Pink</option>
-	  <option style="background-color: wheat" value="Wheat">Wheat</option>
-	  <option style="background-color: lemonchiffon" value="LemonChiffon">Lemon Chiffon</option>
-	  <option style="background-color: palegreen" value="PaleGreen">Pale Green</option>
-	  <option style="background-color: paleturquoise" value="PaleTurquoise">Pale Turquoise</option>
-	  <option style="background-color: lightblue" value="LightBlue">Light Blue</option>
-	  <option style="background-color: plum" value="Plum">Plum</option>
-	  <option style="background-color: white" value="White">White</option>
-	</select></td>
-	<td class="embedded">
-	  <select class="med codebuttons" name='font' onchange="alterfont(this.options[this.selectedIndex].value, 'font')">
-	    <option value="0">--- <?php echo $lang_functions['select_font'] ?> ---</option>
-	    <option value="Arial">Arial</option>
-	    <option value="Arial Black">Arial Black</option>
-	    <option value="Arial Narrow">Arial Narrow</option>
-	    <option value="Book Antiqua">Book Antiqua</option>
-	    <option value="Century Gothic">Century Gothic</option>
-	    <option value="Comic Sans MS">Comic Sans MS</option>
-	    <option value="Courier New">Courier New</option>
-	    <option value="Fixedsys">Fixedsys</option>
-	    <option value="Garamond">Garamond</option>
-	    <option value="Georgia">Georgia</option>
-	    <option value="Impact">Impact</option>
-	    <option value="Lucida Console">Lucida Console</option>
-	    <option value="Lucida Sans Unicode">Lucida Sans Unicode</option>
-	    <option value="Microsoft Sans Serif">Microsoft Sans Serif</option>
-	    <option value="Palatino Linotype">Palatino Linotype</option>
-	    <option value="System">System</option>
-	    <option value="Tahoma">Tahoma</option>
-	    <option value="Times New Roman">Times New Roman</option>
-	    <option value="Trebuchet MS">Trebuchet MS</option>
-	    <option value="Verdana">Verdana</option>
-	  </select>
-	</td>
-	<td class="embedded">
-	  <select class="med codebuttons" name='size' onchange="alterfont(this.options[this.selectedIndex].value, 'size')">
-	    <option value="0">--- <?php echo $lang_functions['select_size'] ?> ---</option>
-	    <option value="1">1</option>
-	    <option value="2">2</option>
-	    <option value="3">3</option>
-	    <option value="4">4</option>
-	    <option value="5">5</option>
-	    <option value="6">6</option>
-	    <option value="7">7</option>
-	  </select></td></tr>
-	</table>
+  <td class="embedded"><input style="font-weight: bold;font-size:11px; margin-right:3px" type="button" name="b" value="B" onclick="javascript: simpletag('b')" /></td>
+  <td class="embedded"><input class="codebuttons" style="font-style: italic;font-size:11px;margin-right:3px" type="button" name="i" value="I" onclick="javascript: simpletag('i')" /></td>
+  <td class="embedded"><input class="codebuttons" style="text-decoration: underline;font-size:11px;margin-right:3px" type="button" name="u" value="U" onclick="javascript: simpletag('u')" /></td>
+  <?php
+    print("<td class=\"embedded\"><input class=\"codebuttons\" style=\"font-size:11px;margin-right:3px\" type=\"button\" name='url' value='URL' onclick=\"javascript:tag_url('" . $lang_functions['js_prompt_enter_url'] . "','" . $lang_functions['js_prompt_enter_title'] . "','" . $lang_functions['js_prompt_error'] . "')\" /></td>");
+    print("<td class=\"embedded\"><input class=\"codebuttons\" style=\"font-size:11px;margin-right:3px\" type=\"button\" name=\"IMG\" value=\"IMG\" onclick=\"javascript: tag_image('" . $lang_functions['js_prompt_enter_image_url'] . "','" . $lang_functions['js_prompt_error'] . "')\" /></td>");
+    print("<td class=\"embedded\"><input type=\"button\" style=\"font-size:11px;margin-right:3px\" name=\"list\" value=\"List\" onclick=\"tag_list('" . addslashes($lang_functions['js_prompt_enter_item']) . "','" . $lang_functions['js_prompt_error'] . "')\" /></td>");
+  ?>
+  <td class="embedded"><input class="codebuttons" style="font-size:11px;margin-right:3px" type="button" name="quote" value="QUOTE" onclick="javascript: simpletag('quote')" /></td>
+  <td class="embedded"><input style="font-size:11px;margin-right:3px" type="button" onclick='javascript:closeall();' name='tagcount' value="Close all tags" /></td>
+  <td class="embedded"><select class="med codebuttons" style="margin-right:3px" name='color' onchange="alterfont(this.options[this.selectedIndex].value, 'color')">
+    <option value='0'>--- <?php echo $lang_functions['select_color'] ?> ---</option>
+    <option style="background-color: black" value="Black">Black</option>
+    <option style="background-color: sienna" value="Sienna">Sienna</option>
+    <option style="background-color: darkolivegreen" value="DarkOliveGreen">Dark Olive Green</option>
+    <option style="background-color: darkgreen" value="DarkGreen">Dark Green</option>
+    <option style="background-color: darkslateblue" value="DarkSlateBlue">Dark Slate Blue</option>
+    <option style="background-color: navy" value="Navy">Navy</option>
+    <option style="background-color: indigo" value="Indigo">Indigo</option>
+    <option style="background-color: darkslategray" value="DarkSlateGray">Dark Slate Gray</option>
+    <option style="background-color: darkred" value="DarkRed">Dark Red</option>
+    <option style="background-color: darkorange" value="DarkOrange">Dark Orange</option>
+    <option style="background-color: olive" value="Olive">Olive</option>
+    <option style="background-color: green" value="Green">Green</option>
+    <option style="background-color: teal" value="Teal">Teal</option>
+    <option style="background-color: blue" value="Blue">Blue</option>
+    <option style="background-color: slategray" value="SlateGray">Slate Gray</option>
+    <option style="background-color: dimgray" value="DimGray">Dim Gray</option>
+    <option style="background-color: red" value="Red">Red</option>
+    <option style="background-color: sandybrown" value="SandyBrown">Sandy Brown</option>
+    <option style="background-color: yellowgreen" value="YellowGreen">Yellow Green</option>
+    <option style="background-color: seagreen" value="SeaGreen">Sea Green</option>
+    <option style="background-color: mediumturquoise" value="MediumTurquoise">Medium Turquoise</option>
+    <option style="background-color: royalblue" value="RoyalBlue">Royal Blue</option>
+    <option style="background-color: purple" value="Purple">Purple</option>
+    <option style="background-color: gray" value="Gray">Gray</option>
+    <option style="background-color: magenta" value="Magenta">Magenta</option>
+    <option style="background-color: orange" value="Orange">Orange</option>
+    <option style="background-color: yellow" value="Yellow">Yellow</option>
+    <option style="background-color: lime" value="Lime">Lime</option>
+    <option style="background-color: cyan" value="Cyan">Cyan</option>
+    <option style="background-color: deepskyblue" value="DeepSkyBlue">Deep Sky Blue</option>
+    <option style="background-color: darkorchid" value="DarkOrchid">Dark Orchid</option>
+    <option style="background-color: silver" value="Silver">Silver</option>
+    <option style="background-color: pink" value="Pink">Pink</option>
+    <option style="background-color: wheat" value="Wheat">Wheat</option>
+    <option style="background-color: lemonchiffon" value="LemonChiffon">Lemon Chiffon</option>
+    <option style="background-color: palegreen" value="PaleGreen">Pale Green</option>
+    <option style="background-color: paleturquoise" value="PaleTurquoise">Pale Turquoise</option>
+    <option style="background-color: lightblue" value="LightBlue">Light Blue</option>
+    <option style="background-color: plum" value="Plum">Plum</option>
+    <option style="background-color: white" value="White">White</option>
+  </select></td>
+  <td class="embedded">
+    <select class="med codebuttons" name='font' onchange="alterfont(this.options[this.selectedIndex].value, 'font')">
+      <option value="0">--- <?php echo $lang_functions['select_font'] ?> ---</option>
+      <option value="Arial">Arial</option>
+      <option value="Arial Black">Arial Black</option>
+      <option value="Arial Narrow">Arial Narrow</option>
+      <option value="Book Antiqua">Book Antiqua</option>
+      <option value="Century Gothic">Century Gothic</option>
+      <option value="Comic Sans MS">Comic Sans MS</option>
+      <option value="Courier New">Courier New</option>
+      <option value="Fixedsys">Fixedsys</option>
+      <option value="Garamond">Garamond</option>
+      <option value="Georgia">Georgia</option>
+      <option value="Impact">Impact</option>
+      <option value="Lucida Console">Lucida Console</option>
+      <option value="Lucida Sans Unicode">Lucida Sans Unicode</option>
+      <option value="Microsoft Sans Serif">Microsoft Sans Serif</option>
+      <option value="Palatino Linotype">Palatino Linotype</option>
+      <option value="System">System</option>
+      <option value="Tahoma">Tahoma</option>
+      <option value="Times New Roman">Times New Roman</option>
+      <option value="Trebuchet MS">Trebuchet MS</option>
+      <option value="Verdana">Verdana</option>
+    </select>
+  </td>
+  <td class="embedded">
+    <select class="med codebuttons" name='size' onchange="alterfont(this.options[this.selectedIndex].value, 'size')">
+      <option value="0">--- <?php echo $lang_functions['select_size'] ?> ---</option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+      <option value="6">6</option>
+      <option value="7">7</option>
+    </select></td></tr>
+  </table>
       </td>
     </tr>
     <?php
-	  if ($enableattach_attachment == 'yes'){
+    if ($enableattach_attachment == 'yes'){
     ?>
     <tr>
       <td colspan="2" valign="middle">
-	<iframe src="<?php echo get_protocol_prefix() . $BASEURL?>/attachment.php" width="100%" height="24" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe>
+  <iframe src="<?php echo get_protocol_prefix() . $BASEURL?>/attachment.php" width="100%" height="24" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe>
       </td>
     </tr>
     <?php
-	  }
-	  print("<tr>");
-	  print("<td align=\"left\"><textarea class=\"bbcode\" cols=\"100\" style=\"width: 650px;\" name=\"".$text."\" id=\"".$text."\" rows=\"20\" onkeydown=\"ctrlenter(event,'compose','qr')\">".$content."</textarea>");
+    }
+    print("<tr>");
+    print("<td align=\"left\"><textarea class=\"bbcode\" cols=\"100\" style=\"width: 650px;\" name=\"".$text."\" id=\"".$text."\" rows=\"20\" onkeydown=\"ctrlenter(event,'compose','qr')\">".$content."</textarea>");
     ?>
   </td>
   <td align="center" width="99%">
     <table cellspacing="1" cellpadding="3">
       <tr>
       <?php
-	  $i = 0;
-	  $quickSmilies = array(1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 13, 16, 17, 19, 20, 21, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 39, 40, 41);
-	  foreach ($quickSmilies as $smily) {
-	    if ($i%4 == 0 && $i > 0) {
-	      print('</tr><tr>');
-	    }
-	    print("<td class=\"embedded\" style=\"padding: 3px;\">".getSmileIt($form, $text, $smily)."</td>");
-	    $i++;
-	  }
+    $i = 0;
+    $quickSmilies = array(1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 13, 16, 17, 19, 20, 21, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 39, 40, 41);
+    foreach ($quickSmilies as $smily) {
+      if ($i%4 == 0 && $i > 0) {
+        print('</tr><tr>');
+      }
+      print("<td class=\"embedded\" style=\"padding: 3px;\">".getSmileIt($form, $text, $smily)."</td>");
+      $i++;
+    }
       ?>
     </tr></table>
     <br />
@@ -943,39 +943,39 @@ function simpletag(thetag)
     function begin_compose($title = "",$type="new", $body="", $hassubject=true, $subject="", $maxsubjectlength=100){
       global $lang_functions;
       if ($title)
-	print('<h1>'.$title."</h1>");
+  print('<h1>'.$title."</h1>");
       switch ($type){
       case 'new': 
-	{
-	  $framename = $lang_functions['text_new'];
-	  break;
-	}
+  {
+    $framename = $lang_functions['text_new'];
+    break;
+  }
       case 'reply': 
-	{
-	  $framename = $lang_functions['text_reply'];
-	  break;
-	}
+  {
+    $framename = $lang_functions['text_reply'];
+    break;
+  }
       case 'quote':
-	{
-	  $framename = $lang_functions['text_quote'];
-	  break;
-	}
+  {
+    $framename = $lang_functions['text_quote'];
+    break;
+  }
       case 'edit':
-	{
-	  $framename = $lang_functions['text_edit'];
-	  break;
-	}
+  {
+    $framename = $lang_functions['text_edit'];
+    break;
+  }
       default:
-	{
-	  $framename = $lang_functions['text_new'];
-	  break;
-	}
+  {
+    $framename = $lang_functions['text_new'];
+    break;
+  }
       }
       begin_frame($framename, true);
       print("<table class=\"main\" width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"5\">\n");
       if ($hassubject)
-	print("<tr><td class=\"rowhead\">".$lang_functions['row_subject']."</td>" .
-	      "<td class=\"rowfollow\" align=\"left\"><input type=\"text\" style=\"width: 650px;\" name=\"subject\" maxlength=\"".$maxsubjectlength."\" value=\"".$subject."\" /></td></tr>\n");
+  print("<tr><td class=\"rowhead\">".$lang_functions['row_subject']."</td>" .
+        "<td class=\"rowfollow\" align=\"left\"><input type=\"text\" style=\"width: 650px;\" name=\"subject\" maxlength=\"".$maxsubjectlength."\" value=\"".$subject."\" /></td></tr>\n");
       print("<tr><td class=\"rowhead\" valign=\"top\">".$lang_functions['row_body']."</td><td class=\"rowfollow\" align=\"left\"><span style=\"display: none;\" id=\"previewouter\"></span><div id=\"editorouter\">");
       textbbcode("compose","body", $body, false);
       print("</div></td></tr>");
@@ -996,11 +996,11 @@ function simpletag(thetag)
     function insert_suggest($keyword, $userid, $pre_escaped = true)
     {
       if(mb_strlen($keyword,"UTF-8") >= 2)
-	{
-	  $userid = 0 + $userid;
-	  if($userid)
-	    sql_query("INSERT INTO suggest(keywords, userid, adddate) VALUES (" . ($pre_escaped == true ? "'" . $keyword . "'" : sqlesc($keyword)) . "," . sqlesc($userid) . ", NOW())") or sqlerr(__FILE__,__LINE__);
-	}
+  {
+    $userid = 0 + $userid;
+    if($userid)
+      sql_query("INSERT INTO suggest(keywords, userid, adddate) VALUES (" . ($pre_escaped == true ? "'" . $keyword . "'" : sqlesc($keyword)) . "," . sqlesc($userid) . ", NOW())") or sqlerr(__FILE__,__LINE__);
+  }
     }
 
     function get_external_tr($imdb_url = "")
@@ -1019,27 +1019,27 @@ function simpletag(thetag)
       unset($result);
 
       if($torrentid)
-	{
-	  $res = sql_query("SELECT url FROM torrents WHERE id=" . $torrentid) or sqlerr(__FILE__,__LINE__);
-	  if(mysql_num_rows($res) == 1)
-	    {
-	      $arr = mysql_fetch_array($res) or sqlerr(__FILE__,__LINE__);
+  {
+    $res = sql_query("SELECT url FROM torrents WHERE id=" . $torrentid) or sqlerr(__FILE__,__LINE__);
+    if(mysql_num_rows($res) == 1)
+      {
+        $arr = mysql_fetch_array($res) or sqlerr(__FILE__,__LINE__);
 
-	      $imdb_id = parse_imdb_id($arr["url"]);
-	      $result['imdb_id'] = $imdb_id;
-	    }
-	}
+        $imdb_id = parse_imdb_id($arr["url"]);
+        $result['imdb_id'] = $imdb_id;
+      }
+  }
       return $result;
     }
 
     function parse_imdb_id($url)
     {
       if ($url != "" && preg_match("/[0-9]{7}/i", $url, $matches)) {
-	return $matches[0];
+  return $matches[0];
       } elseif ($url && is_numeric($url) && strlen($url) < 7) {
-	return str_pad($url, 7, '0', STR_PAD_LEFT);
+  return str_pad($url, 7, '0', STR_PAD_LEFT);
       } else {
-	return false;
+  return false;
       }
     }
 
@@ -1055,49 +1055,49 @@ function simpletag(thetag)
       $torrent_2_user_value = 1.0;
 
       $torrent_res = sql_query("SELECT * FROM torrents WHERE id = " . $user_snatched_arr['torrentid']) or sqlerr(__FILE__, __LINE__);
-      if(mysql_num_rows($torrent_res) == 1)	// torrent still exists
-	{
-	  $torrent_arr = mysql_fetch_array($torrent_res) or sqlerr(__FILE__, __LINE__);
-	  if($torrent_arr['owner'] == $user_snatched_arr['userid'])	// owner's torrent
-	    {
-	      $torrent_2_user_value *= 0.7;	// owner's torrent
-	      $torrent_2_user_value += ($user_snatched_arr['uploaded'] / $torrent_arr['size'] ) -1 > 0 ? 0.2 - exp(-(($user_snatched_arr['uploaded'] / $torrent_arr['size'] ) -1)) : ($user_snatched_arr['uploaded'] / $torrent_arr['size'] ) -1;
-	      $torrent_2_user_value += min(0.1 , ($user_snatched_arr['seedtime'] / 37*60*60 ) * 0.1);
-	    }
-	  else
-	    {
-	      if($user_snatched_arr['finished'] == 'yes')
-		{
-		  $torrent_2_user_value *= 0.5;
-		  $torrent_2_user_value += ($user_snatched_arr['uploaded'] / $torrent_arr['size'] ) -1 > 0 ? 0.4 - exp(-(($user_snatched_arr['uploaded'] / $torrent_arr['size'] ) -1)) : ($user_snatched_arr['uploaded'] / $torrent_arr['size'] ) -1;
-		  $torrent_2_user_value += min(0.1, ($user_snatched_arr['seedtime'] / 22*60*60 ) * 0.1);
-		}
-	      else
-		{
-		  $torrent_2_user_value *= 0.2;
-		  $torrent_2_user_value += min(0.05, ($user_snatched_arr['leechtime'] / 24*60*60 ) * 0.1);	// usually leechtime could not explain much
-		}
-	    }
-	}
-      else	// torrent already deleted, half blind guess, be conservative
-	{
-	  
-	  if($user_snatched_arr['finished'] == 'no' && $user_snatched_arr['uploaded'] > 0 && $user_snatched_arr['downloaded'] == 0)	// possibly owner
-	    {
-	      $torrent_2_user_value *= 0.55;	//conservative
-	      $torrent_2_user_value += min(0.05, ($user_snatched_arr['leechtime'] / 31*60*60 ) * 0.1);
-	      $torrent_2_user_value += min(0.1, ($user_snatched_arr['seedtime'] / 31*60*60 ) * 0.1);
-	    }
-	  else if($user_snatched_arr['downloaded'] > 0)	// possibly leecher
-	    {
-	      $torrent_2_user_value *= 0.38;	//conservative
-	      $torrent_2_user_value *= min(0.22, 0.1 * $user_snatched_arr['uploaded'] / $user_snatched_arr['downloaded']);	// 0.3 for conservative
-	      $torrent_2_user_value += min(0.05, ($user_snatched_arr['leechtime'] / 22*60*60 ) * 0.1);
-	      $torrent_2_user_value += min(0.12, ($user_snatched_arr['seedtime'] / 22*60*60 ) * 0.1);
-	    }
-	  else
-	    $torrent_2_user_value *= 0.0;
-	}
+      if(mysql_num_rows($torrent_res) == 1)  // torrent still exists
+  {
+    $torrent_arr = mysql_fetch_array($torrent_res) or sqlerr(__FILE__, __LINE__);
+    if($torrent_arr['owner'] == $user_snatched_arr['userid'])  // owner's torrent
+      {
+        $torrent_2_user_value *= 0.7;  // owner's torrent
+        $torrent_2_user_value += ($user_snatched_arr['uploaded'] / $torrent_arr['size'] ) -1 > 0 ? 0.2 - exp(-(($user_snatched_arr['uploaded'] / $torrent_arr['size'] ) -1)) : ($user_snatched_arr['uploaded'] / $torrent_arr['size'] ) -1;
+        $torrent_2_user_value += min(0.1 , ($user_snatched_arr['seedtime'] / 37*60*60 ) * 0.1);
+      }
+    else
+      {
+        if($user_snatched_arr['finished'] == 'yes')
+    {
+      $torrent_2_user_value *= 0.5;
+      $torrent_2_user_value += ($user_snatched_arr['uploaded'] / $torrent_arr['size'] ) -1 > 0 ? 0.4 - exp(-(($user_snatched_arr['uploaded'] / $torrent_arr['size'] ) -1)) : ($user_snatched_arr['uploaded'] / $torrent_arr['size'] ) -1;
+      $torrent_2_user_value += min(0.1, ($user_snatched_arr['seedtime'] / 22*60*60 ) * 0.1);
+    }
+        else
+    {
+      $torrent_2_user_value *= 0.2;
+      $torrent_2_user_value += min(0.05, ($user_snatched_arr['leechtime'] / 24*60*60 ) * 0.1);  // usually leechtime could not explain much
+    }
+      }
+  }
+      else  // torrent already deleted, half blind guess, be conservative
+  {
+    
+    if($user_snatched_arr['finished'] == 'no' && $user_snatched_arr['uploaded'] > 0 && $user_snatched_arr['downloaded'] == 0)  // possibly owner
+      {
+        $torrent_2_user_value *= 0.55;  //conservative
+        $torrent_2_user_value += min(0.05, ($user_snatched_arr['leechtime'] / 31*60*60 ) * 0.1);
+        $torrent_2_user_value += min(0.1, ($user_snatched_arr['seedtime'] / 31*60*60 ) * 0.1);
+      }
+    else if($user_snatched_arr['downloaded'] > 0)  // possibly leecher
+      {
+        $torrent_2_user_value *= 0.38;  //conservative
+        $torrent_2_user_value *= min(0.22, 0.1 * $user_snatched_arr['uploaded'] / $user_snatched_arr['downloaded']);  // 0.3 for conservative
+        $torrent_2_user_value += min(0.05, ($user_snatched_arr['leechtime'] / 22*60*60 ) * 0.1);
+        $torrent_2_user_value += min(0.12, ($user_snatched_arr['seedtime'] / 22*60*60 ) * 0.1);
+      }
+    else
+      $torrent_2_user_value *= 0.0;
+  }
       return $torrent_2_user_value;
     }
 
@@ -1105,24 +1105,24 @@ function simpletag(thetag)
       global $lang_functions;
       global $CURUSER;
       if ($CURUSER) {
-	if ($redir) {
-	  header("Location: $redir");
-	  exit(0);
-	}
-	else {
-	  sql_query("UPDATE users SET lang=" . get_langid_from_langcookie() . " WHERE id = ". $CURUSER['id']);
-	  stderr ($lang_functions['std_permission_denied'], $lang_functions['std_already_logged_in']);
-	}	
+  if ($redir) {
+    header("Location: $redir");
+    exit(0);
+  }
+  else {
+    sql_query("UPDATE users SET lang=" . get_langid_from_langcookie() . " WHERE id = ". $CURUSER['id']);
+    stderr ($lang_functions['std_permission_denied'], $lang_functions['std_already_logged_in']);
+  }  
       }
     }
 
     function KPS($type = "+", $point = "1.0", $id = "") {
       global $bonus_tweak;
       if ($point != 0){
-	$point = sqlesc($point);
-	if ($bonus_tweak == "enable" || $bonus_tweak == "disablesave"){
-	  sql_query("UPDATE users SET seedbonus = seedbonus$type$point WHERE id = ".sqlesc($id)) or sqlerr(__FILE__, __LINE__);
-	}
+  $point = sqlesc($point);
+  if ($bonus_tweak == "enable" || $bonus_tweak == "disablesave"){
+    sql_query("UPDATE users SET seedbonus = seedbonus$type$point WHERE id = ".sqlesc($id)) or sqlerr(__FILE__, __LINE__);
+  }
       }
       else return;
     }
@@ -1140,33 +1140,33 @@ function simpletag(thetag)
       $addresses = explode(' ', preg_replace("/[[:space:]]+/", " ", trim($list[value])) );
 
       if(count($addresses) > 0)
-	{
-	  foreach ( $addresses as $email )
-	    {
-	      $email = trim(strtolower(preg_replace('/\./', '\\.', $email)));
-	      if(strstr($email, "@"))
-		{
-		  if(preg_match('/^@/', $email))
-		    {// Any user @host?
-		      // Expand the match expression to catch hosts and
-		      // sub-domains
-		      $email = preg_replace('/^@/', '[@\\.]', $email);
-		      if(preg_match("/".$email."$/", $newEmail))
-			return true;
-		    }
-		}
-	      elseif(preg_match('/@$/', $email))
-		{    // User at any host?
-		  if(preg_match("/^".$email."/", $newEmail))
-		    return true;
-		}
-	      else
-		{                // User@host
-		  if(strtolower($email) == $newEmail)
-		    return true;
-		}
-	    }
-	}
+  {
+    foreach ( $addresses as $email )
+      {
+        $email = trim(strtolower(preg_replace('/\./', '\\.', $email)));
+        if(strstr($email, "@"))
+    {
+      if(preg_match('/^@/', $email))
+        {// Any user @host?
+          // Expand the match expression to catch hosts and
+          // sub-domains
+          $email = preg_replace('/^@/', '[@\\.]', $email);
+          if(preg_match("/".$email."$/", $newEmail))
+      return true;
+        }
+    }
+        elseif(preg_match('/@$/', $email))
+    {    // User at any host?
+      if(preg_match("/^".$email."/", $newEmail))
+        return true;
+    }
+        else
+    {                // User@host
+      if(strtolower($email) == $newEmail)
+        return true;
+    }
+      }
+  }
 
       return false;
     }
@@ -1175,40 +1175,40 @@ function simpletag(thetag)
     {
       global $restrictemaildomain;
       if ($restrictemaildomain == 'yes'){
-	$newEmail = trim(strtolower($newEmail));
-	$sql = sql_query("SELECT * FROM allowedemails") or sqlerr(__FILE__, __LINE__);
-	$list = mysql_fetch_array($sql);
-	$addresses = explode(' ', preg_replace("/[[:space:]]+/", " ", trim($list[value])) );
+  $newEmail = trim(strtolower($newEmail));
+  $sql = sql_query("SELECT * FROM allowedemails") or sqlerr(__FILE__, __LINE__);
+  $list = mysql_fetch_array($sql);
+  $addresses = explode(' ', preg_replace("/[[:space:]]+/", " ", trim($list[value])) );
 
-	if(count($addresses) > 0)
-	  {
-	    foreach ( $addresses as $email )
-	      {
-		$email = trim(strtolower(preg_replace('/\./', '\\.', $email)));
-		if(strstr($email, "@"))
-		  {
-		    if(preg_match('/^@/', $email))
-		      {// Any user @host?
-			// Expand the match expression to catch hosts and
-			// sub-domains
-			$email = preg_replace('/^@/', '[@\\.]', $email);
-			if(preg_match('/'.$email.'$/', $newEmail))
-			  return true;
-		      }
-		  }
-		elseif(preg_match('/@$/', $email))
-		  {    // User at any host?
-		    if(preg_match("/^".$email."/", $newEmail))
-		      return true;
-		  }
-		else
-		  {                // User@host
-		    if(strtolower($email) == $newEmail)
-		      return true;
-		  }
-	      }
-	  }
-	return false;
+  if(count($addresses) > 0)
+    {
+      foreach ( $addresses as $email )
+        {
+    $email = trim(strtolower(preg_replace('/\./', '\\.', $email)));
+    if(strstr($email, "@"))
+      {
+        if(preg_match('/^@/', $email))
+          {// Any user @host?
+      // Expand the match expression to catch hosts and
+      // sub-domains
+      $email = preg_replace('/^@/', '[@\\.]', $email);
+      if(preg_match('/'.$email.'$/', $newEmail))
+        return true;
+          }
+      }
+    elseif(preg_match('/@$/', $email))
+      {    // User at any host?
+        if(preg_match("/^".$email."/", $newEmail))
+          return true;
+      }
+    else
+      {                // User@host
+        if(strtolower($email) == $newEmail)
+          return true;
+      }
+        }
+    }
+  return false;
       }
       else return true;
     }
@@ -1223,10 +1223,10 @@ function simpletag(thetag)
     function redirect($url)
     {
       if(!headers_sent()){
-	header("Location : $url");
+  header("Location : $url");
       }
       else
-	echo "<script type=\"text/javascript\">window.location.href = '$url';</script>";
+  echo "<script type=\"text/javascript\">window.location.href = '$url';</script>";
       exit;
     }
 
@@ -1245,17 +1245,17 @@ function simpletag(thetag)
       $cachefile = $rootpath.$cache ."/" . $CURLANGDIR .'/'.$file.'.html';
       // Serve from the cache if it is younger than $cachetime
       if (file_exists($cachefile) && (time() - $cachetime < filemtime($cachefile)))
-	{
-	  include($cachefile);
-	  if ($endpage)
-	    {
-	      print("<p align=\"center\"><font class=\"small\">".$lang_functions['text_page_last_updated'].date('Y-m-d H:i:s', filemtime($cachefile))."</font></p>");
-	      end_main_frame();
-	      stdfoot();
-	      exit;
-	    }
-	  return false;
-	}
+  {
+    include($cachefile);
+    if ($endpage)
+      {
+        print("<p align=\"center\"><font class=\"small\">".$lang_functions['text_page_last_updated'].date('Y-m-d H:i:s', filemtime($cachefile))."</font></p>");
+        end_main_frame();
+        stdfoot();
+        exit;
+      }
+    return false;
+  }
       ob_start();
       return true;
     }
@@ -1276,9 +1276,9 @@ function simpletag(thetag)
     function get_email_encode($lang)
     {
       if($lang == 'chs' || $lang == 'cht')
-	return "gbk";
+  return "gbk";
       else
-	return "utf-8";
+  return "utf-8";
     }
 
     function change_email_encode($lang, $content)
@@ -1298,9 +1298,9 @@ function simpletag(thetag)
 
     function check_email ($email) {
       if(preg_match('/^[A-Za-z0-9][A-Za-z0-9_.+\-]*@[A-Za-z0-9][A-Za-z0-9_+\-]*(\.[A-Za-z0-9][A-Za-z0-9_+\-]*)+$/', $email))
-	return true;
+  return true;
       else
-	return false;
+  return false;
     }
 
     function sent_mail($to,$fromname,$fromemail,$subject,$body,$type = "confirmation",$showmsg=true,$multiple=false,$multiplemail='',$hdr_encoding = 'UTF-8', $specialcase = '') {
@@ -1308,84 +1308,84 @@ function simpletag(thetag)
       global $rootpath,$SITENAME,$SITEEMAIL,$smtptype,$smtp,$smtp_host,$smtp_port,$smtp_from,$smtpaddress,$smtpport,$accountname,$accountpassword;
       # Is the OS Windows or Mac or Linux?
       if (strtoupper(substr(PHP_OS,0,3)=='WIN')) {
-	$eol="\r\n";
-	$windows = true;
+  $eol="\r\n";
+  $windows = true;
       }
       elseif (strtoupper(substr(PHP_OS,0,3)=='MAC'))
-	$eol="\r";
+  $eol="\r";
       else
-	$eol="\n";
+  $eol="\n";
       if ($smtptype == 'none')
-	return false;
+  return false;
       if ($smtptype == 'default') {
-	@mail($to, "=?".$hdr_encoding."?B?".base64_encode($subject)."?=", $body, "From: ".$SITEEMAIL.$eol."Content-type: text/html; charset=".$hdr_encoding.$eol, "-f$SITEEMAIL") or stderr($lang_functions['std_error'], $lang_functions['text_unable_to_send_mail']);
+  @mail($to, "=?".$hdr_encoding."?B?".base64_encode($subject)."?=", $body, "From: ".$SITEEMAIL.$eol."Content-type: text/html; charset=".$hdr_encoding.$eol, "-f$SITEEMAIL") or stderr($lang_functions['std_error'], $lang_functions['text_unable_to_send_mail']);
       }
       elseif ($smtptype == 'advanced') {
-	$mid = md5(getip() . $fromname);
-	$name = $_SERVER["SERVER_NAME"];
-	$headers .= "From: $fromname <$fromemail>".$eol;
-	$headers .= "Reply-To: $fromname <$fromemail>".$eol;
-	$headers .= "Return-Path: $fromname <$fromemail>".$eol;
-	$headers .= "Message-ID: <$mid thesystem@$name>".$eol;
-	$headers .= "X-Mailer: PHP v".phpversion().$eol;
-	$headers .= "MIME-Version: 1.0".$eol;
-	$headers .= "Content-type: text/html; charset=".$hdr_encoding.$eol;
-	$headers .= "X-Sender: PHP".$eol;
-	if ($multiple)
-	  {
-	    $bcc_multiplemail = "";
-	    foreach ($multiplemail as $toemail)
-	      $bcc_multiplemail = $bcc_multiplemail . ( $bcc_multiplemail != "" ? "," : "") . $toemail;
+  $mid = md5(getip() . $fromname);
+  $name = $_SERVER["SERVER_NAME"];
+  $headers .= "From: $fromname <$fromemail>".$eol;
+  $headers .= "Reply-To: $fromname <$fromemail>".$eol;
+  $headers .= "Return-Path: $fromname <$fromemail>".$eol;
+  $headers .= "Message-ID: <$mid thesystem@$name>".$eol;
+  $headers .= "X-Mailer: PHP v".phpversion().$eol;
+  $headers .= "MIME-Version: 1.0".$eol;
+  $headers .= "Content-type: text/html; charset=".$hdr_encoding.$eol;
+  $headers .= "X-Sender: PHP".$eol;
+  if ($multiple)
+    {
+      $bcc_multiplemail = "";
+      foreach ($multiplemail as $toemail)
+        $bcc_multiplemail = $bcc_multiplemail . ( $bcc_multiplemail != "" ? "," : "") . $toemail;
 
-	    $headers .= "Bcc: $multiplemail.$eol";
-	  }
-	if ($smtp == "yes") {
-	  ini_set('SMTP', $smtp_host);
-	  ini_set('smtp_port', $smtp_port);
-	  if ($windows)
-	    ini_set('sendmail_from', $smtp_from);
-	}
+      $headers .= "Bcc: $multiplemail.$eol";
+    }
+  if ($smtp == "yes") {
+    ini_set('SMTP', $smtp_host);
+    ini_set('smtp_port', $smtp_port);
+    if ($windows)
+      ini_set('sendmail_from', $smtp_from);
+  }
 
-	@mail($to,"=?".$hdr_encoding."?B?".base64_encode($subject)."?=",$body,$headers) or stderr($lang_functions['std_error'], $lang_functions['text_unable_to_send_mail']);
+  @mail($to,"=?".$hdr_encoding."?B?".base64_encode($subject)."?=",$body,$headers) or stderr($lang_functions['std_error'], $lang_functions['text_unable_to_send_mail']);
 
-	ini_restore(SMTP);
-	ini_restore(smtp_port);
-	if ($windows)
-	  ini_restore(sendmail_from);
+  ini_restore(SMTP);
+  ini_restore(smtp_port);
+  if ($windows)
+    ini_restore(sendmail_from);
       }
       elseif ($smtptype == 'external') {
-	require_once ($rootpath . 'include/smtp/smtp.lib.php');
-	$mail = new smtp($hdr_encoding,'eYou');
+  require_once ($rootpath . 'include/smtp/smtp.lib.php');
+  $mail = new smtp($hdr_encoding,'eYou');
 
-	$mail->debug(false);
-	$mail->open($smtpaddress, $smtpport);
-	$mail->auth($accountname, $accountpassword);
-	//	$mail->bcc($multiplemail);
-	$mail->from($SITEEMAIL);
-	if ($multiple)
-	  {
-	    $mail->multi_to_head($to);
-	    foreach ($multiplemail as $toemail)
-	      $mail->multi_to($toemail);
-	  }
-	else
-	  $mail->to($to);
-	$mail->mime_content_transfer_encoding();
-	$mail->mime_charset('text/html', $hdr_encoding);
-	$mail->subject($subject);
-	$mail->body($body);
-	$mail->send() or stderr($lang_functions['std_error'], $lang_functions['text_unable_to_send_mail']);
-	$mail->close();
+  $mail->debug(false);
+  $mail->open($smtpaddress, $smtpport);
+  $mail->auth($accountname, $accountpassword);
+  //  $mail->bcc($multiplemail);
+  $mail->from($SITEEMAIL);
+  if ($multiple)
+    {
+      $mail->multi_to_head($to);
+      foreach ($multiplemail as $toemail)
+        $mail->multi_to($toemail);
+    }
+  else
+    $mail->to($to);
+  $mail->mime_content_transfer_encoding();
+  $mail->mime_charset('text/html', $hdr_encoding);
+  $mail->subject($subject);
+  $mail->body($body);
+  $mail->send() or stderr($lang_functions['std_error'], $lang_functions['text_unable_to_send_mail']);
+  $mail->close();
       }
       if ($showmsg) {
-	if ($type == "confirmation")
-	  stderr($lang_functions['std_success'], $lang_functions['std_confirmation_email_sent']."<b>". htmlspecialchars($to) ."</b>.\n" .
-		 $lang_functions['std_please_wait'],false);
-	elseif ($type == "details")
-	  stderr($lang_functions['std_success'], $lang_functions['std_account_details_sent']."<b>". htmlspecialchars($to) ."</b>.\n" .
-		 $lang_functions['std_please_wait'],false);
+  if ($type == "confirmation")
+    stderr($lang_functions['std_success'], $lang_functions['std_confirmation_email_sent']."<b>". htmlspecialchars($to) ."</b>.\n" .
+     $lang_functions['std_please_wait'],false);
+  elseif ($type == "details")
+    stderr($lang_functions['std_success'], $lang_functions['std_account_details_sent']."<b>". htmlspecialchars($to) ."</b>.\n" .
+     $lang_functions['std_please_wait'],false);
       }else
-	return true;
+  return true;
     }
 
     function failedloginscheck ($type = 'Login') {
@@ -1396,8 +1396,8 @@ function simpletag(thetag)
       $Query = sql_query("SELECT SUM(attempts) FROM loginattempts WHERE ip=$ip") or sqlerr(__FILE__, __LINE__);
       list($total) = mysql_fetch_array($Query);
       if ($total >= $maxloginattempts) {
-	sql_query("UPDATE loginattempts SET banned = 'yes' WHERE ip=$ip") or sqlerr(__FILE__, __LINE__);
-	stderr($type.$lang_functions['std_locked'].$type.$lang_functions['std_attempts_reached'], $lang_functions['std_your_ip_banned']);
+  sql_query("UPDATE loginattempts SET banned = 'yes' WHERE ip=$ip") or sqlerr(__FILE__, __LINE__);
+  stderr($type.$lang_functions['std_locked'].$type.$lang_functions['std_attempts_reached'], $lang_functions['std_your_ip_banned']);
       }
     }
     function failedlogins ($type = 'login', $recover = false, $head = true)
@@ -1407,19 +1407,19 @@ function simpletag(thetag)
       $added = sqlesc(date("Y-m-d H:i:s"));
       $a = (@mysql_fetch_row(@sql_query("select count(*) from loginattempts where ip=$ip"))) or sqlerr(__FILE__, __LINE__);
       if ($a[0] == 0)
-	sql_query("INSERT INTO loginattempts (ip, added, attempts) VALUES ($ip, $added, 1)") or sqlerr(__FILE__, __LINE__);
+  sql_query("INSERT INTO loginattempts (ip, added, attempts) VALUES ($ip, $added, 1)") or sqlerr(__FILE__, __LINE__);
       else
-	sql_query("UPDATE loginattempts SET attempts = attempts + 1 where ip=$ip") or sqlerr(__FILE__, __LINE__);
+  sql_query("UPDATE loginattempts SET attempts = attempts + 1 where ip=$ip") or sqlerr(__FILE__, __LINE__);
       if ($recover)
-	sql_query("UPDATE loginattempts SET type = 'recover' WHERE ip = $ip") or sqlerr(__FILE__, __LINE__);
+  sql_query("UPDATE loginattempts SET type = 'recover' WHERE ip = $ip") or sqlerr(__FILE__, __LINE__);
       if ($type == 'silent')
-	return;
+  return;
       elseif ($type == 'login')
-	{
-	  stderr($lang_functions['std_login_failed'],$lang_functions['std_login_failed_note'],false);
-	}
+  {
+    stderr($lang_functions['std_login_failed'],$lang_functions['std_login_failed_note'],false);
+  }
       else
-	stderr($lang_functions['std_failed'],$type,false, $head);
+  stderr($lang_functions['std_failed'],$type,false, $head);
 
     }
 
@@ -1430,19 +1430,19 @@ function simpletag(thetag)
       $added = sqlesc(date("Y-m-d H:i:s"));
       $a = (@mysql_fetch_row(@sql_query("select count(*) from loginattempts where ip=$ip"))) or sqlerr(__FILE__, __LINE__);
       if ($a[0] == 0)
-	sql_query("INSERT INTO loginattempts (ip, added, attempts) VALUES ($ip, $added, 1)") or sqlerr(__FILE__, __LINE__);
+  sql_query("INSERT INTO loginattempts (ip, added, attempts) VALUES ($ip, $added, 1)") or sqlerr(__FILE__, __LINE__);
       else
-	sql_query("UPDATE loginattempts SET attempts = attempts + 1 where ip=$ip") or sqlerr(__FILE__, __LINE__);
+  sql_query("UPDATE loginattempts SET attempts = attempts + 1 where ip=$ip") or sqlerr(__FILE__, __LINE__);
       if ($recover)
-	sql_query("UPDATE loginattempts SET type = 'recover' WHERE ip = $ip") or sqlerr(__FILE__, __LINE__);
+  sql_query("UPDATE loginattempts SET type = 'recover' WHERE ip = $ip") or sqlerr(__FILE__, __LINE__);
       if ($type == 'silent')
-	return;
+  return;
       elseif ($type == 'login')
-	{
-	  stderr($lang_functions['std_login_failed'],$lang_functions['std_login_failed_note'],false);
-	}
+  {
+    stderr($lang_functions['std_login_failed'],$lang_functions['std_login_failed_note'],false);
+  }
       else
-	stderr($lang_functions['std_recover_failed'],$type,false, $head);
+  stderr($lang_functions['std_recover_failed'],$type,false, $head);
     }
 
     function remaining ($type = 'login') {
@@ -1453,9 +1453,9 @@ function simpletag(thetag)
       list($total) = mysql_fetch_array($Query);
       $remaining = $maxloginattempts - $total;
       if ($remaining <= 2 )
-	$remaining = "<font color=\"red\" size=\"2\">[".$remaining."]</font>";
+  $remaining = "<font color=\"red\" size=\"2\">[".$remaining."]</font>";
       else
-	$remaining = "<font color=\"green\" size=\"2\">[".$remaining."]</font>";
+  $remaining = "<font color=\"green\" size=\"2\">[".$remaining."]</font>";
 
       return $remaining;
     }
@@ -1464,29 +1464,29 @@ function simpletag(thetag)
       global $lang_functions;
       global $invitesystem, $registration, $maxusers, $SITENAME, $maxip;
       if ($type == "invitesystem") {
-	if ($invitesystem == "no") {
-	  stderr($lang_functions['std_oops'], $lang_functions['std_invite_system_disabled'], 0);
-	}
+  if ($invitesystem == "no") {
+    stderr($lang_functions['std_oops'], $lang_functions['std_invite_system_disabled'], 0);
+  }
       }
 
       if ($type == "normal") {
-	if ($registration == "no") {
-	  stderr($lang_functions['std_sorry'], $lang_functions['std_open_registration_disabled'], 0);
-	}
+  if ($registration == "no") {
+    stderr($lang_functions['std_sorry'], $lang_functions['std_open_registration_disabled'], 0);
+  }
       }
 
       if ($maxuserscheck) {
-	$res = sql_query("SELECT COUNT(*) FROM users") or sqlerr(__FILE__, __LINE__);
-	$arr = mysql_fetch_row($res);
-	if ($arr[0] >= $maxusers)
-	  stderr($lang_functions['std_sorry'], $lang_functions['std_account_limit_reached'], 0);
+  $res = sql_query("SELECT COUNT(*) FROM users") or sqlerr(__FILE__, __LINE__);
+  $arr = mysql_fetch_row($res);
+  if ($arr[0] >= $maxusers)
+    stderr($lang_functions['std_sorry'], $lang_functions['std_account_limit_reached'], 0);
       }
 
       if ($ipcheck) {
-	$ip = getip () ;
-	$a = (@mysql_fetch_row(@sql_query("select count(*) from users where ip='" . mysql_real_escape_string($ip) . "'"))) or sqlerr(__FILE__, __LINE__);
-	if ($a[0] > $maxip)
-	  stderr($lang_functions['std_sorry'], $lang_functions['std_the_ip']."<b>" . htmlspecialchars($ip) ."</b>". $lang_functions['std_used_many_times'],false);
+  $ip = getip () ;
+  $a = (@mysql_fetch_row(@sql_query("select count(*) from users where ip='" . mysql_real_escape_string($ip) . "'"))) or sqlerr(__FILE__, __LINE__);
+  if ($a[0] > $maxip)
+    stderr($lang_functions['std_sorry'], $lang_functions['std_the_ip']."<b>" . htmlspecialchars($ip) ."</b>". $lang_functions['std_used_many_times'],false);
       }
       return true;
     }
@@ -1496,10 +1496,10 @@ function simpletag(thetag)
       $set = array("A","B","C","D","E","F","G","H","P","R","M","N","1","2","3","4","5","6","7","8","9");
       $str;
       for($i=1;$i<=$length;$i++)
-	{
-	  $ch = rand(0, count($set)-1);
-	  $str .= $set[$ch];
-	}
+  {
+    $ch = rand(0, count($set)-1);
+    $str .= $set[$ch];
+  }
       return $str;
     }
     function image_code () {
@@ -1514,36 +1514,36 @@ function simpletag(thetag)
     function check_code ($imagehash, $imagestring, $where = 'signup.php',$maxattemptlog=false,$head=true) {
       global $lang_functions;
       $query = sprintf("SELECT * FROM regimages WHERE imagehash='%s' AND imagestring='%s'",
-		       mysql_real_escape_string($imagehash),
-		       mysql_real_escape_string($imagestring));
+           mysql_real_escape_string($imagehash),
+           mysql_real_escape_string($imagestring));
       $sql = sql_query($query);
       $imgcheck = mysql_fetch_array($sql);
       if(!$imgcheck['dateline']) {
-	$delete = sprintf("DELETE FROM regimages WHERE imagehash='%s'",
-			  mysql_real_escape_string($imagehash));
-	sql_query($delete);
-	if (!$maxattemptlog)
-	  bark($lang_functions['std_invalid_image_code']."<a href=\"".htmlspecialchars($where)."\">".$lang_functions['std_here_to_request_new']);
-	else
-	  failedlogins($lang_functions['std_invalid_image_code']."<a href=\"".htmlspecialchars($where)."\">".$lang_functions['std_here_to_request_new'],true,$head);
+  $delete = sprintf("DELETE FROM regimages WHERE imagehash='%s'",
+        mysql_real_escape_string($imagehash));
+  sql_query($delete);
+  if (!$maxattemptlog)
+    bark($lang_functions['std_invalid_image_code']."<a href=\"".htmlspecialchars($where)."\">".$lang_functions['std_here_to_request_new']);
+  else
+    failedlogins($lang_functions['std_invalid_image_code']."<a href=\"".htmlspecialchars($where)."\">".$lang_functions['std_here_to_request_new'],true,$head);
       }else{
-	$delete = sprintf("DELETE FROM regimages WHERE imagehash='%s'",
-			  mysql_real_escape_string($imagehash));
-	sql_query($delete);
-	return true;
+  $delete = sprintf("DELETE FROM regimages WHERE imagehash='%s'",
+        mysql_real_escape_string($imagehash));
+  sql_query($delete);
+  return true;
       }
     }
     function show_image_code () {
       global $lang_functions;
       global $iv;
       if ($iv == "yes") {
-	unset($imagehash);
-	$imagehash = image_code () ;
-	print ("<tr><td class=\"rowhead\">".$lang_functions['row_security_image']."</td>");
-	print ("<td align=\"left\"><img src=\"".htmlspecialchars("image.php?action=regimage&imagehash=".$imagehash)."\" border=\"0\" alt=\"CAPTCHA\" /></td></tr>");
-	print ("<tr><td class=\"rowhead\">".$lang_functions['row_security_code']."</td><td align=\"left\">");
-	print("<input type=\"text\" autocomplete=\"off\" style=\"width: 180px; border: 1px solid gray\" name=\"imagestring\" value=\"\" />");
-	print("<input type=\"hidden\" name=\"imagehash\" value=\"$imagehash\" /></td></tr>");
+  unset($imagehash);
+  $imagehash = image_code () ;
+  print ("<tr><td class=\"rowhead\">".$lang_functions['row_security_image']."</td>");
+  print ("<td align=\"left\"><img src=\"".htmlspecialchars("image.php?action=regimage&imagehash=".$imagehash)."\" border=\"0\" alt=\"CAPTCHA\" /></td></tr>");
+  print ("<tr><td class=\"rowhead\">".$lang_functions['row_security_code']."</td><td align=\"left\">");
+  print("<input type=\"text\" autocomplete=\"off\" style=\"width: 180px; border: 1px solid gray\" name=\"imagestring\" value=\"\" />");
+  print("<input type=\"hidden\" name=\"imagehash\" value=\"$imagehash\" /></td></tr>");
       }
     }
 
@@ -1552,22 +1552,22 @@ function simpletag(thetag)
       global $lang_functions;
       global $Cache;
       if (!$ret = $Cache->get_value('location_list')){
-	$ret = array();
-	$res = sql_query("SELECT * FROM locations") or sqlerr(__FILE__, __LINE__);
-	while ($row = mysql_fetch_array($res))
-	  $ret[] = $row;
-	$Cache->cache_value('location_list', $ret, 152800);
+  $ret = array();
+  $res = sql_query("SELECT * FROM locations") or sqlerr(__FILE__, __LINE__);
+  while ($row = mysql_fetch_array($res))
+    $ret[] = $row;
+  $Cache->cache_value('location_list', $ret, 152800);
       }
       $location = array($lang_functions['text_unknown'],"");
 
       foreach($ret AS $arr)
-	{
-	  if(in_ip_range(false, $ip, $arr["start_ip"], $arr["end_ip"]))
-	    {
-	      $location = array($arr["name"], $lang_functions['text_user_ip'].":&nbsp;" . $ip . ($arr["location_main"] != "" ? "&nbsp;".$lang_functions['text_location_main'].":&nbsp;" . $arr["location_main"] : ""). ($arr["location_sub"] != "" ? "&nbsp;".$lang_functions['text_location_sub'].":&nbsp;" . $arr["location_sub"] : "") . "&nbsp;".$lang_functions['text_ip_range'].":&nbsp;" . $arr["start_ip"] . "&nbsp;~&nbsp;". $arr["end_ip"]);
-	      break;
-	    }
-	}
+  {
+    if(in_ip_range(false, $ip, $arr["start_ip"], $arr["end_ip"]))
+      {
+        $location = array($arr["name"], $lang_functions['text_user_ip'].":&nbsp;" . $ip . ($arr["location_main"] != "" ? "&nbsp;".$lang_functions['text_location_main'].":&nbsp;" . $arr["location_main"] : ""). ($arr["location_sub"] != "" ? "&nbsp;".$lang_functions['text_location_sub'].":&nbsp;" . $arr["location_sub"] : "") . "&nbsp;".$lang_functions['text_ip_range'].":&nbsp;" . $arr["start_ip"] . "&nbsp;~&nbsp;". $arr["end_ip"]);
+        break;
+      }
+  }
       return $location;
     }
 
@@ -1575,20 +1575,20 @@ function simpletag(thetag)
     {
       // if only one ip, check if is this ip
       if($ip_two===false){
-	if(($long ? (long2ip($ip_one) == $targetip) : ( $ip_one == $targetip))){
-	  $ip=true;
-	}
-	else{
-	  $ip=false;
-	}
+  if(($long ? (long2ip($ip_one) == $targetip) : ( $ip_one == $targetip))){
+    $ip=true;
+  }
+  else{
+    $ip=false;
+  }
       }
       else{
-	if($long ? ($ip_one<=ip2long($targetip) && $ip_two>=ip2long($targetip)) : (ip2long($ip_one)<=ip2long($targetip) && ip2long($ip_two)>=ip2long($targetip))){
-	  $ip=true;
-	}
-	else{
-	  $ip=false;
-	}
+  if($long ? ($ip_one<=ip2long($targetip) && $ip_two>=ip2long($targetip)) : (ip2long($ip_one)<=ip2long($targetip) && ip2long($ip_two)>=ip2long($targetip))){
+    $ip=true;
+  }
+  else{
+    $ip=false;
+  }
       }
       return $ip;
     }
@@ -1597,10 +1597,10 @@ function simpletag(thetag)
     function validip_format($ip)
     {
       $ipPattern =
-	'/\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' .
-	'(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' .
-	'(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' .
-	'(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b/';
+  '/\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' .
+  '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' .
+  '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' .
+  '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b/';
 
       return preg_match($ipPattern, $ip);
     }
@@ -1616,41 +1616,41 @@ function simpletag(thetag)
       elseif ($ratio < 0.95 || $gigs < 9.5) $max = 4;
       else $max = 0;
       if ($maxdlsystem == "yes") {
-	if (get_user_class() < UC_VIP) {
-	  if ($max > 0)
-	    print ("<font class='color_slots'>".$lang_functions['text_slots']."</font><a href=\"faq.php#id215\">$max</a>");
-	  else
-	    print ("<font class='color_slots'>".$lang_functions['text_slots']."</font>".$lang_functions['text_unlimited']);
-	}else
-	  print ("<font class='color_slots'>".$lang_functions['text_slots']."</font>".$lang_functions['text_unlimited']);
+  if (get_user_class() < UC_VIP) {
+    if ($max > 0)
+      print ("<font class='color_slots'>".$lang_functions['text_slots']."</font><a href=\"faq.php#id215\">$max</a>");
+    else
+      print ("<font class='color_slots'>".$lang_functions['text_slots']."</font>".$lang_functions['text_unlimited']);
+  }else
+    print ("<font class='color_slots'>".$lang_functions['text_slots']."</font>".$lang_functions['text_unlimited']);
       }else
-	print ("<font class='color_slots'>".$lang_functions['text_slots']."</font>".$lang_functions['text_unlimited']);
+  print ("<font class='color_slots'>".$lang_functions['text_slots']."</font>".$lang_functions['text_unlimited']);
     }
 
     function WriteConfig ($configname = NULL, $config = NULL) {
       global $lang_functions, $CONFIGURATIONS;
 
       if (file_exists('config/allconfig.php')) {
-	require('config/allconfig.php');
+  require('config/allconfig.php');
       }
       if ($configname) {
-	$$configname=$config;
+  $$configname=$config;
       }
       $path = './config/allconfig.php';
       if (!file_exists($path) || !is_writable ($path)) {
-	stdmsg($lang_functions['std_error'], $lang_functions['std_cannot_read_file']."[<b>".htmlspecialchars($path)."</b>]".$lang_functions['std_access_permission_note']);
+  stdmsg($lang_functions['std_error'], $lang_functions['std_cannot_read_file']."[<b>".htmlspecialchars($path)."</b>]".$lang_functions['std_access_permission_note']);
       }
       $data = "<?php\n";
       foreach ($CONFIGURATIONS as $CONFIGURATION) {
-	$data .= "\$$CONFIGURATION=".getExportedValue($$CONFIGURATION).";\n";
+  $data .= "\$$CONFIGURATION=".getExportedValue($$CONFIGURATION).";\n";
       }
       $fp = @fopen ($path, 'w');
       if (!$fp) {
-	stdmsg($lang_functions['std_error'], $lang_functions['std_cannot_open_file']."[<b>".htmlspecialchars($path)."</b>]".$lang_functions['std_to_save_info'].$lang_functions['std_access_permission_note']);
+  stdmsg($lang_functions['std_error'], $lang_functions['std_cannot_open_file']."[<b>".htmlspecialchars($path)."</b>]".$lang_functions['std_to_save_info'].$lang_functions['std_access_permission_note']);
       }
       $Res = @fwrite($fp, $data);
       if (empty($Res)) {
-	stdmsg($lang_functions['std_error'], $lang_functions['text_cannot_save_info_in']."[<b>".htmlspecialchars($path)."</b>]".$lang_functions['std_access_permission_note']);
+  stdmsg($lang_functions['std_error'], $lang_functions['text_cannot_save_info_in']."[<b>".htmlspecialchars($path)."</b>]".$lang_functions['std_access_permission_note']);
       }
       fclose($fp);
       return true;
@@ -1659,23 +1659,23 @@ function simpletag(thetag)
     function getExportedValue($input,$t = null) {
       switch (gettype($input)) {
       case 'string':
-	return "'".str_replace(array("\\","'"),array("\\\\","\'"),$input)."'";
+  return "'".str_replace(array("\\","'"),array("\\\\","\'"),$input)."'";
       case 'array':
-	$output = "array(\r";
-	foreach ($input as $key => $value) {
-	  $output .= $t."\t".getExportedValue($key,$t."\t").' => '.getExportedValue($value,$t."\t");
-	  $output .= ",\n";
-	}
-	$output .= $t.')';
-	return $output;
+  $output = "array(\r";
+  foreach ($input as $key => $value) {
+    $output .= $t."\t".getExportedValue($key,$t."\t").' => '.getExportedValue($value,$t."\t");
+    $output .= ",\n";
+  }
+  $output .= $t.')';
+  return $output;
       case 'boolean':
-	return $input ? 'true' : 'false';
+  return $input ? 'true' : 'false';
       case 'NULL':
-	return 'NULL';
+  return 'NULL';
       case 'integer':
       case 'double':
       case 'float':
-	return "'".(string)$input."'";
+  return "'".(string)$input."'";
       }
       return 'NULL';
     }
@@ -1687,16 +1687,16 @@ function simpletag(thetag)
       global $useCronTriggerCleanUp;
 
       if (!mysql_connect($mysql_host, $mysql_user, $mysql_pass))
-	{
-	  switch (mysql_errno())
-	    {
-	    case 1040:
-	    case 2002:
-	      die("<html><head><meta http-equiv=refresh content=\"10 $_SERVER[REQUEST_URI]\"><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body><table border=0 width=100% height=100%><tr><td><h3 align=center>".$lang_functions['std_server_load_very_high']."</h3></td></tr></table></body></html>");
-	    default:
-	      die("[" . mysql_errno() . "] dbconn: mysql_connect: " . mysql_error());
-	    }
-	}
+  {
+    switch (mysql_errno())
+      {
+      case 1040:
+      case 2002:
+        die("<html><head><meta http-equiv=refresh content=\"10 $_SERVER[REQUEST_URI]\"><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body><table border=0 width=100% height=100%><tr><td><h3 align=center>".$lang_functions['std_server_load_very_high']."</h3></td></tr></table></body></html>");
+      default:
+        die("[" . mysql_errno() . "] dbconn: mysql_connect: " . mysql_error());
+      }
+  }
       mysql_query("SET NAMES UTF8");
       mysql_query("SET collation_connection = 'utf8_general_ci'");
       mysql_query("SET sql_mode=''");
@@ -1705,7 +1705,7 @@ function simpletag(thetag)
       userlogin();
 
       if (!$useCronTriggerCleanUp && $autoclean) {
-	register_shutdown_function("autoclean");
+  register_shutdown_function("autoclean");
       }
     }
     function get_user_row($id)
@@ -1714,22 +1714,22 @@ function simpletag(thetag)
       static $curuserRowUpdated = false;
       static $neededColumns = array('id', 'noad', 'class', 'enabled', 'privacy', 'avatar', 'signature', 'uploaded', 'downloaded', 'last_access', 'username', 'donor', 'leechwarn', 'warned', 'title');
       if ($id == $CURUSER['id']) {
-	$row = array();
-	foreach($neededColumns as $column) {
-	  $row[$column] = $CURUSER[$column];
-	}
-	if (!$curuserRowUpdated) {
-	  $Cache->cache_value('user_'.$CURUSER['id'].'_content', $row, 900);
-	  $curuserRowUpdated = true;
-	}
+  $row = array();
+  foreach($neededColumns as $column) {
+    $row[$column] = $CURUSER[$column];
+  }
+  if (!$curuserRowUpdated) {
+    $Cache->cache_value('user_'.$CURUSER['id'].'_content', $row, 900);
+    $curuserRowUpdated = true;
+  }
       } elseif (!$row = $Cache->get_value('user_'.$id.'_content')){
-	$res = sql_query("SELECT ".implode(',', $neededColumns)." FROM users WHERE id = ".sqlesc($id)) or sqlerr(__FILE__,__LINE__);
-	$row = mysql_fetch_array($res);
-	$Cache->cache_value('user_'.$id.'_content', $row, 900);
+  $res = sql_query("SELECT ".implode(',', $neededColumns)." FROM users WHERE id = ".sqlesc($id)) or sqlerr(__FILE__,__LINE__);
+  $row = mysql_fetch_array($res);
+  $Cache->cache_value('user_'.$id.'_content', $row, 900);
       }
 
       if (!$row)
-	return false;
+  return false;
       else return $row;
     }
 
@@ -1743,75 +1743,75 @@ function simpletag(thetag)
       $ip = getip();
       $nip = ip2long($ip);
       if ($nip) //$nip would be false for IPv6 address
-	{
-	  
-	  $res = sql_query("SELECT * FROM bans WHERE $nip >= first AND $nip <= last") or sqlerr(__FILE__, __LINE__);
-	  if (mysql_num_rows($res) > 0)
-	    {
-	      header("HTTP/1.0 403 Forbidden");
-	      print("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body>".$lang_functions['text_unauthorized_ip']."</body></html>\n");
-	      die;
-	    }
-	  
-	}
+  {
+    
+    $res = sql_query("SELECT * FROM bans WHERE $nip >= first AND $nip <= last") or sqlerr(__FILE__, __LINE__);
+    if (mysql_num_rows($res) > 0)
+      {
+        header("HTTP/1.0 403 Forbidden");
+        print("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body>".$lang_functions['text_unauthorized_ip']."</body></html>\n");
+        die;
+      }
+    
+  }
 
       if (empty($_COOKIE["c_secure_pass"]) || empty($_COOKIE["c_secure_uid"]) || empty($_COOKIE["c_secure_login"]))
-	return;
+  return;
       if ($_COOKIE["c_secure_login"] == base64("yeah"))
-	{
-	  //if (empty($_SESSION["s_secure_uid"]) || empty($_SESSION["s_secure_pass"]))
-	  //return;
-	}
+  {
+    //if (empty($_SESSION["s_secure_uid"]) || empty($_SESSION["s_secure_pass"]))
+    //return;
+  }
       $b_id = base64($_COOKIE["c_secure_uid"],false);
       $id = 0 + $b_id;
       if (!$id || !is_valid_id($id) || strlen($_COOKIE["c_secure_pass"]) != 32)
-	return;
+  return;
 
       if ($_COOKIE["c_secure_login"] == base64("yeah"))
-	{
-	  //if (strlen($_SESSION["s_secure_pass"]) != 32)
-	  //return;
-	}
+  {
+    //if (strlen($_SESSION["s_secure_pass"]) != 32)
+    //return;
+  }
 
       $res = sql_query("SELECT * FROM users WHERE users.id = ".sqlesc($id)." AND users.enabled='yes' AND users.status = 'confirmed' LIMIT 1");
       $row = mysql_fetch_array($res);
       if (!$row)
-	return;
+  return;
 
       $sec = hash_pad($row["secret"]);
 
       //die(base64_decode($_COOKIE["c_secure_login"]));
 
       if ($_COOKIE["c_secure_login"] == base64("yeah"))
-	{
+  {
 
-	  if ($_COOKIE["c_secure_pass"] != md5($row["passhash"].$_SERVER["REMOTE_ADDR"]))
-	    return;
-	}
+    if ($_COOKIE["c_secure_pass"] != md5($row["passhash"].$_SERVER["REMOTE_ADDR"]))
+      return;
+  }
       else
-	{
-	  if ($_COOKIE["c_secure_pass"] !== md5($row["passhash"]))
-	    return;
-	}
+  {
+    if ($_COOKIE["c_secure_pass"] !== md5($row["passhash"]))
+      return;
+  }
 
       if ($_COOKIE["c_secure_login"] == base64("yeah"))
-	{
-	  //if ($_SESSION["s_secure_pass"] !== md5($row["passhash"].$_SERVER["REMOTE_ADDR"]))
-	  //return;
-	}
+  {
+    //if ($_SESSION["s_secure_pass"] !== md5($row["passhash"].$_SERVER["REMOTE_ADDR"]))
+    //return;
+  }
       if (!$row["passkey"]){
-	$passkey = md5($row['username'].date("Y-m-d H:i:s").$row['passhash']);
-	sql_query("UPDATE users SET passkey = ".sqlesc($passkey)." WHERE id=" . sqlesc($row["id"]));// or die(mysql_error());
+  $passkey = md5($row['username'].date("Y-m-d H:i:s").$row['passhash']);
+  sql_query("UPDATE users SET passkey = ".sqlesc($passkey)." WHERE id=" . sqlesc($row["id"]));// or die(mysql_error());
       }
 
       $oldip = $row['ip'];
       $row['ip'] = $ip;
       $GLOBALS["CURUSER"] = $row;//initialize global $CURUSER which will be used frequently in other operations//noted by bluemonster 20111107
       if ($_GET['clearcache'] && get_user_class() >= UC_MODERATOR) {
-	$Cache->setClearCache(1);
+  $Cache->setClearCache(1);
       }
       if ($enablesqldebug_tweak == 'yes' && get_user_class() >= $sqldebug_tweak) {
-	error_reporting(E_ALL & ~E_NOTICE);
+  error_reporting(E_ALL & ~E_NOTICE);
       }
     }
 
@@ -1822,16 +1822,16 @@ function simpletag(thetag)
       $res = sql_query("SELECT value_u FROM avps WHERE arg = 'lastcleantime'");
       $row = mysql_fetch_array($res);
       if (!$row) {
-	sql_query("INSERT INTO avps (arg, value_u) VALUES ('lastcleantime',$now)") or sqlerr(__FILE__, __LINE__);
-	return false;
+  sql_query("INSERT INTO avps (arg, value_u) VALUES ('lastcleantime',$now)") or sqlerr(__FILE__, __LINE__);
+  return false;
       }
       $ts = $row[0];
       if ($ts + $autoclean_interval_one > $now) {
-	return false;
+  return false;
       }
       sql_query("UPDATE avps SET value_u=$now WHERE arg='lastcleantime' AND value_u = $ts") or sqlerr(__FILE__, __LINE__);
       if (!mysql_affected_rows()) {
-	return false;
+  return false;
       }
       require_once($rootpath . 'include/cleanup.php');
       return docleanup();
@@ -1839,7 +1839,7 @@ function simpletag(thetag)
 
     function unesc($x) {
       if (get_magic_quotes_gpc())
-	return stripslashes($x);
+  return stripslashes($x);
       return $x;
     }
 
@@ -1847,59 +1847,59 @@ function simpletag(thetag)
     function getsize_int($amount, $unit = "G")
     {
       if ($unit == "B")
-	return floor($amount);
+  return floor($amount);
       elseif ($unit == "K")
-	return floor($amount * 1024);
+  return floor($amount * 1024);
       elseif ($unit == "M")
-	return floor($amount * 1048576);
+  return floor($amount * 1048576);
       elseif ($unit == "G")
-	return floor($amount * 1073741824);
+  return floor($amount * 1073741824);
       elseif($unit == "T")
-	return floor($amount * 1099511627776);
+  return floor($amount * 1099511627776);
       elseif($unit == "P")
-	return floor($amount * 1125899906842624);
+  return floor($amount * 1125899906842624);
     }
 
     function mksize_compact($bytes)
     {
       if ($bytes < 1000 * 1024)
-	return number_format($bytes / 1024, 2) . "<br />KB";
+  return number_format($bytes / 1024, 2) . "<br />KB";
       elseif ($bytes < 1000 * 1048576)
-	return number_format($bytes / 1048576, 2) . "<br />MB";
+  return number_format($bytes / 1048576, 2) . "<br />MB";
       elseif ($bytes < 1000 * 1073741824)
-	return number_format($bytes / 1073741824, 2) . "<br />GB";
+  return number_format($bytes / 1073741824, 2) . "<br />GB";
       elseif ($bytes < 1000 * 1099511627776)
-	return number_format($bytes / 1099511627776, 3) . "<br />TB";
+  return number_format($bytes / 1099511627776, 3) . "<br />TB";
       else
-	return number_format($bytes / 1125899906842624, 3) . "<br />PB";
+  return number_format($bytes / 1125899906842624, 3) . "<br />PB";
     }
 
     function mksize_loose($bytes)
     {
       if ($bytes < 1000 * 1024)
-	return number_format($bytes / 1024, 2) . "&nbsp;KB";
+  return number_format($bytes / 1024, 2) . "&nbsp;KB";
       elseif ($bytes < 1000 * 1048576)
-	return number_format($bytes / 1048576, 2) . "&nbsp;MB";
+  return number_format($bytes / 1048576, 2) . "&nbsp;MB";
       elseif ($bytes < 1000 * 1073741824)
-	return number_format($bytes / 1073741824, 2) . "&nbsp;GB";
+  return number_format($bytes / 1073741824, 2) . "&nbsp;GB";
       elseif ($bytes < 1000 * 1099511627776)
-	return number_format($bytes / 1099511627776, 3) . "&nbsp;TB";
+  return number_format($bytes / 1099511627776, 3) . "&nbsp;TB";
       else
-	return number_format($bytes / 1125899906842624, 3) . "&nbsp;PB";
+  return number_format($bytes / 1125899906842624, 3) . "&nbsp;PB";
     }
 
     function mksize($bytes)
     {
       if ($bytes < 1000 * 1024)
-	return number_format($bytes / 1024, 2) . " KB";
+  return number_format($bytes / 1024, 2) . " KB";
       elseif ($bytes < 1000 * 1048576)
-	return number_format($bytes / 1048576, 2) . " MB";
+  return number_format($bytes / 1048576, 2) . " MB";
       elseif ($bytes < 1000 * 1073741824)
-	return number_format($bytes / 1073741824, 2) . " GB";
+  return number_format($bytes / 1073741824, 2) . " GB";
       elseif ($bytes < 1000 * 1099511627776)
-	return number_format($bytes / 1099511627776, 3) . " TB";
+  return number_format($bytes / 1099511627776, 3) . " TB";
       else
-	return number_format($bytes / 1125899906842624, 3) . " PB";
+  return number_format($bytes / 1125899906842624, 3) . " PB";
     }
 
 
@@ -1907,17 +1907,17 @@ function simpletag(thetag)
     {
       $bytes = max(0, $bytes);
       if ($bytes < 1000)
-	return floor($bytes) . " B";
+  return floor($bytes) . " B";
       elseif ($bytes < 1000 * 1024)
-	return floor($bytes / 1024) . " kB";
+  return floor($bytes / 1024) . " kB";
       elseif ($bytes < 1000 * 1048576)
-	return floor($bytes / 1048576) . " MB";
+  return floor($bytes / 1048576) . " MB";
       elseif ($bytes < 1000 * 1073741824)
-	return floor($bytes / 1073741824) . " GB";
+  return floor($bytes / 1073741824) . " GB";
       elseif ($bytes < 1000 * 1099511627776)
-	return floor($bytes / 1099511627776) . " TB";
+  return floor($bytes / 1099511627776) . " TB";
       else
-	return floor($bytes / 1125899906842624) . " PB";
+  return floor($bytes / 1125899906842624) . " PB";
     }
 
     function deadtime() {
@@ -1928,23 +1928,23 @@ function simpletag(thetag)
     function mkprettytime($s) {
       global $lang_functions;
       if ($s < 0)
-	$s = 0;
+  $s = 0;
       $t = array();
       foreach (array("60:sec","60:min","24:hour","0:day") as $x) {
-	$y = explode(":", $x);
-	if ($y[0] > 1) {
-	  $v = $s % $y[0];
-	  $s = floor($s / $y[0]);
-	}
-	else
-	  $v = $s;
-	$t[$y[1]] = $v;
+  $y = explode(":", $x);
+  if ($y[0] > 1) {
+    $v = $s % $y[0];
+    $s = floor($s / $y[0]);
+  }
+  else
+    $v = $s;
+  $t[$y[1]] = $v;
       }
 
       if ($t["day"])
-	return $t["day"] . $lang_functions['text_day'] . sprintf("%02d:%02d:%02d", $t["hour"], $t["min"], $t["sec"]);
+  return $t["day"] . $lang_functions['text_day'] . sprintf("%02d:%02d:%02d", $t["hour"], $t["min"], $t["sec"]);
       if ($t["hour"])
-	return sprintf("%d:%02d:%02d", $t["hour"], $t["min"], $t["sec"]);
+  return sprintf("%d:%02d:%02d", $t["hour"], $t["min"], $t["sec"]);
       //    if ($t["min"])
       return sprintf("%d:%02d", $t["min"], $t["sec"]);
       //    return $t["sec"] . " secs";
@@ -1952,44 +1952,44 @@ function simpletag(thetag)
 
     function mkglobal($vars) {
       if (!is_array($vars))
-	$vars = explode(":", $vars);
+  $vars = explode(":", $vars);
       foreach ($vars as $v) {
-	if (isset($_GET[$v]))
-	  $GLOBALS[$v] = unesc($_GET[$v]);
-	elseif (isset($_POST[$v]))
-	  $GLOBALS[$v] = unesc($_POST[$v]);
-	else
-	  return 0;
+  if (isset($_GET[$v]))
+    $GLOBALS[$v] = unesc($_GET[$v]);
+  elseif (isset($_POST[$v]))
+    $GLOBALS[$v] = unesc($_POST[$v]);
+  else
+    return 0;
       }
       return 1;
     }
 
     function tr($x,$y,$noesc=0,$relation='') {
       if ($noesc)
-	$a = $y;
+  $a = $y;
       else {
-	$a = htmlspecialchars($y);
-	$a = str_replace("\n", "<br />\n", $a);
+  $a = htmlspecialchars($y);
+  $a = str_replace("\n", "<br />\n", $a);
       }
       print("<tr".( $relation ? " relation = \"$relation\"" : "")."><td class=\"rowhead nowrap\" valign=\"top\" align=\"right\">$x</td><td class=\"rowfollow\" valign=\"top\" align=\"left\">".$a."</td></tr>\n");
     }
 
     function tr_small($x,$y,$noesc=0,$relation='') {
       if ($noesc)
-	$a = $y;
+  $a = $y;
       else {
-	$a = htmlspecialchars($y);
-	//$a = str_replace("\n", "<br />\n", $a);
+  $a = htmlspecialchars($y);
+  //$a = str_replace("\n", "<br />\n", $a);
       }
       print("<tr".( $relation ? " relation = \"$relation\"" : "")."><td width=\"1%\" class=\"rowhead nowrap\" valign=\"top\" align=\"right\">".$x."</td><td width=\"99%\" class=\"rowfollow\" valign=\"top\" align=\"left\">".$a."</td></tr>\n");
     }
 
     function twotd($x,$y,$nosec=0){
       if ($noesc)
-	$a = $y;
+  $a = $y;
       else {
-	$a = htmlspecialchars($y);
-	$a = str_replace("\n", "<br />\n", $a);
+  $a = htmlspecialchars($y);
+  $a = str_replace("\n", "<br />\n", $a);
       }
       print("<td class=\"rowhead\">".$x."</td><td class=\"rowfollow\">".$y."</td>");
     }
@@ -2007,10 +2007,10 @@ function simpletag(thetag)
       $langid = 0 + $langid;
       $res = sql_query("SELECT * FROM language WHERE site_lang = 1 AND id = " . sqlesc($langid)) or sqlerr(__FILE__, __LINE__);
       if(mysql_num_rows($res) == 1)
-	{
-	  $arr = mysql_fetch_array($res)  or sqlerr(__FILE__, __LINE__);
-	  return $arr['site_lang_folder'];
-	}
+  {
+    $arr = mysql_fetch_array($res)  or sqlerr(__FILE__, __LINE__);
+    return $arr['site_lang_folder'];
+  }
       else return $deflang;
     }
 
@@ -2019,11 +2019,11 @@ function simpletag(thetag)
       global $sptime; 
       // it's sunday
       if($sptime == 'yes' && (date("w",time()) == '0' || (date("w",time()) == 6) && (date("G",time()) >=12 && date("G",time()) <=23)))
-	{
-	  return true;
-	}
+  {
+    return true;
+  }
       else
-	return false;
+  return false;
     }
 
     function menu ($selected = "home") {
@@ -2033,46 +2033,46 @@ function simpletag(thetag)
       global $USERUPDATESET;
       $script_name = $_SERVER["SCRIPT_FILENAME"];
       if (preg_match("/index/i", $script_name)) {
-	$selected = "home";
+  $selected = "home";
       }elseif (preg_match("/forums/i", $script_name)) {
-	$selected = "forums";
+  $selected = "forums";
       }elseif (preg_match("/torrents/i", $script_name)) {
-	$selected = "torrents";
+  $selected = "torrents";
       }elseif (preg_match("/music/i", $script_name)) {
-	$selected = "music";
+  $selected = "music";
       }elseif (preg_match("/offers/i", $script_name) OR preg_match("/offcomment/i", $script_name)) {
-	$selected = "offers";
+  $selected = "offers";
       }elseif (preg_match("/upload/i", $script_name)) {
-	$selected = "upload";
+  $selected = "upload";
       }elseif (preg_match("/subtitles/i", $script_name)) {
-	$selected = "subtitles";
+  $selected = "subtitles";
       }elseif (preg_match("/usercp/i", $script_name)) {
-	$selected = "usercp";
+  $selected = "usercp";
       }elseif (preg_match("/topten/i", $script_name)) {
-	$selected = "topten";
+  $selected = "topten";
       }elseif (preg_match("/log/i", $script_name)) {
-	$selected = "log";
+  $selected = "log";
       }elseif (preg_match("/rules/i", $script_name)) {
-	$selected = "rules";
+  $selected = "rules";
       }elseif (preg_match("/faq/i", $script_name)) {
-	$selected = "faq";
+  $selected = "faq";
       }elseif (preg_match("/staff/i", $script_name)) {
-	$selected = "staff";
+  $selected = "staff";
       }else
-	 $selected = "";
+   $selected = "";
       print ("<div id=\"nav\"><ul id=\"mainmenu\" class=\"menu\">");
       print ("<li" . ($selected == "home" ? " class=\"selected\"" : "") . "><a href=\"index.php\">" . $lang_functions['text_home'] . "</a></li>");
       if ($enableextforum != 'yes')
-	print ("<li" . ($selected == "forums" ? " class=\"selected\"" : "") . "><a href=\"forums.php\">".$lang_functions['text_forums']."</a></li>");
+  print ("<li" . ($selected == "forums" ? " class=\"selected\"" : "") . "><a href=\"forums.php\">".$lang_functions['text_forums']."</a></li>");
       else
-	print ("<li" . ($selected == "forums" ? " class=\"selected\"" : "") . "><a href=\"" . $extforumurl."\" target=\"_blank\">".$lang_functions['text_forums']."</a></li>");
+  print ("<li" . ($selected == "forums" ? " class=\"selected\"" : "") . "><a href=\"" . $extforumurl."\" target=\"_blank\">".$lang_functions['text_forums']."</a></li>");
       print ("<li" . ($selected == "torrents" ? " class=\"selected\"" : "") . "><a href=\"torrents.php\">".$lang_functions['text_torrents']."</a></li>");
       if ($enablespecial == 'yes')
-	print ("<li" . ($selected == "music" ? " class=\"selected\"" : "") . "><a href=\"music.php\">".$lang_functions['text_music']."</a></li>");
+  print ("<li" . ($selected == "music" ? " class=\"selected\"" : "") . "><a href=\"music.php\">".$lang_functions['text_music']."</a></li>");
       if ($enableoffer == 'yes')
-	print ("<li" . ($selected == "offers" ? " class=\"selected\"" : "") . "><a href=\"offers.php\">".$lang_functions['text_offers']."</a></li>");
+  print ("<li" . ($selected == "offers" ? " class=\"selected\"" : "") . "><a href=\"offers.php\">".$lang_functions['text_offers']."</a></li>");
       if ($enablerequest == 'yes')
-	print ("<li" . ($selected == "requests" ? " class=\"selected\"" : "") . "><a href=\"viewrequests.php\">".$lang_functions['text_request']."</a></li>");
+  print ("<li" . ($selected == "requests" ? " class=\"selected\"" : "") . "><a href=\"viewrequests.php\">".$lang_functions['text_request']."</a></li>");
       print ("<li" . ($selected == "upload" ? " class=\"selected\"" : "") . "><a href=\"upload.php\">".$lang_functions['text_upload']."</a></li>");
       print ("<li" . ($selected == "subtitles" ? " class=\"selected\"" : "") . "><a href=\"subtitles.php\">".$lang_functions['text_subtitles']."</a></li>");
       print ("<li" . ($selected == "usercp" ? " class=\"selected\"" : "") . "><a href=\"usercp.php\">".$lang_functions['text_user_cp']."</a></li>");
@@ -2084,8 +2084,8 @@ function simpletag(thetag)
       print ("</ul></div>");
 
       if ($CURUSER){
-	if ($where_tweak == 'yes')
-	  $USERUPDATESET[] = "page = ".sqlesc($selected);
+  if ($where_tweak == 'yes')
+    $USERUPDATESET[] = "page = ".sqlesc($selected);
       }
     }
     function get_css_row() {
@@ -2093,12 +2093,12 @@ function simpletag(thetag)
       static $rows;
       $cssid = $CURUSER ? $CURUSER["stylesheet"] : $defcss;
       if (!$rows && !$rows = $Cache->get_value('stylesheet_content')){
-	$rows = array();
-	$res = sql_query("SELECT * FROM stylesheets ORDER BY id ASC");
-	while($row = mysql_fetch_array($res)) {
-	  $rows[$row['id']] = $row;
-	}
-	$Cache->cache_value('stylesheet_content', $rows, 95400);
+  $rows = array();
+  $res = sql_query("SELECT * FROM stylesheets ORDER BY id ASC");
+  while($row = mysql_fetch_array($res)) {
+    $rows[$row['id']] = $row;
+  }
+  $Cache->cache_value('stylesheet_content', $rows, 95400);
       }
       return $rows[$cssid];
     }
@@ -2107,18 +2107,18 @@ function simpletag(thetag)
       $cssRow = get_css_row();
       $ss_uri = $cssRow['uri'];
       if (!$ss_uri)
-	$ss_uri = get_single_value("stylesheets","uri","WHERE id=".sqlesc($defcss));
+  $ss_uri = get_single_value("stylesheets","uri","WHERE id=".sqlesc($defcss));
       if ($file == "")
-	return $ss_uri;
+  return $ss_uri;
       else return $ss_uri.$file;
     }
 
     function get_font_css_uri(){
       global $CURUSER;
       if ($CURUSER['fontsize'] == 'large')
-	$file = 'largefont.css';
+  $file = 'largefont.css';
       elseif ($CURUSER['fontsize'] == 'small')
-	$file = 'smallfont.css';
+  $file = 'smallfont.css';
       else $file = 'mediumfont.css';
       return "styles/".$file;
     }
@@ -2133,11 +2133,11 @@ function simpletag(thetag)
     {
       static $catPath = array();
       if (!$catPath[$cat]) {
-	global $CURUSER, $CURLANGDIR;
-	$catrow = get_category_row($cat);
-	$catmode = $catrow['catmodename'];
-	$caticonrow = get_category_icon_row($CURUSER['caticon']);
-	$catPath[$cat] = "category/".$catmode."/".$caticonrow['folder'] . ($caticonrow['multilang'] == 'yes' ? $CURLANGDIR."/" : "");
+  global $CURUSER, $CURLANGDIR;
+  $catrow = get_category_row($cat);
+  $catmode = $catrow['catmodename'];
+  $caticonrow = get_category_icon_row($CURUSER['caticon']);
+  $catPath[$cat] = "category/".$catmode."/".$caticonrow['folder'] . ($caticonrow['multilang'] == 'yes' ? $CURLANGDIR."/" : "");
       }
       return $catPath[$cat];
     }
@@ -2146,16 +2146,16 @@ function simpletag(thetag)
     {
       global $CURUSER;
       if ($CURUSER)
-	{
-	  $ss_a = @mysql_fetch_array(@sql_query("select hltr from stylesheets where id=" . $CURUSER["stylesheet"]));
-	  if ($ss_a) $hltr = $ss_a["hltr"];
-	}
+  {
+    $ss_a = @mysql_fetch_array(@sql_query("select hltr from stylesheets where id=" . $CURUSER["stylesheet"]));
+    if ($ss_a) $hltr = $ss_a["hltr"];
+  }
       if (!$hltr)
-	{
-	  $r = sql_query("SELECT hltr FROM stylesheets WHERE id=5") or die(mysql_error());
-	  $a = mysql_fetch_array($r) or die(mysql_error());
-	  $hltr = $a["hltr"];
-	}
+  {
+    $r = sql_query("SELECT hltr FROM stylesheets WHERE id=5") or die(mysql_error());
+    $a = mysql_fetch_array($r) or die(mysql_error());
+    $hltr = $a["hltr"];
+  }
       return $hltr;
     }
 
@@ -2176,30 +2176,30 @@ function simpletag(thetag)
 
       //Insert old ip into iplog
       if ($CURUSER){
-	if ($iplog1 == "yes") {
-	  if (($oldip != $CURUSER["ip"]) && $CURUSER["ip"])
-	    sql_query("INSERT INTO iplog (ip, userid, access) VALUES (" . sqlesc($CURUSER['ip']) . ", " . $CURUSER['id'] . ", '" . $CURUSER['last_access'] . "')");
-	}
-	$USERUPDATESET[] = "last_access = ".sqlesc(date("Y-m-d H:i:s"));
-	$USERUPDATESET[] = "ip = ".sqlesc($CURUSER['ip']);
+  if ($iplog1 == "yes") {
+    if (($oldip != $CURUSER["ip"]) && $CURUSER["ip"])
+      sql_query("INSERT INTO iplog (ip, userid, access) VALUES (" . sqlesc($CURUSER['ip']) . ", " . $CURUSER['id'] . ", '" . $CURUSER['last_access'] . "')");
+  }
+  $USERUPDATESET[] = "last_access = ".sqlesc(date("Y-m-d H:i:s"));
+  $USERUPDATESET[] = "ip = ".sqlesc($CURUSER['ip']);
       }
       header("Content-Type: text/html; charset=utf-8; Cache-control:private");
       //header("Pragma: No-cache");
       if ($title == "")
-	$title = $SITENAME;
+  $title = $SITENAME;
       else
-	$title = $SITENAME."  " . htmlspecialchars($title);
+  $title = $SITENAME."  " . htmlspecialchars($title);
       if ($titlekeywords_tweak)
-	$title .= " ".htmlspecialchars($titlekeywords_tweak);
+  $title .= " ".htmlspecialchars($titlekeywords_tweak);
       $title .= $showversion;
       if ($SITE_ONLINE == "no") {
-	if (get_user_class() < UC_ADMINISTRATOR) {
-	  die($lang_functions['std_site_down_for_maintenance']);
-	}
-	else
-	  {
-	    $offlinemsg = true;
-	  }
+  if (get_user_class() < UC_ADMINISTRATOR) {
+    die($lang_functions['std_site_down_for_maintenance']);
+  }
+  else
+    {
+      $offlinemsg = true;
+    }
       }
   ?>
   <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -2207,22 +2207,22 @@ function simpletag(thetag)
     <head>
       <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
       <?php
-	if ($metakeywords_tweak){
+  if ($metakeywords_tweak){
       ?>
       <meta name="keywords" content="<?php echo htmlspecialchars($metakeywords_tweak)?>" />
       <?php
-	}
-	if ($metadescription_tweak){
+  }
+  if ($metadescription_tweak){
       ?>
       <meta name="description" content="<?php echo htmlspecialchars($metadescription_tweak)?>" />
       <?php
-	}
+  }
       ?>
       <meta name="generator" content="<?php echo PROJECTNAME?>" />
       <?php
-	print(get_style_addicode());
-	$css_uri = get_css_uri();
-	$cssupdatedate=($cssupdatedate ? "?".htmlspecialchars($cssupdatedate) : "");
+  print(get_style_addicode());
+  $css_uri = get_css_uri();
+  $cssupdatedate=($cssupdatedate ? "?".htmlspecialchars($cssupdatedate) : "");
       ?>
       <title><?php echo $title?></title>
       <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
@@ -2235,14 +2235,14 @@ function simpletag(thetag)
       <link rel="stylesheet" href="styles/curtain_imageresizer.css<?php echo $cssupdatedate?>" type="text/css" />
       <link rel="stylesheet" href="<?php echo 'pic/' . get_cat_folder() . "sprite.css"?>" type="text/css" />
       <?php
-	if ($CURUSER){
-	  $caticonrow = get_category_icon_row($CURUSER['caticon']);
-	  if($caticonrow['cssfile']){
+  if ($CURUSER){
+    $caticonrow = get_category_icon_row($CURUSER['caticon']);
+    if($caticonrow['cssfile']){
       ?>
       <link rel="stylesheet" href="<?php echo htmlspecialchars($caticonrow['cssfile']).$cssupdatedate?>" type="text/css" />
       <?php
-	  }
-	}
+    }
+  }
       ?>
       <link rel="alternate" type="application/rss+xml" title="Latest Torrents" href="torrentrss.php" />
       <script type="text/javascript" src="js/jquery.js"></script><!-- Added by bluemonster 20111031-->
@@ -2257,7 +2257,7 @@ function simpletag(thetag)
 <script type="text/javascript" src="js/ie6utf8.js"></script>
 <![endif]-->
       <script type="text/javascript">
-	//<![CDATA[
+  //<![CDATA[
     <?php
     print(js_hb_config());
     ?>
@@ -2266,33 +2266,33 @@ function simpletag(thetag)
     </head>
     <body>
       <div id="wrap">
-	<div id="header">
+  <div id="header">
 <?php
 if ($logo_main == "")
 {
 ?>
-	<div class="logo"><?php echo htmlspecialchars($SITENAME)?></div>
-	<div class="slogan"><?php echo htmlspecialchars($SLOGAN)?></div>
+  <div class="logo"><?php echo htmlspecialchars($SITENAME)?></div>
+  <div class="slogan"><?php echo htmlspecialchars($SLOGAN)?></div>
 <?php
 }
 else
 {
 ?>
-			
-<div class="logo_img"><a href="<?php echo "//$BASEURL/index.php" ?>"><img src="<?php echo $logo_main?>" alt="<?php echo htmlspecialchars($SITENAME)?>" title="<?php echo htmlspecialchars($SITENAME)?> - <?php echo htmlspecialchars($SLOGAN)?>" /></a></div>	
-			
+      
+<div class="logo_img"><a href="<?php echo "//$BASEURL/index.php" ?>"><img src="<?php echo $logo_main?>" alt="<?php echo htmlspecialchars($SITENAME)?>" title="<?php echo htmlspecialchars($SITENAME)?> - <?php echo htmlspecialchars($SLOGAN)?>" /></a></div>  
+      
 <?php
 }
 ?>
 <div id="donate">
 <?php if ($Advertisement->enable_ad()){
-		$headerad=$Advertisement->get_ad('header');
-		if ($headerad){
-			echo "<span id=\"ad_header\">".$headerad[0]."</span>";
-		}
+    $headerad=$Advertisement->get_ad('header');
+    if ($headerad){
+      echo "<span id=\"ad_header\">".$headerad[0]."</span>";
+    }
 }
 if ($enabledonation == 'yes'){?>
-			<a href="donate.php"><img src="<?php echo get_forum_pic_folder()?>/donate.gif" alt="Make a donation" style="margin-left: 5px; margin-top: 50px;" /></a>
+      <a href="donate.php"><img src="<?php echo get_forum_pic_folder()?>/donate.gif" alt="Make a donation" style="margin-left: 5px; margin-top: 50px;" /></a>
 <?php
 }
 ?>
@@ -2316,211 +2316,211 @@ if (!$CURUSER) {
   }
 
  ?>
-			<div id="nav-reg-signup" class="big minor-list list-seperator minor-nav"><ul><li><?php echo $login; ?></li><li><?php echo $signup; ?></li></ul></div>
+      <div id="nav-reg-signup" class="big minor-list list-seperator minor-nav"><ul><li><?php echo $login; ?></li><li><?php echo $signup; ?></li></ul></div>
 <?php } 
 else {
-	menu ();
+  menu ();
 
-	$datum = getdate();
-	$datum["hours"] = sprintf("%02.0f", $datum["hours"]);
-	$datum["minutes"] = sprintf("%02.0f", $datum["minutes"]);
-	$ratio = get_ratio($CURUSER['id']);
+  $datum = getdate();
+  $datum["hours"] = sprintf("%02.0f", $datum["hours"]);
+  $datum["minutes"] = sprintf("%02.0f", $datum["minutes"]);
+  $ratio = get_ratio($CURUSER['id']);
 
-	//// check every 15 minutes //////////////////
-	$messages = $Cache->get_value('user_'.$CURUSER["id"].'_inbox_count');
-	if ($messages == ""){
-		$messages = get_row_count("messages", "WHERE receiver=" . sqlesc($CURUSER["id"]) . " AND location<>0");
-		$Cache->cache_value('user_'.$CURUSER["id"].'_inbox_count', $messages, 900);
-	}
-	$outmessages = $Cache->get_value('user_'.$CURUSER["id"].'_outbox_count');
-	if ($outmessages == ""){
-		$outmessages = get_row_count("messages","WHERE sender=" . sqlesc($CURUSER["id"]) . " AND saved='yes'");
-		$Cache->cache_value('user_'.$CURUSER["id"].'_outbox_count', $outmessages, 900);
-	}
-	if (!$connect = $Cache->get_value('user_'.$CURUSER["id"].'_connect')){
-		$res3 = sql_query("SELECT connectable FROM peers WHERE userid=" . sqlesc($CURUSER["id"]) . " LIMIT 1");
-		if($row = mysql_fetch_row($res3))
-			$connect = $row[0];
-		else $connect = 'unknown';
-		$Cache->cache_value('user_'.$CURUSER["id"].'_connect', $connect, 900);
-	}
+  //// check every 15 minutes //////////////////
+  $messages = $Cache->get_value('user_'.$CURUSER["id"].'_inbox_count');
+  if ($messages == ""){
+    $messages = get_row_count("messages", "WHERE receiver=" . sqlesc($CURUSER["id"]) . " AND location<>0");
+    $Cache->cache_value('user_'.$CURUSER["id"].'_inbox_count', $messages, 900);
+  }
+  $outmessages = $Cache->get_value('user_'.$CURUSER["id"].'_outbox_count');
+  if ($outmessages == ""){
+    $outmessages = get_row_count("messages","WHERE sender=" . sqlesc($CURUSER["id"]) . " AND saved='yes'");
+    $Cache->cache_value('user_'.$CURUSER["id"].'_outbox_count', $outmessages, 900);
+  }
+  if (!$connect = $Cache->get_value('user_'.$CURUSER["id"].'_connect')){
+    $res3 = sql_query("SELECT connectable FROM peers WHERE userid=" . sqlesc($CURUSER["id"]) . " LIMIT 1");
+    if($row = mysql_fetch_row($res3))
+      $connect = $row[0];
+    else $connect = 'unknown';
+    $Cache->cache_value('user_'.$CURUSER["id"].'_connect', $connect, 900);
+  }
 
-	if($connect == "yes")
-		$connectable = "<b><font color=\"green\">".$lang_functions['text_yes']."</font></b>";
-	elseif ($connect == 'no')
-		$connectable = "<a href=\"faq.php#id21\"><b><font color=\"red\">".$lang_functions['text_no']."</font></b></a>";
-	else
-		$connectable = $lang_functions['text_unknown'];
+  if($connect == "yes")
+    $connectable = "<b><font color=\"green\">".$lang_functions['text_yes']."</font></b>";
+  elseif ($connect == 'no')
+    $connectable = "<a href=\"faq.php#id21\"><b><font color=\"red\">".$lang_functions['text_no']."</font></b></a>";
+  else
+    $connectable = $lang_functions['text_unknown'];
 
-	//// check every 60 seconds //////////////////
-	$activeseed = $Cache->get_value('user_'.$CURUSER["id"].'_active_seed_count');
-	if ($activeseed == ""){
-		$activeseed = get_row_count("peers","WHERE userid=" . sqlesc($CURUSER["id"]) . " AND seeder='yes'");
-		$Cache->cache_value('user_'.$CURUSER["id"].'_active_seed_count', $activeseed, 60);
-	}
-	$activeleech = $Cache->get_value('user_'.$CURUSER["id"].'_active_leech_count');
-	if ($activeleech == ""){
-		$activeleech = get_row_count("peers","WHERE userid=" . sqlesc($CURUSER["id"]) . " AND seeder='no'");
-		$Cache->cache_value('user_'.$CURUSER["id"].'_active_leech_count', $activeleech, 60);
-	}
-	$unread = $Cache->get_value('user_'.$CURUSER["id"].'_unread_message_count');
-	if ($unread == ""){
-		$unread = get_row_count("messages","WHERE receiver=" . sqlesc($CURUSER["id"]) . " AND unread='yes'");
-		$Cache->cache_value('user_'.$CURUSER["id"].'_unread_message_count', $unread, 60);
-	}
-	
-	$inboxpic = "<img class=\"".($unread ? "inboxnew" : "inbox")."\" src=\"pic/trans.gif\" alt=\"inbox\" title=\"".($unread ? $lang_functions['title_inbox_new_messages'] : $lang_functions['title_inbox_no_new_messages'])."\" />";
+  //// check every 60 seconds //////////////////
+  $activeseed = $Cache->get_value('user_'.$CURUSER["id"].'_active_seed_count');
+  if ($activeseed == ""){
+    $activeseed = get_row_count("peers","WHERE userid=" . sqlesc($CURUSER["id"]) . " AND seeder='yes'");
+    $Cache->cache_value('user_'.$CURUSER["id"].'_active_seed_count', $activeseed, 60);
+  }
+  $activeleech = $Cache->get_value('user_'.$CURUSER["id"].'_active_leech_count');
+  if ($activeleech == ""){
+    $activeleech = get_row_count("peers","WHERE userid=" . sqlesc($CURUSER["id"]) . " AND seeder='no'");
+    $Cache->cache_value('user_'.$CURUSER["id"].'_active_leech_count', $activeleech, 60);
+  }
+  $unread = $Cache->get_value('user_'.$CURUSER["id"].'_unread_message_count');
+  if ($unread == ""){
+    $unread = get_row_count("messages","WHERE receiver=" . sqlesc($CURUSER["id"]) . " AND unread='yes'");
+    $Cache->cache_value('user_'.$CURUSER["id"].'_unread_message_count', $unread, 60);
+  }
+  
+  $inboxpic = "<img class=\"".($unread ? "inboxnew" : "inbox")."\" src=\"pic/trans.gif\" alt=\"inbox\" title=\"".($unread ? $lang_functions['title_inbox_new_messages'] : $lang_functions['title_inbox_no_new_messages'])."\" />";
 ?>
 
 <div id="info_block" class="table td">
-	<table width="100%" cellspacing="0" cellpadding="0" border="0"><tr>
-		<td class="bottom" style="text-align:left;"><span class="medium"><?php echo $lang_functions['text_welcome_back'] ?>, <?php echo get_username($CURUSER['id'])?>  [<a href="logout.php"><?php echo $lang_functions['text_logout'] ?></a>]<?php if (get_user_class() >= UC_MODERATOR) { ?> [<a href="staffpanel.php"><?php echo $lang_functions['text_staff_panel'] ?></a>] <?php }?> <?php if (get_user_class() >= UC_SYSOP) { ?> [<a href="settings.php"><?php echo $lang_functions['text_site_settings'] ?></a>]<?php } ?> [<a href="torrents.php?inclbookmarked=1&amp;allsec=1&amp;incldead=0"><?php echo $lang_functions['text_bookmarks'] ?></a>] <font class = 'color_bonus'><?php echo $lang_functions['text_bonus'] ?></font>[<a href="mybonus.php"><?php echo $lang_functions['text_use'] ?></a>]: <?php echo number_format($CURUSER['seedbonus'], 1)?> <font class = 'color_invite'><?php echo $lang_functions['text_invite'] ?></font>[<a href="invite.php?id=<?php echo $CURUSER['id']?>"><?php echo $lang_functions['text_send'] ?></a>]: <?php echo $CURUSER['invites']?><br />
+  <table width="100%" cellspacing="0" cellpadding="0" border="0"><tr>
+    <td class="bottom" style="text-align:left;"><span class="medium"><?php echo $lang_functions['text_welcome_back'] ?>, <?php echo get_username($CURUSER['id'])?>  [<a href="logout.php"><?php echo $lang_functions['text_logout'] ?></a>]<?php if (get_user_class() >= UC_MODERATOR) { ?> [<a href="staffpanel.php"><?php echo $lang_functions['text_staff_panel'] ?></a>] <?php }?> <?php if (get_user_class() >= UC_SYSOP) { ?> [<a href="settings.php"><?php echo $lang_functions['text_site_settings'] ?></a>]<?php } ?> [<a href="torrents.php?inclbookmarked=1&amp;allsec=1&amp;incldead=0"><?php echo $lang_functions['text_bookmarks'] ?></a>] <font class = 'color_bonus'><?php echo $lang_functions['text_bonus'] ?></font>[<a href="mybonus.php"><?php echo $lang_functions['text_use'] ?></a>]: <?php echo number_format($CURUSER['seedbonus'], 1)?> <font class = 'color_invite'><?php echo $lang_functions['text_invite'] ?></font>[<a href="invite.php?id=<?php echo $CURUSER['id']?>"><?php echo $lang_functions['text_send'] ?></a>]: <?php echo $CURUSER['invites']?><br />
 
-	<font class="color_ratio"><?php echo $lang_functions['text_ratio'] ?></font> <?php echo $ratio?>  <font class='color_uploaded'><?php echo $lang_functions['text_uploaded'] ?></font> <?php echo mksize($CURUSER['uploaded'])?><font class='color_downloaded'> <?php echo $lang_functions['text_downloaded'] ?></font> <?php echo mksize($CURUSER['downloaded'])?>  <font class='color_active'><?php echo $lang_functions['text_active_torrents'] ?></font> <img class="arrowup" alt="Torrents seeding" title="<?php echo $lang_functions['title_torrents_seeding'] ?>" src="pic/trans.gif" /><?php echo $activeseed?>  <img class="arrowdown" alt="Torrents leeching" title="<?php echo $lang_functions['title_torrents_leeching'] ?>" src="pic/trans.gif" /><?php echo $activeleech?>&nbsp;&nbsp;<font class='color_connectable'><?php echo $lang_functions['text_connectable'] ?></font><?php echo $connectable?> <?php echo maxslots();?></span></td>
+  <font class="color_ratio"><?php echo $lang_functions['text_ratio'] ?></font> <?php echo $ratio?>  <font class='color_uploaded'><?php echo $lang_functions['text_uploaded'] ?></font> <?php echo mksize($CURUSER['uploaded'])?><font class='color_downloaded'> <?php echo $lang_functions['text_downloaded'] ?></font> <?php echo mksize($CURUSER['downloaded'])?>  <font class='color_active'><?php echo $lang_functions['text_active_torrents'] ?></font> <img class="arrowup" alt="Torrents seeding" title="<?php echo $lang_functions['title_torrents_seeding'] ?>" src="pic/trans.gif" /><?php echo $activeseed?>  <img class="arrowdown" alt="Torrents leeching" title="<?php echo $lang_functions['title_torrents_leeching'] ?>" src="pic/trans.gif" /><?php echo $activeleech?>&nbsp;&nbsp;<font class='color_connectable'><?php echo $lang_functions['text_connectable'] ?></font><?php echo $connectable?> <?php echo maxslots();?></span></td>
 
-	<td class="bottom" style="text-align:right;"><span class="medium"><?php echo $lang_functions['text_the_time_is_now'] ?><?php echo $datum[hours].":".$datum[minutes]?><br />
+  <td class="bottom" style="text-align:right;"><span class="medium"><?php echo $lang_functions['text_the_time_is_now'] ?><?php echo $datum[hours].":".$datum[minutes]?><br />
 
 <?php
-	if (get_user_class() >= $staffmem_class){
-	$totalreports = $Cache->get_value('staff_report_count');
-	if ($totalreports == ""){
-		$totalreports = get_row_count("reports");
-		$Cache->cache_value('staff_report_count', $totalreports, 900);
-	}
-	$totalsm = $Cache->get_value('staff_message_count');
-	if ($totalsm == ""){
-		$totalsm = get_row_count("staffmessages");
-		$Cache->cache_value('staff_message_count', $totalsm, 900);
-	}
-	$totalcheaters = $Cache->get_value('staff_cheater_count');
-	if ($totalcheaters == ""){
-		$totalcheaters = get_row_count("cheaters");
-		$Cache->cache_value('staff_cheater_count', $totalcheaters, 900);
-	}
-	print("<a href=\"cheaterbox.php\"><img class=\"cheaterbox\" alt=\"cheaterbox\" title=\"".$lang_functions['title_cheaterbox']."\" src=\"pic/trans.gif\" />  </a>".$totalcheaters."  <a href=\"reports.php\"><img class=\"reportbox\" alt=\"reportbox\" title=\"".$lang_functions['title_reportbox']."\" src=\"pic/trans.gif\" />  </a>".$totalreports."  <a href=\"staffbox.php\"><img class=\"staffbox\" alt=\"staffbox\" title=\"".$lang_functions['title_staffbox']."\" src=\"pic/trans.gif\" />  </a>".$totalsm."  ");
-	}
+  if (get_user_class() >= $staffmem_class){
+  $totalreports = $Cache->get_value('staff_report_count');
+  if ($totalreports == ""){
+    $totalreports = get_row_count("reports");
+    $Cache->cache_value('staff_report_count', $totalreports, 900);
+  }
+  $totalsm = $Cache->get_value('staff_message_count');
+  if ($totalsm == ""){
+    $totalsm = get_row_count("staffmessages");
+    $Cache->cache_value('staff_message_count', $totalsm, 900);
+  }
+  $totalcheaters = $Cache->get_value('staff_cheater_count');
+  if ($totalcheaters == ""){
+    $totalcheaters = get_row_count("cheaters");
+    $Cache->cache_value('staff_cheater_count', $totalcheaters, 900);
+  }
+  print("<a href=\"cheaterbox.php\"><img class=\"cheaterbox\" alt=\"cheaterbox\" title=\"".$lang_functions['title_cheaterbox']."\" src=\"pic/trans.gif\" />  </a>".$totalcheaters."  <a href=\"reports.php\"><img class=\"reportbox\" alt=\"reportbox\" title=\"".$lang_functions['title_reportbox']."\" src=\"pic/trans.gif\" />  </a>".$totalreports."  <a href=\"staffbox.php\"><img class=\"staffbox\" alt=\"staffbox\" title=\"".$lang_functions['title_staffbox']."\" src=\"pic/trans.gif\" />  </a>".$totalsm."  ");
+  }
 
-	print("<a href=\"messages.php\">".$inboxpic."</a> ".($messages ? $messages." (".$unread.$lang_functions['text_message_new'].")" : "0"));
-	print("  <a href=\"messages.php?action=viewmailbox&amp;box=-1\"><img class=\"sentbox\" alt=\"sentbox\" title=\"".$lang_functions['title_sentbox']."\" src=\"pic/trans.gif\" /></a> ".($outmessages ? $outmessages : "0"));
-	print(" <a href=\"friends.php\"><img class=\"buddylist\" alt=\"Buddylist\" title=\"".$lang_functions['title_buddylist']."\" src=\"pic/trans.gif\" /></a>");
-	print(" <a href=\"getrss.php\"><img class=\"rss\" alt=\"RSS\" title=\"".$lang_functions['title_get_rss']."\" src=\"pic/trans.gif\" /></a>");
+  print("<a href=\"messages.php\">".$inboxpic."</a> ".($messages ? $messages." (".$unread.$lang_functions['text_message_new'].")" : "0"));
+  print("  <a href=\"messages.php?action=viewmailbox&amp;box=-1\"><img class=\"sentbox\" alt=\"sentbox\" title=\"".$lang_functions['title_sentbox']."\" src=\"pic/trans.gif\" /></a> ".($outmessages ? $outmessages : "0"));
+  print(" <a href=\"friends.php\"><img class=\"buddylist\" alt=\"Buddylist\" title=\"".$lang_functions['title_buddylist']."\" src=\"pic/trans.gif\" /></a>");
+  print(" <a href=\"getrss.php\"><img class=\"rss\" alt=\"RSS\" title=\"".$lang_functions['title_get_rss']."\" src=\"pic/trans.gif\" /></a>");
 ?>
 
-	</span></td>
-	</tr></table></div>
+  </span></td>
+  </tr></table></div>
 
 <div id="outer">
 <?php
-	if ($Advertisement->enable_ad()){
-			$belownavad=$Advertisement->get_ad('belownav');
-			if ($belownavad)
-			echo "<div align=\"center\" style=\"margin-bottom: 10px\" id=\"ad_belownav\">".$belownavad[0]."</div>";
-	}
+  if ($Advertisement->enable_ad()){
+      $belownavad=$Advertisement->get_ad('belownav');
+      if ($belownavad)
+      echo "<div align=\"center\" style=\"margin-bottom: 10px\" id=\"ad_belownav\">".$belownavad[0]."</div>";
+  }
 if ($msgalert)
 {
-	function msgalert($url, $text, $bgcolor = "red")
-	{
-		print("<p><table border=\"0\" cellspacing=\"0\" cellpadding=\"10\"><tr><td style='border: none; padding: 10px; background: ".$bgcolor."'>\n");
-		print("<b><a href=\"".$url."\"><font color=\"white\">".$text."</font></a></b>");
-		print("</td></tr></table></p><br />");
-	}
-	if($CURUSER['leechwarn'] == 'yes')
-	{
-		$kicktimeout = gettime($CURUSER['leechwarnuntil'], false, false, true);
-		$text = $lang_functions['text_please_improve_ratio_within'].$kicktimeout.$lang_functions['text_or_you_will_be_banned'];
-		msgalert("faq.php#id17", $text, "orange");
-	}
-	if($deletenotransfertwo_account) //inactive account deletion notice
-	{
-		if ($CURUSER['downloaded'] == 0 && ($CURUSER['uploaded'] == 0 || $CURUSER['uploaded'] == $iniupload_main))
-		{
-			$neverdelete_account = ($neverdelete_account <= UC_VIP ? $neverdelete_account : UC_VIP);
-			if (get_user_class() < $neverdelete_account)
-			{
-				$secs = $deletenotransfertwo_account*24*60*60;
-				$addedtime = strtotime($CURUSER['added']);
-				if (TIMENOW > $addedtime+($secs/3)) // start notification if one third of the time has passed
-				{
-					$kicktimeout = gettime(date("Y-m-d H:i:s", $addedtime+$secs), false, false, true);
-					$text = $lang_functions['text_please_download_something_within'].$kicktimeout.$lang_functions['text_inactive_account_be_deleted'];
-					msgalert("rules.php", $text, "gray");
-				}
-			}
-		}
-	}
-	if($CURUSER['showclienterror'] == 'yes')
-	{
-		$text = $lang_functions['text_banned_client_warning'];
-		msgalert("faq.php#id29", $text, "black");
-	}
-	if ($unread)
-	{
-		$text = $lang_functions['text_you_have'].$unread.$lang_functions['text_new_message'] . add_s($unread) . $lang_functions['text_click_here_to_read'];
-		msgalert("messages.php",$text, "red");
-	}
+  function msgalert($url, $text, $bgcolor = "red")
+  {
+    print("<p><table border=\"0\" cellspacing=\"0\" cellpadding=\"10\"><tr><td style='border: none; padding: 10px; background: ".$bgcolor."'>\n");
+    print("<b><a href=\"".$url."\"><font color=\"white\">".$text."</font></a></b>");
+    print("</td></tr></table></p><br />");
+  }
+  if($CURUSER['leechwarn'] == 'yes')
+  {
+    $kicktimeout = gettime($CURUSER['leechwarnuntil'], false, false, true);
+    $text = $lang_functions['text_please_improve_ratio_within'].$kicktimeout.$lang_functions['text_or_you_will_be_banned'];
+    msgalert("faq.php#id17", $text, "orange");
+  }
+  if($deletenotransfertwo_account) //inactive account deletion notice
+  {
+    if ($CURUSER['downloaded'] == 0 && ($CURUSER['uploaded'] == 0 || $CURUSER['uploaded'] == $iniupload_main))
+    {
+      $neverdelete_account = ($neverdelete_account <= UC_VIP ? $neverdelete_account : UC_VIP);
+      if (get_user_class() < $neverdelete_account)
+      {
+        $secs = $deletenotransfertwo_account*24*60*60;
+        $addedtime = strtotime($CURUSER['added']);
+        if (TIMENOW > $addedtime+($secs/3)) // start notification if one third of the time has passed
+        {
+          $kicktimeout = gettime(date("Y-m-d H:i:s", $addedtime+$secs), false, false, true);
+          $text = $lang_functions['text_please_download_something_within'].$kicktimeout.$lang_functions['text_inactive_account_be_deleted'];
+          msgalert("rules.php", $text, "gray");
+        }
+      }
+    }
+  }
+  if($CURUSER['showclienterror'] == 'yes')
+  {
+    $text = $lang_functions['text_banned_client_warning'];
+    msgalert("faq.php#id29", $text, "black");
+  }
+  if ($unread)
+  {
+    $text = $lang_functions['text_you_have'].$unread.$lang_functions['text_new_message'] . add_s($unread) . $lang_functions['text_click_here_to_read'];
+    msgalert("messages.php",$text, "red");
+  }
 /*
-	$pending_invitee = $Cache->get_value('user_'.$CURUSER["id"].'_pending_invitee_count');
-	if ($pending_invitee == ""){
-		$pending_invitee = get_row_count("users","WHERE status = 'pending' AND invited_by = ".sqlesc($CURUSER[id]));
-		$Cache->cache_value('user_'.$CURUSER["id"].'_pending_invitee_count', $pending_invitee, 900);
-	}
-	if ($pending_invitee > 0)
-	{
-		$text = $lang_functions['text_your_friends'].add_s($pending_invitee).is_or_are($pending_invitee).$lang_functions['text_awaiting_confirmation'];
-		msgalert("invite.php?id=".$CURUSER[id],$text, "red");
-	}*/
-	$settings_script_name = $_SERVER["SCRIPT_FILENAME"];
-	if (!preg_match("/index/i", $settings_script_name))
-	{
-		$new_news = $Cache->get_value('user_'.$CURUSER["id"].'_unread_news_count');
-		if ($new_news == ""){
-			$new_news = get_row_count("news","WHERE notify = 'yes' AND added > ".sqlesc($CURUSER['last_home']));
-			$Cache->cache_value('user_'.$CURUSER["id"].'_unread_news_count', $new_news, 300);
-		}
-		if ($new_news > 0)
-		{
-			$text = $lang_functions['text_there_is'].is_or_are($new_news).$new_news.$lang_functions['text_new_news'];
-			msgalert("index.php",$text, "green");
-		}
-	}
+  $pending_invitee = $Cache->get_value('user_'.$CURUSER["id"].'_pending_invitee_count');
+  if ($pending_invitee == ""){
+    $pending_invitee = get_row_count("users","WHERE status = 'pending' AND invited_by = ".sqlesc($CURUSER[id]));
+    $Cache->cache_value('user_'.$CURUSER["id"].'_pending_invitee_count', $pending_invitee, 900);
+  }
+  if ($pending_invitee > 0)
+  {
+    $text = $lang_functions['text_your_friends'].add_s($pending_invitee).is_or_are($pending_invitee).$lang_functions['text_awaiting_confirmation'];
+    msgalert("invite.php?id=".$CURUSER[id],$text, "red");
+  }*/
+  $settings_script_name = $_SERVER["SCRIPT_FILENAME"];
+  if (!preg_match("/index/i", $settings_script_name))
+  {
+    $new_news = $Cache->get_value('user_'.$CURUSER["id"].'_unread_news_count');
+    if ($new_news == ""){
+      $new_news = get_row_count("news","WHERE notify = 'yes' AND added > ".sqlesc($CURUSER['last_home']));
+      $Cache->cache_value('user_'.$CURUSER["id"].'_unread_news_count', $new_news, 300);
+    }
+    if ($new_news > 0)
+    {
+      $text = $lang_functions['text_there_is'].is_or_are($new_news).$new_news.$lang_functions['text_new_news'];
+      msgalert("index.php",$text, "green");
+    }
+  }
 
-	if (get_user_class() >= $staffmem_class)
-	{
-		$numreports = $Cache->get_value('staff_new_report_count');
-		if ($numreports == ""){
-			$numreports = get_row_count("reports","WHERE dealtwith=0");
-			$Cache->cache_value('staff_new_report_count', $numreports, 900);
-		}
-		if ($numreports){
-			$text = $lang_functions['text_there_is'].is_or_are($numreports).$numreports.$lang_functions['text_new_report'] .add_s($numreports);
-			msgalert("reports.php",$text, "blue");
-		}
-		$nummessages = $Cache->get_value('staff_new_message_count');
-		if ($nummessages == ""){
-			$nummessages = get_row_count("staffmessages","WHERE answered='no'");
-			$Cache->cache_value('staff_new_message_count', $nummessages, 900);
-		}
-		if ($nummessages > 0) {
-			$text = $lang_functions['text_there_is'].is_or_are($nummessages).$nummessages.$lang_functions['text_new_staff_message'] . add_s($nummessages);
-			msgalert("staffbox.php",$text, "blue");
-		}
-		$numcheaters = $Cache->get_value('staff_new_cheater_count');
-		if ($numcheaters == ""){
-			$numcheaters = get_row_count("cheaters","WHERE dealtwith=0");
-			$Cache->cache_value('staff_new_cheater_count', $numcheaters, 900);
-		}
-		if ($numcheaters){
-			$text = $lang_functions['text_there_is'].is_or_are($numcheaters).$numcheaters.$lang_functions['text_new_suspected_cheater'] .add_s($numcheaters);
-			msgalert("cheaterbox.php",$text, "blue");
-		}
-	}
+  if (get_user_class() >= $staffmem_class)
+  {
+    $numreports = $Cache->get_value('staff_new_report_count');
+    if ($numreports == ""){
+      $numreports = get_row_count("reports","WHERE dealtwith=0");
+      $Cache->cache_value('staff_new_report_count', $numreports, 900);
+    }
+    if ($numreports){
+      $text = $lang_functions['text_there_is'].is_or_are($numreports).$numreports.$lang_functions['text_new_report'] .add_s($numreports);
+      msgalert("reports.php",$text, "blue");
+    }
+    $nummessages = $Cache->get_value('staff_new_message_count');
+    if ($nummessages == ""){
+      $nummessages = get_row_count("staffmessages","WHERE answered='no'");
+      $Cache->cache_value('staff_new_message_count', $nummessages, 900);
+    }
+    if ($nummessages > 0) {
+      $text = $lang_functions['text_there_is'].is_or_are($nummessages).$nummessages.$lang_functions['text_new_staff_message'] . add_s($nummessages);
+      msgalert("staffbox.php",$text, "blue");
+    }
+    $numcheaters = $Cache->get_value('staff_new_cheater_count');
+    if ($numcheaters == ""){
+      $numcheaters = get_row_count("cheaters","WHERE dealtwith=0");
+      $Cache->cache_value('staff_new_cheater_count', $numcheaters, 900);
+    }
+    if ($numcheaters){
+      $text = $lang_functions['text_there_is'].is_or_are($numcheaters).$numcheaters.$lang_functions['text_new_suspected_cheater'] .add_s($numcheaters);
+      msgalert("cheaterbox.php",$text, "blue");
+    }
+  }
 }
-		if ($offlinemsg)
-		{
-			print("<p><table width=\"737\" border=\"1\" cellspacing=\"0\" cellpadding=\"10\"><tr><td style='padding: 10px; background: red' class=\"text\" align=\"center\">\n");
-			print("<font color=\"white\">".$lang_functions['text_website_offline_warning']."</font>");
-			print("</td></tr></table></p><br />\n");
-		}
+    if ($offlinemsg)
+    {
+      print("<p><table width=\"737\" border=\"1\" cellspacing=\"0\" cellpadding=\"10\"><tr><td style='padding: 10px; background: red' class=\"text\" align=\"center\">\n");
+      print("<font color=\"white\">".$lang_functions['text_website_offline_warning']."</font>");
+      print("</td></tr></table></p><br />\n");
+    }
 }
 
 
@@ -2532,9 +2532,9 @@ function php_json_encode( $data ) {
       $islist = is_array($data) && ( empty($data) || array_keys($data) === range(0,count($data)-1) );
       if( $islist ) $json = '[' . implode(',', array_map('php_json_encode', $data) ) . ']';
       else {
-	$items = Array();
-	foreach( $data as $key => $value ) $items[] = php_json_encode("$key") . ':' . php_json_encode($value);
-	$json = '{' . implode(',', $items) . '}';
+  $items = Array();
+  foreach( $data as $key => $value ) $items[] = php_json_encode("$key") . ':' . php_json_encode($value);
+  $json = '{' . implode(',', $items) . '}';
       }
     } elseif( is_string($data) ) {
       $string = '"' . addcslashes($data, "\\\"\n\r\t/" . chr(8) . chr(12)) . '"';
@@ -2542,21 +2542,21 @@ function php_json_encode( $data ) {
       $json    = '';
       $len    = strlen($string);
       for( $i = 0; $i < $len; $i++ ) {
-	$char = $string[$i];
+  $char = $string[$i];
 
-	$c1 = ord($char);
-	if( $c1 <128 ) { $json .= ($c1 > 31) ? $char : sprintf("\\u%04x", $c1); continue; }
-	$c2 = ord($string[++$i]);
-	if ( ($c1 & 32) === 0 ) { $json .= sprintf("\\u%04x", ($c1 - 192) * 64 + $c2 - 128); continue; }
-	$c3 = ord($string[++$i]);
-	if( ($c1 & 16) === 0 ) { $json .= sprintf("\\u%04x", (($c1 - 224) <<12) + (($c2 - 128) << 6) + ($c3 - 128)); continue; }
-	$c4 = ord($string[++$i]);
-	if( ($c1 & 8 ) === 0 ) {
-	  $u = (($c1 & 15) << 2) + (($c2>>4) & 3) - 1;
-	  $w1 = (54<<10) + ($u<<6) + (($c2 & 15) << 2) + (($c3>>4) & 3);
-	  $w2 = (55<<10) + (($c3 & 15)<<6) + ($c4-128);
-	  $json .= sprintf("\\u%04x\\u%04x", $w1, $w2);
-	}
+  $c1 = ord($char);
+  if( $c1 <128 ) { $json .= ($c1 > 31) ? $char : sprintf("\\u%04x", $c1); continue; }
+  $c2 = ord($string[++$i]);
+  if ( ($c1 & 32) === 0 ) { $json .= sprintf("\\u%04x", ($c1 - 192) * 64 + $c2 - 128); continue; }
+  $c3 = ord($string[++$i]);
+  if( ($c1 & 16) === 0 ) { $json .= sprintf("\\u%04x", (($c1 - 224) <<12) + (($c2 - 128) << 6) + ($c3 - 128)); continue; }
+  $c4 = ord($string[++$i]);
+  if( ($c1 & 8 ) === 0 ) {
+    $u = (($c1 & 15) << 2) + (($c2>>4) & 3) - 1;
+    $w1 = (54<<10) + ($u<<6) + (($c2 & 15) << 2) + (($c3>>4) & 3);
+    $w2 = (55<<10) + (($c3 & 15)<<6) + ($c4-128);
+    $json .= sprintf("\\u%04x\\u%04x", $w1, $w2);
+  }
       }
     }
     else $json = strtolower(var_export( $data, true ));
@@ -2579,9 +2579,9 @@ function js_hb_config() {
       $config = array('user' => $user);
 
       if (!$const) {
-	global $promotion_text;
+  global $promotion_text;
 
-	$const = php_json_encode(array('torrentmanage_class' => $torrentmanage_class, 'cat_class' => get_category_row(), 'lang' => $lang_functions, 'pr' => $promotion_text));
+  $const = php_json_encode(array('torrentmanage_class' => $torrentmanage_class, 'cat_class' => get_category_row(), 'lang' => $lang_functions, 'pr' => $promotion_text));
       }
       $out = 'hb = {config : ' . php_json_encode($config) . ', constant : ' . $const . '}';
     }
@@ -2593,476 +2593,476 @@ function js_hb_config() {
 }
 
 function stdfoot() {
-	global $SITENAME,$BASEURL,$Cache,$datefounded,$tstart,$icplicense_main,$add_key_shortcut,$query_name, $USERUPDATESET, $CURUSER, $enablesqldebug_tweak, $sqldebug_tweak, $Advertisement, $analyticscode_tweak;
-	//$cnzz="<center><script src='http://s94.cnzz.com/stat.php?id=2647714&web_id=2647714&show=pic' language='JavaScript'></script></center>";
-	?>
+  global $SITENAME,$BASEURL,$Cache,$datefounded,$tstart,$icplicense_main,$add_key_shortcut,$query_name, $USERUPDATESET, $CURUSER, $enablesqldebug_tweak, $sqldebug_tweak, $Advertisement, $analyticscode_tweak;
+  //$cnzz="<center><script src='http://s94.cnzz.com/stat.php?id=2647714&web_id=2647714&show=pic' language='JavaScript'></script></center>";
+  ?>
 </div></div>
 <div id="footer">
 <?
-	if ($Advertisement->enable_ad()){
-			$footerad=$Advertisement->get_ad('footer');
-			if ($footerad)
-			echo '<style="margin-top: 10px; text-align:center;" id="ad_footer">'.$footerad[0].'</div>';
-	}
-	print('<div style="margin-top: 10px; margin-bottom: 30px; text-align: center;
+  if ($Advertisement->enable_ad()){
+      $footerad=$Advertisement->get_ad('footer');
+      if ($footerad)
+      echo '<style="margin-top: 10px; text-align:center;" id="ad_footer">'.$footerad[0].'</div>';
+  }
+  print('<div style="margin-top: 10px; margin-bottom: 30px; text-align: center;
 ">');
-	if ($CURUSER){
-		sql_query("UPDATE users SET " . join(",", $USERUPDATESET) . " WHERE id = ".$CURUSER['id']);
-	}
-	// Variables for End Time
-	$tend = getmicrotime();
-	$totaltime = ($tend - $tstart);
-	$year = substr($datefounded, 0, 4);
-	$yearfounded = ($year ? $year : 2007);
-	print(" (c) "." <a href=\"" . get_protocol_prefix() . $BASEURL."\" target=\"_self\">".$SITENAME."</a> ".($icplicense_main ? " ".$icplicense_main." " : "").(date("Y") != $yearfounded ? $yearfounded."-" : "").date("Y")." ".VERSION."<br /><br />");
-	printf ("[page created in <b> %f </b> sec", $totaltime);
-	print (" with <b>".count($query_name)."</b> db queries, <b>".$Cache->getCacheReadTimes()."</b> reads and <b>".$Cache->getCacheWriteTimes()."</b> writes of memcached and <b>".mksize(memory_get_usage())."</b> ram]");
-	print ("</div>\n");
-	if ($enablesqldebug_tweak == 'yes' && get_user_class() >= $sqldebug_tweak) {
-		print("<div id=\"sql_debug\">SQL query list: <ul>");
-		foreach($query_name as $query) {
-			print("<li>".htmlspecialchars($query)."</li>");
-		}
-		print("</ul>");
-		print("Memcached key read: <ul>");
-		foreach($Cache->getKeyHits('read') as $keyName => $hits) {
-			print("<li>".htmlspecialchars($keyName)." : ".$hits."</li>");
-		}
-		print("</ul>");
-		print("Memcached key write: <ul>");
-		foreach($Cache->getKeyHits('write') as $keyName => $hits) {
-			print("<li>".htmlspecialchars($keyName)." : ".$hits."</li>");
-		}
-		print("</ul>");
-		print("</div>");
-	}
-	print ("<div style=\"display: none;\" id=\"lightbox\" class=\"lightbox\"></div><div style=\"display: none;\" id=\"curtain\" class=\"curtain\"></div>");
-	if ($add_key_shortcut != "")
-	print($add_key_shortcut);
-	print("</div>");
-	if ($analyticscode_tweak)
-		print("\n".$analyticscode_tweak."\n");
-	if ($cnzz)
+  if ($CURUSER){
+    sql_query("UPDATE users SET " . join(",", $USERUPDATESET) . " WHERE id = ".$CURUSER['id']);
+  }
+  // Variables for End Time
+  $tend = getmicrotime();
+  $totaltime = ($tend - $tstart);
+  $year = substr($datefounded, 0, 4);
+  $yearfounded = ($year ? $year : 2007);
+  print(" (c) "." <a href=\"" . get_protocol_prefix() . $BASEURL."\" target=\"_self\">".$SITENAME."</a> ".($icplicense_main ? " ".$icplicense_main." " : "").(date("Y") != $yearfounded ? $yearfounded."-" : "").date("Y")." ".VERSION."<br /><br />");
+  printf ("[page created in <b> %f </b> sec", $totaltime);
+  print (" with <b>".count($query_name)."</b> db queries, <b>".$Cache->getCacheReadTimes()."</b> reads and <b>".$Cache->getCacheWriteTimes()."</b> writes of memcached and <b>".mksize(memory_get_usage())."</b> ram]");
+  print ("</div>\n");
+  if ($enablesqldebug_tweak == 'yes' && get_user_class() >= $sqldebug_tweak) {
+    print("<div id=\"sql_debug\">SQL query list: <ul>");
+    foreach($query_name as $query) {
+      print("<li>".htmlspecialchars($query)."</li>");
+    }
+    print("</ul>");
+    print("Memcached key read: <ul>");
+    foreach($Cache->getKeyHits('read') as $keyName => $hits) {
+      print("<li>".htmlspecialchars($keyName)." : ".$hits."</li>");
+    }
+    print("</ul>");
+    print("Memcached key write: <ul>");
+    foreach($Cache->getKeyHits('write') as $keyName => $hits) {
+      print("<li>".htmlspecialchars($keyName)." : ".$hits."</li>");
+    }
+    print("</ul>");
+    print("</div>");
+  }
+  print ("<div style=\"display: none;\" id=\"lightbox\" class=\"lightbox\"></div><div style=\"display: none;\" id=\"curtain\" class=\"curtain\"></div>");
+  if ($add_key_shortcut != "")
+  print($add_key_shortcut);
+  print("</div>");
+  if ($analyticscode_tweak)
+    print("\n".$analyticscode_tweak."\n");
+  if ($cnzz)
       print("\n".$cnzz."\n");
 
-	print("<div></body></html>");
+  print("<div></body></html>");
 
-	//echo replacePngTags(ob_get_clean());
+  //echo replacePngTags(ob_get_clean());
 
-	unset($_SESSION['queries']);
+  unset($_SESSION['queries']);
 }
 
 function genbark($x,$y) {
-	stdhead($y);
-	print("<h1>" . htmlspecialchars($y) . "</h1>\n");
-	print("<p>" . htmlspecialchars($x) . "</p>\n");
-	stdfoot();
-	exit();
+  stdhead($y);
+  print("<h1>" . htmlspecialchars($y) . "</h1>\n");
+  print("<p>" . htmlspecialchars($x) . "</p>\n");
+  stdfoot();
+  exit();
 }
 
 function mksecret($len = 20) {
-	$ret = "";
-	for ($i = 0; $i < $len; $i++)
-	$ret .= chr(mt_rand(100, 120));
-	return $ret;
+  $ret = "";
+  for ($i = 0; $i < $len; $i++)
+  $ret .= chr(mt_rand(100, 120));
+  return $ret;
 }
 
 function httperr($code = 404) {
-	header("HTTP/1.0 404 Not found");
-	print("<h1>Not Found</h1>\n");
-	exit();
+  header("HTTP/1.0 404 Not found");
+  print("<h1>Not Found</h1>\n");
+  exit();
 }
 
 function logincookie($id, $passhash, $updatedb = 1, $expires = 0x7fffffff, $securelogin=false, $ssl=false, $trackerssl=false)
 {
-	if ($expires != 0x7fffffff)
-	$expires = time()+$expires;
+  if ($expires != 0x7fffffff)
+  $expires = time()+$expires;
 
-	setcookie("c_secure_uid", base64($id), $expires, "/");
-	setcookie("c_secure_pass", $passhash, $expires, "/");
-	if($ssl)
-	setcookie("c_secure_ssl", base64("yeah"), $expires, "/");
-	else
-	setcookie("c_secure_ssl", base64("nope"), $expires, "/");
+  setcookie("c_secure_uid", base64($id), $expires, "/");
+  setcookie("c_secure_pass", $passhash, $expires, "/");
+  if($ssl)
+  setcookie("c_secure_ssl", base64("yeah"), $expires, "/");
+  else
+  setcookie("c_secure_ssl", base64("nope"), $expires, "/");
 
-	if($trackerssl)
-	setcookie("c_secure_tracker_ssl", base64("yeah"), $expires, "/");
-	else
-	setcookie("c_secure_tracker_ssl", base64("nope"), $expires, "/");
+  if($trackerssl)
+  setcookie("c_secure_tracker_ssl", base64("yeah"), $expires, "/");
+  else
+  setcookie("c_secure_tracker_ssl", base64("nope"), $expires, "/");
 
-	if ($securelogin)
-	setcookie("c_secure_login", base64("yeah"), $expires, "/");
-	else
-	setcookie("c_secure_login", base64("nope"), $expires, "/");
+  if ($securelogin)
+  setcookie("c_secure_login", base64("yeah"), $expires, "/");
+  else
+  setcookie("c_secure_login", base64("nope"), $expires, "/");
 
 
-	if ($updatedb)
-	sql_query("UPDATE users SET last_login = NOW(), lang=" . sqlesc(get_langid_from_langcookie()) . " WHERE id = ".sqlesc($id));
+  if ($updatedb)
+  sql_query("UPDATE users SET last_login = NOW(), lang=" . sqlesc(get_langid_from_langcookie()) . " WHERE id = ".sqlesc($id));
 }
 
 function set_langfolder_cookie($folder, $expires = 0x7fffffff)
 {
-	if ($expires != 0x7fffffff)
-	$expires = time()+$expires;
+  if ($expires != 0x7fffffff)
+  $expires = time()+$expires;
 
-	setcookie("c_lang_folder", $folder, $expires, "/");
+  setcookie("c_lang_folder", $folder, $expires, "/");
 }
 
 function get_protocol_prefix()
 {
-	global $securelogin;
-	if ($securelogin == "yes") {
-		return "https://";
-	} elseif ($securelogin == "no") {
-		return "http://";
-	} else {
-		if (!isset($_COOKIE["c_secure_ssl"])) {
-			return "http://";
-		} else {
-			return base64_decode($_COOKIE["c_secure_ssl"]) == "yeah" ? "https://" : "http://";
-		}
-	}
+  global $securelogin;
+  if ($securelogin == "yes") {
+    return "https://";
+  } elseif ($securelogin == "no") {
+    return "http://";
+  } else {
+    if (!isset($_COOKIE["c_secure_ssl"])) {
+      return "http://";
+    } else {
+      return base64_decode($_COOKIE["c_secure_ssl"]) == "yeah" ? "https://" : "http://";
+    }
+  }
 }
 
 function get_langid_from_langcookie()
 {
-	global $CURLANGDIR;
-	$row = mysql_fetch_array(sql_query("SELECT id FROM language WHERE site_lang = 1 AND site_lang_folder = " . sqlesc($CURLANGDIR) . "ORDER BY id ASC")) or sqlerr(__FILE__, __LINE__);
-	return $row['id'];
+  global $CURLANGDIR;
+  $row = mysql_fetch_array(sql_query("SELECT id FROM language WHERE site_lang = 1 AND site_lang_folder = " . sqlesc($CURLANGDIR) . "ORDER BY id ASC")) or sqlerr(__FILE__, __LINE__);
+  return $row['id'];
 }
 
 function make_folder($pre, $folder_name)
 {
-	$path = $pre . $folder_name;
-	if(!file_exists($path))
-	mkdir($path,0777,true);
-	return $path;
+  $path = $pre . $folder_name;
+  if(!file_exists($path))
+  mkdir($path,0777,true);
+  return $path;
 }
 
 function logoutcookie() {
-	setcookie("c_secure_uid", "", 0x7fffffff, "/");
-	setcookie("c_secure_pass", "", 0x7fffffff, "/");
+  setcookie("c_secure_uid", "", 0x7fffffff, "/");
+  setcookie("c_secure_pass", "", 0x7fffffff, "/");
 // setcookie("c_secure_ssl", "", 0x7fffffff, "/");
-	setcookie("c_secure_tracker_ssl", "", 0x7fffffff, "/");
-	setcookie("c_secure_login", "", 0x7fffffff, "/");
-//	setcookie("c_lang_folder", "", 0x7fffffff, "/");
+  setcookie("c_secure_tracker_ssl", "", 0x7fffffff, "/");
+  setcookie("c_secure_login", "", 0x7fffffff, "/");
+//  setcookie("c_lang_folder", "", 0x7fffffff, "/");
 }
 
 function base64 ($string, $encode=true) {
-	if ($encode)
-	return base64_encode($string);
-	else
-	return base64_decode($string);
+  if ($encode)
+  return base64_encode($string);
+  else
+  return base64_decode($string);
 }
 
 function loggedinorreturn($mainpage = false) {
-	global $CURUSER,$BASEURL;
-	if (!$CURUSER) {
-		if ($mainpage)
-		header("Location: " . get_protocol_prefix() . "$BASEURL/login.php");
-		else {
-			$to = $_SERVER["REQUEST_URI"];
-			$to = basename($to);
-			header("Location: " . get_protocol_prefix() . "$BASEURL/login.php?returnto=" . rawurlencode($to));
-		}
-		exit();
-	}
+  global $CURUSER,$BASEURL;
+  if (!$CURUSER) {
+    if ($mainpage)
+    header("Location: " . get_protocol_prefix() . "$BASEURL/login.php");
+    else {
+      $to = $_SERVER["REQUEST_URI"];
+      $to = basename($to);
+      header("Location: " . get_protocol_prefix() . "$BASEURL/login.php?returnto=" . rawurlencode($to));
+    }
+    exit();
+  }
 }
 
 function loggedinorreturn2($mainpage = false) {
-	global $CURUSER,$BASEURL;
-	if (!$CURUSER) {
-		if ($mainpage)
-		   Header("Location:/carsi/login.php");
-		else {
-			$to = $_SERVER["REQUEST_URI"];
-			$to = basename($to);
-			header("Location: " . get_protocol_prefix() . "$BASEURL/carsi/login.php?returnto=" . rawurlencode($to));
-		}
-		exit();
-	}
+  global $CURUSER,$BASEURL;
+  if (!$CURUSER) {
+    if ($mainpage)
+       Header("Location:/carsi/login.php");
+    else {
+      $to = $_SERVER["REQUEST_URI"];
+      $to = basename($to);
+      header("Location: " . get_protocol_prefix() . "$BASEURL/carsi/login.php?returnto=" . rawurlencode($to));
+    }
+    exit();
+  }
 }
 
 
 function loggedinorreturn3($mainpage = false) {
-	global $CURUSER,$BASEURL;
+  global $CURUSER,$BASEURL;
 
-	// Check the tongji public account client ip
-	if($CURUSER && $CURUSER['id'] == 53281) {
+  // Check the tongji public account client ip
+  if($CURUSER && $CURUSER['id'] == 53281) {
 
-		$in_tongji = false;
-		
-		$current_ip = ip2long($CURUSER['ip']);
-		
-		if(($current_ip >= ip2long('202.114.136.1') && $current <= ip2long('202.114.136.255'))
-		   || ($current_ip >= ip2long('202.114.128.1') && $current <= ip2long('202.114.128.255'))
-		   || ($current_ip >= ip2long('202.114.13.1') && $current <= ip2long('202.114.13.255'))
-		   || ($current_ip >= ip2long('202.114.129.1') && $current <= ip2long('202.114.129.255'))
-		   || ($current_ip >= ip2long('122.205.16.1') && $current <= ip2long('122.205.16.255'))
-		   || $CURUSER['ip'] == '202.114.135.147') {
-			$in_tongji = true;
-		}
-		
-		if($in_tongji === false) {
-			header("Location: " . get_protocol_prefix() . "$BASEURL/tj_notice.html");
-		}
-	}
-	// End ||
+    $in_tongji = false;
+    
+    $current_ip = ip2long($CURUSER['ip']);
+    
+    if(($current_ip >= ip2long('202.114.136.1') && $current <= ip2long('202.114.136.255'))
+       || ($current_ip >= ip2long('202.114.128.1') && $current <= ip2long('202.114.128.255'))
+       || ($current_ip >= ip2long('202.114.13.1') && $current <= ip2long('202.114.13.255'))
+       || ($current_ip >= ip2long('202.114.129.1') && $current <= ip2long('202.114.129.255'))
+       || ($current_ip >= ip2long('122.205.16.1') && $current <= ip2long('122.205.16.255'))
+       || $CURUSER['ip'] == '202.114.135.147') {
+      $in_tongji = true;
+    }
+    
+    if($in_tongji === false) {
+      header("Location: " . get_protocol_prefix() . "$BASEURL/tj_notice.html");
+    }
+  }
+  // End ||
 
-	if (!$CURUSER) {
-		if ($mainpage)
-		header("Location: " . get_protocol_prefix() . "$BASEURL/login.php");
-		else {
-			$to = $_SERVER["REQUEST_URI"];
-			$to = basename($to);
-			header("Location: " . get_protocol_prefix() . "$BASEURL/login.php?returnto=" . rawurlencode($to));
-		}
-		exit();
-	}
+  if (!$CURUSER) {
+    if ($mainpage)
+    header("Location: " . get_protocol_prefix() . "$BASEURL/login.php");
+    else {
+      $to = $_SERVER["REQUEST_URI"];
+      $to = basename($to);
+      header("Location: " . get_protocol_prefix() . "$BASEURL/login.php?returnto=" . rawurlencode($to));
+    }
+    exit();
+  }
 }
 
 function deletetorrent($id, $deductBonus = false) {
-	global $torrent_dir;
-	sql_query("DELETE FROM torrents WHERE id = ".mysql_real_escape_string($id));
-	sql_query("DELETE FROM snatched WHERE torrentid = ".mysql_real_escape_string($id));
-	foreach(array("peers", "files", "comments") as $x) {
-		sql_query("DELETE FROM $x WHERE torrent = ".mysql_real_escape_string($id));
-	}
-	unlink("$torrent_dir/$id.torrent");
+  global $torrent_dir;
+  sql_query("DELETE FROM torrents WHERE id = ".mysql_real_escape_string($id));
+  sql_query("DELETE FROM snatched WHERE torrentid = ".mysql_real_escape_string($id));
+  foreach(array("peers", "files", "comments") as $x) {
+    sql_query("DELETE FROM $x WHERE torrent = ".mysql_real_escape_string($id));
+  }
+  unlink("$torrent_dir/$id.torrent");
 
-	if ($deductBonus) {
-	  KPS("-",$uploadtorrent_bonus,$row["owner"]);
-	}
+  if ($deductBonus) {
+    KPS("-",$uploadtorrent_bonus,$row["owner"]);
+  }
 }
 
 function pager($rpp, $count, $href, $opts = array(), $pagename = "page") {
-	global $lang_functions,$add_key_shortcut;
-	$next_page_href = '';
-	$pages = ceil($count / $rpp);
+  global $lang_functions,$add_key_shortcut;
+  $next_page_href = '';
+  $pages = ceil($count / $rpp);
 
-	if ($opts['page']) {
-	  $page = $opts['page'];
-	}
-	else {
-	  if (!$opts["lastpagedefault"])
-	    $pagedefault = 0;
-	  else {
-	    $pagedefault = floor(($count - 1) / $rpp);
-	    if ($pagedefault < 0)
-	      $pagedefault = 0;
-	  }
+  if ($opts['page']) {
+    $page = $opts['page'];
+  }
+  else {
+    if (!$opts["lastpagedefault"])
+      $pagedefault = 0;
+    else {
+      $pagedefault = floor(($count - 1) / $rpp);
+      if ($pagedefault < 0)
+        $pagedefault = 0;
+    }
 
-	  if (isset($_GET[$pagename])) {
-	    $page = 0 + $_GET[$pagename];
-	    if ($page < 0)
-	      $page = $pagedefault;
-	  }
-	  else
-	    $page = $pagedefault;
-	}
+    if (isset($_GET[$pagename])) {
+      $page = 0 + $_GET[$pagename];
+      if ($page < 0)
+        $page = $pagedefault;
+    }
+    else
+      $page = $pagedefault;
+  }
 
-	$pager = "<ul>";
-	$mp = $pages - 1;
+  $pager = "<ul>";
+  $mp = $pages - 1;
 
-	//Opera (Presto) doesn't know about event.altKey
-	$is_presto = strpos($_SERVER['HTTP_USER_AGENT'], 'Presto');
-	$as = "&lt;&lt;&nbsp;".$lang_functions['text_prev'];
-	if ($page >= 1) {
-		$pager .= "<li><a href=\"".htmlspecialchars($href.$pagename."=" . ($page - 1) ). "\" title=\"".($is_presto ? $lang_functions['text_shift_pageup_shortcut'] : $lang_functions['text_alt_pageup_shortcut'])."\">";
-		$pager .= $as;
-		$pager .= "</a></li>";
-	}
-	else
-	$pager .= "<li class=\"selected\">".$as."</li>";
-#	$pager .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-	$as = $lang_functions['text_next']."&nbsp;&gt;&gt;";
-	if ($page < $mp && $mp >= 0) {
-	  $next_page_href = $href.$pagename."=" . ($page + 1);
-		$pager .= "<li><a href=\"".htmlspecialchars($next_page_href). "\" title=\"".($is_presto ? $lang_functions['text_shift_pagedown_shortcut'] : $lang_functions['text_alt_pagedown_shortcut'])."\">";
-		$pager .= $as;
-		$pager .= "</a></li>";
-	}
-	else {
-	     $pager .= "<li class=\"selected\">".$as."</li>";
-	}
-	$pager .= '</ul>';
+  //Opera (Presto) doesn't know about event.altKey
+  $is_presto = strpos($_SERVER['HTTP_USER_AGENT'], 'Presto');
+  $as = "&lt;&lt;&nbsp;".$lang_functions['text_prev'];
+  if ($page >= 1) {
+    $pager .= "<li><a href=\"".htmlspecialchars($href.$pagename."=" . ($page - 1) ). "\" title=\"".($is_presto ? $lang_functions['text_shift_pageup_shortcut'] : $lang_functions['text_alt_pageup_shortcut'])."\">";
+    $pager .= $as;
+    $pager .= "</a></li>";
+  }
+  else
+  $pager .= "<li class=\"selected\">".$as."</li>";
+#  $pager .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+  $as = $lang_functions['text_next']."&nbsp;&gt;&gt;";
+  if ($page < $mp && $mp >= 0) {
+    $next_page_href = $href.$pagename."=" . ($page + 1);
+    $pager .= "<li><a href=\"".htmlspecialchars($next_page_href). "\" title=\"".($is_presto ? $lang_functions['text_shift_pagedown_shortcut'] : $lang_functions['text_alt_pagedown_shortcut'])."\">";
+    $pager .= $as;
+    $pager .= "</a></li>";
+  }
+  else {
+       $pager .= "<li class=\"selected\">".$as."</li>";
+  }
+  $pager .= '</ul>';
 
-	if ($count) {
-		$pagerarr = array();
-		$dotted = 0;
-		$dotspace = 3;
-		$dotend = $pages - $dotspace;
-		$curdotend = $page - $dotspace;
-		$curdotstart = $page + $dotspace;
-		for ($i = 0; $i < $pages; $i++) {
-			if (($i >= $dotspace && $i <= $curdotend) || ($i >= $curdotstart && $i < $dotend)) {
-				if (!$dotted)
-				$pagerarr[] = "...";
-				$dotted = 1;
-				continue;
-			}
-			$dotted = 0;
-			$start = $i * $rpp + 1;
-			$end = $start + $rpp - 1;
-			if ($end > $count)
-			$end = $count;
-			$text = "$start&nbsp;-&nbsp;$end";
-			if ($i != $page)
-			$pagerarr[] = "<a class=\"pagenumber\" href=\"".htmlspecialchars($href.$pagename."=".$i)."\">$text</a>";
-			else
-			$pagerarr[] = "<span class=\"selected\">$text</span>";
-		}
-		$pagerstr = '<ul><li>'.join("</li><li>", $pagerarr).'</li></ul>';
-		$pagertop = "<div id='pagertop' class=\"pages\"><div class=\"minor-list\" style=\"margin-bottom:0.6em;\">$pager</div><div class=\"minor-list list-seperator\">$pagerstr</div></div>\n";
-		$pagerbottom = "<div id='pagerbottom' class=\"pages\"><div class=\"minor-list list-seperator\" style=\"margin-bottom:0.6em;\">$pagerstr</div><div class=\"minor-list\">$pager</div></div>\n";
-	}
-	else {
-		$pagertop = "<div id='pagertop' class=\"pages minor-list\"><div class=\"\">$pager</div>\n";
-		$pagerbottom = "<div id='pagerbottom' class=\"pages minor-list\"><div class=\"\">$pager</div>\n";
-	}
+  if ($count) {
+    $pagerarr = array();
+    $dotted = 0;
+    $dotspace = 3;
+    $dotend = $pages - $dotspace;
+    $curdotend = $page - $dotspace;
+    $curdotstart = $page + $dotspace;
+    for ($i = 0; $i < $pages; $i++) {
+      if (($i >= $dotspace && $i <= $curdotend) || ($i >= $curdotstart && $i < $dotend)) {
+        if (!$dotted)
+        $pagerarr[] = "...";
+        $dotted = 1;
+        continue;
+      }
+      $dotted = 0;
+      $start = $i * $rpp + 1;
+      $end = $start + $rpp - 1;
+      if ($end > $count)
+      $end = $count;
+      $text = "$start&nbsp;-&nbsp;$end";
+      if ($i != $page)
+      $pagerarr[] = "<a class=\"pagenumber\" href=\"".htmlspecialchars($href.$pagename."=".$i)."\">$text</a>";
+      else
+      $pagerarr[] = "<span class=\"selected\">$text</span>";
+    }
+    $pagerstr = '<ul><li>'.join("</li><li>", $pagerarr).'</li></ul>';
+    $pagertop = "<div id='pagertop' class=\"pages\"><div class=\"minor-list\" style=\"margin-bottom:0.6em;\">$pager</div><div class=\"minor-list list-seperator\">$pagerstr</div></div>\n";
+    $pagerbottom = "<div id='pagerbottom' class=\"pages\"><div class=\"minor-list list-seperator\" style=\"margin-bottom:0.6em;\">$pagerstr</div><div class=\"minor-list\">$pager</div></div>\n";
+  }
+  else {
+    $pagertop = "<div id='pagertop' class=\"pages minor-list\"><div class=\"\">$pager</div>\n";
+    $pagerbottom = "<div id='pagerbottom' class=\"pages minor-list\"><div class=\"\">$pager</div>\n";
+  }
 
-	$start = $page * $rpp;
-	$add_key_shortcut = key_shortcut($page,$pages-1);
-	return array($pagertop, $pagerbottom, "LIMIT $start,$rpp", $next_page_href, $start);
+  $start = $page * $rpp;
+  $add_key_shortcut = key_shortcut($page,$pages-1);
+  return array($pagertop, $pagerbottom, "LIMIT $start,$rpp", $next_page_href, $start);
 }
 
 
 function commenttable($rows, $type, $parent_id, $review = false, $offset=0) {
-	global $lang_functions;
-	global $CURUSER, $commanage_class;
-	global $Advertisement;
-	begin_main_frame();
+  global $lang_functions;
+  global $CURUSER, $commanage_class;
+  global $Advertisement;
+  begin_main_frame();
 
-	$count = 0;
-	if ($Advertisement->enable_ad())
-		$commentad = $Advertisement->get_ad('comment');
-	foreach ($rows as $row)
-	{
-		$userRow = get_user_row($row['user']);
-		if ($count>=1)
-		{
-			if ($Advertisement->enable_ad()){
-				if ($commentad[$count-1])
-				echo "<div align=\"center\" style=\"margin-top: 10px\" id=\"ad_comment_".$count."\">".$commentad[$count-1]."</div>";
-			}
-		}
+  $count = 0;
+  if ($Advertisement->enable_ad())
+    $commentad = $Advertisement->get_ad('comment');
+  foreach ($rows as $row)
+  {
+    $userRow = get_user_row($row['user']);
+    if ($count>=1)
+    {
+      if ($Advertisement->enable_ad()){
+        if ($commentad[$count-1])
+        echo "<div align=\"center\" style=\"margin-top: 10px\" id=\"ad_comment_".$count."\">".$commentad[$count-1]."</div>";
+      }
+    }
 
-		$by = get_username($row["user"],false,true,true,false,false,true);
-		$added = gettime($row["added"]);
-		
-		print('<div class="forum-author" id="cid' . $row['id']. '"><div class=" minor-list"><ul><li>#'.$row['id'].'</li><li><span class="gray">'.$lang_forums['text_by'].'</span>'.$by.'<span class="gray">'.$lang_forums['text_at']."</span></li><li>".$added);
-		if ($row["editedby"] && get_user_class() >= $commanage_class) {
-		  print("<li class=\"list-seperator\"><a href=\"comment.php?action=vieworiginal&amp;cid=".$row['id']."&amp;type=".$type."\">".$lang_functions['text_view_original']."</a></li>");
-		}
+    $by = get_username($row["user"],false,true,true,false,false,true);
+    $added = gettime($row["added"]);
+    
+    print('<div class="forum-author" id="cid' . $row['id']. '"><div class=" minor-list"><ul><li>#'.$row['id'].'</li><li><span class="gray">'.$lang_forums['text_by'].'</span>'.$by.'<span class="gray">'.$lang_forums['text_at']."</span></li><li>".$added);
+    if ($row["editedby"] && get_user_class() >= $commanage_class) {
+      print("<li class=\"list-seperator\"><a href=\"comment.php?action=vieworiginal&amp;cid=".$row['id']."&amp;type=".$type."\">".$lang_functions['text_view_original']."</a></li>");
+    }
 
-		print('</li></ul></div><div class="forum-floor"><span class="big">#'.$lang_forums['text_number'].($offset+$count+1) . $lang_forums['text_lou']."&nbsp;&nbsp;</span><a href=\"#top\"><img class=\"top\" src=\"pic/trans.gif\" alt=\"Top\" title=\"TOP\" /></a></div>");
+    print('</li></ul></div><div class="forum-floor"><span class="big">#'.$lang_forums['text_number'].($offset+$count+1) . $lang_forums['text_lou']."&nbsp;&nbsp;</span><a href=\"#top\"><img class=\"top\" src=\"pic/trans.gif\" alt=\"Top\" title=\"TOP\" /></a></div>");
 
-		print("</div>\n");
+    print("</div>\n");
 
 
-		$avatar = ($CURUSER["avatars"] == "yes" ? htmlspecialchars(trim($userRow["avatar"])) : "");
-		if (!$avatar)
-			$avatar = "pic/default_avatar.png";
-		$text = format_comment($row["text"]);
-		$text_editby = "";
-		if ($row["editedby"]){
-			$lastedittime = gettime($row['editdate'],true,false);
-			$text_editby = "<br /><p><font class=\"small\">".$lang_functions['text_last_edited_by'].get_username($row['editedby']).$lang_functions['text_edited_at'].$lastedittime."</font></p>\n";
-		}
+    $avatar = ($CURUSER["avatars"] == "yes" ? htmlspecialchars(trim($userRow["avatar"])) : "");
+    if (!$avatar)
+      $avatar = "pic/default_avatar.png";
+    $text = format_comment($row["text"]);
+    $text_editby = "";
+    if ($row["editedby"]){
+      $lastedittime = gettime($row['editdate'],true,false);
+      $text_editby = "<br /><p><font class=\"small\">".$lang_functions['text_last_edited_by'].get_username($row['editedby']).$lang_functions['text_edited_at'].$lastedittime."</font></p>\n";
+    }
 
-		print("<table class=\"main\" width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"5\">\n");
-		$secs = 900;
-		$dt = sqlesc(date("Y-m-d H:i:s",(TIMENOW - $secs))); // calculate date.
-		print("<tr>\n");
-		print("<td class=\"rowfollow\" width=\"150\" valign=\"top\" style=\"padding: 0px;\">".return_avatar_image($avatar)."</td>\n");
-		print("<td class=\"rowfollow\" valign=\"top\"><br />".$text.$text_editby."</td>\n");
-		print("</tr>\n");
-		$actionbar = "<a href=\"comment.php?action=add&amp;sub=quote&amp;cid=".$row[id]."&amp;pid=".$parent_id."&amp;type=".$type."\"><img class=\"f_quote\" src=\"pic/trans.gif\" alt=\"Quote\" title=\"".$lang_functions['title_reply_with_quote']."\" /></a>".
-		"<a href=\"comment.php?action=add&amp;pid=".$parent_id."&amp;type=".$type."\"><img class=\"f_reply\" src=\"pic/trans.gif\" alt=\"Add Reply\" title=\"".$lang_functions['title_add_reply']."\" /></a>".(get_user_class() >= $commanage_class ? "<a href=\"comment.php?action=delete&amp;cid=".$row[id]."&amp;type=".$type."\"><img class=\"f_delete\" src=\"pic/trans.gif\" alt=\"Delete\" title=\"".$lang_functions['title_delete']."\" /></a>" : "").($row["user"] == $CURUSER["id"] || get_user_class() >= $commanage_class ? "<a href=\"comment.php?action=edit&amp;cid=".$row[id]."&amp;type=".$type."\"><img class=\"f_edit\" src=\"pic/trans.gif\" alt=\"Edit\" title=\"".$lang_functions['title_edit']."\" />"."</a>" : "");
-		print("<tr><td class=\"toolbox\"> ".("'".$userRow['last_access']."'"> $dt ? "<img class=\"f_online\" src=\"pic/trans.gif\" alt=\"Online\" title=\"".$lang_functions['title_online']."\" />":"<img class=\"f_offline\" src=\"pic/trans.gif\" alt=\"Offline\" title=\"".$lang_functions['title_offline']."\" />" )."<a href=\"sendmessage.php?receiver=".htmlspecialchars(trim($row["user"]))."\"><img class=\"f_pm\" src=\"pic/trans.gif\" alt=\"PM\" title=\"".$lang_functions['title_send_message_to'].htmlspecialchars($userRow["username"])."\" /></a><a href=\"report.php?commentid=".htmlspecialchars(trim($row["id"]))."\"><img class=\"f_report\" src=\"pic/trans.gif\" alt=\"Report\" title=\"".$lang_functions['title_report_this_comment']."\" /></a></td><td class=\"toolbox\" align=\"right\">".$actionbar."</td>");
+    print("<table class=\"main\" width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"5\">\n");
+    $secs = 900;
+    $dt = sqlesc(date("Y-m-d H:i:s",(TIMENOW - $secs))); // calculate date.
+    print("<tr>\n");
+    print("<td class=\"rowfollow\" width=\"150\" valign=\"top\" style=\"padding: 0px;\">".return_avatar_image($avatar)."</td>\n");
+    print("<td class=\"rowfollow\" valign=\"top\"><br />".$text.$text_editby."</td>\n");
+    print("</tr>\n");
+    $actionbar = "<a href=\"comment.php?action=add&amp;sub=quote&amp;cid=".$row[id]."&amp;pid=".$parent_id."&amp;type=".$type."\"><img class=\"f_quote\" src=\"pic/trans.gif\" alt=\"Quote\" title=\"".$lang_functions['title_reply_with_quote']."\" /></a>".
+    "<a href=\"comment.php?action=add&amp;pid=".$parent_id."&amp;type=".$type."\"><img class=\"f_reply\" src=\"pic/trans.gif\" alt=\"Add Reply\" title=\"".$lang_functions['title_add_reply']."\" /></a>".(get_user_class() >= $commanage_class ? "<a href=\"comment.php?action=delete&amp;cid=".$row[id]."&amp;type=".$type."\"><img class=\"f_delete\" src=\"pic/trans.gif\" alt=\"Delete\" title=\"".$lang_functions['title_delete']."\" /></a>" : "").($row["user"] == $CURUSER["id"] || get_user_class() >= $commanage_class ? "<a href=\"comment.php?action=edit&amp;cid=".$row[id]."&amp;type=".$type."\"><img class=\"f_edit\" src=\"pic/trans.gif\" alt=\"Edit\" title=\"".$lang_functions['title_edit']."\" />"."</a>" : "");
+    print("<tr><td class=\"toolbox\"> ".("'".$userRow['last_access']."'"> $dt ? "<img class=\"f_online\" src=\"pic/trans.gif\" alt=\"Online\" title=\"".$lang_functions['title_online']."\" />":"<img class=\"f_offline\" src=\"pic/trans.gif\" alt=\"Offline\" title=\"".$lang_functions['title_offline']."\" />" )."<a href=\"sendmessage.php?receiver=".htmlspecialchars(trim($row["user"]))."\"><img class=\"f_pm\" src=\"pic/trans.gif\" alt=\"PM\" title=\"".$lang_functions['title_send_message_to'].htmlspecialchars($userRow["username"])."\" /></a><a href=\"report.php?commentid=".htmlspecialchars(trim($row["id"]))."\"><img class=\"f_report\" src=\"pic/trans.gif\" alt=\"Report\" title=\"".$lang_functions['title_report_this_comment']."\" /></a></td><td class=\"toolbox\" align=\"right\">".$actionbar."</td>");
 
-		print("</tr></table>\n");
-		$count++;
-	}
-	end_main_frame();
+    print("</tr></table>\n");
+    $count++;
+  }
+  end_main_frame();
 }
 
 function searchfield($s) {
-	return preg_replace(array('/[^a-z0-9]/si', '/^\s*/s', '/\s*$/s', '/\s+/s'), array(" ", "", "", " "), $s);
+  return preg_replace(array('/[^a-z0-9]/si', '/^\s*/s', '/\s*$/s', '/\s+/s'), array(" ", "", "", " "), $s);
 }
 
 function genrelist($catmode = 1) {
-	global $Cache;
-	if (!$ret = $Cache->get_value('category_list_mode_'.$catmode)){
-		$ret = array();
-		$res = sql_query("SELECT id, mode, name, image FROM categories WHERE mode = ".sqlesc($catmode)." ORDER BY sort_index, id");
-		while ($row = mysql_fetch_array($res))
-			$ret[] = $row;
-		$Cache->cache_value('category_list_mode_'.$catmode, $ret, 152800);
-	}
-	return $ret;
+  global $Cache;
+  if (!$ret = $Cache->get_value('category_list_mode_'.$catmode)){
+    $ret = array();
+    $res = sql_query("SELECT id, mode, name, image FROM categories WHERE mode = ".sqlesc($catmode)." ORDER BY sort_index, id");
+    while ($row = mysql_fetch_array($res))
+      $ret[] = $row;
+    $Cache->cache_value('category_list_mode_'.$catmode, $ret, 152800);
+  }
+  return $ret;
 }
 
 function searchbox_item_list($table = "sources"){
-	global $Cache;
-	if (!$ret = $Cache->get_value($table.'_list')){
-		$ret = array();
-		$res = sql_query("SELECT * FROM ".$table." ORDER BY sort_index, id");
-		while ($row = mysql_fetch_array($res))
-			$ret[] = $row;
-		$Cache->cache_value($table.'_list', $ret, 152800);
-	}
-	return $ret;
+  global $Cache;
+  if (!$ret = $Cache->get_value($table.'_list')){
+    $ret = array();
+    $res = sql_query("SELECT * FROM ".$table." ORDER BY sort_index, id");
+    while ($row = mysql_fetch_array($res))
+      $ret[] = $row;
+    $Cache->cache_value($table.'_list', $ret, 152800);
+  }
+  return $ret;
 }
 
 function langlist($type) {
-	global $Cache;
-	if (!$ret = $Cache->get_value($type.'_lang_list')){
-		$ret = array();
-		$res = sql_query("SELECT id, lang_name, flagpic, site_lang_folder FROM language WHERE ". $type ."=1 ORDER BY site_lang DESC, id ASC");
-		while ($row = mysql_fetch_array($res))
-			$ret[] = $row;
-		$Cache->cache_value($type.'_lang_list', $ret, 152800);
-	}
-	return $ret;
+  global $Cache;
+  if (!$ret = $Cache->get_value($type.'_lang_list')){
+    $ret = array();
+    $res = sql_query("SELECT id, lang_name, flagpic, site_lang_folder FROM language WHERE ". $type ."=1 ORDER BY site_lang DESC, id ASC");
+    while ($row = mysql_fetch_array($res))
+      $ret[] = $row;
+    $Cache->cache_value($type.'_lang_list', $ret, 152800);
+  }
+  return $ret;
 }
 
 function linkcolor($num) {
-	if (!$num)
-	return "red";
-	//    if ($num == 1)
-	//        return "yellow";
-	return "green";
+  if (!$num)
+  return "red";
+  //    if ($num == 1)
+  //        return "yellow";
+  return "green";
 }
 
 function writecomment($userid, $comment) {
-	$res = sql_query("SELECT modcomment FROM users WHERE id = '$userid'") or sqlerr(__FILE__, __LINE__);
-	$arr = mysql_fetch_assoc($res);
+  $res = sql_query("SELECT modcomment FROM users WHERE id = '$userid'") or sqlerr(__FILE__, __LINE__);
+  $arr = mysql_fetch_assoc($res);
 
-	$modcomment = date("d-m-Y") . " - " . $comment . "" . ($arr[modcomment] != "" ? "\n\n" : "") . "$arr[modcomment]";
-	$modcom = sqlesc($modcomment);
+  $modcomment = date("d-m-Y") . " - " . $comment . "" . ($arr[modcomment] != "" ? "\n\n" : "") . "$arr[modcomment]";
+  $modcom = sqlesc($modcomment);
 
-	return sql_query("UPDATE users SET modcomment = $modcom WHERE id = '$userid'") or sqlerr(__FILE__, __LINE__);
+  return sql_query("UPDATE users SET modcomment = $modcom WHERE id = '$userid'") or sqlerr(__FILE__, __LINE__);
 }
 
 function return_torrent_bookmark_array($userid)
 {
-	global $Cache;
-	static $ret;
-	if (!$ret){
-		if (!$ret = $Cache->get_value('user_'.$userid.'_bookmark_array')){
-			$ret = array();
-			$res = sql_query("SELECT * FROM bookmarks WHERE userid=" . sqlesc($userid));
-			if (mysql_num_rows($res) != 0){
-				while ($row = mysql_fetch_array($res))
-					$ret[] = $row['torrentid'];
-				$Cache->cache_value('user_'.$userid.'_bookmark_array', $ret, 132800);
-			} else {
-				$Cache->cache_value('user_'.$userid.'_bookmark_array', array(0), 132800);
-			}
-		}
-	}
-	return $ret;
+  global $Cache;
+  static $ret;
+  if (!$ret){
+    if (!$ret = $Cache->get_value('user_'.$userid.'_bookmark_array')){
+      $ret = array();
+      $res = sql_query("SELECT * FROM bookmarks WHERE userid=" . sqlesc($userid));
+      if (mysql_num_rows($res) != 0){
+        while ($row = mysql_fetch_array($res))
+          $ret[] = $row['torrentid'];
+        $Cache->cache_value('user_'.$userid.'_bookmark_array', $ret, 132800);
+      } else {
+        $Cache->cache_value('user_'.$userid.'_bookmark_array', array(0), 132800);
+      }
+    }
+  }
+  return $ret;
 }
 
 function get_is_torrent_bookmarked($userid, $torrentid) {
@@ -3075,58 +3075,58 @@ function get_is_torrent_bookmarked($userid, $torrentid) {
 
 function get_torrent_bookmark_state($userid, $torrentid, $text = false)
 {
-	global $lang_functions;
-	if (get_is_torrent_bookmarked($userid, $torrentid)) {
-		$act = ($text == true ? $lang_functions['title_delbookmark_torrent'] : "<img class=\"bookmark\" src=\"pic/trans.gif\" alt=\"Bookmarked\" title=\"".$lang_functions['title_delbookmark_torrent']."\" />");
-	}
-	else {
-		$act = ($text == true ?  $lang_functions['title_bookmark_torrent']  : "<img class=\"delbookmark\" src=\"pic/trans.gif\" alt=\"Unbookmarked\" title=\"".$lang_functions['title_bookmark_torrent']."\" />");
-	}
-	return $act;
+  global $lang_functions;
+  if (get_is_torrent_bookmarked($userid, $torrentid)) {
+    $act = ($text == true ? $lang_functions['title_delbookmark_torrent'] : "<img class=\"bookmark\" src=\"pic/trans.gif\" alt=\"Bookmarked\" title=\"".$lang_functions['title_delbookmark_torrent']."\" />");
+  }
+  else {
+    $act = ($text == true ?  $lang_functions['title_bookmark_torrent']  : "<img class=\"delbookmark\" src=\"pic/trans.gif\" alt=\"Unbookmarked\" title=\"".$lang_functions['title_bookmark_torrent']."\" />");
+  }
+  return $act;
 }
 
 function torrenttable($res, $variant = "torrent", $swap_headings = false) {
-	global $Cache;
-	global $lang_functions;
-	global $CURUSER, $waitsystem;
-	global $showextinfo;
-	global $torrentmanage_class, $smalldescription_main, $enabletooltip_tweak;
-	global $CURLANGDIR;
-	// Added Br BruceWolf. 2011-04-24
-	// Filter banned torrents
-	global $seebanned_class;
-	
-	if ($variant == "torrent"){
-		$last_browse = $CURUSER['last_browse'];
-		$sectiontype = $browsecatmode;
-	}
-	elseif($variant == "music"){
-		$last_browse = $CURUSER['last_music'];
-		$sectiontype = $specialcatmode;
-	}
-	else{
-		$last_browse = $CURUSER['last_browse'];
-		$sectiontype = "";
-	}
+  global $Cache;
+  global $lang_functions;
+  global $CURUSER, $waitsystem;
+  global $showextinfo;
+  global $torrentmanage_class, $smalldescription_main, $enabletooltip_tweak;
+  global $CURLANGDIR;
+  // Added Br BruceWolf. 2011-04-24
+  // Filter banned torrents
+  global $seebanned_class;
+  
+  if ($variant == "torrent"){
+    $last_browse = $CURUSER['last_browse'];
+    $sectiontype = $browsecatmode;
+  }
+  elseif($variant == "music"){
+    $last_browse = $CURUSER['last_music'];
+    $sectiontype = $specialcatmode;
+  }
+  else{
+    $last_browse = $CURUSER['last_browse'];
+    $sectiontype = "";
+  }
 
-	$time_now = TIMENOW;
-	if ($last_browse > $time_now) {
-		$last_browse=$time_now;
-	}
+  $time_now = TIMENOW;
+  if ($last_browse > $time_now) {
+    $last_browse=$time_now;
+  }
 
-	if (get_user_class() < UC_VIP && $waitsystem == "yes") {
-		$ratio = get_ratio($CURUSER["id"], false);
-		$gigs = $CURUSER["uploaded"] / (1024*1024*1024);
-		if($gigs > 10)
-		{
-			if ($ratio < 0.4) $wait = 24;
-			elseif ($ratio < 0.5) $wait = 12;
-			elseif ($ratio < 0.6) $wait = 6;
-			elseif ($ratio < 0.8) $wait = 3;
-			else $wait = 0;
-		}
-		else $wait = 0;
-	}
+  if (get_user_class() < UC_VIP && $waitsystem == "yes") {
+    $ratio = get_ratio($CURUSER["id"], false);
+    $gigs = $CURUSER["uploaded"] / (1024*1024*1024);
+    if($gigs > 10)
+    {
+      if ($ratio < 0.4) $wait = 24;
+      elseif ($ratio < 0.5) $wait = 12;
+      elseif ($ratio < 0.6) $wait = 6;
+      elseif ($ratio < 0.8) $wait = 3;
+      else $wait = 0;
+    }
+    else $wait = 0;
+  }
 ?>
 <table id="torrents" class="torrents" cellspacing="0" cellpadding="5" width="100%">
 <thead><tr>
@@ -3134,28 +3134,28 @@ function torrenttable($res, $variant = "torrent", $swap_headings = false) {
 $count_get = 0;
 $oldlink = "";
 foreach ($_GET as $get_name => $get_value) {
-	$get_name = mysql_real_escape_string(strip_tags(str_replace(array("\"","'"),array("",""),$get_name)));
-	$get_value = mysql_real_escape_string(strip_tags(str_replace(array("\"","'"),array("",""),$get_value)));
+  $get_name = mysql_real_escape_string(strip_tags(str_replace(array("\"","'"),array("",""),$get_name)));
+  $get_value = mysql_real_escape_string(strip_tags(str_replace(array("\"","'"),array("",""),$get_value)));
 
-	if ($get_name != "sort" && $get_name != "type") {
-		if ($count_get > 0) {
-			$oldlink .= "&amp;" . $get_name . "=" . $get_value;
-		}
-		else {
-			$oldlink .= $get_name . "=" . $get_value;
-		}
-		$count_get++;
-	}
+  if ($get_name != "sort" && $get_name != "type") {
+    if ($count_get > 0) {
+      $oldlink .= "&amp;" . $get_name . "=" . $get_value;
+    }
+    else {
+      $oldlink .= $get_name . "=" . $get_value;
+    }
+    $count_get++;
+  }
 }
 if ($count_get > 0) {
-	$oldlink = $oldlink . "&amp;";
+  $oldlink = $oldlink . "&amp;";
 }
 $sort = $_GET['sort'];
 $link = array();
 for ($i=1; $i<=9; $i++){
-	if ($sort == $i)
-		$link[$i] = ($_GET['type'] == "desc" ? "asc" : "desc");
-	else $link[$i] = ($i == 1 ? "asc" : "desc");
+  if ($sort == $i)
+    $link[$i] = ($_GET['type'] == "desc" ? "asc" : "desc");
+  else $link[$i] = ($i == 1 ? "asc" : "desc");
 }
 ?>
 <th style="padding: 0px"><?php echo $lang_functions['col_type'] ?></th>
@@ -3164,7 +3164,7 @@ for ($i=1; $i<=9; $i++){
 
 if ($wait)
 {
-	print("<th>".$lang_functions['col_wait']."</th>\n");
+  print("<th>".$lang_functions['col_wait']."</th>\n");
 }
 if ($CURUSER['showcomnum'] != 'no') { ?>
 <th><a href="?<?php echo $oldlink?>sort=3&amp;type=<?php echo $link[3]?>"><img class="comments" src="pic/trans.gif" alt="comments" title="<?php echo $lang_functions['title_number_of_comments'] ?>" /></a></th>
@@ -3178,7 +3178,7 @@ if ($CURUSER['showcomnum'] != 'no') { ?>
 <th><a href="?<?php echo $oldlink?>sort=9&amp;type=<?php echo $link[9]?>"><?php echo $lang_functions['col_uploader']?></a></th>
 <?php
 if (get_user_class() >= $torrentmanage_class) { ?>
-	<th><?php echo $lang_functions['col_action'] ?></th>
+  <th><?php echo $lang_functions['col_action'] ?></th>
 <?php } ?>
 </tr>
 </thead>
@@ -3190,259 +3190,259 @@ $has_secondicon = true;
 else $has_secondicon = false;
 $counter = 0;
 if ($smalldescription_main == 'no' || $CURUSER['showsmalldescr'] == 'no')
-	$displaysmalldescr = false;
+  $displaysmalldescr = false;
 else $displaysmalldescr = true;
 while ($row = mysql_fetch_assoc($res))
 {
-	if($row['banned'] == 'no' 
-	   || ($row['banned'] == 'yes' 
-	      && (get_user_class() >= $seebanned_class 
-	          || $CURUSER['id'] == $row['owner']))) {
-		$id = $row["id"];
-#		$sphighlight = get_torrent_bg_color($row['sp_state']);
-#		print("<tr" . $sphighlight . ">\n");
+  if($row['banned'] == 'no' 
+     || ($row['banned'] == 'yes' 
+        && (get_user_class() >= $seebanned_class 
+            || $CURUSER['id'] == $row['owner']))) {
+    $id = $row["id"];
+#    $sphighlight = get_torrent_bg_color($row['sp_state']);
+#    print("<tr" . $sphighlight . ">\n");
 
-		print('<td class="rowfollow nowrap category-icon">');
-		if (isset($row["category"])) {
-			print(return_category_image($row["category"], "?"));
-			if ($has_secondicon){
-				print(get_second_icon($row, "pic/".$catimgurl."additional/"));
-			}
-		}
-		else
-			print("-");
-		print("</td>\n");
+    print('<td class="rowfollow nowrap category-icon">');
+    if (isset($row["category"])) {
+      print(return_category_image($row["category"], "?"));
+      if ($has_secondicon){
+        print(get_second_icon($row, "pic/".$catimgurl."additional/"));
+      }
+    }
+    else
+      print("-");
+    print("</td>\n");
 
-		//torrent name
-		$dispname = trim($row["name"]);
-		$short_torrent_name_alt = "";
-		$mouseovertorrent = "";
-		$tooltipblock = "";
-		$has_tooltip = false;
-		if ($enabletooltip_tweak == 'yes')
-			$tooltiptype = $CURUSER['tooltip'];
-		else
-			$tooltiptype = 'off';
-		switch ($tooltiptype){
-			case 'minorimdb' : {
-				if ($showextinfo['imdb'] == 'yes' && $row["url"])
-					{
-					$url = $row['url'];
-					$cache = $row['cache_stamp'];
-					$type = 'minor';
-					$has_tooltip = true;
-					}
-				break;
-				}
-			case 'medianimdb' :
-				{
-				if ($showextinfo['imdb'] == 'yes' && $row["url"])
-					{
-					$url = $row['url'];
-					$cache = $row['cache_stamp'];
-					$type = 'median';
-					$has_tooltip = true;
-					}
-				break;
-				}
-			case 'off' :  break;
-		}
-		if (!$has_tooltip)
-			$short_torrent_name_alt = "title=\"".htmlspecialchars($dispname)."\"";
-		else{
-		$torrent_tooltip[$counter]['id'] = "torrent_" . $counter;
-		$torrent_tooltip[$counter]['content'] = "";
-		$mouseovertorrent = "onmouseover=\"get_ext_info_ajax('".$torrent_tooltip[$counter]['id']."','".$url."','".$cache."','".$type."'); domTT_activate(this, event, 'content', document.getElementById('" . $torrent_tooltip[$counter]['id'] . "'), 'trail', false, 'delay',600,'lifetime',6000,'fade','both','styleClass','niceTitle', 'fadeMax',87, 'maxWidth', 500);\"";
-		}
-		$count_dispname=mb_strlen($dispname,"UTF-8");
-		if (!$displaysmalldescr || $row["small_descr"] == "")// maximum length of torrent name
-			$max_length_of_torrent_name = 120;
-		elseif ($CURUSER['fontsize'] == 'large')
-			$max_length_of_torrent_name = 60;
-		elseif ($CURUSER['fontsize'] == 'small')
-			$max_length_of_torrent_name = 80;
-		else $max_length_of_torrent_name = 70;
+    //torrent name
+    $dispname = trim($row["name"]);
+    $short_torrent_name_alt = "";
+    $mouseovertorrent = "";
+    $tooltipblock = "";
+    $has_tooltip = false;
+    if ($enabletooltip_tweak == 'yes')
+      $tooltiptype = $CURUSER['tooltip'];
+    else
+      $tooltiptype = 'off';
+    switch ($tooltiptype){
+      case 'minorimdb' : {
+        if ($showextinfo['imdb'] == 'yes' && $row["url"])
+          {
+          $url = $row['url'];
+          $cache = $row['cache_stamp'];
+          $type = 'minor';
+          $has_tooltip = true;
+          }
+        break;
+        }
+      case 'medianimdb' :
+        {
+        if ($showextinfo['imdb'] == 'yes' && $row["url"])
+          {
+          $url = $row['url'];
+          $cache = $row['cache_stamp'];
+          $type = 'median';
+          $has_tooltip = true;
+          }
+        break;
+        }
+      case 'off' :  break;
+    }
+    if (!$has_tooltip)
+      $short_torrent_name_alt = "title=\"".htmlspecialchars($dispname)."\"";
+    else{
+    $torrent_tooltip[$counter]['id'] = "torrent_" . $counter;
+    $torrent_tooltip[$counter]['content'] = "";
+    $mouseovertorrent = "onmouseover=\"get_ext_info_ajax('".$torrent_tooltip[$counter]['id']."','".$url."','".$cache."','".$type."'); domTT_activate(this, event, 'content', document.getElementById('" . $torrent_tooltip[$counter]['id'] . "'), 'trail', false, 'delay',600,'lifetime',6000,'fade','both','styleClass','niceTitle', 'fadeMax',87, 'maxWidth', 500);\"";
+    }
+    $count_dispname=mb_strlen($dispname,"UTF-8");
+    if (!$displaysmalldescr || $row["small_descr"] == "")// maximum length of torrent name
+      $max_length_of_torrent_name = 120;
+    elseif ($CURUSER['fontsize'] == 'large')
+      $max_length_of_torrent_name = 60;
+    elseif ($CURUSER['fontsize'] == 'small')
+      $max_length_of_torrent_name = 80;
+    else $max_length_of_torrent_name = 70;
 
-		if($count_dispname > $max_length_of_torrent_name)
-			$dispname=mb_substr($dispname, 0, $max_length_of_torrent_name-2,"UTF-8") . "..";
+    if($count_dispname > $max_length_of_torrent_name)
+      $dispname=mb_substr($dispname, 0, $max_length_of_torrent_name-2,"UTF-8") . "..";
 
-		if ($row['pos_state'] == 'sticky' && $CURUSER['appendsticky'] == 'yes')
-			$stickyicon = "<img class=\"sticky\" src=\"pic/trans.gif\" alt=\"Sticky\" title=\"".$lang_functions['title_sticky']."\" />";
-		else $stickyicon = "";
-		
-		if ($displaysmalldescr) {
-			$dissmall_descr = trim($row["small_descr"]);
-			$count_dissmall_descr=mb_strlen($dissmall_descr,"UTF-8");
-			$max_lenght_of_small_descr=$max_length_of_torrent_name; // maximum length
-			if($count_dissmall_descr > $max_lenght_of_small_descr)
-			{
-				$dissmall_descr=mb_substr($dissmall_descr, 0, $max_lenght_of_small_descr-2,"UTF-8") . "..";
-			}
+    if ($row['pos_state'] == 'sticky' && $CURUSER['appendsticky'] == 'yes')
+      $stickyicon = "<img class=\"sticky\" src=\"pic/trans.gif\" alt=\"Sticky\" title=\"".$lang_functions['title_sticky']."\" />";
+    else $stickyicon = "";
+    
+    if ($displaysmalldescr) {
+      $dissmall_descr = trim($row["small_descr"]);
+      $count_dissmall_descr=mb_strlen($dissmall_descr,"UTF-8");
+      $max_lenght_of_small_descr=$max_length_of_torrent_name; // maximum length
+      if($count_dissmall_descr > $max_lenght_of_small_descr)
+      {
+        $dissmall_descr=mb_substr($dissmall_descr, 0, $max_lenght_of_small_descr-2,"UTF-8") . "..";
+      }
 
-		if ($swap_headings && $dissmall_descr != '') {
-		   $buf = $dispname;
-		   $dispname = $dissmall_descr;
-		   $dissmall_descr = $buf;
-		}
-		}
-		print('<td class="torrent"><div><div class="limit-width minor-list"><div class="torrent-title">'.$stickyicon."<h2 class='transparentbg'><a $short_torrent_name_alt $mouseovertorrent href=\"details.php?id=".$id."&amp;hit=1\">".htmlspecialchars($dispname).'</a></h2><ul class="prs">');
-		$sp_torrent = get_torrent_promotion_append($row['sp_state'],"",true,$row["added"], $row['promotion_time_type'], $row['promotion_until']);
-		if ($sp_torrent != '') {
-		  $sp_torrent = '<li>' . $sp_torrent . '</li>';
-		}
-		$sp_torrent_sub = get_torrent_promotion_append_sub($row['sp_state'],"",true,$row["added"], $row['promotion_time_type'], $row['promotion_until']);
-		if ($sp_torrent_sub != '') {
-		  $sp_torrent_sub = '<li>' . $sp_torrent_sub . '</li>';
-		}
+    if ($swap_headings && $dissmall_descr != '') {
+       $buf = $dispname;
+       $dispname = $dissmall_descr;
+       $dissmall_descr = $buf;
+    }
+    }
+    print('<td class="torrent"><div><div class="limit-width minor-list"><div class="torrent-title">'.$stickyicon."<h2 class='transparentbg'><a $short_torrent_name_alt $mouseovertorrent href=\"details.php?id=".$id."&amp;hit=1\">".htmlspecialchars($dispname).'</a></h2><ul class="prs">');
+    $sp_torrent = get_torrent_promotion_append($row['sp_state'],"",true,$row["added"], $row['promotion_time_type'], $row['promotion_until']);
+    if ($sp_torrent != '') {
+      $sp_torrent = '<li>' . $sp_torrent . '</li>';
+    }
+    $sp_torrent_sub = get_torrent_promotion_append_sub($row['sp_state'],"",true,$row["added"], $row['promotion_time_type'], $row['promotion_until']);
+    if ($sp_torrent_sub != '') {
+      $sp_torrent_sub = '<li>' . $sp_torrent_sub . '</li>';
+    }
 
-		$picked_torrent = "";
-		if ($CURUSER['appendpicked'] != 'no'){
-		if($row['picktype']=="hot")
-		$picked_torrent = "<li>[<span class='hot'>".$lang_functions['text_hot']."</span>]</li>";
-		elseif($row['picktype']=="classic")
-		$picked_torrent = "<li>[<span class='classic'>".$lang_functions['text_classic']."</span>]</li>";
-		elseif($row['picktype']=="recommended")
-		$picked_torrent = "<li>[<span class='recommended'>".$lang_functions['text_recommended']."</span>]</li>";
-		//Added by bluemonster 20111026
-		if($row['oday']=="yes")
-		{
-			if (($CURUSER['appendpromotion'] == 'icon' && $forcemode == "") || $forcemode == 'icon'){	
-			//$picked_torrent = " <b>[<font class='recommended'>".$lang_functions['text_oday']."</font>]</b>";
-			$sp_torrent.="<li><img src=\"pic/ico_0day.gif\" border=0 alt=\"0day\" title=\"".$lang_functions['text_oday']."\" /></li>";
-			}
-			elseif (($CURUSER['appendpromotion'] == 'word' && $forcemode == "") || $forcemode == 'word'){
-			$sp_torrent.= "<li>[<span class='oday' ".$onmouseover.">".$lang_functions['text_oday']."</span>]</li>";
-			}
-		}
-		}
-		if ($CURUSER['appendnew'] != 'no' && strtotime($row["added"]) >= $last_browse)
-			print("<li>(<span class='new'>".$lang_functions['text_new_uppercase']."</span>)</li>");
+    $picked_torrent = "";
+    if ($CURUSER['appendpicked'] != 'no'){
+    if($row['picktype']=="hot")
+    $picked_torrent = "<li>[<span class='hot'>".$lang_functions['text_hot']."</span>]</li>";
+    elseif($row['picktype']=="classic")
+    $picked_torrent = "<li>[<span class='classic'>".$lang_functions['text_classic']."</span>]</li>";
+    elseif($row['picktype']=="recommended")
+    $picked_torrent = "<li>[<span class='recommended'>".$lang_functions['text_recommended']."</span>]</li>";
+    //Added by bluemonster 20111026
+    if($row['oday']=="yes")
+    {
+      if (($CURUSER['appendpromotion'] == 'icon' && $forcemode == "") || $forcemode == 'icon'){  
+      //$picked_torrent = " <b>[<font class='recommended'>".$lang_functions['text_oday']."</font>]</b>";
+      $sp_torrent.="<li><img src=\"pic/ico_0day.gif\" border=0 alt=\"0day\" title=\"".$lang_functions['text_oday']."\" /></li>";
+      }
+      elseif (($CURUSER['appendpromotion'] == 'word' && $forcemode == "") || $forcemode == 'word'){
+      $sp_torrent.= "<li>[<span class='oday' ".$onmouseover.">".$lang_functions['text_oday']."</span>]</li>";
+      }
+    }
+    }
+    if ($CURUSER['appendnew'] != 'no' && strtotime($row["added"]) >= $last_browse)
+      print("<li>(<span class='new'>".$lang_functions['text_new_uppercase']."</span>)</li>");
 
-		$banned_torrent = ($row["banned"] == 'yes' ? " <li>(<span class=\"striking\">".$lang_functions['text_banned']."</span>)</li>" : "");
-		print($banned_torrent.$picked_torrent.$sp_torrent .'</ul></div><div class="torrent-title">' );
-		if ($displaysmalldescr){
-			//small descr
-		  $escape_desc = htmlspecialchars($dissmall_descr);
-		  print($dissmall_descr == "" ? "<h3 class='placeholder'></h3>" : '<h3 title="' . $escape_desc . '">'. $escape_desc . '</h3>');
-		}
-		print('<ul class="prs">' . $sp_torrent_sub . '</ul></div></div>');
+    $banned_torrent = ($row["banned"] == 'yes' ? " <li>(<span class=\"striking\">".$lang_functions['text_banned']."</span>)</li>" : "");
+    print($banned_torrent.$picked_torrent.$sp_torrent .'</ul></div><div class="torrent-title">' );
+    if ($displaysmalldescr){
+      //small descr
+      $escape_desc = htmlspecialchars($dissmall_descr);
+      print($dissmall_descr == "" ? "<h3 class='placeholder'></h3>" : '<h3 title="' . $escape_desc . '">'. $escape_desc . '</h3>');
+    }
+    print('<ul class="prs">' . $sp_torrent_sub . '</ul></div></div>');
 
-			$act = "";
-			if ($CURUSER["dlicon"] != 'no' && $CURUSER["downloadpos"] != "no")
-			$act .= "<li><a href=\"download.php?id=".$id."\"><img class=\"download\" src=\"pic/trans.gif\" style='padding-bottom: 2px;' alt=\"download\" title=\"".$lang_functions['title_download_torrent']."\" /></a></li>" ;
-			if ($CURUSER["bmicon"] == 'yes'){
-				$bookmark = " href=\"javascript: bookmark(".$id.");\"";
-				$act .= "<li><a id=\"bookmark".$id."\" ".$bookmark." >".get_torrent_bookmark_state($CURUSER['id'], $id)."</a></li>";
-			}
+      $act = "";
+      if ($CURUSER["dlicon"] != 'no' && $CURUSER["downloadpos"] != "no")
+      $act .= "<li><a href=\"download.php?id=".$id."\"><img class=\"download\" src=\"pic/trans.gif\" style='padding-bottom: 2px;' alt=\"download\" title=\"".$lang_functions['title_download_torrent']."\" /></a></li>" ;
+      if ($CURUSER["bmicon"] == 'yes'){
+        $bookmark = " href=\"javascript: bookmark(".$id.");\"";
+        $act .= "<li><a id=\"bookmark".$id."\" ".$bookmark." >".get_torrent_bookmark_state($CURUSER['id'], $id)."</a></li>";
+      }
 
-		print('<div class="torrent-utilty-icons minor-list-vertical"><ul>'.$act."</ul></div>\n");
+    print('<div class="torrent-utilty-icons minor-list-vertical"><ul>'.$act."</ul></div>\n");
 
-		print('</td>');
-		if ($wait)
-		{
-			$elapsed = floor((TIMENOW - strtotime($row["added"])) / 3600);
-			if ($elapsed < $wait)
-			{
-				$color = dechex(floor(127*($wait - $elapsed)/48 + 128)*65536);
-				print("<td class=\"rowfollow nowrap\"><a href=\"faq.php#id46\"><font color=\"".$color."\">" . number_format($wait - $elapsed) . $lang_functions['text_h']."</font></a></td>\n");
-			}
-			else
-			print("<td class=\"rowfollow nowrap\">".$lang_functions['text_none']."</td>\n");
-		}
-		
-		if ($CURUSER['showcomnum'] != 'no')
-		{
-		print("<td class=\"rowfollow\">");
-		$nl = "";
+    print('</td>');
+    if ($wait)
+    {
+      $elapsed = floor((TIMENOW - strtotime($row["added"])) / 3600);
+      if ($elapsed < $wait)
+      {
+        $color = dechex(floor(127*($wait - $elapsed)/48 + 128)*65536);
+        print("<td class=\"rowfollow nowrap\"><a href=\"faq.php#id46\"><font color=\"".$color."\">" . number_format($wait - $elapsed) . $lang_functions['text_h']."</font></a></td>\n");
+      }
+      else
+      print("<td class=\"rowfollow nowrap\">".$lang_functions['text_none']."</td>\n");
+    }
+    
+    if ($CURUSER['showcomnum'] != 'no')
+    {
+    print("<td class=\"rowfollow\">");
+    $nl = "";
 
-		//comments
+    //comments
 
-		$nl = "<br />";
-		if (!$row["comments"]) {
-			print("<a href=\"comment.php?action=add&amp;pid=".$id."&amp;type=torrent\" title=\"".$lang_functions['title_add_comments']."\">" . $row["comments"] .  "</a>");
-		} else {
-			if ($enabletooltip_tweak == 'yes' && $CURUSER['showlastcom'] != 'no')
-			{
-				if (!$lastcom = $Cache->get_value('torrent_'.$id.'_last_comment_content')){
-					$res2 = sql_query("SELECT user, added, text FROM comments WHERE torrent = $id ORDER BY id DESC LIMIT 1");
-					$lastcom = mysql_fetch_array($res2);
-					$Cache->cache_value('torrent_'.$id.'_last_comment_content', $lastcom, 1855);
-				}
-				$timestamp = strtotime($lastcom["added"]);
-				$hasnewcom = ($lastcom['user'] != $CURUSER['id'] && $timestamp >= $last_browse);
-				if ($lastcom)
-				{
-					if ($CURUSER['timetype'] != 'timealive')
-						$lastcomtime = $lang_functions['text_at_time'].$lastcom['added'];
-					else
-						$lastcomtime = $lang_functions['text_blank'].gettime($lastcom["added"],true,false,true);
-						$lastcom_tooltip[$counter]['id'] = "lastcom_" . $counter;
-						$lastcom_tooltip[$counter]['content'] = ($hasnewcom ? "<b>(<font class='new'>".$lang_functions['text_new_uppercase']."</font>)</b> " : "").$lang_functions['text_last_commented_by'].get_username($lastcom['user']) . $lastcomtime."<br />". format_comment(mb_substr($lastcom['text'],0,100,"UTF-8") . (mb_strlen($lastcom['text'],"UTF-8") > 100 ? " ......" : "" ),true,false,false,true,600,false,false);
-						$onmouseover = "onmouseover=\"domTT_activate(this, event, 'content', document.getElementById('" . $lastcom_tooltip[$counter]['id'] . "'), 'trail', false, 'delay', 500,'lifetime',3000,'fade','both','styleClass','niceTitle','fadeMax', 87,'maxWidth', 400);\"";
-				}
-			} else {
-				$hasnewcom = false;
-				$onmouseover = "";
-			}
-			print("<b><a href=\"details.php?id=".$id."&amp;hit=1&amp;cmtpage=1#startcomments\" ".$onmouseover.">". ($hasnewcom ? "<font class='new'>" : ""). $row["comments"] .($hasnewcom ? "</font>" : ""). "</a></b>");
-		}
+    $nl = "<br />";
+    if (!$row["comments"]) {
+      print("<a href=\"comment.php?action=add&amp;pid=".$id."&amp;type=torrent\" title=\"".$lang_functions['title_add_comments']."\">" . $row["comments"] .  "</a>");
+    } else {
+      if ($enabletooltip_tweak == 'yes' && $CURUSER['showlastcom'] != 'no')
+      {
+        if (!$lastcom = $Cache->get_value('torrent_'.$id.'_last_comment_content')){
+          $res2 = sql_query("SELECT user, added, text FROM comments WHERE torrent = $id ORDER BY id DESC LIMIT 1");
+          $lastcom = mysql_fetch_array($res2);
+          $Cache->cache_value('torrent_'.$id.'_last_comment_content', $lastcom, 1855);
+        }
+        $timestamp = strtotime($lastcom["added"]);
+        $hasnewcom = ($lastcom['user'] != $CURUSER['id'] && $timestamp >= $last_browse);
+        if ($lastcom)
+        {
+          if ($CURUSER['timetype'] != 'timealive')
+            $lastcomtime = $lang_functions['text_at_time'].$lastcom['added'];
+          else
+            $lastcomtime = $lang_functions['text_blank'].gettime($lastcom["added"],true,false,true);
+            $lastcom_tooltip[$counter]['id'] = "lastcom_" . $counter;
+            $lastcom_tooltip[$counter]['content'] = ($hasnewcom ? "<b>(<font class='new'>".$lang_functions['text_new_uppercase']."</font>)</b> " : "").$lang_functions['text_last_commented_by'].get_username($lastcom['user']) . $lastcomtime."<br />". format_comment(mb_substr($lastcom['text'],0,100,"UTF-8") . (mb_strlen($lastcom['text'],"UTF-8") > 100 ? " ......" : "" ),true,false,false,true,600,false,false);
+            $onmouseover = "onmouseover=\"domTT_activate(this, event, 'content', document.getElementById('" . $lastcom_tooltip[$counter]['id'] . "'), 'trail', false, 'delay', 500,'lifetime',3000,'fade','both','styleClass','niceTitle','fadeMax', 87,'maxWidth', 400);\"";
+        }
+      } else {
+        $hasnewcom = false;
+        $onmouseover = "";
+      }
+      print("<b><a href=\"details.php?id=".$id."&amp;hit=1&amp;cmtpage=1#startcomments\" ".$onmouseover.">". ($hasnewcom ? "<font class='new'>" : ""). $row["comments"] .($hasnewcom ? "</font>" : ""). "</a></b>");
+    }
 
-		print("</td>");
-		}
+    print("</td>");
+    }
 
-		$time = $row["added"];
-		$time = gettime($time,false,true);
-		print("<td class=\"rowfollow nowrap\">". $time. "</td>");
+    $time = $row["added"];
+    $time = gettime($time,false,true);
+    print("<td class=\"rowfollow nowrap\">". $time. "</td>");
 
-		//size
-		print("<td class=\"rowfollow\">" . mksize_compact($row["size"])."</td>");
+    //size
+    print("<td class=\"rowfollow\">" . mksize_compact($row["size"])."</td>");
 
-		if ($row["seeders"]) {
-				$ratio = ($row["leechers"] ? ($row["seeders"] / $row["leechers"]) : 1);
-				$ratiocolor = get_slr_color($ratio);
-				print("<td class=\"rowfollow\" align=\"center\"><b><a href=\"details.php?id=".$id."&amp;hit=1&amp;dllist=1#seeders\">".($ratiocolor ? "<font color=\"" .
-				$ratiocolor . "\">" . number_format($row["seeders"]) . "</font>" : number_format($row["seeders"]))."</a></b></td>\n");
-		}
-		else
-			print("<td class=\"rowfollow\"><span class=\"" . linkcolor($row["seeders"]) . "\">" . number_format($row["seeders"]) . "</span></td>\n");
+    if ($row["seeders"]) {
+        $ratio = ($row["leechers"] ? ($row["seeders"] / $row["leechers"]) : 1);
+        $ratiocolor = get_slr_color($ratio);
+        print("<td class=\"rowfollow\" align=\"center\"><b><a href=\"details.php?id=".$id."&amp;hit=1&amp;dllist=1#seeders\">".($ratiocolor ? "<font color=\"" .
+        $ratiocolor . "\">" . number_format($row["seeders"]) . "</font>" : number_format($row["seeders"]))."</a></b></td>\n");
+    }
+    else
+      print("<td class=\"rowfollow\"><span class=\"" . linkcolor($row["seeders"]) . "\">" . number_format($row["seeders"]) . "</span></td>\n");
 
-		if ($row["leechers"]) {
-			print("<td class=\"rowfollow\"><b><a href=\"details.php?id=".$id."&amp;hit=1&amp;dllist=1#leechers\">" .
-			number_format($row["leechers"]) . "</a></b></td>\n");
-		}
-		else
-			print("<td class=\"rowfollow\">0</td>\n");
+    if ($row["leechers"]) {
+      print("<td class=\"rowfollow\"><b><a href=\"details.php?id=".$id."&amp;hit=1&amp;dllist=1#leechers\">" .
+      number_format($row["leechers"]) . "</a></b></td>\n");
+    }
+    else
+      print("<td class=\"rowfollow\">0</td>\n");
 
-		if ($row["times_completed"] >=1)
-		print("<td class=\"rowfollow\"><a href=\"viewsnatches.php?id=".$row[id]."\"><b>" . number_format($row["times_completed"]) . "</b></a></td>\n");
-		else
-		print("<td class=\"rowfollow\">" . number_format($row["times_completed"]) . "</td>\n");
+    if ($row["times_completed"] >=1)
+    print("<td class=\"rowfollow\"><a href=\"viewsnatches.php?id=".$row[id]."\"><b>" . number_format($row["times_completed"]) . "</b></a></td>\n");
+    else
+    print("<td class=\"rowfollow\">" . number_format($row["times_completed"]) . "</td>\n");
 
-			if ($row["anonymous"] == "yes" && get_user_class() >= $torrentmanage_class)
-			{
-				print("<td class=\"rowfollow\" align=\"center\"><i>".$lang_functions['text_anonymous']."</i><br />".(isset($row["owner"]) ? "(" . get_username($row["owner"]) .")" : "<i>".$lang_functions['text_orphaned']."</i>") . "</td>\n");
-			}
-			elseif ($row["anonymous"] == "yes")
-			{
-				print("<td class=\"rowfollow\"><i>".$lang_functions['text_anonymous']."</i></td>\n");
-			}
-			else
-			{
-				print("<td class=\"rowfollow\">" . (isset($row["owner"]) ? get_username($row["owner"]) : "<i>".$lang_functions['text_orphaned']."</i>") . "</td>\n");
-			}
+      if ($row["anonymous"] == "yes" && get_user_class() >= $torrentmanage_class)
+      {
+        print("<td class=\"rowfollow\" align=\"center\"><i>".$lang_functions['text_anonymous']."</i><br />".(isset($row["owner"]) ? "(" . get_username($row["owner"]) .")" : "<i>".$lang_functions['text_orphaned']."</i>") . "</td>\n");
+      }
+      elseif ($row["anonymous"] == "yes")
+      {
+        print("<td class=\"rowfollow\"><i>".$lang_functions['text_anonymous']."</i></td>\n");
+      }
+      else
+      {
+        print("<td class=\"rowfollow\">" . (isset($row["owner"]) ? get_username($row["owner"]) : "<i>".$lang_functions['text_orphaned']."</i>") . "</td>\n");
+      }
 
-		if (get_user_class() >= $torrentmanage_class)
-		{
-			print("<td class=\"rowfollow\"><a class=\"staff-quick-delete\" href=\"".htmlspecialchars("fastdelete.php?id=".$row[id])."\"><img class=\"staff_delete\" src=\"pic/trans.gif\" alt=\"D\" title=\"".$lang_functions['text_delete']."\" /></a>");
-			print("<br /><a href=\"edit.php?returnto=" . rawurlencode($_SERVER["REQUEST_URI"]) . "&amp;id=" . $row["id"] . "\"><img class=\"staff_edit\" src=\"pic/trans.gif\" alt=\"E\" title=\"".$lang_functions['text_edit']."\" /></a></td>\n");
-		}
-		print("</tr>\n");
-		$counter++;
-	}
+    if (get_user_class() >= $torrentmanage_class)
+    {
+      print("<td class=\"rowfollow\"><a class=\"staff-quick-delete\" href=\"".htmlspecialchars("fastdelete.php?id=".$row[id])."\"><img class=\"staff_delete\" src=\"pic/trans.gif\" alt=\"D\" title=\"".$lang_functions['text_delete']."\" /></a>");
+      print("<br /><a href=\"edit.php?returnto=" . rawurlencode($_SERVER["REQUEST_URI"]) . "&amp;id=" . $row["id"] . "\"><img class=\"staff_edit\" src=\"pic/trans.gif\" alt=\"E\" title=\"".$lang_functions['text_edit']."\" /></a></td>\n");
+    }
+    print("</tr>\n");
+    $counter++;
+  }
 }
 print("</table>");
 if ($CURUSER['appendpromotion'] == 'highlight')
-	print("<p align=\"center\"> ".$lang_functions['text_promoted_torrents_note']."</p>\n");
+  print("<p align=\"center\"> ".$lang_functions['text_promoted_torrents_note']."</p>\n");
 
 if($enabletooltip_tweak == 'yes' && (!isset($CURUSER) || $CURUSER['showlastcom'] == 'yes'))
 create_tooltip_container($lastcom_tooltip, 400);
@@ -3451,134 +3451,134 @@ create_tooltip_container($torrent_tooltip, 500);
 
 function get_username($id, $big = false, $link = true, $bold = true, $target = false, $bracket = false, $withtitle = false, $link_ext = "", $underline = false)
 {
-	static $usernameArray = array();
-	global $lang_functions;
-	$id = 0+$id;
+  static $usernameArray = array();
+  global $lang_functions;
+  $id = 0+$id;
 
-	if (func_num_args() == 1 && $usernameArray[$id]) {  //One argument=is default display of username. Get it directly from static array if available
-		return $usernameArray[$id];
-	}
-	$arr = get_user_row($id);
-	if ($arr){
-		if ($big)
-		{
-			$donorpic = "starbig";
-			$leechwarnpic = "leechwarnedbig";
-			$warnedpic = "warnedbig";
-			$disabledpic = "disabledbig";
-			$style = "style='margin-left: 4pt'";
-		}
-		else
-		{
-			$donorpic = "star";
-			$leechwarnpic = "leechwarned";
-			$warnedpic = "warned";
-			$disabledpic = "disabled";
-			$style = "style='margin-left: 2pt'";
-		}
-		$pics = $arr["donor"] == "yes" ? "<img class=\"".$donorpic."\" src=\"pic/trans.gif\" alt=\"Donor\" ".$style." />" : "";
+  if (func_num_args() == 1 && $usernameArray[$id]) {  //One argument=is default display of username. Get it directly from static array if available
+    return $usernameArray[$id];
+  }
+  $arr = get_user_row($id);
+  if ($arr){
+    if ($big)
+    {
+      $donorpic = "starbig";
+      $leechwarnpic = "leechwarnedbig";
+      $warnedpic = "warnedbig";
+      $disabledpic = "disabledbig";
+      $style = "style='margin-left: 4pt'";
+    }
+    else
+    {
+      $donorpic = "star";
+      $leechwarnpic = "leechwarned";
+      $warnedpic = "warned";
+      $disabledpic = "disabled";
+      $style = "style='margin-left: 2pt'";
+    }
+    $pics = $arr["donor"] == "yes" ? "<img class=\"".$donorpic."\" src=\"pic/trans.gif\" alt=\"Donor\" ".$style." />" : "";
 
-		if ($arr["enabled"] == "yes")
-			$pics .= ($arr["leechwarn"] == "yes" ? "<img class=\"".$leechwarnpic."\" src=\"pic/trans.gif\" alt=\"Leechwarned\" ".$style." />" : "") . ($arr["warned"] == "yes" ? "<img class=\"".$warnedpic."\" src=\"pic/trans.gif\" alt=\"Warned\" ".$style." />" : "");
-		else
-			$pics .= "<img class=\"".$disabledpic."\" src=\"pic/trans.gif\" alt=\"Disabled\" ".$style." />\n";
+    if ($arr["enabled"] == "yes")
+      $pics .= ($arr["leechwarn"] == "yes" ? "<img class=\"".$leechwarnpic."\" src=\"pic/trans.gif\" alt=\"Leechwarned\" ".$style." />" : "") . ($arr["warned"] == "yes" ? "<img class=\"".$warnedpic."\" src=\"pic/trans.gif\" alt=\"Warned\" ".$style." />" : "");
+    else
+      $pics .= "<img class=\"".$disabledpic."\" src=\"pic/trans.gif\" alt=\"Disabled\" ".$style." />\n";
 
-		$username = ($underline == true ? "<u>" . $arr['username'] . "</u>" : $arr['username']);
-		$username = ($bold == true ? "<b>" . $username . "</b>" : $username);
-		$username = ($link == true ? "<a ". $link_ext . " href=\"userdetails.php?id=" . $id . "\"" . ($target == true ? " target=\"_blank\"" : "") . " class='". get_user_class_name($arr['class'],true) . "_Name'>" . $username . "</a>" : $username) . $pics . ($withtitle == true ? " (" . ($arr['title'] == "" ?  get_user_class_name($arr['class'],false,true,true) : "<span class='".get_user_class_name($arr['class'],true) . "_Name'><b>".htmlspecialchars($arr['title'])) . "</b></span>)" : "");
+    $username = ($underline == true ? "<u>" . $arr['username'] . "</u>" : $arr['username']);
+    $username = ($bold == true ? "<b>" . $username . "</b>" : $username);
+    $username = ($link == true ? "<a ". $link_ext . " href=\"userdetails.php?id=" . $id . "\"" . ($target == true ? " target=\"_blank\"" : "") . " class='". get_user_class_name($arr['class'],true) . "_Name'>" . $username . "</a>" : $username) . $pics . ($withtitle == true ? " (" . ($arr['title'] == "" ?  get_user_class_name($arr['class'],false,true,true) : "<span class='".get_user_class_name($arr['class'],true) . "_Name'><b>".htmlspecialchars($arr['title'])) . "</b></span>)" : "");
 
-		$username = "<span class=\"nowrap\">" . ( $bracket == true ? "(" . $username . ")" : $username) . "</span>";
-	}
-	else
-	{
-		$username = "<i>".$lang_functions['text_orphaned']."</i>";
-		$username = "<span class=\"nowrap\">" . ( $bracket == true ? "(" . $username . ")" : $username) . "</span>";
-	}
-	if (func_num_args() == 1) { //One argument=is default display of username, save it in static array
-		$usernameArray[$id] = $username;
-	}
-	return $username;
+    $username = "<span class=\"nowrap\">" . ( $bracket == true ? "(" . $username . ")" : $username) . "</span>";
+  }
+  else
+  {
+    $username = "<i>".$lang_functions['text_orphaned']."</i>";
+    $username = "<span class=\"nowrap\">" . ( $bracket == true ? "(" . $username . ")" : $username) . "</span>";
+  }
+  if (func_num_args() == 1) { //One argument=is default display of username, save it in static array
+    $usernameArray[$id] = $username;
+  }
+  return $username;
 }
 
 function get_percent_completed_image($p) {
-	$maxpx = "45"; // Maximum amount of pixels for the progress bar
+  $maxpx = "45"; // Maximum amount of pixels for the progress bar
 
-	if ($p == 0) $progress = "<img class=\"progbarrest\" src=\"pic/trans.gif\" style=\"width: " . ($maxpx) . "px;\" alt=\"\" />";
-	if ($p == 100) $progress = "<img class=\"progbargreen\" src=\"pic/trans.gif\" style=\"width: " . ($maxpx) . "px;\" alt=\"\" />";
-	if ($p >= 1 && $p <= 30) $progress = "<img class=\"progbarred\" src=\"pic/trans.gif\" style=\"width: " . ($p*($maxpx/100)) . "px;\" alt=\"\" /><img class=\"progbarrest\" src=\"pic/trans.gif\" style=\"width: " . ((100-$p)*($maxpx/100)) . "px;\" alt=\"\" />";
-	if ($p >= 31 && $p <= 65) $progress = "<img class=\"progbaryellow\" src=\"pic/trans.gif\" style=\"width: " . ($p*($maxpx/100)) . "px;\" alt=\"\" /><img class=\"progbarrest\" src=\"pic/trans.gif\" style=\"width: " . ((100-$p)*($maxpx/100)) . "px;\" alt=\"\" />";
-	if ($p >= 66 && $p <= 99) $progress = "<img class=\"progbargreen\" src=\"pic/trans.gif\" style=\"width: " . ($p*($maxpx/100)) . "px;\" alt=\"\" /><img class=\"progbarrest\" src=\"pic/trans.gif\" style=\"width: " . ((100-$p)*($maxpx/100)) . "px;\" alt=\"\" />";
-	return "<img class=\"bar_left\" src=\"pic/trans.gif\" alt=\"\" />" . $progress ."<img class=\"bar_right\" src=\"pic/trans.gif\" alt=\"\" />";
+  if ($p == 0) $progress = "<img class=\"progbarrest\" src=\"pic/trans.gif\" style=\"width: " . ($maxpx) . "px;\" alt=\"\" />";
+  if ($p == 100) $progress = "<img class=\"progbargreen\" src=\"pic/trans.gif\" style=\"width: " . ($maxpx) . "px;\" alt=\"\" />";
+  if ($p >= 1 && $p <= 30) $progress = "<img class=\"progbarred\" src=\"pic/trans.gif\" style=\"width: " . ($p*($maxpx/100)) . "px;\" alt=\"\" /><img class=\"progbarrest\" src=\"pic/trans.gif\" style=\"width: " . ((100-$p)*($maxpx/100)) . "px;\" alt=\"\" />";
+  if ($p >= 31 && $p <= 65) $progress = "<img class=\"progbaryellow\" src=\"pic/trans.gif\" style=\"width: " . ($p*($maxpx/100)) . "px;\" alt=\"\" /><img class=\"progbarrest\" src=\"pic/trans.gif\" style=\"width: " . ((100-$p)*($maxpx/100)) . "px;\" alt=\"\" />";
+  if ($p >= 66 && $p <= 99) $progress = "<img class=\"progbargreen\" src=\"pic/trans.gif\" style=\"width: " . ($p*($maxpx/100)) . "px;\" alt=\"\" /><img class=\"progbarrest\" src=\"pic/trans.gif\" style=\"width: " . ((100-$p)*($maxpx/100)) . "px;\" alt=\"\" />";
+  return "<img class=\"bar_left\" src=\"pic/trans.gif\" alt=\"\" />" . $progress ."<img class=\"bar_right\" src=\"pic/trans.gif\" alt=\"\" />";
 }
 
 function get_ratio_img($ratio)
 {
-	if ($ratio >= 16)
-	$s = "163";
-	else if ($ratio >= 8)
-	$s = "117";
-	else if ($ratio >= 4)
-	$s = "5";
-	else if ($ratio >= 2)
-	$s = "3";
-	else if ($ratio >= 1)
-	$s = "2";
-	else if ($ratio >= 0.5)
-	$s = "34";
-	else if ($ratio >= 0.25)
-	$s = "10";
-	else
-	$s = "52";
+  if ($ratio >= 16)
+  $s = "163";
+  else if ($ratio >= 8)
+  $s = "117";
+  else if ($ratio >= 4)
+  $s = "5";
+  else if ($ratio >= 2)
+  $s = "3";
+  else if ($ratio >= 1)
+  $s = "2";
+  else if ($ratio >= 0.5)
+  $s = "34";
+  else if ($ratio >= 0.25)
+  $s = "10";
+  else
+  $s = "52";
 
-	return "<img src=\"pic/smilies/".$s.".gif\" alt=\"\" />";
+  return "<img src=\"pic/smilies/".$s.".gif\" alt=\"\" />";
 }
 
 function GetVar ($name) {
-	if ( is_array($name) ) {
-		foreach ($name as $var) GetVar ($var);
-	} else {
-		if ( !isset($_REQUEST[$name]) )
-		return false;
-		if ( get_magic_quotes_gpc() ) {
-			$_REQUEST[$name] = ssr($_REQUEST[$name]);
-		}
-		$GLOBALS[$name] = $_REQUEST[$name];
-		return $GLOBALS[$name];
-	}
+  if ( is_array($name) ) {
+    foreach ($name as $var) GetVar ($var);
+  } else {
+    if ( !isset($_REQUEST[$name]) )
+    return false;
+    if ( get_magic_quotes_gpc() ) {
+      $_REQUEST[$name] = ssr($_REQUEST[$name]);
+    }
+    $GLOBALS[$name] = $_REQUEST[$name];
+    return $GLOBALS[$name];
+  }
 }
 
 function ssr ($arg) {
-	if (is_array($arg)) {
-		foreach ($arg as $key=>$arg_bit) {
-			$arg[$key] = ssr($arg_bit);
-		}
-	} else {
-		$arg = stripslashes($arg);
-	}
-	return $arg;
+  if (is_array($arg)) {
+    foreach ($arg as $key=>$arg_bit) {
+      $arg[$key] = ssr($arg_bit);
+    }
+  } else {
+    $arg = stripslashes($arg);
+  }
+  return $arg;
 }
 
 function parked()
 {
-	global $lang_functions;
-	global $CURUSER;
-	if ($CURUSER["parked"] == "yes")
-	stderr($lang_functions['std_access_denied'], $lang_functions['std_your_account_parked']);
+  global $lang_functions;
+  global $CURUSER;
+  if ($CURUSER["parked"] == "yes")
+  stderr($lang_functions['std_access_denied'], $lang_functions['std_your_account_parked']);
 }
 
 function validusername($username)
 {
-	if ($username == "")
-	return false;
+  if ($username == "")
+  return false;
 
-	// The following characters are allowed in user names
-	$allowedchars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  // The following characters are allowed in user names
+  $allowedchars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
-	for ($i = 0; $i < strlen($username); ++$i)
-	if (strpos($allowedchars, $username[$i]) === false)
-	return false;
+  for ($i = 0; $i < strlen($username); ++$i)
+  if (strpos($allowedchars, $username[$i]) === false)
+  return false;
 
-	return true;
+  return true;
 }
 
 //Code for Viewing NFO file
@@ -3678,112 +3678,112 @@ return $s;
 //Tooltip container for hot movie, classic movie, etc
 function create_tooltip_container($id_content_arr, $width = 400)
 {
-	if(count($id_content_arr))
-	{
-		$result = "<div id=\"tooltipPool\" style=\"display: none\">";
-		foreach($id_content_arr as $id_content_arr_each)
-		{
-			$result .= "<div id=\"" . $id_content_arr_each['id'] . "\">" . $id_content_arr_each['content'] . "</div>";
-		}
-		$result .= "</div>";
-		print($result);
-	}
+  if(count($id_content_arr))
+  {
+    $result = "<div id=\"tooltipPool\" style=\"display: none\">";
+    foreach($id_content_arr as $id_content_arr_each)
+    {
+      $result .= "<div id=\"" . $id_content_arr_each['id'] . "\">" . $id_content_arr_each['content'] . "</div>";
+    }
+    $result .= "</div>";
+    print($result);
+  }
 }
 
 function getimdb($imdb_id, $cache_stamp, $mode = 'minor')
 {
-	global $lang_functions;
-	global $showextinfo;
-	$thenumbers = $imdb_id;
-	$movie = new imdb ($thenumbers);
-	$movieid = $thenumbers;
-	$movie->setid ($movieid);
+  global $lang_functions;
+  global $showextinfo;
+  $thenumbers = $imdb_id;
+  $movie = new imdb ($thenumbers);
+  $movieid = $thenumbers;
+  $movie->setid ($movieid);
 
-	$target = array('Title', 'Credits', 'Plot');
-	switch ($movie->cachestate($target))
-	{
-		case "0": //cache is not ready
-			{
-			return false;
-			break;
-			}
-		case "1": //normal
-			{
-				$title = $movie->title ();
-				$year = $movie->year ();
-				$country = $movie->country ();
-				$countries = "";
-				$temp = "";
-				for ($i = 0; $i < count ($country); $i++)
-				{
-					$temp .="$country[$i], ";
-				}
-				$countries = rtrim(trim($temp), ",");
+  $target = array('Title', 'Credits', 'Plot');
+  switch ($movie->cachestate($target))
+  {
+    case "0": //cache is not ready
+      {
+      return false;
+      break;
+      }
+    case "1": //normal
+      {
+        $title = $movie->title ();
+        $year = $movie->year ();
+        $country = $movie->country ();
+        $countries = "";
+        $temp = "";
+        for ($i = 0; $i < count ($country); $i++)
+        {
+          $temp .="$country[$i], ";
+        }
+        $countries = rtrim(trim($temp), ",");
 
-				$director = $movie->director();
-				$director_or_creator = "";
-				if ($director)
-				{
-					$temp = "";
-					for ($i = 0; $i < count ($director); $i++)
-					{
-						$temp .= $director[$i]["name"].", ";
-					}
-					$director_or_creator = "<strong><font color=\"DarkRed\">".$lang_functions['text_director'].": </font></strong>".rtrim(trim($temp), ",");
-				}
-				else { //for tv series
-					$creator = $movie->creator();
-					$director_or_creator = "<strong><font color=\"DarkRed\">".$lang_functions['text_creator'].": </font></strong>".$creator;
-				}
-				$cast = $movie->cast();
-				$temp = "";
-				for ($i = 0; $i < count ($cast); $i++) //get names of first three casts
-				{
-					if ($i > 2)
-					{
-						break;
-					}
-					$temp .= $cast[$i]["name"].", ";
-				}
-				$casts = rtrim(trim($temp), ",");
-				$gen = $movie->genres();
-				$genres = $gen[0].(count($gen) > 1 ? ", ".$gen[1] : ""); //get first two genres;
-				$rating = $movie->rating ();
-				$votes = $movie->votes ();
-				if ($votes)
-					$imdbrating = "<b>".$rating."</b>/10 (".$votes.$lang_functions['text_votes'].")";
-				else $imdbrating = $lang_functions['text_awaiting_five_votes'];
+        $director = $movie->director();
+        $director_or_creator = "";
+        if ($director)
+        {
+          $temp = "";
+          for ($i = 0; $i < count ($director); $i++)
+          {
+            $temp .= $director[$i]["name"].", ";
+          }
+          $director_or_creator = "<strong><font color=\"DarkRed\">".$lang_functions['text_director'].": </font></strong>".rtrim(trim($temp), ",");
+        }
+        else { //for tv series
+          $creator = $movie->creator();
+          $director_or_creator = "<strong><font color=\"DarkRed\">".$lang_functions['text_creator'].": </font></strong>".$creator;
+        }
+        $cast = $movie->cast();
+        $temp = "";
+        for ($i = 0; $i < count ($cast); $i++) //get names of first three casts
+        {
+          if ($i > 2)
+          {
+            break;
+          }
+          $temp .= $cast[$i]["name"].", ";
+        }
+        $casts = rtrim(trim($temp), ",");
+        $gen = $movie->genres();
+        $genres = $gen[0].(count($gen) > 1 ? ", ".$gen[1] : ""); //get first two genres;
+        $rating = $movie->rating ();
+        $votes = $movie->votes ();
+        if ($votes)
+          $imdbrating = "<b>".$rating."</b>/10 (".$votes.$lang_functions['text_votes'].")";
+        else $imdbrating = $lang_functions['text_awaiting_five_votes'];
 
-				$tagline = $movie->tagline ();
-				switch ($mode)
-				{
-				case 'minor' : 
-					{
-					$autodata = "<font class=\"big\"><b>".$title."</b></font> (".$year.") <br /><strong><font color=\"DarkRed\">".$lang_functions['text_imdb'].": </font></strong>".$imdbrating." <strong><font color=\"DarkRed\">".$lang_functions['text_country'].": </font></strong>".$countries." <strong><font color=\"DarkRed\">".$lang_functions['text_genres'].": </font></strong>".$genres."<br />".$director_or_creator."<strong><font color=\"DarkRed\"> ".$lang_functions['text_starring'].": </font></strong>".$casts."<br /><p><strong>".$tagline."</strong></p>";
-					break;
-					}
-				case 'median':
-					{
-					if (($photo_url = $movie->photo_localurl() ) != FALSE)
-						$smallth = "<img src=\"".$photo_url. "\" width=\"105\" alt=\"poster\" />";
-					else $smallth = "";
-					$runtime = $movie->runtime ();
-					$language = $movie->language ();
-					$plot = $movie->plot ();
-					$plots = "";
-					if(count($plot) != 0){ //get plots from plot page
-							$plots .= "<font color=\"DarkRed\">*</font> ".strip_tags($plot[0], '<br /><i>');
-							$plots = mb_substr($plots,0,300,"UTF-8") . (mb_strlen($plots,"UTF-8") > 300 ? " ..." : "" );
-							$plots .= (strpos($plots,"<i>") == true && strpos($plots,"</i>") == false ? "</i>" : "");//sometimes <i> is open and not ended because of mb_substr;
-							$plots = "<font class=\"small\">".$plots."</font>";
-						}
-					elseif ($plotoutline = $movie->plotoutline ()){ //get plot from title page
-						$plots .= "<font color=\"DarkRed\">*</font> ".strip_tags($plotoutline, '<br /><i>');
-						$plots = mb_substr($plots,0,300,"UTF-8") . (mb_strlen($plots,"UTF-8") > 300 ? " ..." : "" );
-						$plots .= (strpos($plots,"<i>") == true && strpos($plots,"</i>") == false ? "</i>" : "");//sometimes <i> is open and not ended because of mb_substr;
-						$plots = "<font class=\"small\">".$plots."</font>";
-						}
-					$autodata = "<table style=\"background-color: transparent;\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\">
+        $tagline = $movie->tagline ();
+        switch ($mode)
+        {
+        case 'minor' : 
+          {
+          $autodata = "<font class=\"big\"><b>".$title."</b></font> (".$year.") <br /><strong><font color=\"DarkRed\">".$lang_functions['text_imdb'].": </font></strong>".$imdbrating." <strong><font color=\"DarkRed\">".$lang_functions['text_country'].": </font></strong>".$countries." <strong><font color=\"DarkRed\">".$lang_functions['text_genres'].": </font></strong>".$genres."<br />".$director_or_creator."<strong><font color=\"DarkRed\"> ".$lang_functions['text_starring'].": </font></strong>".$casts."<br /><p><strong>".$tagline."</strong></p>";
+          break;
+          }
+        case 'median':
+          {
+          if (($photo_url = $movie->photo_localurl() ) != FALSE)
+            $smallth = "<img src=\"".$photo_url. "\" width=\"105\" alt=\"poster\" />";
+          else $smallth = "";
+          $runtime = $movie->runtime ();
+          $language = $movie->language ();
+          $plot = $movie->plot ();
+          $plots = "";
+          if(count($plot) != 0){ //get plots from plot page
+              $plots .= "<font color=\"DarkRed\">*</font> ".strip_tags($plot[0], '<br /><i>');
+              $plots = mb_substr($plots,0,300,"UTF-8") . (mb_strlen($plots,"UTF-8") > 300 ? " ..." : "" );
+              $plots .= (strpos($plots,"<i>") == true && strpos($plots,"</i>") == false ? "</i>" : "");//sometimes <i> is open and not ended because of mb_substr;
+              $plots = "<font class=\"small\">".$plots."</font>";
+            }
+          elseif ($plotoutline = $movie->plotoutline ()){ //get plot from title page
+            $plots .= "<font color=\"DarkRed\">*</font> ".strip_tags($plotoutline, '<br /><i>');
+            $plots = mb_substr($plots,0,300,"UTF-8") . (mb_strlen($plots,"UTF-8") > 300 ? " ..." : "" );
+            $plots .= (strpos($plots,"<i>") == true && strpos($plots,"</i>") == false ? "</i>" : "");//sometimes <i> is open and not ended because of mb_substr;
+            $plots = "<font class=\"small\">".$plots."</font>";
+            }
+          $autodata = "<table style=\"background-color: transparent;\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\">
 ".($smallth ? "<td class=\"clear\" valign=\"top\" align=\"right\">
 $smallth
 </td>" : "")
@@ -3801,208 +3801,208 @@ $smallth
 </table>
 </td>
 </table>";
-					break;
-					}
-				}
-				return $autodata;
-			}
-			case "2" : 
-			{
-				return false;
-				break;
-			}
-			case "3" :
-			{
-				return false;
-				break;
-			}
-	}
+          break;
+          }
+        }
+        return $autodata;
+      }
+      case "2" : 
+      {
+        return false;
+        break;
+      }
+      case "3" :
+      {
+        return false;
+        break;
+      }
+  }
 }
 
 function quickreply($formname, $taname,$submit){
-	print("<textarea name='".$taname."' cols=\"100\" rows=\"8\" style=\"width: 450px\" onkeydown=\"ctrlenter(event,'compose','qr')\"></textarea>");
-	print(smile_row($formname, $taname));
-	print("<br />");
- 	print("<input type=\"submit\" id=\"qr\" class=\"btn\" value=\"".$submit."\" />");
+  print("<textarea name='".$taname."' cols=\"100\" rows=\"8\" style=\"width: 450px\" onkeydown=\"ctrlenter(event,'compose','qr')\"></textarea>");
+  print(smile_row($formname, $taname));
+  print("<br />");
+   print("<input type=\"submit\" id=\"qr\" class=\"btn\" value=\"".$submit."\" />");
 }
 
 function smile_row($formname, $taname){
-	$quickSmilesNumbers = array(4, 5, 39, 25, 11, 8, 10, 15, 27, 57, 42, 122, 52, 28, 29, 30, 176);
-	$smilerow = "<div align=\"center\">";
-	foreach ($quickSmilesNumbers as $smilyNumber) {
-		$smilerow .= getSmileIt($formname, $taname, $smilyNumber);
-	}
-	$smilerow .= "</div>";
-	return $smilerow;
+  $quickSmilesNumbers = array(4, 5, 39, 25, 11, 8, 10, 15, 27, 57, 42, 122, 52, 28, 29, 30, 176);
+  $smilerow = "<div align=\"center\">";
+  foreach ($quickSmilesNumbers as $smilyNumber) {
+    $smilerow .= getSmileIt($formname, $taname, $smilyNumber);
+  }
+  $smilerow .= "</div>";
+  return $smilerow;
 }
 function getSmileIt($formname, $taname, $smilyNumber) {
-	return "<a href=\"javascript: SmileIT('[em$smilyNumber]','".$formname."','".$taname."')\"  onmouseover=\"domTT_activate(this, event, 'content', '".htmlspecialchars("<table><tr><td><img src=\'pic/smilies/$smilyNumber.gif\' alt=\'\' /></td></tr></table>")."', 'trail', false, 'delay', 0,'lifetime',10000,'styleClass','smilies','maxWidth', 400);\"><img style=\"max-width: 25px;\" src=\"pic/smilies/$smilyNumber.gif\" alt=\"\" /></a>";
+  return "<a href=\"javascript: SmileIT('[em$smilyNumber]','".$formname."','".$taname."')\"  onmouseover=\"domTT_activate(this, event, 'content', '".htmlspecialchars("<table><tr><td><img src=\'pic/smilies/$smilyNumber.gif\' alt=\'\' /></td></tr></table>")."', 'trail', false, 'delay', 0,'lifetime',10000,'styleClass','smilies','maxWidth', 400);\"><img style=\"max-width: 25px;\" src=\"pic/smilies/$smilyNumber.gif\" alt=\"\" /></a>";
 }
 
 function classlist($selectname,$maxclass, $selected, $minClass = 0){
-	$list = "<select name=\"".$selectname."\">";
-	for ($i = $minClass; $i <= $maxclass; $i++)
-		$list .= "<option value=\"".$i."\"" . ($selected == $i ? " selected=\"selected\"" : "") . ">" . get_user_class_name($i,false,false,true) . "</option>\n";
-	$list .= "</select>";
-	return $list;
+  $list = "<select name=\"".$selectname."\">";
+  for ($i = $minClass; $i <= $maxclass; $i++)
+    $list .= "<option value=\"".$i."\"" . ($selected == $i ? " selected=\"selected\"" : "") . ">" . get_user_class_name($i,false,false,true) . "</option>\n";
+  $list .= "</select>";
+  return $list;
 }
 
 function permissiondenied(){
-	global $lang_functions;
-	stderr($lang_functions['std_error'], $lang_functions['std_permission_denied']);
+  global $lang_functions;
+  stderr($lang_functions['std_error'], $lang_functions['std_permission_denied']);
 }
 
 function gettime($time, $withago = true, $twoline = false, $forceago = false, $oneunit = false, $isfuturetime = false){
-	global $lang_functions, $CURUSER;
-	if ($CURUSER['timetype'] != 'timealive' && !$forceago){
-		$newtime = $time;
-		if ($twoline){
-		$newtime = str_replace(" ", "<br />", $newtime);
-		}
-	}
-	else{
-		$timestamp = strtotime($time);
-		if ($isfuturetime && $timestamp < TIMENOW)
-			$newtime = false;
-		else
-		{
-			$newtime = get_elapsed_time($timestamp,$oneunit).($withago ? $lang_functions['text_ago'] : "");
-			if($twoline){
-				$newtime = str_replace("&nbsp;", "<br />", $newtime);
-			}
-			elseif($oneunit){
-				if ($length = strpos($newtime, "&nbsp;"))
-					$newtime = substr($newtime,0,$length);
-			}
-			else $newtime = str_replace("&nbsp;", $lang_functions['text_space'], $newtime);
-			$newtime = "<span title=\"".$time."\">".$newtime."</span>";
-		}
-	}
-	return $newtime;
+  global $lang_functions, $CURUSER;
+  if ($CURUSER['timetype'] != 'timealive' && !$forceago){
+    $newtime = $time;
+    if ($twoline){
+    $newtime = str_replace(" ", "<br />", $newtime);
+    }
+  }
+  else{
+    $timestamp = strtotime($time);
+    if ($isfuturetime && $timestamp < TIMENOW)
+      $newtime = false;
+    else
+    {
+      $newtime = get_elapsed_time($timestamp,$oneunit).($withago ? $lang_functions['text_ago'] : "");
+      if($twoline){
+        $newtime = str_replace("&nbsp;", "<br />", $newtime);
+      }
+      elseif($oneunit){
+        if ($length = strpos($newtime, "&nbsp;"))
+          $newtime = substr($newtime,0,$length);
+      }
+      else $newtime = str_replace("&nbsp;", $lang_functions['text_space'], $newtime);
+      $newtime = "<span title=\"".$time."\">".$newtime."</span>";
+    }
+  }
+  return $newtime;
 }
 
 function get_forum_pic_folder(){
-	global $CURLANGDIR;
-	return "pic/forum_pic/".$CURLANGDIR;
+  global $CURLANGDIR;
+  return "pic/forum_pic/".$CURLANGDIR;
 }
 
 function get_category_icon_row($typeid)
 {
-	global $Cache;
-	static $rows;
-	if (!$typeid) {
-		$typeid=1;
-	}
-	if (!$rows && !$rows = $Cache->get_value('category_icon_content')){
-		$rows = array();
-		$res = sql_query("SELECT * FROM caticons ORDER BY id ASC");
-		while($row = mysql_fetch_array($res)) {
-			$rows[$row['id']] = $row;
-		}
-		$Cache->cache_value('category_icon_content', $rows, 156400);
-	}
-	return $rows[$typeid];
+  global $Cache;
+  static $rows;
+  if (!$typeid) {
+    $typeid=1;
+  }
+  if (!$rows && !$rows = $Cache->get_value('category_icon_content')){
+    $rows = array();
+    $res = sql_query("SELECT * FROM caticons ORDER BY id ASC");
+    while($row = mysql_fetch_array($res)) {
+      $rows[$row['id']] = $row;
+    }
+    $Cache->cache_value('category_icon_content', $rows, 156400);
+  }
+  return $rows[$typeid];
 }
 function get_category_row($catid = NULL)
 {
-	global $Cache;
-	static $rows;
-	if (!$rows && !$rows = $Cache->get_value('category_content')){
-		$res = sql_query("SELECT categories.*, searchbox.name AS catmodename FROM categories LEFT JOIN searchbox ON categories.mode=searchbox.id");
-		while($row = mysql_fetch_array($res)) {
-			$rows[$row['id']] = $row;
-		}
-		$Cache->cache_value('category_content', $rows, 126400);
-	}
+  global $Cache;
+  static $rows;
+  if (!$rows && !$rows = $Cache->get_value('category_content')){
+    $res = sql_query("SELECT categories.*, searchbox.name AS catmodename FROM categories LEFT JOIN searchbox ON categories.mode=searchbox.id");
+    while($row = mysql_fetch_array($res)) {
+      $rows[$row['id']] = $row;
+    }
+    $Cache->cache_value('category_content', $rows, 126400);
+  }
 
-	if ($catid) {
-		return $rows[$catid];
-	} else {
-		return $rows;
-	}
+  if ($catid) {
+    return $rows[$catid];
+  } else {
+    return $rows;
+  }
 }
 
 function get_second_icon($row, $catimgurl) //for CHDBits
 {
-	global $CURUSER, $Cache;
-	$source=$row['source'];
-	$medium=$row['medium'];
-	$codec=$row['codec'];
-	$standard=$row['standard'];
-	$processing=$row['processing'];
-	$team=$row['team'];
-	$audiocodec=$row['audiocodec'];
-	if (!$sirow = $Cache->get_value('secondicon_'.$source.'_'.$medium.'_'.$codec.'_'.$standard.'_'.$processing.'_'.$team.'_'.$audiocodec.'_content')){
-		$res = sql_query("SELECT * FROM secondicons WHERE (source = ".sqlesc($source)." OR source=0) AND (medium = ".sqlesc($medium)." OR medium=0) AND (codec = ".sqlesc($codec)." OR codec = 0) AND (standard = ".sqlesc($standard)." OR standard = 0) AND (processing = ".sqlesc($processing)." OR processing = 0) AND (team = ".sqlesc($team)." OR team = 0) AND (audiocodec = ".sqlesc($audiocodec)." OR audiocodec = 0) LIMIT 1");
-		$sirow = mysql_fetch_array($res);
-		if (!$sirow)
-			$sirow = 'not allowed';
-		$Cache->cache_value('secondicon_'.$source.'_'.$medium.'_'.$codec.'_'.$standard.'_'.$processing.'_'.$team.'_'.$audiocodec.'_content', $sirow, 116400);
-	}
-	$catimgurl = get_cat_folder($row['category']);
-	if ($sirow == 'not allowed')
-		return "<img src=\"pic/cattrans.gif\" style=\"background-image: url(pic/". $catimgurl. "additional/notallowed.png);\" alt=\"" . $sirow["name"] . "\" alt=\"Not Allowed\" />";
-	else {
-		return "<img".($sirow['class_name'] ? " class=\"".$sirow['class_name']."\"" : "")." src=\"pic/cattrans.gif\" style=\"background-image: url(pic/". $catimgurl. "additional/". $sirow['image'].");\" alt=\"" . $sirow["name"] . "\" title=\"".$sirow['name']."\" />";
-	}
+  global $CURUSER, $Cache;
+  $source=$row['source'];
+  $medium=$row['medium'];
+  $codec=$row['codec'];
+  $standard=$row['standard'];
+  $processing=$row['processing'];
+  $team=$row['team'];
+  $audiocodec=$row['audiocodec'];
+  if (!$sirow = $Cache->get_value('secondicon_'.$source.'_'.$medium.'_'.$codec.'_'.$standard.'_'.$processing.'_'.$team.'_'.$audiocodec.'_content')){
+    $res = sql_query("SELECT * FROM secondicons WHERE (source = ".sqlesc($source)." OR source=0) AND (medium = ".sqlesc($medium)." OR medium=0) AND (codec = ".sqlesc($codec)." OR codec = 0) AND (standard = ".sqlesc($standard)." OR standard = 0) AND (processing = ".sqlesc($processing)." OR processing = 0) AND (team = ".sqlesc($team)." OR team = 0) AND (audiocodec = ".sqlesc($audiocodec)." OR audiocodec = 0) LIMIT 1");
+    $sirow = mysql_fetch_array($res);
+    if (!$sirow)
+      $sirow = 'not allowed';
+    $Cache->cache_value('secondicon_'.$source.'_'.$medium.'_'.$codec.'_'.$standard.'_'.$processing.'_'.$team.'_'.$audiocodec.'_content', $sirow, 116400);
+  }
+  $catimgurl = get_cat_folder($row['category']);
+  if ($sirow == 'not allowed')
+    return "<img src=\"pic/cattrans.gif\" style=\"background-image: url(pic/". $catimgurl. "additional/notallowed.png);\" alt=\"" . $sirow["name"] . "\" alt=\"Not Allowed\" />";
+  else {
+    return "<img".($sirow['class_name'] ? " class=\"".$sirow['class_name']."\"" : "")." src=\"pic/cattrans.gif\" style=\"background-image: url(pic/". $catimgurl. "additional/". $sirow['image'].");\" alt=\"" . $sirow["name"] . "\" title=\"".$sirow['name']."\" />";
+  }
 }
 
 function get_torrent_bg_color($promotion = 1)
 {
-	global $CURUSER;
+  global $CURUSER;
 
-	if ($CURUSER['appendpromotion'] == 'highlight'){
-		$global_promotion_state = get_global_sp_state();
-		if ($global_promotion_state == 1){
-			if($promotion==1)
-				$sphighlight = "";
-			elseif($promotion==2)
-				$sphighlight = " class='free_bg'";
-			elseif($promotion==3)
-				$sphighlight = " class='twoup_bg'";
-			elseif($promotion==4)
-				$sphighlight = " class='twoupfree_bg'";
-			elseif($promotion==5)
-				$sphighlight = " class='halfdown_bg'";
-			elseif($promotion==6)
-				$sphighlight = " class='twouphalfdown_bg'";
-			elseif($promotion==7)
-				$sphighlight = " class='thirtypercentdown_bg'";
-			else $sphighlight = "";
-		}
-		elseif($global_promotion_state == 2)
-			$sphighlight = " class='free_bg'";
-		elseif($global_promotion_state == 3)
-			$sphighlight = " class='twoup_bg'";
-		elseif($global_promotion_state == 4)
-			$sphighlight = " class='twoupfree_bg'";
-		elseif($global_promotion_state == 5)
-			$sphighlight = " class='halfdown_bg'";
-		elseif($global_promotion_state == 6)
-			$sphighlight = " class='twouphalfdown_bg'";
-		elseif($global_promotion_state == 7)
-			$sphighlight = " class='thirtypercentdown_bg'";
-		else
-			$sphighlight = "";
-	}
-	else $sphighlight = "";
-	return $sphighlight;
+  if ($CURUSER['appendpromotion'] == 'highlight'){
+    $global_promotion_state = get_global_sp_state();
+    if ($global_promotion_state == 1){
+      if($promotion==1)
+        $sphighlight = "";
+      elseif($promotion==2)
+        $sphighlight = " class='free_bg'";
+      elseif($promotion==3)
+        $sphighlight = " class='twoup_bg'";
+      elseif($promotion==4)
+        $sphighlight = " class='twoupfree_bg'";
+      elseif($promotion==5)
+        $sphighlight = " class='halfdown_bg'";
+      elseif($promotion==6)
+        $sphighlight = " class='twouphalfdown_bg'";
+      elseif($promotion==7)
+        $sphighlight = " class='thirtypercentdown_bg'";
+      else $sphighlight = "";
+    }
+    elseif($global_promotion_state == 2)
+      $sphighlight = " class='free_bg'";
+    elseif($global_promotion_state == 3)
+      $sphighlight = " class='twoup_bg'";
+    elseif($global_promotion_state == 4)
+      $sphighlight = " class='twoupfree_bg'";
+    elseif($global_promotion_state == 5)
+      $sphighlight = " class='halfdown_bg'";
+    elseif($global_promotion_state == 6)
+      $sphighlight = " class='twouphalfdown_bg'";
+    elseif($global_promotion_state == 7)
+      $sphighlight = " class='thirtypercentdown_bg'";
+    else
+      $sphighlight = "";
+  }
+  else $sphighlight = "";
+  return $sphighlight;
 }
 
 function get_pr_state($promotion, $added = '', $promotionTimeType = 0, $promotionUntil = '') {
   //PRCONFIG
   static $sp_global_table = array(array(1,2,3,4,5,6,7),
-				 array(2,2,2,2,2,2,2),
-				 array(3,3,3,3,3,3,3),
-				 array(4,4,4,4,4,4,4),
-				 array(5,5,5,5,5,5,5),
-				 array(6,6,6,6,6,6,6));
+         array(2,2,2,2,2,2,2),
+         array(3,3,3,3,3,3,3),
+         array(4,4,4,4,4,4,4),
+         array(5,5,5,5,5,5,5),
+         array(6,6,6,6,6,6,6));
 /* array(array(1,2,3,4,5,6,7), */
-			    /* 	 array(2,2,4,4,2,4,2), */
-			    /* 	 array(3,4,3,4,6,6,3), */
-			    /* 	 array(4,4,4,4,4,4,4), */
-			    /* 	 array(5,2,6,4,6,6,7), */
-			    /* 	 array(6,4,6,4,6,6,6)); */
+          /*    array(2,2,4,4,2,4,2), */
+          /*    array(3,4,3,4,6,6,3), */
+          /*    array(4,4,4,4,4,4,4), */
+          /*    array(5,2,6,4,6,6,7), */
+          /*    array(6,4,6,4,6,6,6)); */
 
   $gstate = get_global_sp_state();
   $state = $sp_global_table[$gstate-1][$promotion-1];
@@ -4019,8 +4019,8 @@ function get_pr_state($promotion, $added = '', $promotionTimeType = 0, $promotio
     if ($expire_day != 0) {
       $expire = strtotime($added) + $expire_limits[$state] * 86400;
       if ($expire < TIMENOW && $added != '') {
-	$state = 1;
-	$expire = NULL;
+  $state = 1;
+  $expire = NULL;
       }
     }
     else {
@@ -4059,595 +4059,595 @@ function get_torrent_promotion_append($promotion = 1,$forcemode = "",$showtimele
 }
 
 function get_user_id_from_name($username){
-	global $lang_functions;
-	$res = sql_query("SELECT id FROM users WHERE LOWER(username)=LOWER(" . sqlesc($username).")");
-	$arr = mysql_fetch_array($res);
-	if (!$arr){
-		stderr($lang_functions['std_error'],$lang_functions['std_no_user_named']."'".$username."'");
-	}
-	else return $arr['id'];
+  global $lang_functions;
+  $res = sql_query("SELECT id FROM users WHERE LOWER(username)=LOWER(" . sqlesc($username).")");
+  $arr = mysql_fetch_array($res);
+  if (!$arr){
+    stderr($lang_functions['std_error'],$lang_functions['std_no_user_named']."'".$username."'");
+  }
+  else return $arr['id'];
 }
 
 function is_forum_moderator($id, $in = 'post'){
-	global $CURUSER;
-	switch($in){
-		case 'post':{
-			$res = sql_query("SELECT topicid FROM posts WHERE id=$id") or sqlerr(__FILE__, __LINE__);
-			if ($arr = mysql_fetch_array($res)){
-				if (is_forum_moderator($arr['topicid'],'topic'))
-					return true;
-			}
-			return false;
-			break;
-		}
-		case 'topic':{
-			$modcount = sql_query("SELECT COUNT(forummods.userid) FROM forummods LEFT JOIN topics ON forummods.forumid = topics.forumid WHERE topics.id=$id AND forummods.userid=".sqlesc($CURUSER['id'])) or sqlerr(__FILE__, __LINE__);
-			$arr = mysql_fetch_array($modcount);
-			if ($arr[0])
-				return true;
-			else return false;
-			break;
-		}
-		case 'forum':{
-			$modcount = get_row_count("forummods","WHERE forumid=$id AND userid=".sqlesc($CURUSER['id']));
-			if ($modcount)
-				return true;
-			else return false;
-			break;
-		}
-		default: {
-		return false;
-		}
-	}
+  global $CURUSER;
+  switch($in){
+    case 'post':{
+      $res = sql_query("SELECT topicid FROM posts WHERE id=$id") or sqlerr(__FILE__, __LINE__);
+      if ($arr = mysql_fetch_array($res)){
+        if (is_forum_moderator($arr['topicid'],'topic'))
+          return true;
+      }
+      return false;
+      break;
+    }
+    case 'topic':{
+      $modcount = sql_query("SELECT COUNT(forummods.userid) FROM forummods LEFT JOIN topics ON forummods.forumid = topics.forumid WHERE topics.id=$id AND forummods.userid=".sqlesc($CURUSER['id'])) or sqlerr(__FILE__, __LINE__);
+      $arr = mysql_fetch_array($modcount);
+      if ($arr[0])
+        return true;
+      else return false;
+      break;
+    }
+    case 'forum':{
+      $modcount = get_row_count("forummods","WHERE forumid=$id AND userid=".sqlesc($CURUSER['id']));
+      if ($modcount)
+        return true;
+      else return false;
+      break;
+    }
+    default: {
+    return false;
+    }
+  }
 }
 
 function get_guest_lang_id(){
-	global $CURLANGDIR;
-	$langfolder=$CURLANGDIR;
-	$res = sql_query("SELECT id FROM language WHERE site_lang_folder=".sqlesc($langfolder)." AND site_lang=1");
-	$row = mysql_fetch_array($res);
-	if ($row){
-		return $row['id'];
-	}
-	else return 6;//return English
+  global $CURLANGDIR;
+  $langfolder=$CURLANGDIR;
+  $res = sql_query("SELECT id FROM language WHERE site_lang_folder=".sqlesc($langfolder)." AND site_lang=1");
+  $row = mysql_fetch_array($res);
+  if ($row){
+    return $row['id'];
+  }
+  else return 6;//return English
 }
 
 function set_forum_moderators($name, $forumid, $limit=3){
-	$name = rtrim(trim($name), ",");
-	$users = explode(",", $name);
-	$userids = array();
-	foreach ($users as $user){
-		$userids[]=get_user_id_from_name(trim($user));
-	}
-	$max = count($userids);
-	sql_query("DELETE FROM forummods WHERE forumid=".sqlesc($forumid)) or sqlerr(__FILE__, __LINE__);
-	for($i=0; $i < $limit && $i < $max; $i++){
-		sql_query("INSERT INTO forummods (forumid, userid) VALUES (".sqlesc($forumid).",".sqlesc($userids[$i]).")") or sqlerr(__FILE__, __LINE__);
-	}
+  $name = rtrim(trim($name), ",");
+  $users = explode(",", $name);
+  $userids = array();
+  foreach ($users as $user){
+    $userids[]=get_user_id_from_name(trim($user));
+  }
+  $max = count($userids);
+  sql_query("DELETE FROM forummods WHERE forumid=".sqlesc($forumid)) or sqlerr(__FILE__, __LINE__);
+  for($i=0; $i < $limit && $i < $max; $i++){
+    sql_query("INSERT INTO forummods (forumid, userid) VALUES (".sqlesc($forumid).",".sqlesc($userids[$i]).")") or sqlerr(__FILE__, __LINE__);
+  }
 }
 
 function get_plain_username($id){
-	$row = get_user_row($id);	
-	if ($row)
-		$username = $row['username'];
-	else $username = "";
-	return $username;
+  $row = get_user_row($id);  
+  if ($row)
+    $username = $row['username'];
+  else $username = "";
+  return $username;
 }
 
 function get_searchbox_value($mode = 1, $item = 'showsubcat'){
-	global $Cache;
-	static $rows;
-	if (!$rows && !$rows = $Cache->get_value('searchbox_content')){
-		$rows = array();
-		$res = sql_query("SELECT * FROM searchbox ORDER BY id ASC");
-		while ($row = mysql_fetch_array($res)) {
-			$rows[$row['id']] = $row;
-		}
-		$Cache->cache_value('searchbox_content', $rows, 100500);
-	}
-	return $rows[$mode][$item];
+  global $Cache;
+  static $rows;
+  if (!$rows && !$rows = $Cache->get_value('searchbox_content')){
+    $rows = array();
+    $res = sql_query("SELECT * FROM searchbox ORDER BY id ASC");
+    while ($row = mysql_fetch_array($res)) {
+      $rows[$row['id']] = $row;
+    }
+    $Cache->cache_value('searchbox_content', $rows, 100500);
+  }
+  return $rows[$mode][$item];
 }
 
 function get_ratio($userid, $html = true){
-	global $lang_functions;
-	$row = get_user_row($userid);
-	$uped = $row['uploaded'];
-	$downed = $row['downloaded'];
-	if ($html == true){
-		if ($downed > 0)
-		{
-			$ratio = $uped / $downed;
-			$color = get_ratio_color($ratio);
-			$ratio = number_format($ratio, 3);
+  global $lang_functions;
+  $row = get_user_row($userid);
+  $uped = $row['uploaded'];
+  $downed = $row['downloaded'];
+  if ($html == true){
+    if ($downed > 0)
+    {
+      $ratio = $uped / $downed;
+      $color = get_ratio_color($ratio);
+      $ratio = number_format($ratio, 3);
 
-			if ($color)
-				$ratio = "<font color=\"".$color."\">".$ratio."</font>";
-		}
-		elseif ($uped > 0)
-			$ratio = $lang_functions['text_inf'];
-		else
-			$ratio = "---";
-	}
-	else{
-		if ($downed > 0)
-		{
-			$ratio = $uped / $downed;
-		}
-		else $ratio = 1;
-	}
-	return $ratio;
+      if ($color)
+        $ratio = "<font color=\"".$color."\">".$ratio."</font>";
+    }
+    elseif ($uped > 0)
+      $ratio = $lang_functions['text_inf'];
+    else
+      $ratio = "---";
+  }
+  else{
+    if ($downed > 0)
+    {
+      $ratio = $uped / $downed;
+    }
+    else $ratio = 1;
+  }
+  return $ratio;
 }
 
 function add_s($num, $es = false)
 {
-	global $lang_functions;
-	return ($num > 1 ? ($es ? $lang_functions['text_es'] : $lang_functions['text_s']) : "");
+  global $lang_functions;
+  return ($num > 1 ? ($es ? $lang_functions['text_es'] : $lang_functions['text_s']) : "");
 }
 
 function is_or_are($num)
 {
-	global $lang_functions;
-	return ($num > 1 ? $lang_functions['text_are'] : $lang_functions['text_is']);
+  global $lang_functions;
+  return ($num > 1 ? $lang_functions['text_are'] : $lang_functions['text_is']);
 }
 
 function getmicrotime(){
-	list($usec, $sec) = explode(" ",microtime());
-	return ((float)$usec + (float)$sec);
+  list($usec, $sec) = explode(" ",microtime());
+  return ((float)$usec + (float)$sec);
 }
 
 function get_user_class_image($class){
-	$UC = array(
-		"Staff Leader" => "pic/staffleader.gif",
-		"SysOp" => "pic/sysop.gif",
-		"Administrator" => "pic/administrator.gif",
-		"Moderator" => "pic/moderator.gif",
-		"Forum Moderator" => "pic/forummoderator.gif",
-		"Uploader" => "pic/uploader.gif",
-		"Retiree" => "pic/retiree.gif",
-		"VIP" => "pic/vip.gif",
-		"Nexus Master" => "pic/nexus.gif",
-		"Ultimate User" => "pic/ultimate.gif",
-		"Extreme User" => "pic/extreme.gif",
-		"Veteran User" => "pic/veteran.gif",
-		"Insane User" => "pic/insane.gif",
-		"Crazy User" => "pic/crazy.gif",
-		"Elite User" => "pic/elite.gif",
-		"Power User" => "pic/power.gif",
-		"User" => "pic/user.gif",
-		"Peasant" => "pic/peasant.gif"
-	);
-	if (isset($class))
-		$uclass = $UC[get_user_class_name($class,false,false,false)];
-	else $uclass = "pic/banned.gif";
-	return $uclass;
+  $UC = array(
+    "Staff Leader" => "pic/staffleader.gif",
+    "SysOp" => "pic/sysop.gif",
+    "Administrator" => "pic/administrator.gif",
+    "Moderator" => "pic/moderator.gif",
+    "Forum Moderator" => "pic/forummoderator.gif",
+    "Uploader" => "pic/uploader.gif",
+    "Retiree" => "pic/retiree.gif",
+    "VIP" => "pic/vip.gif",
+    "Nexus Master" => "pic/nexus.gif",
+    "Ultimate User" => "pic/ultimate.gif",
+    "Extreme User" => "pic/extreme.gif",
+    "Veteran User" => "pic/veteran.gif",
+    "Insane User" => "pic/insane.gif",
+    "Crazy User" => "pic/crazy.gif",
+    "Elite User" => "pic/elite.gif",
+    "Power User" => "pic/power.gif",
+    "User" => "pic/user.gif",
+    "Peasant" => "pic/peasant.gif"
+  );
+  if (isset($class))
+    $uclass = $UC[get_user_class_name($class,false,false,false)];
+  else $uclass = "pic/banned.gif";
+  return $uclass;
 }
 
 function user_can_upload($where = "torrents"){
-	global $CURUSER,$upload_class,$enablespecial,$uploadspecial_class;
+  global $CURUSER,$upload_class,$enablespecial,$uploadspecial_class;
 
-	if ($CURUSER["uploadpos"] != 'yes')
-		return false;
-	if ($where == "torrents")
-	{
-		if (get_user_class() >= $upload_class)
-			return true;
-		if (get_if_restricted_is_open())
-			return true;
-	}
-	if ($where == "music")
-	{
-		if ($enablespecial == 'yes' && get_user_class() >= $uploadspecial_class)
-			return true;
-	}
-	return false;
+  if ($CURUSER["uploadpos"] != 'yes')
+    return false;
+  if ($where == "torrents")
+  {
+    if (get_user_class() >= $upload_class)
+      return true;
+    if (get_if_restricted_is_open())
+      return true;
+  }
+  if ($where == "music")
+  {
+    if ($enablespecial == 'yes' && get_user_class() >= $uploadspecial_class)
+      return true;
+  }
+  return false;
 }
 
 function torrent_selection($name,$selname,$listname,$selectedid = 0)
 {
-	global $lang_functions;
-	$selection = "<b>".$name."</b>&nbsp;<select name=\"".$selname."\">\n<option value=\"0\">".$lang_functions['select_choose_one']."</option>\n";
-	$listarray = searchbox_item_list($listname);
-	foreach ($listarray as $row)
-		$selection .= "<option value=\"" . $row["id"] . "\"". ($row["id"]==$selectedid ? " selected=\"selected\"" : "").">" . htmlspecialchars($row["name"]) . "</option>\n";
-	$selection .= "</select>&nbsp;&nbsp;&nbsp;\n";
-	return $selection;
+  global $lang_functions;
+  $selection = "<b>".$name."</b>&nbsp;<select name=\"".$selname."\">\n<option value=\"0\">".$lang_functions['select_choose_one']."</option>\n";
+  $listarray = searchbox_item_list($listname);
+  foreach ($listarray as $row)
+    $selection .= "<option value=\"" . $row["id"] . "\"". ($row["id"]==$selectedid ? " selected=\"selected\"" : "").">" . htmlspecialchars($row["name"]) . "</option>\n";
+  $selection .= "</select>&nbsp;&nbsp;&nbsp;\n";
+  return $selection;
 }
 
 function get_hl_color($color=0)
 {
-	switch ($color){
-		case 0: return false;
-		case 1: return "Black";
-		case 2: return "Sienna";
-		case 3: return "DarkOliveGreen";
-		case 4: return "DarkGreen";
-		case 5: return "DarkSlateBlue";
-		case 6: return "Navy";
-		case 7: return "Indigo";
-		case 8: return "DarkSlateGray";
-		case 9: return "DarkRed";
-		case 10: return "DarkOrange";
-		case 11: return "Olive";
-		case 12: return "Green";
-		case 13: return "Teal";
-		case 14: return "Blue";
-		case 15: return "SlateGray";
-		case 16: return "DimGray";
-		case 17: return "Red";
-		case 18: return "SandyBrown";
-		case 19: return "YellowGreen";
-		case 20: return "SeaGreen";
-		case 21: return "MediumTurquoise";
-		case 22: return "RoyalBlue";
-		case 23: return "Purple";
-		case 24: return "Gray";
-		case 25: return "Magenta";
-		case 26: return "Orange";
-		case 27: return "Yellow";
-		case 28: return "Lime";
-		case 29: return "Cyan";
-		case 30: return "DeepSkyBlue";
-		case 31: return "DarkOrchid";
-		case 32: return "Silver";
-		case 33: return "Pink";
-		case 34: return "Wheat";
-		case 35: return "LemonChiffon";
-		case 36: return "PaleGreen";
-		case 37: return "PaleTurquoise";
-		case 38: return "LightBlue";
-		case 39: return "Plum";
-		case 40: return "White";
-		default: return false;
-	}
+  switch ($color){
+    case 0: return false;
+    case 1: return "Black";
+    case 2: return "Sienna";
+    case 3: return "DarkOliveGreen";
+    case 4: return "DarkGreen";
+    case 5: return "DarkSlateBlue";
+    case 6: return "Navy";
+    case 7: return "Indigo";
+    case 8: return "DarkSlateGray";
+    case 9: return "DarkRed";
+    case 10: return "DarkOrange";
+    case 11: return "Olive";
+    case 12: return "Green";
+    case 13: return "Teal";
+    case 14: return "Blue";
+    case 15: return "SlateGray";
+    case 16: return "DimGray";
+    case 17: return "Red";
+    case 18: return "SandyBrown";
+    case 19: return "YellowGreen";
+    case 20: return "SeaGreen";
+    case 21: return "MediumTurquoise";
+    case 22: return "RoyalBlue";
+    case 23: return "Purple";
+    case 24: return "Gray";
+    case 25: return "Magenta";
+    case 26: return "Orange";
+    case 27: return "Yellow";
+    case 28: return "Lime";
+    case 29: return "Cyan";
+    case 30: return "DeepSkyBlue";
+    case 31: return "DarkOrchid";
+    case 32: return "Silver";
+    case 33: return "Pink";
+    case 34: return "Wheat";
+    case 35: return "LemonChiffon";
+    case 36: return "PaleGreen";
+    case 37: return "PaleTurquoise";
+    case 38: return "LightBlue";
+    case 39: return "Plum";
+    case 40: return "White";
+    default: return false;
+  }
 }
 
 function get_forum_moderators($forumid, $plaintext = true)
 {
-	global $Cache;
-	static $moderatorsArray;
+  global $Cache;
+  static $moderatorsArray;
 
-	if (!$moderatorsArray && !$moderatorsArray = $Cache->get_value('forum_moderator_array')) {
-		$moderatorsArray = array();
-		$res = sql_query("SELECT forumid, userid FROM forummods ORDER BY forumid ASC") or sqlerr(__FILE__, __LINE__);
-		while ($row = mysql_fetch_array($res)) {
-			$moderatorsArray[$row['forumid']][] = $row['userid'];
-		}
-		$Cache->cache_value('forum_moderator_array', $moderatorsArray, 86200);
-	}
-	$ret = (array)$moderatorsArray[$forumid];
+  if (!$moderatorsArray && !$moderatorsArray = $Cache->get_value('forum_moderator_array')) {
+    $moderatorsArray = array();
+    $res = sql_query("SELECT forumid, userid FROM forummods ORDER BY forumid ASC") or sqlerr(__FILE__, __LINE__);
+    while ($row = mysql_fetch_array($res)) {
+      $moderatorsArray[$row['forumid']][] = $row['userid'];
+    }
+    $Cache->cache_value('forum_moderator_array', $moderatorsArray, 86200);
+  }
+  $ret = (array)$moderatorsArray[$forumid];
 
-	$moderators = "";
-	foreach($ret as $userid) {
-		if ($plaintext)
-			$moderators .= get_plain_username($userid).", ";
-		else $moderators .= get_username($userid).", ";
-	}
-	$moderators = rtrim(trim($moderators), ",");
-	return $moderators;
+  $moderators = "";
+  foreach($ret as $userid) {
+    if ($plaintext)
+      $moderators .= get_plain_username($userid).", ";
+    else $moderators .= get_username($userid).", ";
+  }
+  $moderators = rtrim(trim($moderators), ",");
+  return $moderators;
 }
 function key_shortcut($page=1,$pages=1)
 {
-	$currentpage = "var currentpage=".$page.";";
-	$maxpage = "var maxpage=".$pages.";";
-	$key_shortcut_block = "\n<script type=\"text/javascript\">\n//<![CDATA[\n".$maxpage."\n".$currentpage."\n//]]>\n</script>\n";
-	return $key_shortcut_block;
+  $currentpage = "var currentpage=".$page.";";
+  $maxpage = "var maxpage=".$pages.";";
+  $key_shortcut_block = "\n<script type=\"text/javascript\">\n//<![CDATA[\n".$maxpage."\n".$currentpage."\n//]]>\n</script>\n";
+  return $key_shortcut_block;
 }
 function promotion_selection($selected = 0, $hide = 0)
 {
-	global $lang_functions;
-	$selection = "";
-	if ($hide != 1)
-		$selection .= "<option value=\"1\"".($selected == 1 ? " selected=\"selected\"" : "").">".$lang_functions['text_normal']."</option>";
-	if ($hide != 2)
-		$selection .= "<option value=\"2\"".($selected == 2 ? " selected=\"selected\"" : "").">".$lang_functions['text_free']."</option>";
-	if ($hide != 3)
-		$selection .= "<option value=\"3\"".($selected == 3 ? " selected=\"selected\"" : "").">".$lang_functions['text_two_times_up']."</option>";
-	if ($hide != 4)
-		$selection .= "<option value=\"4\"".($selected == 4 ? " selected=\"selected\"" : "").">".$lang_functions['text_free_two_times_up']."</option>";
-	if ($hide != 5)
-		$selection .= "<option value=\"5\"".($selected == 5 ? " selected=\"selected\"" : "").">".$lang_functions['text_half_down']."</option>";
-	if ($hide != 6)
-		$selection .= "<option value=\"6\"".($selected == 6 ? " selected=\"selected\"" : "").">".$lang_functions['text_half_down_two_up']."</option>";
-	if ($hide != 7)
-		$selection .= "<option value=\"7\"".($selected == 7 ? " selected=\"selected\"" : "").">".$lang_functions['text_thirty_percent_down']."</option>";
-	return $selection;
+  global $lang_functions;
+  $selection = "";
+  if ($hide != 1)
+    $selection .= "<option value=\"1\"".($selected == 1 ? " selected=\"selected\"" : "").">".$lang_functions['text_normal']."</option>";
+  if ($hide != 2)
+    $selection .= "<option value=\"2\"".($selected == 2 ? " selected=\"selected\"" : "").">".$lang_functions['text_free']."</option>";
+  if ($hide != 3)
+    $selection .= "<option value=\"3\"".($selected == 3 ? " selected=\"selected\"" : "").">".$lang_functions['text_two_times_up']."</option>";
+  if ($hide != 4)
+    $selection .= "<option value=\"4\"".($selected == 4 ? " selected=\"selected\"" : "").">".$lang_functions['text_free_two_times_up']."</option>";
+  if ($hide != 5)
+    $selection .= "<option value=\"5\"".($selected == 5 ? " selected=\"selected\"" : "").">".$lang_functions['text_half_down']."</option>";
+  if ($hide != 6)
+    $selection .= "<option value=\"6\"".($selected == 6 ? " selected=\"selected\"" : "").">".$lang_functions['text_half_down_two_up']."</option>";
+  if ($hide != 7)
+    $selection .= "<option value=\"7\"".($selected == 7 ? " selected=\"selected\"" : "").">".$lang_functions['text_thirty_percent_down']."</option>";
+  return $selection;
 }
 
 function get_post_row($postid)
 {
-	global $Cache;
-	if (!$row = $Cache->get_value('post_'.$postid.'_content')){
-		$res = sql_query("SELECT * FROM posts WHERE id=".sqlesc($postid)." LIMIT 1") or sqlerr(__FILE__,__LINE__);
-		$row = mysql_fetch_array($res);
-		$Cache->cache_value('post_'.$postid.'_content', $row, 7200);
-	}
-	if (!$row)
-		return false;
-	else return $row;
+  global $Cache;
+  if (!$row = $Cache->get_value('post_'.$postid.'_content')){
+    $res = sql_query("SELECT * FROM posts WHERE id=".sqlesc($postid)." LIMIT 1") or sqlerr(__FILE__,__LINE__);
+    $row = mysql_fetch_array($res);
+    $Cache->cache_value('post_'.$postid.'_content', $row, 7200);
+  }
+  if (!$row)
+    return false;
+  else return $row;
 }
 
 function get_country_row($id)
 {
-	global $Cache;
-	if (!$row = $Cache->get_value('country_'.$id.'_content')){
-		$res = sql_query("SELECT * FROM countries WHERE id=".sqlesc($id)." LIMIT 1") or sqlerr(__FILE__,__LINE__);
-		$row = mysql_fetch_array($res);
-		$Cache->cache_value('country_'.$id.'_content', $row, 86400);
-	}
-	if (!$row)
-		return false;
-	else return $row;
+  global $Cache;
+  if (!$row = $Cache->get_value('country_'.$id.'_content')){
+    $res = sql_query("SELECT * FROM countries WHERE id=".sqlesc($id)." LIMIT 1") or sqlerr(__FILE__,__LINE__);
+    $row = mysql_fetch_array($res);
+    $Cache->cache_value('country_'.$id.'_content', $row, 86400);
+  }
+  if (!$row)
+    return false;
+  else return $row;
 }
 
 function get_downloadspeed_row($id)
 {
-	global $Cache;
-	if (!$row = $Cache->get_value('downloadspeed_'.$id.'_content')){
-		$res = sql_query("SELECT * FROM downloadspeed WHERE id=".sqlesc($id)." LIMIT 1") or sqlerr(__FILE__,__LINE__);
-		$row = mysql_fetch_array($res);
-		$Cache->cache_value('downloadspeed_'.$id.'_content', $row, 86400);
-	}
-	if (!$row)
-		return false;
-	else return $row;
+  global $Cache;
+  if (!$row = $Cache->get_value('downloadspeed_'.$id.'_content')){
+    $res = sql_query("SELECT * FROM downloadspeed WHERE id=".sqlesc($id)." LIMIT 1") or sqlerr(__FILE__,__LINE__);
+    $row = mysql_fetch_array($res);
+    $Cache->cache_value('downloadspeed_'.$id.'_content', $row, 86400);
+  }
+  if (!$row)
+    return false;
+  else return $row;
 }
 
 function get_uploadspeed_row($id)
 {
-	global $Cache;
-	if (!$row = $Cache->get_value('uploadspeed_'.$id.'_content')){
-		$res = sql_query("SELECT * FROM uploadspeed WHERE id=".sqlesc($id)." LIMIT 1") or sqlerr(__FILE__,__LINE__);
-		$row = mysql_fetch_array($res);
-		$Cache->cache_value('uploadspeed_'.$id.'_content', $row, 86400);
-	}
-	if (!$row)
-		return false;
-	else return $row;
+  global $Cache;
+  if (!$row = $Cache->get_value('uploadspeed_'.$id.'_content')){
+    $res = sql_query("SELECT * FROM uploadspeed WHERE id=".sqlesc($id)." LIMIT 1") or sqlerr(__FILE__,__LINE__);
+    $row = mysql_fetch_array($res);
+    $Cache->cache_value('uploadspeed_'.$id.'_content', $row, 86400);
+  }
+  if (!$row)
+    return false;
+  else return $row;
 }
 
 function get_isp_row($id)
 {
-	global $Cache;
-	if (!$row = $Cache->get_value('isp_'.$id.'_content')){
-		$res = sql_query("SELECT * FROM isp WHERE id=".sqlesc($id)." LIMIT 1") or sqlerr(__FILE__,__LINE__);
-		$row = mysql_fetch_array($res);
-		$Cache->cache_value('isp_'.$id.'_content', $row, 86400);
-	}
-	if (!$row)
-		return false;
-	else return $row;
+  global $Cache;
+  if (!$row = $Cache->get_value('isp_'.$id.'_content')){
+    $res = sql_query("SELECT * FROM isp WHERE id=".sqlesc($id)." LIMIT 1") or sqlerr(__FILE__,__LINE__);
+    $row = mysql_fetch_array($res);
+    $Cache->cache_value('isp_'.$id.'_content', $row, 86400);
+  }
+  if (!$row)
+    return false;
+  else return $row;
 }
 
 function valid_file_name($filename)
 {
-	$allowedchars = "abcdefghijklmnopqrstuvwxyz0123456789_./";
+  $allowedchars = "abcdefghijklmnopqrstuvwxyz0123456789_./";
 
-	$total=strlen($filename);
-	for ($i = 0; $i < $total; ++$i)
-	if (strpos($allowedchars, $filename[$i]) === false)
-		return false;
-	return true;
+  $total=strlen($filename);
+  for ($i = 0; $i < $total; ++$i)
+  if (strpos($allowedchars, $filename[$i]) === false)
+    return false;
+  return true;
 }
 
 function valid_class_name($filename)
 {
-	$allowedfirstchars = "abcdefghijklmnopqrstuvwxyz";
-	$allowedchars = "abcdefghijklmnopqrstuvwxyz0123456789_";
+  $allowedfirstchars = "abcdefghijklmnopqrstuvwxyz";
+  $allowedchars = "abcdefghijklmnopqrstuvwxyz0123456789_";
 
-	if(strpos($allowedfirstchars, $filename[0]) === false)
-		return false;
-	$total=strlen($filename);
-	for ($i = 1; $i < $total; ++$i)
-	if (strpos($allowedchars, $filename[$i]) === false)
-		return false;
-	return true;
+  if(strpos($allowedfirstchars, $filename[0]) === false)
+    return false;
+  $total=strlen($filename);
+  for ($i = 1; $i < $total; ++$i)
+  if (strpos($allowedchars, $filename[$i]) === false)
+    return false;
+  return true;
 }
 
 function return_avatar_image($url)
 {
-	global $CURLANGDIR;
-	return "<img src=\"".$url."\" alt=\"avatar\" width=\"150px\" onload=\"check_avatar(this, '".$CURLANGDIR."');\" />";
+  global $CURLANGDIR;
+  return "<img src=\"".$url."\" alt=\"avatar\" width=\"150px\" onload=\"check_avatar(this, '".$CURLANGDIR."');\" />";
 }
 function return_category_image($categoryid, $link="")
 {
-	static $catImg = array();
-	if ($catImg[$categoryid]) {
-		$catimg = $catImg[$categoryid];
-	} else {
-		$categoryrow = get_category_row($categoryid);
-		$catimgurl = get_cat_folder($categoryid);
-#		$catImg[$categoryid] = $catimg = "<img".($categoryrow['class_name'] ? " class=\"".$categoryrow['class_name']."\"" : "")." src=\"pic/cattrans.gif\" alt=\"" . $categoryrow["name"] . "\" title=\"" .$categoryrow["name"]. "\" style=\"background-image: url(pic/" . $catimgurl . $categoryrow["image"].");\" />";
-		$catImg[$categoryid] = $catimg = "<img".($categoryrow['class_name'] ? " class=\"".$categoryrow['class_name']."\"" : "")." src=\"pic/cattrans.gif\" alt=\"" . $categoryrow["name"] . "\" title=\"" .$categoryrow["name"]. "\" />";
-	}
-	if ($link) {
-		$catimg = "<a href=\"".$link."cat=" . $categoryid . "\">".$catimg."</a>";
-	}
-	return $catimg;
+  static $catImg = array();
+  if ($catImg[$categoryid]) {
+    $catimg = $catImg[$categoryid];
+  } else {
+    $categoryrow = get_category_row($categoryid);
+    $catimgurl = get_cat_folder($categoryid);
+#    $catImg[$categoryid] = $catimg = "<img".($categoryrow['class_name'] ? " class=\"".$categoryrow['class_name']."\"" : "")." src=\"pic/cattrans.gif\" alt=\"" . $categoryrow["name"] . "\" title=\"" .$categoryrow["name"]. "\" style=\"background-image: url(pic/" . $catimgurl . $categoryrow["image"].");\" />";
+    $catImg[$categoryid] = $catimg = "<img".($categoryrow['class_name'] ? " class=\"".$categoryrow['class_name']."\"" : "")." src=\"pic/cattrans.gif\" alt=\"" . $categoryrow["name"] . "\" title=\"" .$categoryrow["name"]. "\" />";
+  }
+  if ($link) {
+    $catimg = "<a href=\"".$link."cat=" . $categoryid . "\">".$catimg."</a>";
+  }
+  return $catimg;
 }
 
 
 function format_comment2($text, $strip_html = true, $xssclean = false, $newtab = false, $imageresizer = true, $image_max_width = 700, $enableimage = true, $enableflash = true , $imagenum = -1, $image_max_height = 0, $adid = 0)
 {
-	global $lang_functions;
-	global $CURUSER, $SITENAME, $BASEURL, $enableattach_attachment;
-	global $tempCode, $tempCodeCount;
-	$tempCode = array();
-	$tempCodeCount = 0;
-	$imageresizer = $imageresizer ? 1 : 0;
-	$s = $text;
+  global $lang_functions;
+  global $CURUSER, $SITENAME, $BASEURL, $enableattach_attachment;
+  global $tempCode, $tempCodeCount;
+  $tempCode = array();
+  $tempCodeCount = 0;
+  $imageresizer = $imageresizer ? 1 : 0;
+  $s = $text;
 
-	if ($strip_html) {
-		$s = htmlspecialchars($s);
-	}
-	// Linebreaks
-	$s = nl2br($s);
+  if ($strip_html) {
+    $s = htmlspecialchars($s);
+  }
+  // Linebreaks
+  $s = nl2br($s);
 
-	if (strpos($s,"[code]") !== false && strpos($s,"[/code]") !== false) {
-		$s = preg_replace("/\[code\](.+?)\[\/code\]/eis","formatCode('\\1')", $s);
-	}
+  if (strpos($s,"[code]") !== false && strpos($s,"[/code]") !== false) {
+    $s = preg_replace("/\[code\](.+?)\[\/code\]/eis","formatCode('\\1')", $s);
+  }
 
-	$originalBbTagArray = array('[siteurl]', '[site]','[*]', '[b]', '[/b]', '[i]', '[/i]', '[u]', '[/u]', '[pre]', '[/pre]', '[/color]', '[/font]', '[/size]', "  ");
-	$replaceXhtmlTagArray = array(get_protocol_prefix().$BASEURL, $SITENAME, '<img class="listicon listitem" src="pic/trans.gif" alt="list" />', '<b>', '</b>', '<i>', '</i>', '<u>', '</u>', '<pre>', '</pre>', '</span>', '</font>', '</font>', ' &nbsp;');
-	$s = str_replace($originalBbTagArray, $replaceXhtmlTagArray, $s);
+  $originalBbTagArray = array('[siteurl]', '[site]','[*]', '[b]', '[/b]', '[i]', '[/i]', '[u]', '[/u]', '[pre]', '[/pre]', '[/color]', '[/font]', '[/size]', "  ");
+  $replaceXhtmlTagArray = array(get_protocol_prefix().$BASEURL, $SITENAME, '<img class="listicon listitem" src="pic/trans.gif" alt="list" />', '<b>', '</b>', '<i>', '</i>', '<u>', '</u>', '<pre>', '</pre>', '</span>', '</font>', '</font>', ' &nbsp;');
+  $s = str_replace($originalBbTagArray, $replaceXhtmlTagArray, $s);
 
-	$originalBbTagArray = array("/\[font=([^\[\(&\\;]+?)\]/is", "/\[color=([#0-9a-z]{1,15})\]/is", "/\[color=([a-z]+)\]/is", "/\[size=([1-7])\]/is");
-	$replaceXhtmlTagArray = array("<font face=\"\\1\">", "<span style=\"color: \\1;\">", "<span style=\"color: \\1;\">", "<font size=\"\\1\">");
-	$s = preg_replace($originalBbTagArray, $replaceXhtmlTagArray, $s);
+  $originalBbTagArray = array("/\[font=([^\[\(&\\;]+?)\]/is", "/\[color=([#0-9a-z]{1,15})\]/is", "/\[color=([a-z]+)\]/is", "/\[size=([1-7])\]/is");
+  $replaceXhtmlTagArray = array("<font face=\"\\1\">", "<span style=\"color: \\1;\">", "<span style=\"color: \\1;\">", "<font size=\"\\1\">");
+  $s = preg_replace($originalBbTagArray, $replaceXhtmlTagArray, $s);
 
-	if ($enableattach_attachment == 'yes' && $imagenum != 1){
-		$limit = 20;
-		$s = preg_replace("/\[attach\]([0-9a-zA-z][0-9a-zA-z]*)\[\/attach\]/ies", "print_attachment('\\1', ".($enableimage ? 1 : 0).", ".($imageresizer ? 1 : 0).")", $s, $limit);
-	}
-	
-	if ($enableimage) {
+  if ($enableattach_attachment == 'yes' && $imagenum != 1){
+    $limit = 20;
+    $s = preg_replace("/\[attach\]([0-9a-zA-z][0-9a-zA-z]*)\[\/attach\]/ies", "print_attachment('\\1', ".($enableimage ? 1 : 0).", ".($imageresizer ? 1 : 0).")", $s, $limit);
+  }
+  
+  if ($enableimage) {
 
-		$s = preg_replace("/\[img\]([^\<\r\n\"']+?)\[\/img\]/ei", "formatImg('\\1',".$imageresizer.",".$image_max_width.",".$image_max_height.")", $s, $imagenum, $imgReplaceCount);
-		$s = preg_replace("/\[img=([^,\<\r\n\"']+?)\]/ei", "formatImg('\\1',".$imageresizer.",".$image_max_width.",".$image_max_height.")", $s, ($imagenum != -1 ? max($imagenum-$imgReplaceCount, 0) : -1));
-	} else {
-		$s = preg_replace("/\[img\]([^\<\r\n\"']+?)\[\/img\]/i", '', $s, -1);
-		$s = preg_replace("/\[img=([^,\<\r\n\"']+?)\]/i", '', $s, -1);
-	}
-	
-	// [url]http://www.example.com[/url]
-	$s = preg_replace("/\[url\]([^\[\s]+?)\[\/url\]/ei", "formatUrl('\\1', ".($newtab==true ? 1 : 0).", '', 'faqlink')", $s);
+    $s = preg_replace("/\[img\]([^\<\r\n\"']+?)\[\/img\]/ei", "formatImg('\\1',".$imageresizer.",".$image_max_width.",".$image_max_height.")", $s, $imagenum, $imgReplaceCount);
+    $s = preg_replace("/\[img=([^,\<\r\n\"']+?)\]/ei", "formatImg('\\1',".$imageresizer.",".$image_max_width.",".$image_max_height.")", $s, ($imagenum != -1 ? max($imagenum-$imgReplaceCount, 0) : -1));
+  } else {
+    $s = preg_replace("/\[img\]([^\<\r\n\"']+?)\[\/img\]/i", '', $s, -1);
+    $s = preg_replace("/\[img=([^,\<\r\n\"']+?)\]/i", '', $s, -1);
+  }
+  
+  // [url]http://www.example.com[/url]
+  $s = preg_replace("/\[url\]([^\[\s]+?)\[\/url\]/ei", "formatUrl('\\1', ".($newtab==true ? 1 : 0).", '', 'faqlink')", $s);
 
-	// [url=http://www.example.com]Text[/url]
-	if ($adid) {
-		$s = preg_replace("/\[url=([^\[\s]+?)\](.+?)\[\/url\]/ei", "formatAdUrl(".$adid." ,'\\1', '\\2', ".($newtab==true ? 1 : 0).", 'faqlink')", $s);
-	} else {
-		$s = preg_replace("/\[url=([^\[\s]+?)\](.+?)\[\/url\]/ei", "formatUrl('\\1', ".($newtab==true ? 1 : 0).", '\\2', 'faqlink')", $s);
-	}
+  // [url=http://www.example.com]Text[/url]
+  if ($adid) {
+    $s = preg_replace("/\[url=([^\[\s]+?)\](.+?)\[\/url\]/ei", "formatAdUrl(".$adid." ,'\\1', '\\2', ".($newtab==true ? 1 : 0).", 'faqlink')", $s);
+  } else {
+    $s = preg_replace("/\[url=([^\[\s]+?)\](.+?)\[\/url\]/ei", "formatUrl('\\1', ".($newtab==true ? 1 : 0).", '\\2', 'faqlink')", $s);
+  }
 
-	// [flash,500,400]http://www/image.swf[/flash]
-	if (strpos($s,"[flash") !== false) { //flash is not often used. Better check if it exist before hand
-		if ($enableflash) {
-			$s = preg_replace("/\[flash(\,([1-9][0-9]*)\,([1-9][0-9]*))?\]((http|ftp):\/\/[^\s'\"<>]+(\.(swf)))\[\/flash\]/ei", "formatFlash('\\4', '\\2', '\\3')", $s);
-		} else {
-			$s = preg_replace("/\[flash(\,([1-9][0-9]*)\,([1-9][0-9]*))?\]((http|ftp):\/\/[^\s'\"<>]+(\.(swf)))\[\/flash\]/i", '', $s);
-		}
-	}
-	//[flv,320,240]http://www/a.flv[/flv]
-	if (strpos($s,"[flv") !== false) { //flv is not often used. Better check if it exist before hand
-		if ($enableflash) {
-			$s = preg_replace("/\[flv(\,([1-9][0-9]*)\,([1-9][0-9]*))?\]((http|ftp):\/\/[^\s'\"<>]+(\.(flv)))\[\/flv\]/ei", "formatFlv('\\4', '\\2', '\\3')", $s);
-		} else {
-			$s = preg_replace("/\[flv(\,([1-9][0-9]*)\,([1-9][0-9]*))?\]((http|ftp):\/\/[^\s'\"<>]+(\.(flv)))\[\/flv\]/i", '', $s);
-		}
-	}
-	// Quotes
-	if (strpos($s,"[quote") !== false && strpos($s,"[/quote]") !== false) { //format_quote is kind of slow. Better check if [quote] exists beforehand
-		$s = format_quotes($s);
-	}
+  // [flash,500,400]http://www/image.swf[/flash]
+  if (strpos($s,"[flash") !== false) { //flash is not often used. Better check if it exist before hand
+    if ($enableflash) {
+      $s = preg_replace("/\[flash(\,([1-9][0-9]*)\,([1-9][0-9]*))?\]((http|ftp):\/\/[^\s'\"<>]+(\.(swf)))\[\/flash\]/ei", "formatFlash('\\4', '\\2', '\\3')", $s);
+    } else {
+      $s = preg_replace("/\[flash(\,([1-9][0-9]*)\,([1-9][0-9]*))?\]((http|ftp):\/\/[^\s'\"<>]+(\.(swf)))\[\/flash\]/i", '', $s);
+    }
+  }
+  //[flv,320,240]http://www/a.flv[/flv]
+  if (strpos($s,"[flv") !== false) { //flv is not often used. Better check if it exist before hand
+    if ($enableflash) {
+      $s = preg_replace("/\[flv(\,([1-9][0-9]*)\,([1-9][0-9]*))?\]((http|ftp):\/\/[^\s'\"<>]+(\.(flv)))\[\/flv\]/ei", "formatFlv('\\4', '\\2', '\\3')", $s);
+    } else {
+      $s = preg_replace("/\[flv(\,([1-9][0-9]*)\,([1-9][0-9]*))?\]((http|ftp):\/\/[^\s'\"<>]+(\.(flv)))\[\/flv\]/i", '', $s);
+    }
+  }
+  // Quotes
+  if (strpos($s,"[quote") !== false && strpos($s,"[/quote]") !== false) { //format_quote is kind of slow. Better check if [quote] exists beforehand
+    $s = format_quotes($s);
+  }
 
-	$s = preg_replace("/\[em([1-9][0-9]*)\]/ie", "(\\1 < 192 ? '<img src=\"pic/smilies/\\1.gif\" alt=\"[em\\1]\" />' : '[em\\1]')", $s);
-	
-
-
-	reset($tempCode);
-	$j = 0;
-	while(count($tempCode) || $j > 5) {
-		foreach($tempCode as $key=>$code) {
-			$s = str_replace("<tempCode_$key>", $code, $s, $count);
-			if ($count) {
-				unset($tempCode[$key]);
-				$i = $i+$count;
-			}
-		}
-		$j++;
-	}
+  $s = preg_replace("/\[em([1-9][0-9]*)\]/ie", "(\\1 < 192 ? '<img src=\"pic/smilies/\\1.gif\" alt=\"[em\\1]\" />' : '[em\\1]')", $s);
+  
 
 
-	
-	$s = preg_replace("/\[img=(\d{1,4})[x|\,](\d{1,4})\]\s*([^\[\<\r\n]+?)\s*\[\/img\]/ies", "bbcodeurl('\\3', '<img width=\"\\1\" height=\"\\2\" src=\"%s\" border=\"0\" alt=\"\" />')", $s);
-	$searcharray['bbcode_regexp'] = array(
-			"/\[url\]\s*(www.|https?:\/\/|ftp:\/\/|gopher:\/\/|news:\/\/|telnet:\/\/|rtsp:\/\/|mms:\/\/|callto:\/\/|bctp:\/\/|ed2k:\/\/|thunder:\/\/|synacast:\/\/){1}([^\[\"']+?)\s*\[\/url\]/ie",
-			"/\[url=www.([^\[\"']+?)\](.+?)\[\/url\]/is",
-			"/\[url=(https?|ftp|gopher|news|telnet|rtsp|mms|callto|bctp|ed2k){1}:\/\/([^\[\"']+?)\](.+?)\[\/url\]/is",
-			"/\[email\]\s*([a-z0-9\-_.+]+)@([a-z0-9\-_]+[.][a-z0-9\-_.]+)\s*\[\/email\]/i",
-			"/\[email=([a-z0-9\-_.+]+)@([a-z0-9\-_]+[.][a-z0-9\-_.]+)\](.+?)\[\/email\]/is",
-			"/\[color=([#\w]+?)\]/i",
-			"/\[size=(\d+?)\]/i",
-			"/\[size=(\d+(\.\d+)?(px|pt|in|cm|mm|pc|em|ex|%)+?)\]/i",
-			"/\[font=([^\[\<]+?)\]/i",
-			"/\[align=(left|center|right)\]/i",
-			"/\[float=(left|right)\]/i"
-		);
-		$replacearray['bbcode_regexp'] = array(
-			"cuturl('\\1\\2')",
-			"<a href=\"http://www.\\1\" target=\"_blank\">\\2</a>",
-			"<a href=\"\\1://\\2\" target=\"_blank\">\\3</a>",
-			"<a href=\"mailto:\\1@\\2\">\\1@\\2</a>",
-			"<a href=\"mailto:\\1@\\2\">\\3</a>",
-			"<font color=\"\\1\">",
-			"<font size=\"\\1\">",
-			"<font style=\"font-size: \\1\">",
-			"<font face=\"\\1 \">",
-			"<p align=\"\\1\">",
-			"<br style=\"clear: both\"><span style=\"float: \\1;\">"
-		);
+  reset($tempCode);
+  $j = 0;
+  while(count($tempCode) || $j > 5) {
+    foreach($tempCode as $key=>$code) {
+      $s = str_replace("<tempCode_$key>", $code, $s, $count);
+      if ($count) {
+        unset($tempCode[$key]);
+        $i = $i+$count;
+      }
+    }
+    $j++;
+  }
 
-		$searcharray['bbcode_regexp'][] = "/\[table(?:=(\d{1,4}%?)(?:,([\(\)%,#\w ]+))?)?\]\s*(.+?)\s*\[\/table\]/ies";
-		$replacearray['bbcode_regexp'][] = "parsetable('\\1', '\\2', '\\3')";
-		$searcharray['bbcode_regexp'][] = "/\[table(?:=(\d{1,4}%?)(?:,([\(\)%,#\w ]+))?)?\]\s*(.+?)\s*\[\/table\]/ies";
-		$replacearray['bbcode_regexp'][] = "parsetable('\\1', '\\2', '\\3')";
 
-		$searcharray['bbcode_regexp'][] = "/\s*\[quote\][\n\r]*(.+?)[\n\r]*\[\/quote\]\s*/is";
-		$replacearray['bbcode_regexp'][] = "<br><br><div class=\"msgbody\"><div class=\"msgheader\">QUOTE:</div><div class=\"msgborder\">\\1</div></div><br>";
+  
+  $s = preg_replace("/\[img=(\d{1,4})[x|\,](\d{1,4})\]\s*([^\[\<\r\n]+?)\s*\[\/img\]/ies", "bbcodeurl('\\3', '<img width=\"\\1\" height=\"\\2\" src=\"%s\" border=\"0\" alt=\"\" />')", $s);
+  $searcharray['bbcode_regexp'] = array(
+      "/\[url\]\s*(www.|https?:\/\/|ftp:\/\/|gopher:\/\/|news:\/\/|telnet:\/\/|rtsp:\/\/|mms:\/\/|callto:\/\/|bctp:\/\/|ed2k:\/\/|thunder:\/\/|synacast:\/\/){1}([^\[\"']+?)\s*\[\/url\]/ie",
+      "/\[url=www.([^\[\"']+?)\](.+?)\[\/url\]/is",
+      "/\[url=(https?|ftp|gopher|news|telnet|rtsp|mms|callto|bctp|ed2k){1}:\/\/([^\[\"']+?)\](.+?)\[\/url\]/is",
+      "/\[email\]\s*([a-z0-9\-_.+]+)@([a-z0-9\-_]+[.][a-z0-9\-_.]+)\s*\[\/email\]/i",
+      "/\[email=([a-z0-9\-_.+]+)@([a-z0-9\-_]+[.][a-z0-9\-_.]+)\](.+?)\[\/email\]/is",
+      "/\[color=([#\w]+?)\]/i",
+      "/\[size=(\d+?)\]/i",
+      "/\[size=(\d+(\.\d+)?(px|pt|in|cm|mm|pc|em|ex|%)+?)\]/i",
+      "/\[font=([^\[\<]+?)\]/i",
+      "/\[align=(left|center|right)\]/i",
+      "/\[float=(left|right)\]/i"
+    );
+    $replacearray['bbcode_regexp'] = array(
+      "cuturl('\\1\\2')",
+      "<a href=\"http://www.\\1\" target=\"_blank\">\\2</a>",
+      "<a href=\"\\1://\\2\" target=\"_blank\">\\3</a>",
+      "<a href=\"mailto:\\1@\\2\">\\1@\\2</a>",
+      "<a href=\"mailto:\\1@\\2\">\\3</a>",
+      "<font color=\"\\1\">",
+      "<font size=\"\\1\">",
+      "<font style=\"font-size: \\1\">",
+      "<font face=\"\\1 \">",
+      "<p align=\"\\1\">",
+      "<br style=\"clear: both\"><span style=\"float: \\1;\">"
+    );
 
-		$searcharray['bbcode_str'] = array(
-			'[/color]', '[/size]', '[/font]', '[/align]', '[b]', '[/b]',
-			'[i]', '[/i]', '[u]', '[/u]', '[list]', '[list=1]', '[list=a]',
-			'[list=A]', '[*]', '[/list]', '[indent]', '[/indent]', '[/float]',
-			'=\"', '\" '
-		);
+    $searcharray['bbcode_regexp'][] = "/\[table(?:=(\d{1,4}%?)(?:,([\(\)%,#\w ]+))?)?\]\s*(.+?)\s*\[\/table\]/ies";
+    $replacearray['bbcode_regexp'][] = "parsetable('\\1', '\\2', '\\3')";
+    $searcharray['bbcode_regexp'][] = "/\[table(?:=(\d{1,4}%?)(?:,([\(\)%,#\w ]+))?)?\]\s*(.+?)\s*\[\/table\]/ies";
+    $replacearray['bbcode_regexp'][] = "parsetable('\\1', '\\2', '\\3')";
 
-		$replacearray['bbcode_str'] = array(
-			'</font>', '</font>', '</font>', '</p>', '<b>', '</b>', '<i>',
-			'</i>', '<u>', '</u>', '<ul>', '<ul type=1>', '<ul type=a>',
-			'<ul type=A>', '<li>', '</ul>', '<blockquote>', '</blockquote>', '</span>',
-			'="', '" '
-		);
-	@$s = preg_replace( $searcharray['bbcode_regexp'] , $replacearray['bbcode_regexp'] , $s );
-	$s = str_replace( $searcharray['bbcode_str'], $replacearray['bbcode_str'], $s);
+    $searcharray['bbcode_regexp'][] = "/\s*\[quote\][\n\r]*(.+?)[\n\r]*\[\/quote\]\s*/is";
+    $replacearray['bbcode_regexp'][] = "<br><br><div class=\"msgbody\"><div class=\"msgheader\">QUOTE:</div><div class=\"msgborder\">\\1</div></div><br>";
+
+    $searcharray['bbcode_str'] = array(
+      '[/color]', '[/size]', '[/font]', '[/align]', '[b]', '[/b]',
+      '[i]', '[/i]', '[u]', '[/u]', '[list]', '[list=1]', '[list=a]',
+      '[list=A]', '[*]', '[/list]', '[indent]', '[/indent]', '[/float]',
+      '=\"', '\" '
+    );
+
+    $replacearray['bbcode_str'] = array(
+      '</font>', '</font>', '</font>', '</p>', '<b>', '</b>', '<i>',
+      '</i>', '<u>', '</u>', '<ul>', '<ul type=1>', '<ul type=a>',
+      '<ul type=A>', '<li>', '</ul>', '<blockquote>', '</blockquote>', '</span>',
+      '="', '" '
+    );
+  @$s = preg_replace( $searcharray['bbcode_regexp'] , $replacearray['bbcode_regexp'] , $s );
+  $s = str_replace( $searcharray['bbcode_str'], $replacearray['bbcode_str'], $s);
 // �ᵼ�¶Ա�ǩ�� url ��Ϊֵ����������?ȥ��
-//	$s = format_urls($s, $newtab);
-	
-	return $s;
+//  $s = format_urls($s, $newtab);
+  
+  return $s;
 }
 
 function parsetable($width, $bgcolor, $message) {
-	if(!in_array(substr($message, 0, 4), array('[tr]', '<tr>'))) {
-		return $message;
-	}
-	$width = substr($width, -1) == '%' ? (substr($width, 0, -1) <= 98 ? $width : '98%') : ($width <= 560 ? $width : '98%');
-	return '<table cellspacing="0" '.
-		($width == '' ? NULL : 'width="'.$width.'" ').
-		'align="center" class="t_table"'.($bgcolor ? ' style="background: '.$bgcolor.'">' : '>').
-		str_replace('\\"', '"', preg_replace(array(
-				"/\[tr(?:=([\(\)%,#\w]+))?\]\s*\[td(?:=(\d{1,2}),(\d{1,2})(?:,(\d{1,4}%?))?)?\]/ie",
-				"/\[\/td\]\s*\[td(?:=(\d{1,2}),(\d{1,2})(?:,(\d{1,4}%?))?)?\]/ie",
-				"/\[\/td\]\s*\[\/tr\]/i"
-			), array(
-				"parsetrtd('\\1', '\\2', '\\3', '\\4')",
-				"parsetrtd('td', '\\1', '\\2', '\\3')",
-				'</td></tr>'
-			), $message)
-		).'</table>';
+  if(!in_array(substr($message, 0, 4), array('[tr]', '<tr>'))) {
+    return $message;
+  }
+  $width = substr($width, -1) == '%' ? (substr($width, 0, -1) <= 98 ? $width : '98%') : ($width <= 560 ? $width : '98%');
+  return '<table cellspacing="0" '.
+    ($width == '' ? NULL : 'width="'.$width.'" ').
+    'align="center" class="t_table"'.($bgcolor ? ' style="background: '.$bgcolor.'">' : '>').
+    str_replace('\\"', '"', preg_replace(array(
+        "/\[tr(?:=([\(\)%,#\w]+))?\]\s*\[td(?:=(\d{1,2}),(\d{1,2})(?:,(\d{1,4}%?))?)?\]/ie",
+        "/\[\/td\]\s*\[td(?:=(\d{1,2}),(\d{1,2})(?:,(\d{1,4}%?))?)?\]/ie",
+        "/\[\/td\]\s*\[\/tr\]/i"
+      ), array(
+        "parsetrtd('\\1', '\\2', '\\3', '\\4')",
+        "parsetrtd('td', '\\1', '\\2', '\\3')",
+        '</td></tr>'
+      ), $message)
+    ).'</table>';
 }
 
 function parsetrtd($bgcolor, $colspan, $rowspan, $width) {
-	return ($bgcolor == 'td' ? '</td>' : '<tr'.($bgcolor ? ' style="background: '.$bgcolor.'"' : '').'>').'<td'.($colspan > 1 ? ' colspan="'.$colspan.'"' : '').($rowspan > 1 ? ' rowspan="'.$rowspan.'"' : '').($width ? ' width="'.$width.'"' : '').'>';
+  return ($bgcolor == 'td' ? '</td>' : '<tr'.($bgcolor ? ' style="background: '.$bgcolor.'"' : '').'>').'<td'.($colspan > 1 ? ' colspan="'.$colspan.'"' : '').($rowspan > 1 ? ' rowspan="'.$rowspan.'"' : '').($width ? ' width="'.$width.'"' : '').'>';
 }
 
 function bbcodeurl($url, $tags) {
-	if(!preg_match("/<.+?>/s", $url)) {
-		if(!in_array(strtolower(substr($url, 0, 6)), array('http:/', 'https:', 'ftp://', 'rtsp:/', 'mms://'))) {
-			$url = 'http://'.$url;
-		}
-		return str_replace(array('submit', 'logging.php'), array('', ''), sprintf($tags, $url, addslashes($url)));
-	} else {
-		return '&nbsp;'.$url;
-	}
+  if(!preg_match("/<.+?>/s", $url)) {
+    if(!in_array(strtolower(substr($url, 0, 6)), array('http:/', 'https:', 'ftp://', 'rtsp:/', 'mms://'))) {
+      $url = 'http://'.$url;
+    }
+    return str_replace(array('submit', 'logging.php'), array('', ''), sprintf($tags, $url, addslashes($url)));
+  } else {
+    return '&nbsp;'.$url;
+  }
 }
 
 function get_torrent_promotion_append_sub($promotion = 1,$forcemode = "",$showtimeleft = false, $added = "", $promotionTimeType = 0, $promotionUntil = ''){
@@ -4680,8 +4680,8 @@ $langs = langlist("site_lang");
 
 foreach ($langs as $row)
 {
-	if ($row["site_lang_folder"] == get_langfolder_cookie()) $se = "selected=\"selected\""; else $se = "";
-	$s .= "<option value=\"". $row["id"] ."\" ". $se. ">" . htmlspecialchars($row["lang_name"]) . "</option>\n";
+  if ($row["site_lang_folder"] == get_langfolder_cookie()) $se = "selected=\"selected\""; else $se = "";
+  $s .= "<option value=\"". $row["id"] ."\" ". $se. ">" . htmlspecialchars($row["lang_name"]) . "</option>\n";
 }
 $s .= "\n</select>";
 
@@ -4694,6 +4694,23 @@ print('<div id="lang-choice">'.$lang_functions['text_select_lang']. $s . "</div>
 </form>
 <?php
 
+}
+
+function a_to_z_index($letter='', $query = '') {
+  $out = '<div class="minor-list"><ul>';
+
+  for ($i = 97; $i < 123; ++$i) {
+    $l = chr($i);
+    $L = chr($i - 32);
+    if ($l == $letter) {
+      $out .= ('<li class="selected">' . $L . '</li>');
+    }
+    else {
+      $out .= ('<li><a href="?letter=' . $l . $query . '">' . $L . '</a></li>');
+    }
+  }
+  $out .= '</ul></div>';
+  return $out;
 }
 
 ?>

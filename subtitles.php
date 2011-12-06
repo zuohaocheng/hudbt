@@ -258,10 +258,8 @@ if (get_user_class() >= UC_PEASANT)
 		$Cache->cache_value('subtitle_sum_size', $size, 3600);
 	}
 
-	print('<h2 style="text-align:center;">' . $lang_subtitles['text_upload_subtitles'].mksize($size));
-	?>
-	</h2>
-<?php
+	print('<h2 id="page-title">' . $lang_subtitles['text_upload_subtitles'] . '<h2>');
+	print('<h3 class="page-titles">' . $lang_subtitles['text_uploaded_size'] .mksize($size) . '</h3>');
 
 	print("<h3>".$lang_subtitles['text_rules']."</h3>\n");
 	print('<div><ol>');
@@ -271,31 +269,35 @@ if (get_user_class() >= UC_PEASANT)
 	}
 	print('</ol></div>');
 	
-	print($lang_subtitles['text_red_star_required']);
 	if($in_detail != "")
 	{
 		print("<p >".$lang_subtitles['text_uploading_subtitles_for_torrent']."<b>$torrent_name</b></p>\n");
 		print("<br />");
 	}
+?>
 
-	print("<form enctype=multipart/form-data method=post action=?>\n");
-	print("<input type=hidden name=action value=upload>");
-	print("<table class=main border=1 cellspacing=0 cellpadding=5>\n");
-
-	print("<tr><td class=rowhead>".$lang_subtitles['row_file']."<font color=red>*</font></td><td class=rowfollow align=left><input type=file name=file>");
+<form enctype="multipart/form-data" method="post" action="?">
+  <input type="hidden" name="action" value="upload">
+  <table class="main" border="1" cellspacing="0" cellpadding="5">
+    <thead>
+      <tr><th colspan="2"><?php echo $lang_subtitles['text_red_star_required']; ?></th></tr>
+    </thead>
+    <tbody>
+	<tr><td class="rowhead"><?php echo $lang_subtitles['row_file'] ?><span class="required-field">*</span></td><td class="rowfollow" align="left"><input type="file" name="file">
+<?php
 	if ($maxsubsize_main > 0)
 		print("<br />(".$lang_subtitles['text_maximum_file_size'].mksize($maxsubsize_main).".)");
 	print("</td></tr>\n");
 	if($in_detail == "")
-	print("<tr><td class=rowhead>".$lang_subtitles['row_torrent_id']."<font color=red>*</font></td><td class=rowfollow align=left><input type=text name=torrent_id style=\"width:300px\"><br />".$lang_subtitles['text_torrent_id_note']."</td></tr>\n");
+	print("<tr><td class=rowhead>".$lang_subtitles['row_torrent_id'].'<span class="required-field">*</span></td><td class="rowfollow" align="left"><input type=text name=torrent_id style="width:300px"><br />'.$lang_subtitles['text_torrent_id_note']."</td></tr>\n");
 	else
 	{
-		print("<tr><td class=rowhead>".$lang_subtitles['row_torrent_id']."<font color=red>*</font></td><td class=rowfollow align=left><input type=text name=torrent_id value=$detail_torrent_id style=\"width:300px\"><br />".$lang_subtitles['text_torrent_id_note']."</td></tr>\n");
+		print("<tr><td class=rowhead>".$lang_subtitles['row_torrent_id'].'<span class="required-field">*</span></td><td class=rowfollow align=left><input type=text name=torrent_id value=$detail_torrent_id style="width:300px"><br />'.$lang_subtitles['text_torrent_id_note']."</td></tr>\n");
 		$in_detail = "";
 	}
-	print("<tr><td class=rowhead>".$lang_subtitles['row_title']."</td><td class=rowfollow colspan=3 align=left><input type=text name=title style=\"width:300px\"><br />".$lang_subtitles['text_title_note']."</td></tr>\n");
+	print('<tr><td class="rowhead">'.$lang_subtitles['row_title'].'</td><td class="rowfollow" colspan="3" align="left"><input type="text" name="title" style="width:300px"><br />'.$lang_subtitles['text_title_note']."</td></tr>\n");
 
-	$s = "<tr><td class=rowhead>".$lang_subtitles['row_language']."<font color=red>*</font></td><td class=rowfollow align=left><select name=\"sel_lang\"><option value=\"0\">".$lang_subtitles['select_choose_one']."</option>\n";
+	$s = '<tr><td class="rowhead">'.$lang_subtitles['row_language'].'<span class="required-field">*</span></td><td class="rowfollow" align="left"><select name="sel_lang"><option value="0">'.$lang_subtitles['select_choose_one']."</option>\n";
 
 	$langs = langlist("sub_lang");
 
@@ -339,15 +341,7 @@ if(get_user_class() >= UC_PEASANT)
 ?>
 </form>
 <?php
-		for ($i = 97; $i < 123; ++$i)
-		{
-			$l = chr($i);
-			$L = chr($i - 32);
-			if ($l == $letter)
-				print("<b><font class=gray>$L</font></b>\n");
-			else
-				print("<a href=?letter=$l><b>$L</b></a>\n");
-		}
+		echo a_to_z_index($letter);
 ?>
 </div>
 <?

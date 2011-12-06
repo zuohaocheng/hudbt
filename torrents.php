@@ -20,6 +20,7 @@ $catsperrow = get_searchbox_value($sectiontype, 'catsperrow'); //show how many c
 $catpadding = get_searchbox_value($sectiontype, 'catpadding'); //padding space between categories in pixel
 
 $cats = genrelist($sectiontype);
+
 if ($showsubcat){
 	if ($showsource) $sources = searchbox_item_list("sources");
 	if ($showmedium) $media = searchbox_item_list("media");
@@ -307,6 +308,13 @@ if ($showteam) $team_get = 0 + $_GET["team"];
 if ($showaudiocodec) $audiocodec_get = 0 + $_GET["audiocodec"];
 }
 
+$mainCat = array('1' => array('401', '413', '414', '415'),
+		 '2' => array('402', '416', '417', '418'),
+		 '3' => array('405', '427', '428', '429'),
+		 '5' => array('403', '419', '420', '421'),
+		 '6' => array('412', '409'),
+		 '8' => array('408', '422', '423', '425'));
+
 $all = 0 + $_GET["all"];
 
 if (!$all)
@@ -314,6 +322,7 @@ if (!$all)
 	if (!$_GET && $CURUSER['notifs'])
 	{
 		$all = true;
+
 		foreach ($cats as $cat)
 		{
 			$all &= $cat[id];

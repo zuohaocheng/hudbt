@@ -99,9 +99,8 @@ h2.transparentbg
 .torrent-title h2 {
     color: black;
 }
-
-p
-{
+#page-title, .page-titles {
+    text-align:center;
 }
 p.sub
 {
@@ -896,6 +895,10 @@ td.category-icon {
 .donate512 {background-color: #99CCFF;}
 .donate1024 {background-color: #FF9999;}
 .donate_note {margin: 0;}
+
+.required-field {
+    color: red;
+}
 
 #search-subtitles {
     text-align:center;

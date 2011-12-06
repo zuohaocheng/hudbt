@@ -45,8 +45,7 @@ if ($country > 0)
 	$q .= ($q ? "&" : "") . "country=$country";
 }
 stdhead($lang_users['head_users']);
-
-print($lang_users['text_users']);
+begin_main_frame($lang_users['text_users'], true);
 
 print("<form method=get action=?>\n");
 print($lang_users['text_search'] ." <input type=text style=\"width:100px\" name=search value=$search> \n");
@@ -68,27 +67,13 @@ print("<select name=country>".$countries."</select>");
 print("<input type=submit value=\"".$lang_users['submit_okay']."\">\n");
 print("</form>\n");
 
-print("<p>\n");
-
-for ($i = 97; $i < 123; ++$i)
-{
-	$l = chr($i);
-	$L = chr($i - 32);
-	//stderr("",$class);
-	if ($l == $letter)
-		print("<font class=gray><b>$L</b></font>\n");
-	else
-	{
-		if($class == '-')
-			print("<a href=?letter=$l".($country > 0 ? "&country=".$country : "")."><b>$L</b></a>\n");
-		else
-		{
-			print("<a href=?letter=$l&class=$class".($country > 0 ? "&country=".$country : "")."><b>$L</b></a>\n");
-		}
-	}
+$href = ($country > 0 ? "&country=".$country : "");
+if($class != '-') {
+  $href .= '&class=' . $class;
 }
 
-print("</p>\n");
+echo a_to_z_index($letter, $href);
+end_main_frame();
 
 $perpage = 50;
 
@@ -98,7 +83,6 @@ $count = $arr[0];
 
 list($pagertop, $pagerbottom, $limit) = pager($perpage, $count, "users.php?".$q.($q ? "&" : ""));
 
-print($pagertop);
 
 $country_sql = "concat('<img src=\"pic/flag/', countries.flagpic, '\" alt=\"', countries.name  ,'\">')";
 
@@ -128,17 +112,23 @@ $res = sql_query($sql) or sqlerr();
 
 $num = mysql_num_rows($res);
 
-print("<table border=1 cellspacing=0 cellpadding=5>\n");
-print("<tr><td class=colhead align=left>".$lang_users['col_user_name']."</td><td class=colhead>".$lang_users['col_registered']."</td><td class=colhead>".$lang_users['col_last_access']."</td><td class=colhead align=left>".$lang_users['col_class']."</td><td class=colhead>".$lang_users['col_country']."</td></tr>\n");
-for ($i = 0; $i < $num; ++$i)
-{
-$arr = mysql_fetch_assoc($res);
-
-print("<tr><td align=left>".get_username($arr['id'])."</td><td>".gettime($arr['added'], true, false)."</td><td>".gettime($arr['last_access'],true,false)."</td><td align=left>". get_user_class_name($arr['class'],false,true,true) . "</td><td align=center>".$arr['country']."</td></tr>");
+if ($num == 0) {
+  print('<h3 class="page-titles">' . $lang_users['text_no_found'] . '</h3>');
 }
+else {
+  print($pagertop);
+  print("<table border=1 cellspacing=0 cellpadding=5>\n");
+  print("<tr><td class=colhead align=left>".$lang_users['col_user_name']."</td><td class=colhead>".$lang_users['col_registered']."</td><td class=colhead>".$lang_users['col_last_access']."</td><td class=colhead align=left>".$lang_users['col_class']."</td><td class=colhead>".$lang_users['col_country']."</td></tr>\n");
+  for ($i = 0; $i < $num; ++$i)
+    {
+      $arr = mysql_fetch_assoc($res);
 
-print("</table>");
-print($pagerbottom);
+      print("<tr><td align=left>".get_username($arr['id'])."</td><td>".gettime($arr['added'], true, false)."</td><td>".gettime($arr['last_access'],true,false)."</td><td align=left>". get_user_class_name($arr['class'],false,true,true) . "</td><td align=center>".$arr['country']."</td></tr>");
+    }
+
+  print("</table>");
+  print($pagerbottom);
+}
 
 stdfoot();
 die;
