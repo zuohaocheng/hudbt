@@ -673,6 +673,10 @@ A.Peasant_Name:visited{color: #708090}
     padding-right: .5em;
 }
 
+.minor-list.compact li {
+    margin: 0;
+}
+
 .minor-list-vertical ul {
     margin: 0px;
     padding: 0px;
@@ -864,17 +868,22 @@ td.category-icon {
 #searchbox-header {
     padding:0.5em;
     font-weight:bold;
-    border-bottom: gray 1px solid;
+    border-bottom: #CCC 1px solid;
 }
 
 #ksearchboxmain {
     position: relative;
+    zoom: 1;
 }
 
 #searchbox-cats {
     padding: 1em;
+    text-align:left;
 }
 
+#ksearchbox-simple {
+    zoom: 1;
+}
 
 #hotbox {
     position: absolute;
@@ -883,7 +892,6 @@ td.category-icon {
     padding: 2em 2em 0 2em;
     width: 100px;
     text-align: left;
-    /* border-left:1px solid gray; */
 }
 
 #hotbox div {
@@ -895,8 +903,8 @@ td.category-icon {
 }
 
 #searchbox-opts {
-    border-top:1px solid gray;
-    border-bottom:1px solid gray;
+    border-top:1px solid #CCC;
+    border-bottom:1px solid #CCC;
     text-align:left;
     padding:1em;
 }
@@ -979,6 +987,17 @@ td.category-icon {
     list-style: none;
     list-style-type: none;
     list-style-image:none;
+}
+
+input.a {
+    border:none;
+    background-color:transparent;
+    padding:0;
+}
+
+input.a:hover {
+    color:red;
+    cursor:pointer;
 }
 
 #nav-reg-signup {

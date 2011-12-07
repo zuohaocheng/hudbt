@@ -7,7 +7,7 @@ else stdhead($lang_torrents['head_music']);
 
 if ($allsec != 1 || $enablespecial != 'yes'){ //do not print searchbox if showing bookmarked torrents from all sections;
 ?>
-<form method="get" name="searchbox" action="?">
+<form method="get" name="searchbox" id="form-searchbox" action="?">
   <div id="searchbox" class="table td">
     <div id="searchbox-header"><a href="#"><img class="plus" src="pic/trans.gif" id="picsearchboxmain" alt="Show/Hide" /><?php echo $lang_torrents['text_search_box'] ?></a></div>
     <div id="ksearchbox-simple" class="minor-list"><ul>
@@ -140,6 +140,10 @@ if (!$Cache->get_page()){
 echo $Cache->next_row();
 ?>
 </div></form>
+<script type="text/javascript" src="js/jquery.json-2.3.min.js"></script>
+<script type="text/javascript" src="js/jstorage.min.js"></script>
+<script type="text/javascript" src="js/jquery.form.js"></script>
+<script src="js/torrents.js" type="text/javascript"></script>
 
 <?php
 }
@@ -205,9 +209,6 @@ print('<script type="text/javascript">hb.nextpage = "'. $next_page_href .'";');
 	print('hb.constant.maincats = ' . php_json_encode($mainCats) . ';</script>');
 ?>
 <a href="#" id="back-to-top" title="回到页首" style="display:none;"></a>
-<script type="text/javascript" src="js/jquery.json-2.3.min.js"></script>
-<script type="text/javascript" src="js/jstorage.min.js"></script>
-<script src="js/torrents.js" type="text/javascript"></script>
 <?php
 stdfoot();
 

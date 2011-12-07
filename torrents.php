@@ -496,7 +496,7 @@ if (!$all) {
     int_check($category_get,true,true,true);
     $mainCat = $mainCats[$category_get];
     if ($mainCat) {
-      	$selectedMainCat[$mainCat] = true;
+      	$selectedMainCat[$category_get] = true;
 	foreach($mainCat as $subcat) {
 	  $wherecatina[] = $subcat;
 	}

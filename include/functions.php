@@ -2374,9 +2374,23 @@ else {
 
 <div id="info_block" class="table td">
   <table width="100%" cellspacing="0" cellpadding="0" border="0"><tr>
-    <td class="bottom" style="text-align:left;"><span class="medium"><?php echo $lang_functions['text_welcome_back'] ?>, <?php echo get_username($CURUSER['id'])?>  [<a href="logout.php"><?php echo $lang_functions['text_logout'] ?></a>]<?php if (get_user_class() >= UC_MODERATOR) { ?> [<a href="staffpanel.php"><?php echo $lang_functions['text_staff_panel'] ?></a>] <?php }?> <?php if (get_user_class() >= UC_SYSOP) { ?> [<a href="settings.php"><?php echo $lang_functions['text_site_settings'] ?></a>]<?php } ?> [<a href="torrents.php?inclbookmarked=1&amp;allsec=1&amp;incldead=0"><?php echo $lang_functions['text_bookmarks'] ?></a>] <font class = 'color_bonus'><?php echo $lang_functions['text_bonus'] ?></font>[<a href="mybonus.php"><?php echo $lang_functions['text_use'] ?></a>]: <?php echo number_format($CURUSER['seedbonus'], 1)?> <font class = 'color_invite'><?php echo $lang_functions['text_invite'] ?></font>[<a href="invite.php?id=<?php echo $CURUSER['id']?>"><?php echo $lang_functions['text_send'] ?></a>]: <?php echo $CURUSER['invites']?><br />
-
-  <font class="color_ratio"><?php echo $lang_functions['text_ratio'] ?></font> <?php echo $ratio?>  <font class='color_uploaded'><?php echo $lang_functions['text_uploaded'] ?></font> <?php echo mksize($CURUSER['uploaded'])?><font class='color_downloaded'> <?php echo $lang_functions['text_downloaded'] ?></font> <?php echo mksize($CURUSER['downloaded'])?>  <font class='color_active'><?php echo $lang_functions['text_active_torrents'] ?></font> <img class="arrowup" alt="Torrents seeding" title="<?php echo $lang_functions['title_torrents_seeding'] ?>" src="pic/trans.gif" /><?php echo $activeseed?>  <img class="arrowdown" alt="Torrents leeching" title="<?php echo $lang_functions['title_torrents_leeching'] ?>" src="pic/trans.gif" /><?php echo $activeleech?>&nbsp;&nbsp;<font class='color_connectable'><?php echo $lang_functions['text_connectable'] ?></font><?php echo $connectable?> <?php echo maxslots();?></span></td>
+    <td class="bottom" style="text-align:left;">
+    <div class="minor-list list-seperator compact"><ul>
+      <li><span class="medium"><?php echo $lang_functions['text_welcome_back'] ?>, <?php echo get_username($CURUSER['id'])?></li>
+      <li><form action="logout.php" method="POST"><input type="submit" class="a" value="<?php echo $lang_functions['text_logout'] ?>" /></form></li>
+<?php if (get_user_class() >= UC_MODERATOR) { ?> <li><a href="staffpanel.php"><?php echo $lang_functions['text_staff_panel'] ?></a></li> <?php }?> 
+<?php if (get_user_class() >= UC_SYSOP) { ?> <li><a href="settings.php"><?php echo $lang_functions['text_site_settings'] ?></a></li><?php } ?>
+<li><a href="torrents.php?inclbookmarked=1&amp;allsec=1&amp;incldead=0"><?php echo $lang_functions['text_bookmarks'] ?></a></li>
+<li><a href="mybonus.php" title="<?php echo $lang_functions['text_use'] ?>"><span class = 'color_bonus'><?php echo $lang_functions['text_bonus'] ?></span>: <?php echo number_format($CURUSER['seedbonus'], 1)?></a></li>
+<li><a href="invite.php?id=<?php echo $CURUSER['id']?>" title="<?php echo $lang_functions['text_send'] ?>"><span class = 'color_invite'><?php echo $lang_functions['text_invite'] ?></span>: <?php echo $CURUSER['invites']?></a></li></ul></div>
+<div class="minor-list compact"><ul>
+  <li><span class="color_ratio"><?php echo $lang_functions['text_ratio'] ?></span> <?php echo $ratio?></li>
+  <li><span class='color_uploaded'><?php echo $lang_functions['text_uploaded'] ?></span> <?php echo mksize($CURUSER['uploaded'])?></li>
+  <li><span class='color_downloaded'> <?php echo $lang_functions['text_downloaded'] ?></span> <?php echo mksize($CURUSER['downloaded'])?></li>
+  <li><span class='color_active'><?php echo $lang_functions['text_active_torrents'] ?></span> <img class="arrowup" alt="Torrents seeding" title="<?php echo $lang_functions['title_torrents_seeding'] ?>" src="pic/trans.gif" /><?php echo $activeseed?>  <img class="arrowdown" alt="Torrents leeching" title="<?php echo $lang_functions['title_torrents_leeching'] ?>" src="pic/trans.gif" /><?php echo $activeleech?></li>
+  <li><span class='color_connectable'><?php echo $lang_functions['text_connectable'] ?></span><?php echo $connectable?></li>
+  <li><?php echo maxslots();?></li>
+</ul></div></td>
 
   <td class="bottom" style="text-align:right;"><span class="medium"><?php echo $lang_functions['text_the_time_is_now'] ?><?php echo $datum[hours].":".$datum[minutes]?><br />
 
@@ -2740,6 +2754,10 @@ function make_folder($pre, $folder_name)
 }
 
 function logoutcookie() {
+  if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+    stderr('No hacking allowed!', 'This method allows POST request only.');
+    return;
+  }
   setcookie("c_secure_uid", "", 0x7fffffff, "/");
   setcookie("c_secure_pass", "", 0x7fffffff, "/");
 // setcookie("c_secure_ssl", "", 0x7fffffff, "/");
