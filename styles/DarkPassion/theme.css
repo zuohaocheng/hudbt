@@ -683,9 +683,14 @@ A.Peasant_Name:visited{color: #708090}
 }
 
 .minor-list-vertical li {
+    display: block;
     padding: 0;
     margin:  0;
     zoom: 1;
+}
+
+.minor-list-vertical li:first-child {
+    padding: 0;
 }
 
 #searchbox-right li {
@@ -878,7 +883,7 @@ td.category-icon {
     padding: 2em 2em 0 2em;
     width: 100px;
     text-align: left;
-    border-left:1px solid gray;
+    /* border-left:1px solid gray; */
 }
 
 #hotbox div {
@@ -893,7 +898,7 @@ td.category-icon {
     border-top:1px solid gray;
     border-bottom:1px solid gray;
     text-align:left;
-    padding:2em;
+    padding:1em;
 }
 
 #suggcontainer {

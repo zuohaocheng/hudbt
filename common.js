@@ -123,23 +123,23 @@ var klappe_news = (function() {
 	}
 
 	var $klappText = $('#k' + id);
-	if (!noPic) {
-	    var klappBild = document.getElementById('pic' + id);
-	}
-
-	if ($klappText.css('display') === 'none') {
-	    $klappText.slideDown('normal', function() {
+	if (noPic) {
+	    $klappText.slideToggle('normal', function() {
 		unlock(id);
 	    });
-	    if (!noPic) {
-		klappBild.className = 'minus';
-	    }
 	}
 	else {
-	    $klappText.slideUp('normal', function() {
-		unlock(id);
-	    });
-	    if (!noPic) {
+	    var klappBild = document.getElementById('pic' + id);
+	    if ($klappText.css('display') === 'none') {
+		$klappText.slideDown('normal', function() {
+		    unlock(id);
+		});
+		klappBild.className = 'minus';
+	    }
+	    else {
+		$klappText.slideUp('normal', function() {
+		    unlock(id);
+		});
 		klappBild.className = 'plus';
 	    }
 	}

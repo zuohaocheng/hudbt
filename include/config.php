@@ -383,7 +383,7 @@ $normalbecome_torrent = $TORRENT['normalbecome'];
 $uploaderdouble_torrent = $TORRENT['uploaderdouble'];
 $deldeadtorrent_torrent = $TORRENT['deldeadtorrent'];
 
-$promotion_text = array('', array('name' => 'free', 'lang' => 'text_free'), array('name'=>'2up', 'lang'=>'text_two_times_up'), array('name' => 'free2up', 'lang'=> 'text_free_two_times_up'), array('name' => '50pctdown', 'lang' => 'text_half_down'), array('name' => '50pctdown2up','lang' => 'text_half_down_two_up'), array('name' => '30pctdown', 'lang' => 'text_thirty_percent_down'));
+$promotion_text = array(array('name' => 'normal', 'lang' => 'text_normal'), array('name' => 'free', 'lang' => 'text_free'), array('name'=>'2up', 'lang'=>'text_two_times_up'), array('name' => 'free2up', 'lang'=> 'text_free_two_times_up'), array('name' => '50pctdown', 'lang' => 'text_half_down'), array('name' => '50pctdown2up','lang' => 'text_half_down_two_up'), array('name' => '30pctdown', 'lang' => 'text_thirty_percent_down'));
 $expire_limits = array(NULL, 0, $expirefree_torrent, $expiretwoup_torrent, $expiretwoupfree_torrent, $expirehalfleech_torrent, $expiretwouphalfleech_torrent, $expirethirtypercentleech_torrent);
 
 foreach ($CONFIGURATIONS as $CONFIGURATION) {

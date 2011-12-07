@@ -16,6 +16,7 @@ $showstandard = get_searchbox_value($sectiontype, 'showstandard'); //whether sho
 $showprocessing = get_searchbox_value($sectiontype, 'showprocessing'); //whether show processings or not
 $showteam = get_searchbox_value($sectiontype, 'showteam'); //whether show teams or not
 $showaudiocodec = get_searchbox_value($sectiontype, 'showaudiocodec'); //whether show audio codec or not
+
 $catsperrow = get_searchbox_value($sectiontype, 'catsperrow'); //show how many cats per line in search box
 $catpadding = get_searchbox_value($sectiontype, 'catpadding'); //padding space between categories in pixel
 
@@ -92,17 +93,21 @@ if ($showsubcat){
   if ($showaudiocodec) $whereaudiocodecina = array();
 }
 //----------------- start whether show torrents from all sections---------------------//
-if ($_GET)
+if ($_GET) {
   $allsec = 0 + $_GET["allsec"];
-else $allsec = 0;
-if ($allsec == 1)		//show torrents from all sections
-  {
-    $addparam .= "allsec=1&";
-  }
+}
+else {
+  $allsec = 0;
+}
+
+if ($allsec == 1) {		//show torrents from all sections
+  $addparam .= "allsec=1&";
+}
 // ----------------- end whether ignoring section ---------------------//
 // ----------------- start bookmarked ---------------------//
-if ($_GET)
+if ($_GET) {
   $inclbookmarked = 0 + $_GET["inclbookmarked"];
+}
 elseif ($CURUSER['notifs']){
   if (strpos($CURUSER['notifs'], "[inclbookmarked=0]") !== false)
     $inclbookmarked = 0;
@@ -297,6 +302,21 @@ elseif ($special_state == 7)	//30% down
       }
   }
 
+if ($_GET['hot']) {
+  $wherehot = true;
+  $wherea[] = "picktype='hot'";
+  $addparam .= 'hot=1&';
+}
+
+if ($_GET["indate"]) {
+  $indate = 0 + $_GET["indate"];
+
+  if ($indate) {
+    $addparam .= 'indate=' . $indate .'&';
+    $wherea[] = " DATEDIFF('".date("Y-m-d H:i:s")."',torrents.added)<=" . mysql_real_escape_string($indate);
+  }
+}
+
 $category_get = 0 + $_GET["cat"];
 if ($showsubcat){
   if ($showsource) $source_get = 0 + $_GET["source"];
@@ -476,6 +496,7 @@ if (!$all) {
     int_check($category_get,true,true,true);
     $mainCat = $mainCats[$category_get];
     if ($mainCat) {
+      	$selectedMainCat[$mainCat] = true;
 	foreach($mainCat as $subcat) {
 	  $wherecatina[] = $subcat;
 	}
@@ -533,6 +554,7 @@ if (!$all) {
 
     foreach ($mainCats as $cat=>$subcats) {
       if ($_GET["cat$cat"]) {
+	$selectedMainCat[$cat] = true;
 	foreach($subcats as $subcat) {
 	  $wherecatina[] = $subcat;
 	}
@@ -883,20 +905,20 @@ if ($count)
     list($pagertop, $pagerbottom, $limit, $next_page_href) = pager($torrentsperpage, $count, "?" . $addparam);
 
     if ($allsec == 1 || $enablespecial != 'yes'){
-      //$query = "SELECT torrents.id, torrents.sp_state, torrents.promotion_time_type, torrents.promotion_until, torrents.banned, torrents.picktype, torrents.pos_state, torrents.category, torrents.source, torrents.medium, torrents.codec, torrents.standard, torrents.processing, torrents.team, torrents.audiocodec, torrents.leechers, torrents.seeders, torrents.name, torrents.small_descr, torrents.times_completed, torrents.size, torrents.added, torrents.comments,torrents.anonymous,torrents.owner,torrents.url,torrents.cache_stamp FROM torrents ".($search_area == 3 || $column == "owner" ? "LEFT JOIN users ON torrents.owner = users.id " : "")." $where $orderby $limit";
       //Modified by bluemonster 20111026
       $query = "SELECT torrents.id, torrents.sp_state, torrents.promotion_time_type, torrents.promotion_until, torrents.banned, torrents.picktype, torrents.pos_state, torrents.category, torrents.source, torrents.medium, torrents.codec, torrents.standard, torrents.processing, torrents.team, torrents.audiocodec, torrents.leechers, torrents.seeders, torrents.name, torrents.small_descr, torrents.times_completed, torrents.size, torrents.added, torrents.comments,torrents.anonymous,torrents.owner,torrents.url,torrents.cache_stamp,torrents.oday FROM torrents ".($search_area == 3 || $column == "owner" ? "LEFT JOIN users ON torrents.owner = users.id " : "")." $where $orderby $limit";
     }
     else{
-      //$query = "SELECT torrents.id, torrents.sp_state, torrents.promotion_time_type, torrents.promotion_until, torrents.banned, torrents.picktype, torrents.pos_state, torrents.category, torrents.source, torrents.medium, torrents.codec, torrents.standard, torrents.processing, torrents.team, torrents.audiocodec, torrents.leechers, torrents.seeders, torrents.name, torrents.small_descr, torrents.times_completed, torrents.size, torrents.added, torrents.comments,torrents.anonymous,torrents.owner,torrents.url,torrents.cache_stamp FROM torrents ".($search_area == 3 || $column == "owner" ? "LEFT JOIN users ON torrents.owner = users.id " : "")." LEFT JOIN categories ON torrents.category=categories.id $where $orderby $limit";
       //Modified by bluemonster 20111026
       $query = "SELECT torrents.id, torrents.sp_state, torrents.promotion_time_type, torrents.promotion_until, torrents.banned, torrents.picktype, torrents.pos_state, torrents.category, torrents.source, torrents.medium, torrents.codec, torrents.standard, torrents.processing, torrents.team, torrents.audiocodec, torrents.leechers, torrents.seeders, torrents.name, torrents.small_descr, torrents.times_completed, torrents.size, torrents.added, torrents.comments,torrents.anonymous,torrents.owner,torrents.url,torrents.cache_stamp,torrents.oday FROM torrents ".($search_area == 3 || $column == "owner" ? "LEFT JOIN users ON torrents.owner = users.id " : "")." LEFT JOIN categories ON torrents.category=categories.id $where $orderby $limit";
     }
-
     $res = sql_query($query) or die(mysql_error());
   }
 else
   unset($res);
+
+
+
 
 if ($_GET['format'] == 'xml') {
   include('include/torrents_xml.php');

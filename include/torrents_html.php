@@ -9,12 +9,12 @@ if ($allsec != 1 || $enablespecial != 'yes'){ //do not print searchbox if showin
 ?>
 <form method="get" name="searchbox" action="?">
   <div id="searchbox" class="table td">
-    <div id="searchbox-header"><a href="javascript: klappe_news('searchboxmain');klappe_news('searchbox-simple', true)"><img class="plus" src="pic/trans.gif" id="picsearchboxmain" alt="Show/Hide" /><?php echo $lang_torrents['text_search_box'] ?></a></div>
+    <div id="searchbox-header"><a href="#"><img class="plus" src="pic/trans.gif" id="picsearchboxmain" alt="Show/Hide" /><?php echo $lang_torrents['text_search_box'] ?></a></div>
     <div id="ksearchbox-simple" class="minor-list"><ul>
       <?php
   foreach($mainCatsName as $catNo => $name) {
     ?>
-      <li><input type="checkbox" value="1" name="cat<?php echo $catNo; ?>"/><a href="?cat=<?php echo $catNo; ?>"><?php echo $name; ?></a></li>
+    <li><input type="checkbox" value="1" id="cat<?php echo $catNo; ?>" name="cat<?php echo $catNo; ?>" <?php echo ($selectedMainCat[$catNo] ? ' checked="checked"': ''); ?>/><a href="?cat=<?php echo $catNo; ?>"><?php echo $name; ?></a></li>
 <?
   }
 ?>
@@ -22,49 +22,48 @@ if ($allsec != 1 || $enablespecial != 'yes'){ //do not print searchbox if showin
     <div id="ksearchboxmain" style="display: none;" >
       <div id="searchbox-cats">
       <table>
-					<?php
-						function printcat($name, $listarray, $cbname, $wherelistina, $btname, $showimg = false)
-						{
-							global $catpadding,$catsperrow,$lang_torrents,$CURUSER,$CURLANGDIR,$catimgurl;
+	<?php
+	  function printcat($name, $listarray, $cbname, $wherelistina, $btname, $showimg = false) {
+	    global $catpadding,$catsperrow,$lang_torrents,$CURUSER,$CURLANGDIR,$catimgurl;
 
-							print("<tr><td class=\"embedded\" colspan=\"".$catsperrow."\" align=\"left\"><b>".$name."</b></td></tr><tr>");
-							$i = 0;
-							foreach($listarray as $list){
-								if ($i && $i % $catsperrow == 0){
-									print("</tr><tr>");
-								}
-								print("<td align=\"left\" class=\"bottom\" style=\"padding-bottom: 4px; padding-left: ".$catpadding."px;\"><input type=\"checkbox\" id=\"".$cbname.$list[id]."\" name=\"".$cbname.$list[id]."\"" . (in_array($list[id],$wherelistina) ? " checked=\"checked\"" : "") . " value=\"1\" />".($showimg ? return_category_image($list[id], "?") : "<a title=\"" .$list[name] . "\" href=\"?".$cbname."=".$list[id]."\">".$list[name]."</a>")."</td>\n");
-								$i++;
-							}
-							$checker = "<input name=\"".$btname."\" value='" .  $lang_torrents['input_check_all'] . "' class=\"btn medium\" type=\"button\" onclick=\"javascript:SetChecked('".$cbname."','".$btname."','". $lang_torrents['input_check_all'] ."','" . $lang_torrents['input_uncheck_all'] . "',-1,10)\" />";
-							print("<td colspan=\"2\" class=\"bottom\" align=\"left\" style=\"padding-left: 15px\">".$checker."</td>\n");
-							print("</tr>");
-						}
-					printcat($lang_torrents['text_category'],$cats,"cat",$wherecatina,"cat_check",true);
+	  print("<tr><td class=\"embedded\" colspan=\"".$catsperrow."\" align=\"left\"><b>".$name."</b></td></tr><tr>");
+	  $i = 0;
+	  foreach($listarray as $list){
+	    if ($i && $i % $catsperrow == 0){
+	      print("</tr><tr>");
+	    }
+	    print("<td align=\"left\" class=\"bottom\" style=\"padding-bottom: 4px; padding-left: ".$catpadding."px;\"><input type=\"checkbox\" id=\"".$cbname.$list[id]."\" name=\"".$cbname.$list[id]."\"" . (in_array($list[id],$wherelistina) ? " checked=\"checked\"" : "") . " value=\"1\" />".($showimg ? return_category_image($list[id], "?") : "<a title=\"" .$list[name] . "\" href=\"?".$cbname."=".$list[id]."\">".$list[name]."</a>")."</td>\n");
+	    $i++;
+	  }
+	  $checker = "<input name=\"".$btname."\" value='" .  $lang_torrents['input_check_all'] . "' class=\"btn medium\" type=\"button\" onclick=\"javascript:SetChecked('".$cbname."','".$btname."','". $lang_torrents['input_check_all'] ."','" . $lang_torrents['input_uncheck_all'] . "',-1,10)\" />";
+	  print("<td colspan=\"2\" class=\"bottom\" align=\"left\" style=\"padding-left: 15px\">".$checker."</td>\n");
+	  print("</tr>");
+	}
+    printcat($lang_torrents['text_category'],$cats,"cat",$wherecatina,"cat_check",true);
 
-					if ($showsubcat){
-						if ($showsource)
-							printcat($lang_torrents['text_source'], $sources, "source", $wheresourceina, "source_check");
-						if ($showmedium)
-							printcat($lang_torrents['text_medium'], $media, "medium", $wheremediumina, "medium_check");
-						if ($showcodec)
-							printcat($lang_torrents['text_codec'], $codecs, "codec", $wherecodecina, "codec_check");
-						if ($showaudiocodec)
-							printcat($lang_torrents['text_audio_codec'], $audiocodecs, "audiocodec", $whereaudiocodecina, "audiocodec_check");
-						if ($showstandard)
-							printcat($lang_torrents['text_standard'], $standards, "standard", $wherestandardina, "standard_check");
-						if ($showprocessing)
-							printcat($lang_torrents['text_processing'], $processings, "processing", $whereprocessingina, "processing_check");
-						if ($showteam)
-							printcat($lang_torrents['text_team'], $teams, "team", $whereteamina, "team_check");
-					}
-					?>
-				</table>
-			</div>
-<?php hotmenu() ?>
-			<div class="rowfollow minor-list" id="searchbox-opts">
-			  <ul><li>
-			    <span class="medium"><?php echo $lang_torrents['text_show_dead_active'] ?></span>
+    if ($showsubcat){
+      if ($showsource)
+	printcat($lang_torrents['text_source'], $sources, "source", $wheresourceina, "source_check");
+      if ($showmedium)
+	printcat($lang_torrents['text_medium'], $media, "medium", $wheremediumina, "medium_check");
+      if ($showcodec)
+	printcat($lang_torrents['text_codec'], $codecs, "codec", $wherecodecina, "codec_check");
+      if ($showaudiocodec)
+	printcat($lang_torrents['text_audio_codec'], $audiocodecs, "audiocodec", $whereaudiocodecina, "audiocodec_check");
+      if ($showstandard)
+	printcat($lang_torrents['text_standard'], $standards, "standard", $wherestandardina, "standard_check");
+      if ($showprocessing)
+	printcat($lang_torrents['text_processing'], $processings, "processing", $whereprocessingina, "processing_check");
+      if ($showteam)
+	printcat($lang_torrents['text_team'], $teams, "team", $whereteamina, "team_check");
+    }
+	?>
+      </table>
+      </div>
+      <?php hotmenu() ?>
+      <div class="rowfollow minor-list" id="searchbox-opts">
+	<ul><li>
+	  <span class="medium"><?php echo $lang_torrents['text_show_dead_active'] ?></span>
 
 			    <select class="med" name="incldead" style="width: 100px;">
 			      <option value="0"><?php echo $lang_torrents['select_including_dead'] ?></option>
@@ -202,34 +201,60 @@ if ($CURUSER){
 		$USERUPDATESET[] = "last_browse = ".TIMENOW;
 	else	$USERUPDATESET[] = "last_music = ".TIMENOW;
 }
-print('<script type="text/javascript">hb.nextpage = "'. $next_page_href .'"</script>');
+print('<script type="text/javascript">hb.nextpage = "'. $next_page_href .'";');
+	print('hb.constant.maincats = ' . php_json_encode($mainCats) . ';</script>');
 ?>
 <a href="#" id="back-to-top" title="回到页首" style="display:none;"></a>
+<script type="text/javascript" src="js/jquery.json-2.3.min.js"></script>
+<script type="text/javascript" src="js/jstorage.min.js"></script>
 <script src="js/torrents.js" type="text/javascript"></script>
-
 <?php
 stdfoot();
 
 function hotmenu(){
-  global $lang_functions, $lang_torrents; 
+  global $lang_functions, $lang_torrents, $promotion_text;
+  global $wherehot, $indate, $special_state;
 ?>
-  <div id="hotbox" class="table">
-  <div class="minor-list"><span class="title"><span class="align">热门资源</span>:</span><ul><li><a class="index" href=hot.php?cat=>最多做种</a></li><li><a class="index" href=hot.php?cat=1>电影</a></li><li><a class="index" href=hot.php?cat=2>剧集</a></li><li><a class="index" href=hot.php?cat=3>动漫</a></li><li><a class="index" href=hot.php?cat=4>游戏</a></li><li><a class="index" href=hot.php?cat=5>综艺</a></li>
-  <li><a class="index" href=hot.php?cat=6>资料</a></li><li><a class="index" href=hot.php?cat=7>体育</a></li><li><a class="index" href=hot.php?cat=8>音乐</a></li><li><a class="index" href=hot.php?cat=9>纪录片</a></li><li><a class="index" href=hot.php?cat=10>软件</a></li><li><a class="index" href=hot.php?cat=11>MTV</a>
-</ul></div>
-<div class="minor-list"><span class="title">最近热门:</span><ul><li><a class="index" href=hot.php?time=1>3天</a></li><li><a class="index" href=hot.php?time=2>1个月</a></li><li><a class="index" href=hot.php?time=3>3个月</a></li></ul></div>
+  <div id="hotbox" class="table minor-list"><ul>
+    <li><input type="checkbox" name="hot" value="1" <?php echo ($wherehot? 'checked="checked"':'') ?>/><a href="?hot=1">热门</a></li>
 
-<div class="minor-list-vertical"><span class="title"><span class="align">促&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;销</span>:</span><ul>
+<li><span class="title">发布时间:</span>
+<select name="indate">
+<?php
+  $selections = array('0' => '不限', '3' => '3天内', '7' => '一周内', '30' => '一个月内', '90' => '三个月内');
+  foreach ($selections as $days => $text) {
+    echo '<option value="' . $days . '"';
+    if ($indate == $days) {
+      echo ' selected="selected"';
+    }
+    echo '>' . $text . '</option>';
+  }
+  ?>
+</select></li>
+
+<li class="minor-list-vertical"><div class="title" style="margin-bottom:0;">促销:</div><ul>
 <li><input type="radio" name="spstate" value="0" /><?php echo $lang_torrents['select_all'] ?></li>
-<li><input type="radio" name="spstate" value="1" /><a href="?spstate=1"><?php echo $lang_functions['text_normal']?></a></li>
-<li><input type="radio" name="spstate" value="2" /><a href="?spstate=2"><span class="free"><?php echo $lang_functions['text_free'] ?></span></a></li>
-<li><input type="radio" name="spstate" value="3" /><a href="?sptate=3"><span class="twoup"><?php echo $lang_functions['text_two_times_up'] ?></span></a></li>
-<li><input type="radio" name="spstate" value="4" /><a href="?sptate=4"><span class="twoupfree"><?php echo $lang_functions['text_free_two_times_up'] ?></span></a></li>
-<li><input type="radio" name="spstate" value="5" /><a href="?sptate=5"><span class="halfdown"><?php echo $lang_functions['text_half_down'] ?></span></a></li>
-<li><input type="radio" name="spstate" value="6" /><a href="?sptate=6"><span class="twouphalfdown"><?php echo $lang_functions['text_half_down_two_up'] ?></span></a></li>
-<li><input type="radio" name="spstate" value="7" /><a href="?sptate=7"><span class="thirtypercent"><?php echo $lang_functions['text_thirty_percent_down'] ?></span></a></li>
+  <?php foreach ($promotion_text as $idx => $pr){
+  $val = $idx + 1;
+  echo '<li><input type="radio" name="spstate" value="' . $val . '"';
+  if ($special_state == $val) {
+    echo ' checked="checked"';
+  }
+  echo '><a href="?spstate=' . $val .'">';
+  if ($val == 1) {
+    echo $lang_functions[$pr['lang']];
+  }
+  else {
+    echo '<img class="pro_' . $pr['name'] . '" alt="' . $lang_functions[$pr['lang']] . '" title="' . $lang_functions[$pr['lang']] . '" src="pic/trans.gif"/ >';
+  }
+  echo '</a></li>';
+}?>
+</ul></li>
 </ul></div>
-</div>
 <?php
 }
 ?>
+
+
+
+

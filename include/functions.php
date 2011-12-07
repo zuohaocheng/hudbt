@@ -2245,7 +2245,7 @@ function simpletag(thetag)
   }
       ?>
       <link rel="alternate" type="application/rss+xml" title="Latest Torrents" href="torrentrss.php" />
-      <script type="text/javascript" src="js/jquery.js"></script><!-- Added by bluemonster 20111031-->
+      <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
       <script type="text/javascript" src="curtain_imageresizer.js<?php echo $cssupdatedate?>"></script>
       <script type="text/javascript" src="ajaxbasic.js<?php echo $cssupdatedate?>"></script>
       <script type="text/javascript" src="common.js<?php echo $cssupdatedate?>"></script>

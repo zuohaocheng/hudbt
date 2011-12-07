@@ -388,4 +388,67 @@ $(function() {
     	    }
 	});
     }
+
+    $.each(hb.constant.maincats, function(idx, item) {
+	var mainCheck = $('#cat' + idx);
+	var catChecks = $.map(item, function(cat) {
+	    return $('#cat' + cat);
+	});
+
+	var catClicked = function () {
+	    var check = function(item) {
+		item.attr('checked', 'checked');
+	    };
+	    var uncheck = function(item) {
+		item.removeAttr('checked');
+	    };
+	    if (mainCheck.attr('id') === this.id) {
+		var setCheck;
+		if (mainCheck.attr('checked')) {
+		    setCheck = check;
+		}
+		else {
+		    setCheck = uncheck;
+		}
+
+		$.each(catChecks, function(idx, item) {
+		    setCheck(item);
+		});
+	    }
+	    else {
+		var alltrue = true;
+		$.each(catChecks, function(idx, item) {
+		    alltrue = item.attr('checked') && alltrue;
+		});
+		
+		if (alltrue) {
+		    check(mainCheck);
+		}
+		else {
+		    uncheck(mainCheck);
+		}
+	    }
+	};
+
+	mainCheck.click(catClicked);
+	$.each(catChecks, function(idx, item) {
+	    item.click(catClicked);
+	});
+    });
+
+    var searchbox = $('#ksearchboxmain');
+    var toggleSearchbox = function() {
+	klappe_news('searchboxmain');
+	klappe_news('searchbox-simple', true);
+    }
+
+    if (!$.jStorage.get('hideSearchbox', true)) {
+	toggleSearchbox();
+    }
+
+    $('#searchbox-header a').click(function(e) {
+	e.preventDefault();
+	$.jStorage.set('hideSearchbox', (searchbox.css('dislay') === 'none'));
+	toggleSearchbox();
+    });
 });
