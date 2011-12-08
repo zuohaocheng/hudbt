@@ -35,7 +35,7 @@ if ($allsec != 1 || $enablespecial != 'yes'){ //do not print searchbox if showin
 	    print("<td align=\"left\" class=\"bottom\" style=\"padding-bottom: 4px; padding-left: ".$catpadding."px;\"><input type=\"checkbox\" id=\"".$cbname.$list[id]."\" name=\"".$cbname.$list[id]."\"" . (in_array($list[id],$wherelistina) ? " checked=\"checked\"" : "") . " value=\"1\" />".($showimg ? return_category_image($list[id], "?") : "<a title=\"" .$list[name] . "\" href=\"?".$cbname."=".$list[id]."\">".$list[name]."</a>")."</td>\n");
 	    $i++;
 	  }
-	  $checker = "<input name=\"".$btname."\" value='" .  $lang_torrents['input_check_all'] . "' class=\"btn medium\" type=\"button\" onclick=\"javascript:SetChecked('".$cbname."','".$btname."','". $lang_torrents['input_check_all'] ."','" . $lang_torrents['input_uncheck_all'] . "',-1,10)\" />";
+	  $checker = "<input id=\"".$btname."\" value='" .  $lang_torrents['input_check_all'] . "' class=\"btn medium\" type=\"button\" onclick=\"javascript:SetChecked('".$cbname."','".$btname."','". $lang_torrents['input_check_all'] ."','" . $lang_torrents['input_uncheck_all'] . "',-1,10)\" />";
 	  print("<td colspan=\"2\" class=\"bottom\" align=\"left\" style=\"padding-left: 15px\">".$checker."</td>\n");
 	  print("</tr>");
 	}
@@ -142,64 +142,57 @@ echo $Cache->next_row();
 </div></form>
 <script type="text/javascript" src="js/jquery.json-2.3.min.js"></script>
 <script type="text/javascript" src="js/jstorage.min.js"></script>
-<script type="text/javascript" src="js/jquery.form.js"></script>
 <script src="js/torrents.js" type="text/javascript"></script>
 
 <?php
 }
 
+if ($Advertisement->enable_ad()){
+  $belowsearchboxad = $Advertisement->get_ad('belowsearchbox');
+  echo "<div align=\"center\" style=\"margin-top: 10px\" id=\"ad_belowsearchbox\">".$belowsearchboxad[0]."</div>";
+}
 
-	if ($Advertisement->enable_ad()){
-			$belowsearchboxad = $Advertisement->get_ad('belowsearchbox');
-			echo "<div align=\"center\" style=\"margin-top: 10px\" id=\"ad_belowsearchbox\">".$belowsearchboxad[0]."</div>";
-	}
-if($inclbookmarked == 1)
-{
+if($inclbookmarked == 1) {
 	print("<h1 align=\"center\">" . get_username($CURUSER['id']) . $lang_torrents['text_s_bookmarked_torrent'] . "</h1>");
 }
-elseif($inclbookmarked == 2)
-{
+elseif($inclbookmarked == 2) {
 	print("<h1 align=\"center\">" . get_username($CURUSER['id']) . $lang_torrents['text_s_not_bookmarked_torrent'] . "</h1>");
 }
 
-
-
-
-
-
-
-
-
 if ($count) {
-	print($pagertop);
+  print($pagertop);
 
-	$swap_headings = $_GET["swaph"];
+  $swap_headings = $_GET["swaph"];
 
-	if ($sectiontype == $browsecatmode)
-	  torrenttable($res, "torrents", $swap_headings);
-	elseif ($sectiontype == $specialcatmode) 
-	  torrenttable($res, "music", $swap_headings);
-	else 
-	  torrenttable($res, "bookmarks", $swap_headings);
+  if ($sectiontype == $browsecatmode)
+    torrenttable($res, "torrents", $swap_headings);
+  elseif ($sectiontype == $specialcatmode) 
+    torrenttable($res, "music", $swap_headings);
+  else 
+    torrenttable($res, "bookmarks", $swap_headings);
 
-	if ($swap_headings) {
-	  ?><script type="text/javascript">
-	  hb.config.swaph = true;
-	  </script>
-	  <?php
-	}
-	
-	print($pagerbottom);
+  if ($swap_headings) {
+    ?><script type="text/javascript">
+    hb.config.swaph = true;
+</script>
+<?php
+  }
+  
+  print($pagerbottom);
 }
 else {
-	if (isset($searchstr)) {
-		print("<br />");
-		stdmsg($lang_torrents['std_search_results_for'] . $searchstr_ori . "\"",$lang_torrents['std_try_again']);
-	}
-	else {
-		stdmsg($lang_torrents['std_nothing_found'],$lang_torrents['std_no_active_torrents']);
-	}
+  if (isset($searchstr)) {
+    print("<br />");
+    stdmsg($lang_torrents['std_search_results_for'] . $searchstr_ori . "\"",$lang_torrents['std_try_again']);
+  }
+  else {
+    stdmsg($lang_torrents['std_nothing_found'],$lang_torrents['std_no_active_torrents']);
+  }
 }
+?>
+<div id="loader" class="loader" style="display: none; "></div>
+<?
+
 if ($CURUSER){
 	if ($sectiontype == $browsecatmode)
 		$USERUPDATESET[] = "last_browse = ".TIMENOW;

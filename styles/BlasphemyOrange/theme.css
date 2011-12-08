@@ -527,6 +527,7 @@ ul.menu li a
     font-variant: normal;
     text-align: center;
     display: inline-block;
+    border-radius:3px 3px 0 0;
 }
 ul.menu li a:link
 {

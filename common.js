@@ -282,40 +282,36 @@ function check(field,checkall_name,uncheckall_name) {
 // in torrents.php
 var form='searchbox';
 function SetChecked(chkName,ctrlName,checkall_name,uncheckall_name,start,count) {
-	dml=document.forms[form];
-	len = dml.elements.length;
-	var begin;
-	var end;
-	if (start == -1){
+    var dml=document.forms[form];
+    var len = dml.elements.length;
+    var begin;
+    var end;
+    var check_state;
+    if (start == -1){
 	begin = 0;
 	end = len;
-	}
-	else{
+    }
+    else{
 	begin = start;
 	end = start + count;
-	}
-	var check_state;
-	for( i=0 ; i<len ; i++) {
-		if(dml.elements[i].name==ctrlName)
-		{
-			if(dml.elements[i].value == checkall_name)
-			{
-				dml.elements[i].value = uncheckall_name;
-				check_state=1;
-			}
-			else
-			{
-				dml.elements[i].value = checkall_name;
-				check_state=0;
-			}
-		}
+    }
+    var check_state;
+    var button = document.getElementById(ctrlName)
 
+    if(button.value == checkall_name) {
+	button.value = uncheckall_name;
+	check_state=1;
+    }
+    else {
+	button.value = checkall_name;
+	check_state=0;
+    }
+
+    for( i=begin ; i<end ; i++) {
+	if (dml.elements[i].name.indexOf(chkName) != -1) {
+	    dml.elements[i].checked=check_state;
 	}
-	for( i=begin ; i<end ; i++) {
-		if (dml.elements[i].name.indexOf(chkName) != -1) {
-			dml.elements[i].checked=check_state;
-		}
-	}
+    }
 }
 
 // funvote.js

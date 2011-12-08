@@ -191,6 +191,7 @@ $out = array('torrents' => torrenttable_api($res, "torrents"));
 if ($next_page_href != '') {
   $out['continue'] = $next_page_href;
 }
+$out['pager'] = array('top' => $pagertop, 'bottom' => $pagerbottom);
 print(php_json_encode($out));
 
 ?>

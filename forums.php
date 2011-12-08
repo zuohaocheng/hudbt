@@ -172,6 +172,16 @@ function get_last_read_post_id($topicid) {
 	else return 0;
 }
 
+function dequote($s) {
+  $MAX_LEN = 40;
+  
+  $s = preg_replace('/\[quote(=[a-z0-9]+)?\].*\[\/quote\]/smi', '', $s);
+  if (iconv_strlen($s, 'utf-8') > $MAX_LEN) {
+    $s = iconv_substr($s, 0, $MAX_LEN, 'utf-8') . '...';
+  }
+  return $s;
+}
+
 //-------- Inserts a compose frame
 function insert_compose_frame($id, $type = 'new')
 {
@@ -204,7 +214,7 @@ function insert_compose_frame($id, $type = 'new')
 			if (mysql_num_rows($res) != 1)
 				stderr($lang_forums['std_error'], $lang_forums['std_no_post_id']);
 			$arr = mysql_fetch_assoc($res);
-			$body = "[quote=".htmlspecialchars($arr["username"])."]".htmlspecialchars(unesc($arr["body"]))."[/quote]";
+			$body = "[quote=".htmlspecialchars($arr["username"])."]".htmlspecialchars(dequote(unesc($arr["body"])))."[/quote]";
 			$id = $topicid;
 			$type = 'reply';
 			break;
@@ -774,7 +784,7 @@ if ($action == "viewtopic")
 
 	print($pagerbottom);
 	if ($maypost){
-	print('<div id="forum-reply-post" class="table td"><h2><a class="index" href="'.htmlspecialchars('?action=reply&topicid='.$topicid).'">'.$lang_forums['text_add_reply'].'</a></h2><form id="compose" name="compose" method="post" action="?action=post" onsubmit="return postvalid(this);"><input type="hidden" name="id" value="".$topicid."" /><input type="hidden" name="type" value="reply" />');
+	print('<div id="forum-reply-post" class="table td"><h2><a class="index" href="'.htmlspecialchars('?action=reply&topicid='.$topicid).'">'.$lang_forums['text_add_reply'].'</a></h2><form id="compose" name="compose" method="post" action="?action=post" onsubmit="return postvalid(this);"><input type="hidden" name="id" value='.$topicid.' /><input type="hidden" name="type" value="reply" />');
 	quickreply('compose', 'body',$lang_forums['submit_add_reply']);
 	print("</form></div>");
 	}

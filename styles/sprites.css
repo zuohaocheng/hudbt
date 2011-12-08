@@ -474,3 +474,10 @@ img.sltbar
 height:10px;
 background:url(bar.gif) repeat-x 0 -116px;
 }
+.loader {
+display: block;
+height: 32px;
+width: 32px;
+background-image: url(loader.gif);
+margin: 10px auto;
+}
