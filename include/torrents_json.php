@@ -92,8 +92,8 @@ function torrentInfoForRow($row) {
 
   $info['comments'] = $comments;
 
-
-  $info['added'] = $row["added"];
+  $time = $row["added"];
+  $info['added'] = array('raw' => $time, 'canonical' => gettime($time,false,true));
 
   //size
   $info['size'] = array('raw' => $row['size'], 'canonical'=> mksize_compact($row["size"]));
@@ -191,7 +191,9 @@ $out = array('torrents' => torrenttable_api($res, "torrents"));
 if ($next_page_href != '') {
   $out['continue'] = $next_page_href;
 }
+
 $out['pager'] = array('top' => $pagertop, 'bottom' => $pagerbottom);
+
 print(php_json_encode($out));
 
 ?>

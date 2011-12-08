@@ -493,10 +493,19 @@ function end_main_frame() {
   print('</div>');
 }
 
-function begin_frame($caption = "", $center = false, $padding = 10, $width="100%", $caption_center="left") {
-  print('<div class="frame">');
-  print($caption ? "<h2>".$caption."</h2>" : "");
-
+function begin_frame($caption = "", $center = false, $padding = 10, $width="100%", $caption_center="left", $table = false) {
+  $caption = $caption ? "<h2>".$caption."</h2>" : "";
+  if ($table) {
+    echo $caption;
+  }
+  echo '<div class="frame';
+  if ($table) {
+    echo ' table td';
+  }
+  echo '">';
+  if (!$table) {
+    echo $caption;
+  }
 }
 
 function end_frame() {
@@ -3103,7 +3112,7 @@ function get_torrent_bookmark_state($userid, $torrentid, $text = false)
   return $act;
 }
 
-function torrenttable($res, $variant = "torrent", $swap_headings = false) {
+function torrenttable($res, $variant = "torrent", $swap_headings = false, $onlyhead=false) {
   global $Cache;
   global $lang_functions;
   global $CURUSER, $waitsystem;
@@ -3146,7 +3155,7 @@ function torrenttable($res, $variant = "torrent", $swap_headings = false) {
     else $wait = 0;
   }
 ?>
-<table id="torrents" class="torrents" cellspacing="0" cellpadding="5" width="100%">
+<table id="torrents" class="torrents" cellspacing="0" cellpadding="5" width="100%" <?php echo ($onlyhead ? 'style="display:none;"':'') ?>>
 <thead><tr>
 <?php
 $count_get = 0;
@@ -3176,7 +3185,7 @@ for ($i=1; $i<=9; $i++){
   else $link[$i] = ($i == 1 ? "asc" : "desc");
 }
 ?>
-<th style="padding: 0px"><?php echo $lang_functions['col_type'] ?></th>
+<th style="padding: 0px;width:45px;"><?php echo $lang_functions['col_type'] ?></th>
 <th><a href="?<?php echo $oldlink?>sort=1&amp;type=<?php echo $link[1]?>"><?php echo $lang_functions['col_name'] ?></a></th>
 <?php
 
@@ -3202,6 +3211,7 @@ if (get_user_class() >= $torrentmanage_class) { ?>
 </thead>
 <tbody>
 <?php
+if (!$onlyhead) {
 $caticonrow = get_category_icon_row($CURUSER['caticon']);
 if ($caticonrow['secondicon'] == 'yes')
 $has_secondicon = true;
@@ -3458,7 +3468,8 @@ while ($row = mysql_fetch_assoc($res))
     $counter++;
   }
 }
-print("</table>");
+}
+print("</tbody></table>");
 if ($CURUSER['appendpromotion'] == 'highlight')
   print("<p align=\"center\"> ".$lang_functions['text_promoted_torrents_note']."</p>\n");
 

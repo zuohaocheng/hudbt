@@ -188,9 +188,11 @@ else {
   else {
     stdmsg($lang_torrents['std_nothing_found'],$lang_torrents['std_no_active_torrents']);
   }
+
+  torrenttable('', '', '',true);
 }
 ?>
-<div id="loader" class="loader" style="display: none; "></div>
+<div id="loader" style="display: none; "></div>
 <?
 
 if ($CURUSER){

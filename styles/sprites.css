@@ -474,10 +474,24 @@ img.sltbar
 height:10px;
 background:url(bar.gif) repeat-x 0 -116px;
 }
-.loader {
+
+#loader {
 display: block;
-height: 32px;
-width: 32px;
-background-image: url(loader.gif);
-margin: 10px auto;
+height: 42px;
+width: 42px;
+margin: 2px auto;
 }
+
+.loader0 {background: url("spinner.png") 0 0px no-repeat;}
+.loader1 {background: url("spinner.png") 0 -42px no-repeat;}
+.loader2 {background: url("spinner.png") 0 -84px no-repeat;}
+.loader3 {background: url("spinner.png") 0 -126px no-repeat;}
+.loader4 {background: url("spinner.png") 0 -168px no-repeat;}
+.loader5 {background: url("spinner.png") 0 -210px no-repeat;}
+.loader6 {background: url("spinner.png") 0 -252px no-repeat;}
+.loader7 {background: url("spinner.png") 0 -294px no-repeat;}
+.loader8 {background: url("spinner.png") 0 -336px no-repeat;}
+.loader9 {background: url("spinner.png") 0 -378px no-repeat;}
+.loader10 {background: url("spinner.png") 0 -420px no-repeat;}
+.loader11 {background: url("spinner.png") 0 -462px no-repeat;}
+

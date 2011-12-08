@@ -13,9 +13,9 @@ $Cache->add_whole_row();
 //cache_check ('faq');
 begin_main_frame();
 
-begin_frame($lang_faq['text_welcome_to'].$SITENAME." - ".$SLOGAN);
+echo '<h1>' . $lang_faq['text_welcome_to'].$SITENAME." - ".$SLOGAN . '</h1>';
 print($lang_faq['text_welcome_content_one'].$lang_faq['text_welcome_content_two']);
-end_frame();
+
 if ($CURUSER)
 $lang_id = $CURUSER['lang'];
 else
@@ -40,24 +40,7 @@ while ($arr = mysql_fetch_array($res, MYSQL_BOTH)) {
 }
 
 if (isset($faq_categ)) {
-	// gather orphaned items
-	/*
-	foreach ($faq_categ as $id => $temp)
-	{
-		if (!array_key_exists("title", $faq_categ[$id]))
-		{
-			foreach ($faq_categ[$id][items] as $id2 => $temp)
-			{
-				$faq_orphaned[$id2][question] = $faq_categ[$id][items][$id2][question];
-				$faq_orphaned[$id2][answer] = $faq_categ[$id][items][$id2][answer];
-				$faq_orphaned[$id2][flag] = $faq_categ[$id][items][$id2][flag];
-				unset($faq_categ[$id]);
-			}
-		}
-	}
-	*/
-
-	begin_frame("<span id=\"top\">".$lang_faq['text_contents'] . "</span>");
+  begin_frame("<span id=\"top\">".$lang_faq['text_contents'] . "</span>", '', '', '', '', true);
 	foreach ($faq_categ as $id => $temp)
 	{
 		if ($faq_categ[$id][flag] == "1")
@@ -81,7 +64,7 @@ if (isset($faq_categ)) {
 		if ($faq_categ[$id][flag] == "1")
 		{
 			$frame = $faq_categ[$id][title] ." - <a href=\"#top\"><img class=\"top\" src=\"pic/trans.gif\" alt=\"Top\" title=\"Top\" /></a>";
-			begin_frame($frame);
+			begin_frame($frame, '', '', '', '', true);
 			print("<span id=\"id". $faq_categ[$id][link_id] ."\"></span>");
 			if (array_key_exists("items", $faq_categ[$id]))
 			{

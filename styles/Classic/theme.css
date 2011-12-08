@@ -672,6 +672,10 @@ A.Peasant_Name:visited{color: #708090}
     margin: 0;
 }
 
+.minor-list-vertical.loose li {
+    margin: 0.4em;
+}
+
 .minor-list-vertical ul {
     margin: 0px;
     padding: 0px;
