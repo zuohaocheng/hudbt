@@ -292,7 +292,7 @@ if (get_user_class() >= UC_PEASANT)
 	print("<tr><td class=rowhead>".$lang_subtitles['row_torrent_id'].'<span class="required-field">*</span></td><td class="rowfollow" align="left"><input type=text name=torrent_id style="width:300px"><br />'.$lang_subtitles['text_torrent_id_note']."</td></tr>\n");
 	else
 	{
-		print("<tr><td class=rowhead>".$lang_subtitles['row_torrent_id'].'<span class="required-field">*</span></td><td class=rowfollow align=left><input type=text name=torrent_id value=$detail_torrent_id style="width:300px"><br />'.$lang_subtitles['text_torrent_id_note']."</td></tr>\n");
+		print("<tr><td class=rowhead>".$lang_subtitles['row_torrent_id'].'<span class="required-field">*</span></td><td class=rowfollow align=left><input type=text name=torrent_id value="' . $detail_torrent_id . '" style="width:300px"><br />'.$lang_subtitles['text_torrent_id_note']."</td></tr>\n");
 		$in_detail = "";
 	}
 	print('<tr><td class="rowhead">'.$lang_subtitles['row_title'].'</td><td class="rowfollow" colspan="3" align="left"><input type="text" name="title" style="width:300px"><br />'.$lang_subtitles['text_title_note']."</td></tr>\n");

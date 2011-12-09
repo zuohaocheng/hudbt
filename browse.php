@@ -1,3 +1,3 @@
 <?php
-header("Location: //$BASEURL/torrents.php");
+header("Location: torrents.php");
 ?>

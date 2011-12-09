@@ -16,6 +16,7 @@ function get_user_prop($id) {
 }
 
 function torrentInfoForRow($row) {
+  global $torrentmanage_class;
   global $CURUSER;
   $info = array();
   
@@ -173,10 +174,7 @@ function torrenttable_api($res, $variant = "torrent", $swap_headings = false) {
 
   $torrents = array();
   while ($row = mysql_fetch_assoc($res))  {
-    if($row['banned'] == 'no' 
-     || ($row['banned'] == 'yes' 
-	 && (get_user_class() >= $seebanned_class 
-	     || $CURUSER['id'] == $row['owner']))) {
+    if($row['banned'] == 'no' || get_user_class() >= $seebanned_class || $CURUSER['id'] == $row['owner']) {
       $torrents[] = torrentInfoForRow($row);
     }
   }

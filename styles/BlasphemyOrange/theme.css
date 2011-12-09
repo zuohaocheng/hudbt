@@ -885,6 +885,10 @@ td.category-icon {
     margin: 0.5em auto;
 }
 
+#mybonus-result-text {
+    margin: 1em auto;
+}
+
 #friends, #blocks {
     width: 880px;
     margin: 1.5em auto;

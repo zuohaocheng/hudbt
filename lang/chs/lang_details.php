@@ -116,10 +116,8 @@ $lang_details = array
 	'row_upped_by' => "由",
 	'text_click' => "点击",
 	'text_num_files' => "文件数：",
-	'text_see_full_list' => "[查看列表]",
 	'text_files' => "个文件",
 	'row_file_list' => "文件列表",
-	'text_hide_list' => "[隐藏列表]",
 	'row_action' => "行为",
 	'text_download_torrent' => "下载种子",
 	'title_download_torrent' => "下载种子",
@@ -218,6 +216,7 @@ $lang_details = array
 	'row_uploader_bandwidth' => "发布者带宽",
 	'text_and_more' => "……（这里只显示最新记录。共",
 	'text_users_in_total' => "个用户表示了感谢）",
+	'col_path' => "路径"
 );
 
 ?>

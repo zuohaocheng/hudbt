@@ -397,6 +397,46 @@ function customgift() {
     }
 }
 
+var getquerystring = function (form) {
+    var qstr = "";
+    function GetElemValue(name, value) {
+	qstr += (qstr.length > 0 ? "&" : "")
+	    + encodeURIComponent(name) + "="
+	    + encodeURIComponent(value ? value : "");
+    }
+    var elemArray = form.elements;
+    for (var i = 0; i < elemArray.length; i++) {
+	var element = elemArray[i];
+	var elemType = element.type.toUpperCase();
+	var elemName = element.name;
+	if (elemName) {
+	    if (elemType == "TEXT"
+		|| elemType == "TEXTAREA"
+		|| elemType == "PASSWORD"
+		|| elemType == "BUTTON"
+		|| elemType == "RESET"
+		|| elemType == "SUBMIT"
+		|| elemType == "FILE"
+		|| elemType == "IMAGE"
+		|| elemType == "HIDDEN")
+		GetElemValue(elemName, element.value);
+	    else if (elemType == "CHECKBOX" && element.checked)
+		GetElemValue(elemName,
+			     element.value ? element.value : "On");
+	    else if (elemType == "RADIO" && element.checked)
+		GetElemValue(elemName, element.value);
+	    else if (elemType.indexOf("SELECT") != -1)
+		for (var j = 0; j < element.options.length; j++) {
+		    var option = element.options[j];
+		    if (option.selected)
+			GetElemValue(elemName,
+				     option.value ? option.value : option.text);
+		}
+	}
+    }
+    return qstr;
+};
+
 $(function() {
     var $top = $('#top');
     if ($top.length === 0) {

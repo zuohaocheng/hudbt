@@ -2390,7 +2390,7 @@ else {
 <?php if (get_user_class() >= UC_MODERATOR) { ?> <li><a href="staffpanel.php"><?php echo $lang_functions['text_staff_panel'] ?></a></li> <?php }?> 
 <?php if (get_user_class() >= UC_SYSOP) { ?> <li><a href="settings.php"><?php echo $lang_functions['text_site_settings'] ?></a></li><?php } ?>
 <li><a href="torrents.php?inclbookmarked=1&amp;allsec=1&amp;incldead=0"><?php echo $lang_functions['text_bookmarks'] ?></a></li>
-<li><a href="mybonus.php" title="<?php echo $lang_functions['text_use'] ?>"><span class = 'color_bonus'><?php echo $lang_functions['text_bonus'] ?></span>: <?php echo number_format($CURUSER['seedbonus'], 1)?></a></li>
+<li><a href="mybonus.php" title="<?php echo $lang_functions['text_use'] ?>"><span class = 'color_bonus'><?php echo $lang_functions['text_bonus'] ?></span>: <span id="bonus"><?php echo number_format($CURUSER['seedbonus'], 1)?></span></a></li>
 <li><a href="invite.php?id=<?php echo $CURUSER['id']?>" title="<?php echo $lang_functions['text_send'] ?>"><span class = 'color_invite'><?php echo $lang_functions['text_invite'] ?></span>: <?php echo $CURUSER['invites']?></a></li></ul></div>
 <div class="minor-list compact"><ul>
   <li><span class="color_ratio"><?php echo $lang_functions['text_ratio'] ?></span> <?php echo $ratio?></li>
@@ -2763,10 +2763,7 @@ function make_folder($pre, $folder_name)
 }
 
 function logoutcookie() {
-  if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-    stderr('No hacking allowed!', 'This method allows POST request only.');
-    return;
-  }
+  checkHTTPMethod('POST');
   setcookie("c_secure_uid", "", 0x7fffffff, "/");
   setcookie("c_secure_pass", "", 0x7fffffff, "/");
 // setcookie("c_secure_ssl", "", 0x7fffffff, "/");
@@ -4590,6 +4587,13 @@ function a_to_z_index($letter='', $query = '') {
   }
   $out .= '</ul></div>';
   return $out;
+}
+
+function checkHTTPMethod($method) {
+  if (strtoupper($_SERVER['REQUEST_METHOD']) != strtoupper($method)) {
+    stderr('No hacking allowed!', 'This method allows ' . $method . ' request only.');
+    die();
+  }
 }
 
 ?>
