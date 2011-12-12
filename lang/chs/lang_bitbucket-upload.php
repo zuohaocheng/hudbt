@@ -29,7 +29,7 @@ $lang_bitbucketupload = array
 	'text_disclaimer_three' => "像素则会被按宽高比缩小。<br />文件大小不能超过",
 	'text_disclaimer_four' => " Bytes。",
 	'row_file' => "文件",
-	'checkbox_avatar_shared' => "共享头像(其他用户可以选择使用我的头像)。",
+	'checkbox_avatar_shared' => "共享头像(其他用户可以选择使用我的头像-不建议勾选)。",
 	'submit_upload' => "上传",
 );
 
