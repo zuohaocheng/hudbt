@@ -11,8 +11,8 @@ $lang_donations = array
 	'col_amount' => "数量",
 	'col_time' => "时间",
 	'text_not_available' => "无",
-	'text_no_torrent' => '种子已被删除',
-	'text_no_record' => '<h3 style="text-align:center;">无记录</h3>',
+	'text_no_torrent' => '种子已被干掉了',
+	'text_no_record' => '<h3 style="text-align:center;">木有记录，森马都没有看到</h3>',
 	'nav_donate' => '捐赠记录',
 	'nav_receive' => '收到记录'
 );
