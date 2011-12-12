@@ -258,7 +258,7 @@ if (get_user_class() >= UC_PEASANT)
 		$Cache->cache_value('subtitle_sum_size', $size, 3600);
 	}
 
-	print('<h2 id="page-title">' . $lang_subtitles['text_upload_subtitles'] . '<h2>');
+	print('<h2 id="page-title" class="transparentbg">' . $lang_subtitles['text_upload_subtitles'] . '</h2>');
 	print('<h3 class="page-titles">' . $lang_subtitles['text_uploaded_size'] .mksize($size) . '</h3>');
 
 	print("<h3>".$lang_subtitles['text_rules']."</h3>\n");

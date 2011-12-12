@@ -87,10 +87,7 @@ if ($allsec != 1 || $enablespecial != 'yes'){ //do not print searchbox if showin
 		<div class="minor-list"><ul>
 		   <li><?php echo $lang_torrents['text_search'] ?>
 		    <input id="searchinput" name="search" type="text" value="<?php echo  $searchstr_ori ?>" autocomplete="off" style="width: 200px"/ >
-		  <script src="suggest.js" type="text/javascript"></script>
-		  <div id="suggcontainer" class="minor-div-vertical" style="display: none;">
-		    <ul id="suggestions"></ul>
-		  </div></li>
+		  </li>
 		  <li>
 		  <?php echo $lang_torrents['text_in'] ?>
 		  <select name="search_area">
@@ -142,6 +139,8 @@ echo $Cache->next_row();
 </div></form>
 <script type="text/javascript" src="js/jquery.json-2.3.min.js"></script>
 <script type="text/javascript" src="js/jstorage.min.js"></script>
+<script type="text/javascript" src="js/jquery-ui-1.8.16.custom.min.js"></script>
+<link rel="stylesheet" href="styles/jqui/ui-lightness/jquery-ui-1.8.16.custom.css" type="text/css" media="screen" />
 <script src="js/torrents.js" type="text/javascript"></script>
 
 <?php
@@ -201,7 +200,7 @@ if ($CURUSER){
 	else	$USERUPDATESET[] = "last_music = ".TIMENOW;
 }
 print('<script type="text/javascript">hb.nextpage = "'. $next_page_href .'";');
-	print('hb.constant.maincats = ' . php_json_encode($mainCats) . ';</script>');
+print('hb.constant.maincats = ' . php_json_encode($mainCats) . ';</script>');
 ?>
 <a href="#" id="back-to-top" title="回到页首" style="display:none;"></a>
 <?php

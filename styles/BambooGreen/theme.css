@@ -846,6 +846,23 @@ td.category-icon {
     margin: 0.5em auto;
 }
 
+.alert {
+    margin: 1.5em auto;
+    text-align: center;
+}
+
+.alert span {
+    border-radius: 3px;
+    background-color: red;
+    padding: 10px;
+    box-shadow:2px 2px 5px black;
+}
+
+.alert a {
+    font-weight: bold;
+    color: white;
+}
+
 #mybonus-result-text {
     margin: 1em auto;
 }
@@ -903,29 +920,10 @@ td.category-icon {
     padding:1em;
 }
 
-#suggcontainer {
-    text-align:right;
-    position: relative;
-}
-
-#suggcontainer>ul {
-    width:204px; border: 1px solid gray; cursor: default;
-    color: black; background-color: white;text-align:left;
+.suggestion-count {
     position:absolute;
-    top:0.2em;
+    zoom: 1;
     right:0.5em;
-}
-
-#suggcontainer>ul>li {
-    display:block;
-    position:relative;
-    margin: 0.2em 0.5em;
-    padding: 0;
-}
-
-#suggestions .selected {
-    color: white;
-    background-color: #3366cc;
 }
 
 #donating {
@@ -976,7 +974,7 @@ td.category-icon {
 }
 
 .hints ul {
-    font-size: larger;
+    font-size: 120%;
 
     list-style: none;
     list-style-type: none;

@@ -1,6 +1,11 @@
 <?php
-function bonusTextFromAction($do) {
+function bonusTextFromAction($do, $title='') {
   global $lang_mybonus;
+  global $CURUSER;
+  if ($title == '') {
+    $title = $CURUSER['title'];
+  }
+
   if ($do == "upload")
     $msg = $lang_mybonus['text_success_upload'];
   elseif ($do == "invite")
@@ -9,8 +14,9 @@ function bonusTextFromAction($do) {
     $msg =  $lang_mybonus['text_success_vip']."<b>".get_user_class_name(UC_VIP,false,false,true)."</b>".$lang_mybonus['text_success_vip_two'];
   elseif ($do == "vipfalse")
     $msg =  $lang_mybonus['text_no_permission'];
-  elseif ($do == "title")
-    $msg = $lang_mybonus['text_success_custom_title'];
+  elseif ($do == "title") {
+    $msg = $lang_mybonus['text_success_custom_title1'] . $title . $lang_mybonus['text_success_custom_title2'];
+  }
   elseif ($do == "transfer")
     $msg =  $lang_mybonus['text_success_gift'];
   elseif ($do == "noad")

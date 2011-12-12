@@ -34,8 +34,8 @@ function success($action) {
      header("Location: mybonus.php?do=$action");
   }
   else {
-    $row = mysql_fetch_array(sql_query("SELECT seedbonus FROM users WHERE id=".sqlesc($CURUSER['id']))) or sqlerr(__FILE__, __LINE__);
-    echo php_json_encode(array('success' => true, 'title' => '成功', 'text' => bonusTextFromAction($action), 'bonus' => number_format($row['seedbonus'], 1)));
+    $row = mysql_fetch_array(sql_query("SELECT seedbonus, title, uploaded FROM users WHERE id=".sqlesc($CURUSER['id']))) or sqlerr(__FILE__, __LINE__);
+    echo php_json_encode(array('success' => true, 'title' => '成功', 'text' => bonusTextFromAction($action, $row['title']), 'bonus' => number_format($row['seedbonus'], 1), 'uploaded' => mksize($row['uploaded'])));
   }
   die();
 }

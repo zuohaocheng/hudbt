@@ -10,12 +10,21 @@ $(function() {
     var ie = $.browser.msie;
     var ie8 = ie && $.browser.version < 9;
 
+    //Spin loader
     var loader = (function() {
 	var $loader = $('#loader');
 	var loaderInt;
 	var step = 0;
+	var lock = false;
 	return function(show) {
 	    if (show) {
+		if(lock) {
+		    return false;
+		}
+		else {
+		    lock = true;
+		}
+
 		$loader.show();
 		$loader.attr('class', 'loader' + step);
 		loaderInt = setInterval(function() {
@@ -29,10 +38,14 @@ $(function() {
 	    else {
 		$loader.hide();
 		clearInterval(loaderInt);
+		lock = false;
 	    }
+	    return true;
 	};
     })();
 
+    //Auto filling width
+    //CAUTION: This method have critical problems in performance under ie
     var setTitleWidth;
     if (ie) {
     	setTitleWidth = function(targets) {
@@ -76,17 +89,20 @@ $(function() {
 	setTitleWidth($('td.torrent div.limit-width.minor-list'));
     }
 
+    //Handling quick delete
     var quickDelete;
     if (isManager) {
 	quickDelete = function(a) {
 	    a.click(function(e) {
+		var $this = $(this);
 		e.preventDefault();
+		var tr = $this.parent().parent().parent().parent().parent();
 		if (confirm('确认删除本种子?')) {
-		    $.getJSON(a.attr('href') + '&sure=1&format=json', function(res) {
+		    $.post($this.attr('href') + '&sure=1&format=json', function(res) {
 			if (res.success) {
-			    $(this).parent().parent().remove();
+			    tr.remove();
 			}
-		    });
+		    }, 'json');
 		}
 	    });
 	};
@@ -96,7 +112,7 @@ $(function() {
 	quickDelete = function() {};
     }
 
-    //    if (!ie8) {
+    //Convert json to html
     var user_out = function(user) {
 	var userClass = user['class'].canonical;
 	var userCss = userClass.replace(/\s/g, '') + '_Name username';
@@ -293,8 +309,7 @@ $(function() {
 	    var targetH = target.height();
 	    $document.scroll(function() {
 		var loc = $document.scrollTop() + $window.height();
-		if(loc > targetH) {
-		    loader(true);
+		if(loc > targetH && loader(true)) {
 		    $.getJSON(uri, get_func);
 		    $document.unbind('scroll');
 		}
@@ -302,11 +317,13 @@ $(function() {
 	}
 	else {
 	    $('#pagertop').remove();
+	    //table.tablesorter();
 	}
 	//	    var end = ((new Date()).getTime());
 	//	    console.log(end - start);
     };
 
+    //Auto scroll
     if (hb.nextpage !== '') {
 	var backtotop = $('#back-to-top');
 	backtotop.click(function(e) {
@@ -328,14 +345,10 @@ $(function() {
 
 	$document.scroll(function(){
 	    var loc = $document.scrollTop() + $(window).height();
-	    if(loc > targetH) {
+	    if(loc > targetH && loader(true)) {
 		var uri = hb.nextpage + surfix;
-		loader(false);
 		$.getJSON(uri, function(res) {
 		    $('#pagerbottom').remove();
-		    target.after($('<div></div>', {
-			'class' : 'pages'
-		    }));
 		    get_func(res);
 		});
 		$document.unbind('scroll');
@@ -344,15 +357,51 @@ $(function() {
     }
 
     var getFromUri = function(uri) {
+	if (!loader(true)) {
+	    return false;
+	}
 	$('.pages').remove();
 	$('#torrents tbody tr').remove();
 	table.hide();
 	$('#stderr').remove();
-	loader(true);
 	$.getJSON(uri + surfix, function(result) {
 	    var targ = $('#outer');
 	    if (result.torrents.length) {
 		table.before(result.pager.top);
+
+		var args = new Object();
+		$.each(uri.split('?')[1].split('&'), function(idx, obj) {
+		    var t = obj.split('=');
+		    args[t[0]] = t[1];
+		});
+		var sortcol = args.sort;
+		var sortcoltype = args.type;
+		delete args.sort;
+		delete args.type;
+
+		table.find('.sort').each(function() {
+		    var $this = $(this);
+		    var col = $this.attr('value');
+		    var sorttype;
+		    if (sortcol === col) {
+			sorttype = (sortcoltype === 'desc' ? 'asc' : 'desc');
+		    }
+		    else {
+			if (col === '1') {
+			    sorttype = 'asc';
+			}
+			else {
+			    sorttype = 'desc';
+			}
+		    }
+		    args.sort = col;
+		    args.type = sorttype;
+		    var sortUri = '?' + $.param(args);
+		    delete args.sort;
+		    delete args.type;
+		    $this.attr('href', sortUri);
+		});
+
 		table.show();
 
 		$document.unbind('scroll');
@@ -365,11 +414,8 @@ $(function() {
 	});
     };
 
-    var searchboxform = $('#form-searchbox');
-    searchboxform.submit(function(e) {
-	e.preventDefault();
-	var query = searchboxform.serialize();
-	var uri = 'torrents.php?' + query;
+    //Ajax search
+    var getFromUriWithHistory = function(uri) {
 	var state = {
 	    title : document.title,
 	    url : uri
@@ -379,6 +425,20 @@ $(function() {
 	}
 
 	getFromUri(uri);
+    };
+
+    var searchboxform = $('#form-searchbox');
+    searchboxform.submit(function(e) {
+	e.preventDefault();
+	var query = searchboxform.serialize();
+	var uri = 'torrents.php?' + query;
+	getFromUriWithHistory(uri);
+    });
+
+    $('a[href^="?"]').click(function(e) {
+	e.preventDefault();
+	var uri = this.href;
+	getFromUriWithHistory(uri);
     });
 
     // var popped = ('state' in window.history);
@@ -394,6 +454,7 @@ $(function() {
     // }, false);
 
 
+    //Check items in searchbox
     var mainCheckClicked = false;
     var dictChecks = [];
 
@@ -469,8 +530,40 @@ $(function() {
 	});
 	return catChecks;
     });
+
+    //Auto complete
+    var cache = {};
+    var lastXhr;
+    $( "#searchinput" ).autocomplete({
+	minLength: 2,
+	source: function( request, response ) {
+	    var term = request.term;
+	    if ( term in cache ) {
+		response( cache[ term ] );
+		return;
+	    }
+
+	    lastXhr = $.getJSON( "suggest.php", request, function( data, status, xhr ) {
+		cache[ term ] = data;
+		if ( xhr === lastXhr ) {
+		    response( data );
+		}
+	    });
+	}
+    }).data( "autocomplete" )._renderItem = function( ul, item ) {
+	var stime = item.count + ' Time';
+	if (item.count > 1) {
+	    stime += 's';
+	}
+
+	return $( "<li></li>" )
+	    .data( "item.autocomplete", item )
+	    .append( "<a>" + item.label + '<span class="suggestion-count">' + stime + "</span></a>" )
+	    .appendTo( ul );
+    };
 });
 
+//Persist searchbox status
 (function() {
     var searchbox = $('#ksearchboxmain');
     var toggleSearchbox = function() {

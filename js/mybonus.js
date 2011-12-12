@@ -18,10 +18,10 @@ $(function() {
 		posting = false;
 		submits.removeAttr('disabled');
 		$target = $('#mybonus-result-text');
-		$target.show();
 		if (result.success) {
 		    $target.html(result.text);
 		    $('#bonus, .bonus').text(result.bonus);
+		    $('#uploaded').text(result.uploaded);
 		}
 		else {
 		    $target.html(result.text + '<br />' + result.desc);
