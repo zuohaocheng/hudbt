@@ -142,6 +142,8 @@ echo $Cache->next_row();
 <script type="text/javascript" src="js/jquery-ui-1.8.16.custom.min.js"></script>
 <link rel="stylesheet" href="styles/jqui/ui-lightness/jquery-ui-1.8.16.custom.css" type="text/css" media="screen" />
 <script src="js/torrents.js" type="text/javascript"></script>
+<script src="js/jquery.tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
+<link rel="stylesheet" href="js/jquery.tablesorter/jquery.tablesorter.css" type="text/css" media="screen" />
 
 <?php
 }
@@ -157,9 +159,13 @@ if($inclbookmarked == 1) {
 elseif($inclbookmarked == 2) {
 	print("<h1 align=\"center\">" . get_username($CURUSER['id']) . $lang_torrents['text_s_not_bookmarked_torrent'] . "</h1>");
 }
-
+?>
+<a id="content-marker"></a>
+<?php
 if ($count) {
-  print($pagertop);
+  if ($next_page_href != '') {
+    print($pagertop);
+  }
 
   $swap_headings = $_GET["swaph"];
 
@@ -170,14 +176,9 @@ if ($count) {
   else 
     torrenttable($res, "bookmarks", $swap_headings);
 
-  if ($swap_headings) {
-    ?><script type="text/javascript">
-    hb.config.swaph = true;
-</script>
-<?php
+  if ($next_page_href != '') {
+    print($pagerbottom);
   }
-  
-  print($pagerbottom);
 }
 else {
   if (isset($searchstr)) {

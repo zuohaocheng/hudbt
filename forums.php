@@ -672,7 +672,7 @@ if ($action == "viewtopic")
 
 		print("<table class=\"main\" width=\"940\" border=\"1\" cellspacing=\"0\" cellpadding=\"5\">\n");
 
-		$body = "<div id=\"pid".$postid."body\">".format_comment($arr["body"]);
+		$body = '<div id="pid'.$postid.'body" class="forum-post-body">'.format_comment($arr["body"]);
 
 		if ($highlight){
 			$body = highlight($highlight,$body);

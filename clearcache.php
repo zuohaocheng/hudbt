@@ -30,4 +30,4 @@ print ("<p align=center><font class=striking>Cache cleared</font></p>");
 <tr><td colspan=2 align=center><input type=submit value="Okay" class=btn></td></tr>
 </table>
 </form>
-<?php stdfoot();
+<?php stdfoot(); ?>

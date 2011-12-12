@@ -397,6 +397,24 @@ function customgift() {
     }
 }
 
+var scrollToPosition = (function() {
+    var $document = $(document);
+    return function(top) {
+    	var goTop=setInterval(scrollMove,10);  
+	var buf = -1000;
+
+	function scrollMove(){
+	    var pos = $document.scrollTop();
+	    var diff = pos - top;
+	    $document.scrollTop(diff / 1.15 + top);
+	    if(Math.abs(diff) < 1 || Math.abs(buf - pos) <1) {
+		clearInterval(goTop);  
+	    }
+	    buf = pos;
+        }
+    };
+})();
+
 $(function() {
     var $top = $('#top');
     if ($top.length === 0) {
@@ -404,21 +422,8 @@ $(function() {
     }
     var top = $top.offset().top;
     var $document = $(document);
-    $('a[href="#top"]').each(function() {
-	var $a = $(this);
-	$a.click(function(e) {
-	    e.preventDefault();
-
-	    var goTop=setInterval(scrollMove,10);  
-
-	    function scrollMove(){
-		var pos = $document.scrollTop();
-		var diff = pos - top;
-		$document.scrollTop(diff / 1.15 + top);
-		if(diff < 1) {
-		    clearInterval(goTop);  
-		}
-            }
-	});
+    $('a[href="#top"]').click(function(e) {
+	e.preventDefault();
+	scrollToPosition(top);
     });
 });

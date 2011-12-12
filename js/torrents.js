@@ -10,6 +10,92 @@ $(function() {
     var ie = $.browser.msie;
     var ie8 = ie && $.browser.version < 9;
 
+    var argsFromUri = function(uri) {
+	var args = new Object();
+	$.each(uri.split('?')[1].split('&'), function(idx, obj) {
+	    var t = obj.split('=');
+	    args[t[0]] = t[1];
+	});
+	return args;
+    };
+    var args = argsFromUri(window.location.search);
+
+    var $sortHeaders = table.find('thead th:not(.unsortable)');
+    var sortHeader = function(isJs) {
+	if (isJs) {
+	    $sortHeaders.unbind('click');
+	    table.tablesorter();
+	    return;
+	}
+	var sortcol = args.sort;
+	var sortcoltype = args.type;
+	delete args.sort;
+	delete args.type;
+
+	$sortHeaders.each(function() {
+	    var $this = $(this);
+	    var col = $this.attr('value');
+	    var sorttype;
+	    var sortclass = 'headerSort';
+	    if (sortcol === col) {
+		if (sortcoltype === 'desc') {
+		    sorttype = 'asc';
+		    sortclass += ' headerSortDown';
+		}
+		else {
+		    sorttype = 'desc';
+		    sortclass += ' headerSortUp';
+		}
+	    }
+	    else {
+		if (col === '1' || col ==='4') {
+		    sorttype = 'asc';
+		    if (col === '4' && typeof(sortcol) === 'undefined') {
+			sortclass += 'headSortDown';
+		    }
+		}
+		else {
+		    sorttype = 'desc';
+		}
+	    }
+
+	    var coltitle;
+	    if (sorttype === 'asc') {
+		coltitle = '升序排序';
+	    }
+	    else {
+		coltitle = '降序排序';
+	    }
+
+	    args.sort = col;
+	    args.type = sorttype;
+	    var sortUri = '?' + $.param(args);
+	    delete args.sort;
+	    delete args.type;
+	    $this.attr({
+		'class': sortclass,
+		title : coltitle
+	    }).unbind('click').click(function() {
+		getFromUriWithHistory(sortUri);
+	    });
+	});
+    };
+    table.find('thead th:not(.unsortable)').each(function() {
+	var $this = $(this);
+	$this.html($this.find('a').html());
+    });
+    sortHeader(!hb.nextpage);
+
+    //Go to content
+    var goToContent = (function() {
+	var $top = $('#content-marker');
+	var top = $top.offset().top;
+	return function() {
+	    scrollToPosition(top);
+	};
+    })();
+
+
     //Spin loader
     var loader = (function() {
 	var $loader = $('#loader');
@@ -175,7 +261,7 @@ $(function() {
 	    var textMainTitle = torrent.name;
 	    var textSubTitle = torrent.desc;
 
-	    if (hb.config.swaph && textSubTitle !== '') {
+	    if (args.swaph && textSubTitle !== '') {
 		var buf = textMainTitle;
 		textMainTitle = textSubTitle;
 		textSubTitle = buf;
@@ -310,6 +396,7 @@ $(function() {
 	    $document.scroll(function() {
 		var loc = $document.scrollTop() + $window.height();
 		if(loc > targetH && loader(true)) {
+		    args = argsFromUri(uri);
 		    $.getJSON(uri, get_func);
 		    $document.unbind('scroll');
 		}
@@ -317,36 +404,30 @@ $(function() {
 	}
 	else {
 	    $('#pagertop').remove();
-	    //table.tablesorter();
+	    sortHeader(true);
 	}
 	//	    var end = ((new Date()).getTime());
 	//	    console.log(end - start);
     };
 
+    //Back to top
+    var backtotop = $('#back-to-top');
+    backtotop.click(function(e) {
+	e.preventDefault();
+	scrollToPosition(0);
+    });
+
+    window.onscroll=function() {
+	$document.scrollTop() > 200 ? backtotop.css('display', "") : backtotop.css('display', 'none');
+    };
+
     //Auto scroll
     if (hb.nextpage !== '') {
-	var backtotop = $('#back-to-top');
-	backtotop.click(function(e) {
-	    e.preventDefault();
-
-	    var goTop=setInterval(scrollMove,10);  
-	    function scrollMove(){
-		var pos = $document.scrollTop();
-		$document.scrollTop(pos / 1.15);
-		if(pos < 1) {
-		    clearInterval(goTop);  
-		}
-	    }
-	});
-
-	window.onscroll=function() {
-	    $document.scrollTop() > 200 ? backtotop.css('display', "") : backtotop.css('display', 'none');
-	}
-
 	$document.scroll(function(){
 	    var loc = $document.scrollTop() + $(window).height();
 	    if(loc > targetH && loader(true)) {
 		var uri = hb.nextpage + surfix;
+		args = argsFromUri(uri);
 		$.getJSON(uri, function(res) {
 		    $('#pagerbottom').remove();
 		    get_func(res);
@@ -364,44 +445,12 @@ $(function() {
 	$('#torrents tbody tr').remove();
 	table.hide();
 	$('#stderr').remove();
+	args = argsFromUri(uri);
 	$.getJSON(uri + surfix, function(result) {
 	    var targ = $('#outer');
 	    if (result.torrents.length) {
 		table.before(result.pager.top);
-
-		var args = new Object();
-		$.each(uri.split('?')[1].split('&'), function(idx, obj) {
-		    var t = obj.split('=');
-		    args[t[0]] = t[1];
-		});
-		var sortcol = args.sort;
-		var sortcoltype = args.type;
-		delete args.sort;
-		delete args.type;
-
-		table.find('.sort').each(function() {
-		    var $this = $(this);
-		    var col = $this.attr('value');
-		    var sorttype;
-		    if (sortcol === col) {
-			sorttype = (sortcoltype === 'desc' ? 'asc' : 'desc');
-		    }
-		    else {
-			if (col === '1') {
-			    sorttype = 'asc';
-			}
-			else {
-			    sorttype = 'desc';
-			}
-		    }
-		    args.sort = col;
-		    args.type = sorttype;
-		    var sortUri = '?' + $.param(args);
-		    delete args.sort;
-		    delete args.type;
-		    $this.attr('href', sortUri);
-		});
-
+		sortHeader(!result['continue']);
 		table.show();
 
 		$document.unbind('scroll');
@@ -411,6 +460,7 @@ $(function() {
 		loader(false);
 		targ.append('<div id="stderr"><h2>没有结果！</h2><div class="table td frame">没有种子:(</div></div>');
 	    }
+	    goToContent();
 	});
     };
 

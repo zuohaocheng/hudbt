@@ -484,8 +484,8 @@ function begin_main_frame($caption = "", $center = false, $width = 100) {
   if ($center)
     $tdextra .= 'text-align:center;';
 
-  $width = 940 * $width /100;
-  print('<div style="width:' . $width . 'px;' . $tdextra . '">');
+  $width = $width;
+  print('<div style="width:' . $width . '%;' . $tdextra . '">');
 
 }
 
@@ -494,7 +494,7 @@ function end_main_frame() {
 }
 
 function begin_frame($caption = "", $center = false, $padding = 10, $width="100%", $caption_center="left", $table = false) {
-  $caption = $caption ? "<h2>".$caption."</h2>" : "";
+  $caption = $caption ? '<h2 class="page-titles">'.$caption."</h2>" : "";
   if ($table) {
     echo $caption;
   }
@@ -2381,26 +2381,7 @@ function simpletag(thetag)
 	    ?>
 
 	    <div id="info_block" class="table td">
-	      <table width="100%" cellspacing="0" cellpadding="0" border="0"><tr>
-		<td class="bottom" style="text-align:left;">
-		  <div class="minor-list list-seperator compact"><ul>
-		    <li><span class="medium"><?php echo $lang_functions['text_welcome_back'] ?>, <?php echo get_username($CURUSER['id'])?></li>
-		    <li><form action="logout.php" method="POST"><input type="submit" class="a" value="<?php echo $lang_functions['text_logout'] ?>" /></form></li>
-		    <?php if (get_user_class() >= UC_MODERATOR) { ?> <li><a href="staffpanel.php"><?php echo $lang_functions['text_staff_panel'] ?></a></li> <?php }?> 
-		    <?php if (get_user_class() >= UC_SYSOP) { ?> <li><a href="settings.php"><?php echo $lang_functions['text_site_settings'] ?></a></li><?php } ?>
-		    <li><a href="torrents.php?inclbookmarked=1&amp;allsec=1&amp;incldead=0"><?php echo $lang_functions['text_bookmarks'] ?></a></li>
-		    <li><a href="mybonus.php" title="<?php echo $lang_functions['text_use'] ?>"><span class = 'color_bonus'><?php echo $lang_functions['text_bonus'] ?></span>: <span id="bonus"><?php echo number_format($CURUSER['seedbonus'], 1)?></span></a></li>
-		    <li><a href="invite.php?id=<?php echo $CURUSER['id']?>" title="<?php echo $lang_functions['text_send'] ?>"><span class = 'color_invite'><?php echo $lang_functions['text_invite'] ?></span>: <?php echo $CURUSER['invites']?></a></li></ul></div>
-		    <div class="minor-list compact"><ul>
-		      <li><span class="color_ratio"><?php echo $lang_functions['text_ratio'] ?></span> <?php echo $ratio?></li>
-		      <li><span class='color_uploaded'><?php echo $lang_functions['text_uploaded'] ?></span><span id="uploaded"><?php echo mksize($CURUSER['uploaded'])?></span></li>
-		      <li><span class='color_downloaded'> <?php echo $lang_functions['text_downloaded'] ?></span> <?php echo mksize($CURUSER['downloaded'])?></li>
-		      <li><span class='color_active'><?php echo $lang_functions['text_active_torrents'] ?></span> <img class="arrowup" alt="Torrents seeding" title="<?php echo $lang_functions['title_torrents_seeding'] ?>" src="pic/trans.gif" /><?php echo $activeseed?>  <img class="arrowdown" alt="Torrents leeching" title="<?php echo $lang_functions['title_torrents_leeching'] ?>" src="pic/trans.gif" /><?php echo $activeleech?></li>
-		      <li><span class='color_connectable'><?php echo $lang_functions['text_connectable'] ?></span><?php echo $connectable?></li>
-		      <li><?php echo maxslots();?></li>
-		    </ul></div></td>
-
-		    <td class="bottom" style="text-align:right;"><span class="medium"><?php echo $lang_functions['text_the_time_is_now'] ?><?php echo $datum[hours].":".$datum[minutes]?><br />
+		    <div><span class="medium"><?php echo $lang_functions['text_the_time_is_now'] ?><?php echo $datum[hours].":".$datum[minutes]?><br />
 
 		    <?php
 		      if (get_user_class() >= $staffmem_class){
@@ -2428,10 +2409,26 @@ function simpletag(thetag)
 		      print(" <a href=\"getrss.php\"><img class=\"rss\" alt=\"RSS\" title=\"".$lang_functions['title_get_rss']."\" src=\"pic/trans.gif\" /></a>");
 		    ?>
 
-		    </span></td>
-		  </tr></table></div>
+		    </span></div>
+		<div>
+		  <div class="minor-list list-seperator compact"><ul>
+		    <li><span class="medium"><?php echo $lang_functions['text_welcome_back'] ?>, <?php echo get_username($CURUSER['id'])?></li>
+		    <li><form action="logout.php" method="POST"><input type="submit" class="a" value="<?php echo $lang_functions['text_logout'] ?>" /></form></li>
+		    <?php if (get_user_class() >= UC_MODERATOR) { ?> <li><a href="staffpanel.php"><?php echo $lang_functions['text_staff_panel'] ?></a></li> <?php }?> 
+		    <?php if (get_user_class() >= UC_SYSOP) { ?> <li><a href="settings.php"><?php echo $lang_functions['text_site_settings'] ?></a></li><?php } ?>
+		    <li><a href="torrents.php?inclbookmarked=1&amp;allsec=1&amp;incldead=0"><?php echo $lang_functions['text_bookmarks'] ?></a></li>
+		    <li><a href="mybonus.php" title="<?php echo $lang_functions['text_use'] ?>"><span class = 'color_bonus'><?php echo $lang_functions['text_bonus'] ?></span>: <span id="bonus"><?php echo number_format($CURUSER['seedbonus'], 1)?></span></a></li>
+		    <li><a href="invite.php?id=<?php echo $CURUSER['id']?>" title="<?php echo $lang_functions['text_send'] ?>"><span class = 'color_invite'><?php echo $lang_functions['text_invite'] ?></span>: <?php echo $CURUSER['invites']?></a></li></ul></div>
+		    <div class="minor-list compact"><ul>
+		      <li><span class="color_ratio"><?php echo $lang_functions['text_ratio'] ?></span> <?php echo $ratio?></li>
+		      <li><span class='color_uploaded'><?php echo $lang_functions['text_uploaded'] ?></span><span id="uploaded"><?php echo mksize($CURUSER['uploaded'])?></span></li>
+		      <li><span class='color_downloaded'> <?php echo $lang_functions['text_downloaded'] ?></span> <?php echo mksize($CURUSER['downloaded'])?></li>
+		      <li><span class='color_active'><?php echo $lang_functions['text_active_torrents'] ?></span> <img class="arrowup" alt="Torrents seeding" title="<?php echo $lang_functions['title_torrents_seeding'] ?>" src="pic/trans.gif" /><?php echo $activeseed?>  <img class="arrowdown" alt="Torrents leeching" title="<?php echo $lang_functions['title_torrents_leeching'] ?>" src="pic/trans.gif" /><?php echo $activeleech?></li>
+		      <li><span class='color_connectable'><?php echo $lang_functions['text_connectable'] ?></span><?php echo $connectable?></li>
+		      <li><?php echo maxslots();?></li>
+		    </ul></div></div>
+</div>
 
-		  <div id="outer">
 		    <?php
 		      if ($Advertisement->enable_ad()){
 			$belownavad=$Advertisement->get_ad('belownav');
@@ -2481,17 +2478,7 @@ function simpletag(thetag)
 			      $text = $lang_functions['text_you_have'].$unread.$lang_functions['text_new_message'] . add_s($unread) . $lang_functions['text_click_here_to_read'];
 			      msgalert("messages.php",$text, "red");
 			    }
-			  /*
-			    $pending_invitee = $Cache->get_value('user_'.$CURUSER["id"].'_pending_invitee_count');
-			    if ($pending_invitee == ""){
-			    $pending_invitee = get_row_count("users","WHERE status = 'pending' AND invited_by = ".sqlesc($CURUSER[id]));
-			    $Cache->cache_value('user_'.$CURUSER["id"].'_pending_invitee_count', $pending_invitee, 900);
-			    }
-			    if ($pending_invitee > 0)
-			    {
-			    $text = $lang_functions['text_your_friends'].add_s($pending_invitee).is_or_are($pending_invitee).$lang_functions['text_awaiting_confirmation'];
-			    msgalert("invite.php?id=".$CURUSER[id],$text, "red");
-			    }*/
+
 			  $settings_script_name = $_SERVER["SCRIPT_FILENAME"];
 			  if (!preg_match("/index/i", $settings_script_name))
 			    {
@@ -2544,9 +2531,10 @@ function simpletag(thetag)
 			print("<font color=\"white\">".$lang_functions['text_website_offline_warning']."</font>");
 			print("</td></tr></table></p><br />\n");
 		      }
-		}
-
-
+		?>
+		  <div id="outer">
+		    <?
+		      }
     }
 
 function php_json_encode( $data ) {
@@ -3189,28 +3177,25 @@ for ($i=1; $i<=9; $i++){
   }
 }
 ?>
-<th style="padding: 0px;width:45px;"><?php echo $lang_functions['col_type'] ?></th>
-<th><a class="sort" value="1" href="?<?php echo $oldlink?>sort=1&amp;type=<?php echo $link[1]?>"><?php echo $lang_functions['col_name'] ?></a></th>
+<th style="padding: 0px;width:45px;" class="unsortable"><?php echo $lang_functions['col_type'] ?></th>
+<th value="1"><a href="?<?php echo $oldlink?>sort=1&amp;type=<?php echo $link[1]?>"><?php echo $lang_functions['col_name'] ?></a></th>
 <?php
 
 if ($wait)
 {
-  print("<th>".$lang_functions['col_wait']."</th>\n");
+  print('<th class="unsortable">'.$lang_functions['col_wait']."</th>\n");
 }
 if ($CURUSER['showcomnum'] != 'no') { ?>
-<th><a class="sort" value="3" href="?<?php echo $oldlink?>sort=3&amp;type=<?php echo $link[3]?>"><img class="comments" src="pic/trans.gif" alt="comments" title="<?php echo $lang_functions['title_number_of_comments'] ?>" /></a></th>
+<th value="3"><a href="?<?php echo $oldlink?>sort=3&amp;type=<?php echo $link[3]?>"><img class="comments" src="pic/trans.gif" alt="comments" title="<?php echo $lang_functions['title_number_of_comments'] ?>" /></a></th>
 <?php } ?>
 
-<th><a class="sort" value="4" href="?<?php echo $oldlink?>sort=4&amp;type=<?php echo $link[4]?>"><img class="time" src="pic/trans.gif" alt="time" title="<?php echo ($CURUSER['timetype'] != 'timealive' ? $lang_functions['title_time_added'] : $lang_functions['title_time_alive'])?>" /></a></th>
-<th><a class="sort" value="5" href="?<?php echo $oldlink?>sort=5&amp;type=<?php echo $link[5]?>"><img class="size" src="pic/trans.gif" alt="size" title="<?php echo $lang_functions['title_size'] ?>" /></a></th>
-<th><a class="sort" value="7" href="?<?php echo $oldlink?>sort=7&amp;type=<?php echo $link[7]?>"><img class="seeders" src="pic/trans.gif" alt="seeders" title="<?php echo $lang_functions['title_number_of_seeders'] ?>" /></a></th>
-<th><a class="sort" value="8" href="?<?php echo $oldlink?>sort=8&amp;type=<?php echo $link[8]?>"><img class="leechers" src="pic/trans.gif" alt="leechers" title="<?php echo $lang_functions['title_number_of_leechers'] ?>" /></a></th>
-<th><a class="sort" value="6" href="?<?php echo $oldlink?>sort=6&amp;type=<?php echo $link[6]?>"><img class="snatched" src="pic/trans.gif" alt="snatched" title="<?php echo $lang_functions['title_number_of_snatched']?>" /></a></th>
-<th><a class="sort" value="9" href="?<?php echo $oldlink?>sort=9&amp;type=<?php echo $link[9]?>"><?php echo $lang_functions['col_uploader']?></a></th>
-<?php
-if (get_user_class() >= $torrentmanage_class) { ?>
-  <th><?php echo $lang_functions['col_action'] ?></th>
-<?php } ?>
+<th value="4"><a href="?<?php echo $oldlink?>sort=4&amp;type=<?php echo $link[4]?>"><img class="time" src="pic/trans.gif" alt="time" title="<?php echo ($CURUSER['timetype'] != 'timealive' ? $lang_functions['title_time_added'] : $lang_functions['title_time_alive'])?>" /></a></th>
+<th value="5"><a href="?<?php echo $oldlink?>sort=5&amp;type=<?php echo $link[5]?>"><img class="size" src="pic/trans.gif" alt="size" title="<?php echo $lang_functions['title_size'] ?>" /></a></th>
+<th value="7"><a href="?<?php echo $oldlink?>sort=7&amp;type=<?php echo $link[7]?>"><img class="seeders" src="pic/trans.gif" alt="seeders" title="<?php echo $lang_functions['title_number_of_seeders'] ?>" /></a></th>
+<th value="8"><a href="?<?php echo $oldlink?>sort=8&amp;type=<?php echo $link[8]?>"><img class="leechers" src="pic/trans.gif" alt="leechers" title="<?php echo $lang_functions['title_number_of_leechers'] ?>" /></a></th>
+<th value="6"><a href="?<?php echo $oldlink?>sort=6&amp;type=<?php echo $link[6]?>"><img class="snatched" src="pic/trans.gif" alt="snatched" title="<?php echo $lang_functions['title_number_of_snatched']?>" /></a></th>
+<th value="9"><a href="?<?php echo $oldlink?>sort=9&amp;type=<?php echo $link[9]?>"><?php echo $lang_functions['col_uploader']?></a></th>
+<th class="unsortable"><?php echo (get_user_class() >= $torrentmanage_class ? $lang_functions['col_action'] : '') ?></th>
 </tr>
 </thead>
 <tbody>
