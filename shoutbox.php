@@ -20,8 +20,7 @@ $refresh = ($CURUSER['sbrefresh'] ? $CURUSER['sbrefresh'] : 120)
 <meta http-equiv="Refresh" content="<?php echo $refresh?>; url=<?php echo get_protocol_prefix() . $BASEURL?>/shoutbox.php?type=<?php echo $where?>">
 <link rel="stylesheet" href="<?php echo get_font_css_uri()?>" type="text/css">
 <link rel="stylesheet" href="<?php echo get_css_uri()."theme.css"?>" type="text/css">
-<link rel="stylesheet" href="styles/curtain_imageresizer.css" type="text/css">
-<script src="curtain_imageresizer.js" type="text/javascript"></script><style type="text/css">body {overflow-y:scroll; overflow-x: hidden}</style>
+
 <?php
 print(get_style_addicode());
 $startcountdown = "startcountdown(".$CURUSER['sbrefresh'].")";

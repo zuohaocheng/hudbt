@@ -13,24 +13,23 @@ if (get_user_class() < $topten_class){
 	stderr($lang_topten['std_sorry'],$lang_topten['std_permission_denied_only'].get_user_class_name($topten_class,false,true,true).$lang_topten['std_or_above_can_view'],false);
 }
 
-function usershare_table($res, $frame_caption)
-{
+function usershare_table($res, $frame_caption) {
 	global $lang_topten;
 	global $CURUSER;
 	global $lang_topten;
 	begin_frame($frame_caption, true);
 	begin_table();
 ?>
-<tr>
-<td class="colhead"><?php echo $lang_topten['col_rank'] ?></td>
-<td class="colhead" align="left"> <?php echo $lang_topten['col_user'] ?> </td>
-<td class="colhead"> <?php echo $lang_topten['col_uploaded'] ?> </td>
-<td class="colhead" align="left"> <?php echo $lang_topten['col_ul_speed'] ?> </td>
-<td class="colhead"> <?php echo $lang_topten['col_downloaded'] ?></td>
-<td class="colhead" align="left"> <?php echo $lang_topten['col_dl_speed'] ?> </td>
-<td class="colhead" align="right"> <?php echo $lang_topten['col_ratio'] ?> </td>
-<td class="colhead" align="left"> <?php echo $lang_topten['col_joined'] ?> </td>
-</tr>
+<thead><tr>
+<th><?php echo $lang_topten['col_rank'] ?></th>
+<th align="left"> <?php echo $lang_topten['col_user'] ?> </th>
+<th> <?php echo $lang_topten['col_uploaded'] ?> </th>
+<th align="left"> <?php echo $lang_topten['col_ul_speed'] ?> </th>
+<th> <?php echo $lang_topten['col_downloaded'] ?></th>
+<th align="left"> <?php echo $lang_topten['col_dl_speed'] ?> </th>
+<th align="right"> <?php echo $lang_topten['col_ratio'] ?> </th>
+<th align="left"> <?php echo $lang_topten['col_joined'] ?> </th>
+</tr></thead><tbody>
 <?php
 $num = 0;
 while ($a = mysql_fetch_assoc($res))
@@ -54,6 +53,7 @@ while ($a = mysql_fetch_assoc($res))
 	"</td><td class=\"rowfollow\" align=\"right\">" . $ratio .
 	"</td><td class=\"rowfollow\" align=\"left\">" . gettime($a["added"],true,false). "</td></tr>");
 }
+echo '</tbody>';
 end_table();
 end_frame();
 }
@@ -64,16 +64,16 @@ function _torrenttable($res, $frame_caption)
 	begin_frame($frame_caption, true);
 	begin_table();
 ?>
-<tr>
-<td class="colhead" align="center"><?php echo $lang_topten['col_rank'] ?></td>
-<td class="colhead" align="left"><?php echo $lang_topten['col_name'] ?></td>
-<td class="colhead" align="right"><?php echo "<img class=\"snatched\" src=\"pic/trans.gif\" alt=\"snatched\" title=\"".$lang_topten['title_sna']."\" />" ?></td>
-<td class="colhead" align="right"><?php echo $lang_topten['col_data'] ?></td>
-<td class="colhead" align="right"><?php echo "<img class=\"seeders\" src=\"pic/trans.gif\" alt=\"seeders\" title=\"".$lang_topten['title_se']."\" />" ?></td>
-<td class="colhead" align="right"><?php echo "<img class=\"leechers\" src=\"pic/trans.gif\" alt=\"leechers\" title=\"".$lang_topten['title_le']."\" />" ?></td>
-<td class="colhead" align="right"><?php echo $lang_topten['col_to'] ?></td>
-<td class="colhead" align="right"><?php echo $lang_topten['col_ratio'] ?></td>
-</tr>
+<thead><tr>
+<th align="center"><?php echo $lang_topten['col_rank'] ?></th>
+<th align="left"><?php echo $lang_topten['col_name'] ?></th>
+<th align="right"><?php echo "<img class=\"snatched\" src=\"pic/trans.gif\" alt=\"snatched\" title=\"".$lang_topten['title_sna']."\" />" ?></th>
+<th align="right"><?php echo $lang_topten['col_data'] ?></th>
+<th align="right"><?php echo "<img class=\"seeders\" src=\"pic/trans.gif\" alt=\"seeders\" title=\"".$lang_topten['title_se']."\" />" ?></th>
+<th align="right"><?php echo "<img class=\"leechers\" src=\"pic/trans.gif\" alt=\"leechers\" title=\"".$lang_topten['title_le']."\" />" ?></th>
+<th align="right"><?php echo $lang_topten['col_to'] ?></th>
+<th align="right"><?php echo $lang_topten['col_ratio'] ?></th>
+</tr></thead><tbody>
 <?php
 $num = 0;
 while ($a = mysql_fetch_assoc($res))
@@ -92,6 +92,7 @@ while ($a = mysql_fetch_assoc($res))
 	"</td><td class=\"rowfollow\" align=\"right\">" . number_format($a["leechers"]) . "</td><td class=\"rowfollow\" align=\"right\">" . ($a["leechers"] + $a["seeders"]) .
 	"</td><td class=\"rowfollow\" align=\"right\">$ratio</td>\n");
 }
+echo '</tbody>';
 end_table();
 end_frame();
 }
@@ -103,11 +104,11 @@ function countriestable($res, $frame_caption, $what)
 	begin_frame($frame_caption, true);
 	begin_table();
 ?>
-<tr>
-<td class="colhead"><?php echo $lang_topten['col_rank'] ?></td>
-<td class="colhead" align="left"><?php echo $lang_topten['col_country'] ?></td>
-<td class="colhead" align="right"><?php echo $what?></td>
-</tr>
+<thead><tr>
+<th><?php echo $lang_topten['col_rank'] ?></th>
+<th align="left"><?php echo $lang_topten['col_country'] ?></th>
+<th align="right"><?php echo $what?></th>
+</tr></thead><tbody>
 <?php
 $num = 0;
 while ($a = mysql_fetch_assoc($res))
@@ -125,6 +126,7 @@ while ($a = mysql_fetch_assoc($res))
 	"<img align=\"center\" src=\"pic/flag/$a[flagpic]\" alt=\"\" /></td><td class=\"embedded\" style='padding-left: 5px'><b>$a[name]</b></td>".
 	"</tr></table></td><td class=\"rowfollow\" align=\"right\">$value</td></tr>\n");
 }
+echo '</tbody>';
 end_table();
 end_frame();
 }
@@ -135,15 +137,14 @@ function peerstable($res, $frame_caption)
 	begin_frame($frame_caption, true);
 	begin_table();
 
-	print("<tr><td class=\"colhead\">".$lang_topten['col_rank']."</td><td class=\"colhead\">".$lang_topten['col_username']."</td><td class=\"colhead\">".$lang_topten['col_upload_rate']."</td><td class=\"colhead\">".$lang_topten['col_download_rate']."</td></tr>");
+	print("<thead><tr><th>".$lang_topten['col_rank']."</th><th>".$lang_topten['col_username']."</th><th>".$lang_topten['col_upload_rate']."</th><th>".$lang_topten['col_download_rate']."</th></tr></thead><tbody>");
 
 	$n = 1;
-	while ($arr = mysql_fetch_assoc($res))
-	{
+	while ($arr = mysql_fetch_assoc($res)) {
 		print("<tr><td class=\"rowfollow\">$n</td><td class=\"rowfollow\">" . get_username($arr["userid"]) . "</td><td class=\"rowfollow\">" . mksize($arr["uprate"]) . "/s</td><td class=\"rowfollow\">" . mksize($arr["downrate"]) . "/s</td></tr>\n");
 		++$n;
 	}
-
+	echo '</tbody>';
 	end_table();
 	end_frame();
 }
@@ -154,7 +155,7 @@ function bonustable($res, $frame_caption)
 	begin_frame($frame_caption, true);
 	begin_table();
 
-	print("<tr><td class=\"colhead\">".$lang_topten['col_rank']."</td><td class=\"colhead\">".$lang_topten['col_username']."</td><td class=\"colhead\">".$lang_topten['col_bonus']."</td></tr>");
+	print("<thead><tr><th>".$lang_topten['col_rank']."</th><th>".$lang_topten['col_username']."</th><th>".$lang_topten['col_bonus']."</th></tr></thead><tbody>");
 
 	$n = 1;
 	while ($arr = mysql_fetch_assoc($res))
@@ -163,85 +164,77 @@ function bonustable($res, $frame_caption)
 		print("<tr><td class=\"rowfollow\" align=\"center\">$n</td><td class=\"rowfollow\" align=\"left\">" . get_username($arr["id"]) . "</td><td class=\"rowfollow\" align=\"right\">" . number_format($arr["seedbonus"], 1) . "</td></tr>\n");
 		$n++;
 	}
-
+	echo '</tbody>';
 	end_table();
 	end_frame();
 }
 
-function prolinkclicktable($res, $frame_caption)
-{
+function prolinkclicktable($res, $frame_caption) {
 	global $lang_topten;
 	begin_frame($frame_caption, true);
 	begin_table();
 
-	print("<tr><td class=\"colhead\">".$lang_topten['col_rank']."</td><td class=\"colhead\">".$lang_topten['col_username']."</td><td class=\"colhead\">".$lang_topten['col_clicks']."</td></tr>");
+	print("<thead><tr><th>".$lang_topten['col_rank']."</th><th>".$lang_topten['col_username']."</th><th>".$lang_topten['col_clicks']."</th></tr></thead><tbody>");
 
 	$n = 1;
-	while ($arr = mysql_fetch_assoc($res))
-	{
+	while ($arr = mysql_fetch_assoc($res)) {
 		//die();
 		print("<tr><td class=\"rowfollow\" align=\"center\">$n</td><td class=\"rowfollow\" align=\"left\">" . get_username($arr["userid"]) . "</td><td class=\"rowfollow\" align=\"right\">" . number_format($arr["count"]) . "</td></tr>\n");
 		$n++;
 	}
-
+	echo '</tbody>';
 	end_table();
 	end_frame();
 }
 
-function charityTable($res, $frame_caption)
-{
+function charityTable($res, $frame_caption) {
 	global $lang_topten;
 	begin_frame($frame_caption, true);
 	begin_table();
 
-	print("<tr><td class=\"colhead\">".$lang_topten['col_rank']."</td><td class=\"colhead\">".$lang_topten['col_username']."</td><td class=\"colhead\">".$lang_topten['col_bonus']."</td></tr>");
+	print("<thead><tr><th>".$lang_topten['col_rank']."</th><th>".$lang_topten['col_username']."</th><th>".$lang_topten['col_bonus']."</th></tr></thead><tbody>");
 
 	$n = 1;
-	while ($arr = mysql_fetch_assoc($res))
-	{
+	while ($arr = mysql_fetch_assoc($res)) {
 		//die();
 		print("<tr><td class=\"rowfollow\" align=\"center\">$n</td><td class=\"rowfollow\" align=\"left\">" . get_username($arr["id"]) . "</td><td class=\"rowfollow\" align=\"right\">" . number_format($arr["charity"]) . "</td></tr>\n");
 		$n++;
 	}
-
+	echo '</tbody>';
 	end_table();
 	end_frame();
 }
 
-function cmttable($res, $frame_caption, $col2_name)
-{
+function cmttable($res, $frame_caption, $col2_name) {
 	global $lang_topten;
 	begin_frame($frame_caption, true);
 	begin_table();
 
-	print("<tr><td class=\"colhead\">".$lang_topten['col_rank']."</td><td class=\"colhead\">".$lang_topten['col_username']."</td><td class=\"colhead\">".$col2_name."</td></tr>");
+	print("<thead><tr><th>".$lang_topten['col_rank']."</th><th>".$lang_topten['col_username']."</th><th>".$col2_name."</th></tr></thead><tbody>");
 
 	$n = 1;
-	while ($arr = mysql_fetch_assoc($res))
-	{
+	while ($arr = mysql_fetch_assoc($res)) {
 		print("<tr><td class=\"rowfollow\" align=\"center\">$n</td><td class=\"rowfollow\" align=\"left\">" . get_username($arr["userid"]) . "</td><td class=\"rowfollow\" align=\"right\">" . number_format($arr["num"]) . "</td></tr>\n");
 		$n++;
 	}
-
+	echo '</tbody>';
 	end_table();
 	end_frame();
 }
 
-function locationtable($res, $frame_caption)
-{
+function locationtable($res, $frame_caption) {
 	global $lang_topten;
 	begin_frame($frame_caption, true);
 	begin_table();
 
-	print("<tr><td class=\"colhead\">".$lang_topten['col_rank']."</td><td class=\"colhead\">".$lang_topten['col_location']."</td><td class=\"colhead\">".$lang_topten['col_number']."</td></tr>");
+	print("<thead><tr><th>".$lang_topten['col_rank']."</th><th>".$lang_topten['col_location']."</th><th>".$lang_topten['col_number']."</th></tr></thead><tbody>");
 
 	$n = 1;
-	while ($arr = mysql_fetch_assoc($res))
-	{
+	while ($arr = mysql_fetch_assoc($res)) {
 		print("<tr><td class=\"rowfollow\" align=\"center\">$n</td><td class=\"rowfollow\" align=\"left\">" . get_username($arr["location_name"]) . "</td><td class=\"rowfollow\" align=\"right\">" . number_format($arr["num"]) . "</td></tr>\n");
 		$n++;
 	}
-
+	echo '</tbody>';
 	end_table();
 	end_frame();
 }
@@ -252,7 +245,7 @@ function postable($res, $frame_caption)
 	begin_frame($frame_caption, true);
 	begin_table();
 
-	print("<tr><td class=\"colhead\">".$lang_topten['col_rank']."</td><td class=\"colhead\">".$lang_topten['col_username']."</td><td class=\"colhead\">".$lang_topten['col_topics']."</td><td class=\"colhead\">".$lang_topten['col_posts']."</td></tr>");
+	print("<thead><tr><th>".$lang_topten['col_rank']."</th><th>".$lang_topten['col_username']."</th><th>".$lang_topten['col_topics']."</th><th>".$lang_topten['col_posts']."</th></tr></thead><tbody>");
 
 	$n = 1;
 	while ($arr = mysql_fetch_assoc($res))
@@ -260,7 +253,7 @@ function postable($res, $frame_caption)
 		print("<tr><td class=\"rowfollow\" align=\"center\">$n</td><td class=\"rowfollow\" align=\"left\">" . get_username($arr["userid"]) . "</td><td class=\"rowfollow\" align=\"right\">" . number_format($arr["usertopics"]) . "</td><td class=\"rowfollow\" align=\"right\">" . number_format($arr["userposts"]) . "</td></tr>\n");
 		$n++;
 	}
-
+	echo '</tbody>';
 	end_table();
 	end_frame();
 }
@@ -271,7 +264,7 @@ function bigtopic_table($res, $frame_caption)
 	begin_frame($frame_caption, true);
 	begin_table();
 
-	print("<tr><td class=\"colhead\">".$lang_topten['col_rank']."</td><td class=\"colhead\">".$lang_topten['col_subject']."</td><td class=\"colhead\">".$lang_topten['col_posts']."</td></tr>");
+	print("<thead><tr><th>".$lang_topten['col_rank']."</th><th>".$lang_topten['col_subject']."</th><th>".$lang_topten['col_posts']."</th></tr></thead><tbody>");
 
 	$n = 1;
 	while ($arr = mysql_fetch_assoc($res))
@@ -281,7 +274,7 @@ function bigtopic_table($res, $frame_caption)
 		print("<tr><td class=\"rowfollow\" align=\"center\">$n</td><td class=\"rowfollow\" align=\"left\">" . $topic. "</td><td class=\"rowfollow\" align=\"right\">" . number_format($arr["postnum"]) . "</td></tr>\n");
 		$n++;
 	}
-
+	echo '</tbody>';
 	end_table();
 	end_frame();
 }
@@ -292,7 +285,7 @@ function donortable($res, $frame_caption)
 	begin_frame($frame_caption, true);
 	begin_table();
 
-	print("<tr><td class=\"colhead\">".$lang_topten['col_rank']."</td><td class=\"colhead\">".$lang_topten['col_username']."</td><td class=\"colhead\">".$lang_topten['col_donated_usd']."</td><td class=\"colhead\">".$lang_topten['col_donated_cny']."</td></tr>");
+	print("<thead><tr><th>".$lang_topten['col_rank']."</th><th>".$lang_topten['col_username']."</th><th>".$lang_topten['col_donated_usd']."</th><th>".$lang_topten['col_donated_cny']."</th></tr></thead><tbody>");
 
 	$n = 1;
 	while ($arr = mysql_fetch_assoc($res))
@@ -300,7 +293,8 @@ function donortable($res, $frame_caption)
 		print("<tr><td class=\"rowfollow\" align=\"center\">$n</td><td class=\"rowfollow\" align=\"left\">" . get_username($arr["id"]) . "</td><td class=\"rowfollow\" align=\"right\">" . number_format($arr["donated"], 2) . "</td><td class=\"rowfollow\" align=\"right\">" . number_format($arr["donated_cny"], 2) . "</td></tr>\n");
 		$n++;
 	}
-
+	
+	echo '</tbody>';
 	end_table();
 	end_frame();
 }
@@ -311,7 +305,7 @@ function clienttable($res, $frame_caption)
 	begin_frame($frame_caption, true);
 	begin_table();
 
-	print("<tr><td class=\"colhead\">".$lang_topten['col_rank']."</td><td class=\"colhead\">".$lang_topten['col_name']."</td><td class=\"colhead\">".$lang_topten['col_number']."</td></tr>");
+	print("<thead><tr><th>".$lang_topten['col_rank']."</th><th>".$lang_topten['col_name']."</th><th>".$lang_topten['col_number']."</th></tr></thead><tbody>");
 
 	$n = 1;
 	while ($arr = mysql_fetch_assoc($res))
@@ -320,6 +314,7 @@ function clienttable($res, $frame_caption)
 		$n++;
 	}
 
+	echo '</tbody>';
 	end_table();
 	end_frame();
 }
@@ -330,7 +325,7 @@ function lastsearch_table($res, $frame_caption)
 	begin_frame($frame_caption, true);
 	begin_table();
 
-	print("<tr><td class=\"colhead\">".$lang_topten['col_rank']."</td><td class=\"colhead\">".$lang_topten['col_keyword']."</td><td class=\"colhead\">".$lang_topten['col_datetime']."</td></tr>");
+	print("<thead><tr><th>".$lang_topten['col_rank']."</th><th>".$lang_topten['col_keyword']."</th><th>".$lang_topten['col_datetime']."</th></tr></thead><tbody>");
 
 	$n = 1;
 	while ($arr = mysql_fetch_assoc($res))
@@ -338,7 +333,7 @@ function lastsearch_table($res, $frame_caption)
 		print("<tr><td class=\"rowfollow\" align=\"center\">$n</td><td class=\"rowfollow\" align=\"left\"><a href=\"torrents.php?search=" . rawurlencode($arr["keywords"]) . "\">" . $arr["keywords"] . "</a></td><td class=\"rowfollow\" align=\"right\">" . gettime($arr["adddate"], true,false) . "</td></tr>\n");
 		$n++;
 	}
-
+	echo '</tbody>';
 	end_table();
 	end_frame();
 }
@@ -349,7 +344,7 @@ function search_ranktable($res, $frame_caption)
 	begin_frame($frame_caption, true);
 	begin_table();
 
-	print("<tr><td class=\"colhead\">".$lang_topten['col_rank']."</td><td class=\"colhead\">".$lang_topten['col_keyword']."</td><td class=\"colhead\">".$lang_topten['col_times']."</td></tr>");
+	print("<thead><tr><th>".$lang_topten['col_rank']."</th><th>".$lang_topten['col_keyword']."</th><th>".$lang_topten['col_times']."</th></tr></thead><tbody>");
 
 	$n = 1;
 	while ($arr = mysql_fetch_assoc($res))
@@ -357,7 +352,7 @@ function search_ranktable($res, $frame_caption)
 		print("<tr><td class=\"rowfollow\" align=\"center\">$n</td><td class=\"rowfollow\" align=\"left\"><a href=\"torrents.php?search=" . rawurlencode($arr["keywords"]) . "\">" . $arr["keywords"] . "</a></td><td class=\"rowfollow\" align=\"right\">" . number_format($arr["count"]) . "</td></tr>\n");
 		$n++;
 	}
-
+	echo '</tbody>';
 	end_table();
 	end_frame();
 }
@@ -372,16 +367,16 @@ function supply_snatchtable($res, $frame_caption)
 	begin_table();
 ?>
 
-<tr>
-<td class="colhead"><?php echo $lang_topten['col_rank'] ?></td>
-<td class="colhead" align="left"> <?php echo $lang_topten['col_user'] ?> </td>
-<td class="colhead" align="left"> <?php echo $lang_topten['col_torrent_uploaded'] ?> </td>
-<td class="colhead"> <?php echo $lang_topten['col_uploaded'] ?> </td>
-<td class="colhead" align="left"> <?php echo $lang_topten['col_torrent_downloaded'] ?> </td>
-<td class="colhead"> <?php echo $lang_topten['col_downloaded'] ?></td>
-<td class="colhead" align="right"> <?php echo $lang_topten['col_ratio'] ?> </td>
-<td class="colhead" align="left"> <?php echo $lang_topten['col_joined'] ?> </td>
-</tr>
+<thead><tr>
+<th><?php echo $lang_topten['col_rank'] ?></th>
+<th align="left"> <?php echo $lang_topten['col_user'] ?> </th>
+<th align="left"> <?php echo $lang_topten['col_torrent_uploaded'] ?> </th>
+<th> <?php echo $lang_topten['col_uploaded'] ?> </th>
+<th align="left"> <?php echo $lang_topten['col_torrent_downloaded'] ?> </th>
+<th> <?php echo $lang_topten['col_downloaded'] ?></th>
+<th align="right"> <?php echo $lang_topten['col_ratio'] ?> </th>
+<th align="left"> <?php echo $lang_topten['col_joined'] ?> </th>
+</tr></thead><tbody>
 <?php
 $num = 0;
 while ($a = mysql_fetch_assoc($res))
@@ -405,6 +400,7 @@ while ($a = mysql_fetch_assoc($res))
 	"</td><td class=\"rowfollow\" align=\"right\">" . $ratio .
 	"</td><td class=\"rowfollow\" align=\"left\">" . gettime($a["added"]). "</td></tr>");
 }
+	echo '</tbody>';
 end_table();
 end_frame();
 }
@@ -415,7 +411,7 @@ function stylesheettable($res, $frame_caption)
 	begin_frame($frame_caption, true);
 	begin_table();
 
-	print("<tr><td class=\"colhead\">".$lang_topten['col_rank']."</td><td class=\"colhead\">".$lang_topten['col_name']."</td><td class=\"colhead\">".$lang_topten['col_number']."</td></tr>");
+	print("<thead><tr><th>".$lang_topten['col_rank']."</th><th>".$lang_topten['col_name']."</th><th>".$lang_topten['col_number']."</th></tr></thead><tbody>");
 
 	$n = 1;
 	while ($arr = mysql_fetch_assoc($res))
@@ -424,7 +420,7 @@ function stylesheettable($res, $frame_caption)
 		print("<tr><td class=\"rowfollow\" align=\"center\">$n</td><td class=\"rowfollow\" align=\"left\">" . $arr["stylesheet_name"] . "</td><td class=\"rowfollow\" align=\"right\">" . number_format($arr["stylesheet_num"]) . "</td></tr>\n");
 		$n++;
 	}
-
+	echo '</tbody>';
 	end_table();
 	end_frame();
 }
@@ -435,7 +431,7 @@ function languagetable($res, $frame_caption)
 	begin_frame($frame_caption, true);
 	begin_table();
 
-	print("<tr><td class=\"colhead\">".$lang_topten['col_rank']."</td><td class=\"colhead\">".$lang_topten['col_name']."</td><td class=\"colhead\">".$lang_topten['col_number']."</td></tr>");
+	print("<thead><tr><th>".$lang_topten['col_rank']."</th><th>".$lang_topten['col_name']."</th><th>".$lang_topten['col_number']."</th></tr></thead><tbody>");
 
 	$n = 1;
 	while ($arr = mysql_fetch_assoc($res))
@@ -444,7 +440,7 @@ function languagetable($res, $frame_caption)
 		print("<tr><td class=\"rowfollow\" align=\"center\">$n</td><td class=\"rowfollow\" align=\"left\">" . $arr["lang_name"] . "</td><td class=\"rowfollow\" align=\"right\">" . number_format($arr["lang_num"]) . "</td></tr>\n");
 		$n++;
 	}
-
+	echo '</tbody>';
 	end_table();
 	end_frame();
 }

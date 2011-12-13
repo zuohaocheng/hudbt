@@ -2,8 +2,8 @@
 
 function get_user_prop($id) {
   $user = get_user_row($id);
-  $out = array();
   if ($user) {
+    $out = array();
     $out['id'] = $user['id'];
     $out['username'] = $user['username'];
     $out['class'] = array('raw' => $user['class'], 'canonical' => get_user_class_name($user['class'],false));
@@ -11,6 +11,9 @@ function get_user_prop($id) {
     if ($user['donor'] == 'yes') {
       $out['donor'] = true;
     }
+  }
+  else {
+    $out = null;
   }
   return $out;
 }

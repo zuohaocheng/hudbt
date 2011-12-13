@@ -4,7 +4,7 @@ if(!defined('IN_TRACKER'))
 error_reporting(E_ERROR | E_PARSE);
 ini_set('display_errors', 1);
 include_once($rootpath . 'classes/class_cache.php'); //Require the caching class
-$Cache = NEW CACHE('192.168.1.120', 11211); //Load the caching class
+$Cache = NEW CACHE(); //Load the caching class
 $Cache->setLanguageFolderArray(get_langfolder_list());
 define('TIMENOW', time());
 $USERUPDATESET = array();

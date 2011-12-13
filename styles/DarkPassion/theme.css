@@ -1,17 +1,24 @@
-body
-{
+body {
     margin-top: 0px;
     margin-bottom: 0px;
     color: #000000;
     font-family: tahoma, arial, helvetica, sans-serif;
-    background: url(./bg.jpg) no-repeat center top;
     background-color: #0f5475;
+    background-repeat:no-repeat;
+    background-image: linear-gradient(top, #caebfa 0, #0f5475 150px);
+    background-image: -webkit-linear-gradient(top, #caebfa 0, #0f5475 150px);
+    background-image: -moz-linear-gradient(top, #caebfa 0, #0f5475 150px);
+    background-image: -o-linear-gradient(top, #caebfa 0, #0f5475 150px);
+    background-image: -ms-linear-gradient(top, #caebfa 0, #0f5475 150px);
+    filter:alpha(opacity=100 finishopacity=0 style=1 startx=0,starty=0,finishx=0,finishy=30) progid:DXImageTransform.Microsoft.gradient(startcolorstr=#caebfa,endcolorstr=#of5475,gradientType=0);
+    -ms-filter:alpha(opacity=100 finishopacity=0 style=1 startx=0,starty=0,finishx=0,finishy=30) progid:DXImageTransform.Microsoft.gradient(startcolorstr=#caebfa,endcolorstr=#of5475,gradientType=0);
 }
-body.inframe
-{
+
+body.inframe {
     background-image: none;
     background-color: #caebfa;
 }
+
 table, .table {
     border-right: medium none;
     border-top: medium none;
@@ -19,6 +26,10 @@ table, .table {
     border-bottom: medium none;
     border-collapse: collapse;
     background-color: #eff1ff
+}
+
+table.transparent {
+    background-color:transparent;
 }
 
 #page {
@@ -197,10 +208,6 @@ td.rowhead, tbody>tr>th {
     text-align: right;
 }
 
-/* td.colfollow, tbody>tr>td { */
-/*     text-align: center; */
-/* } */
-
 table.torrents td.colhead, table.torrents th {
     text-align: center;
 }
@@ -368,7 +375,7 @@ a.altlink_green:hover
     cursor: pointer;
     color: #666;
     padding-top: 1px;
-    border-bottom: #ccc 1px outset
+    border-bottom: #ccc 1px outset;
 }
 .btn
 {
@@ -383,7 +390,8 @@ a.altlink_green:hover
     cursor: pointer;
     color: #666;
     padding-top: 1px;
-    border-bottom: #ccc 1px outset
+    border-bottom: #ccc 1px outset;
+    border-radius: 3px;
 }
 .small
 {
@@ -920,7 +928,14 @@ td.category-icon {
 }
 
 #ksearchbox-simple {
+    position:relative;
     zoom: 1;
+}
+
+#ksearchbox-simple div {
+    position: absolute;
+    zoom: 1;
+    right:2em;
 }
 
 #hotbox {
@@ -938,13 +953,6 @@ td.category-icon {
 
 #hotbox li {
     padding-bottom: 0.3em;
-}
-
-#searchbox-opts {
-    border-top:1px solid #CCC;
-    border-bottom:1px solid #CCC;
-    text-align:left;
-    padding:1em;
 }
 
 .suggestion-count {
@@ -994,6 +1002,27 @@ td.category-icon {
     margin: 0 auto;
 }
 
+.center {
+    text-align: center;
+    margin: 1em auto;
+}
+
+#hot-search li {
+    white-space: nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    max-width:8em;
+}
+
+#news {
+    padding: 20px 10px;
+}
+
+#poll {
+    margin: 0 auto;
+    width: 60%;
+}
+
 .minor-nav {
     text-align: center;
     margin-top: 0.5em;
@@ -1012,6 +1041,7 @@ input.a {
     border:none;
     background-color:transparent;
     padding:0;
+    vertical-align: 0;
 }
 
 input.a:hover {
@@ -1044,6 +1074,7 @@ input.a:hover {
 
 #header {
     position:relative;
+    background:url(../hustlogo.png) no-repeat 85% bottom;
 }
 
 #donate {

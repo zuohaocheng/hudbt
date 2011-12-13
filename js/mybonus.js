@@ -22,6 +22,7 @@ $(function() {
 		    $target.html(result.text);
 		    $('#bonus, .bonus').text(result.bonus);
 		    $('#uploaded').text(result.uploaded);
+		    $('#invites').text(result.invites);
 		}
 		else {
 		    $target.html(result.text + '<br />' + result.desc);
@@ -32,5 +33,17 @@ $(function() {
 		setTimeout(function(){$target.dialog("close")},5000);
 	    }, 'json');
 	});
+    });
+
+    var txtCustom = document.getElementById("giftcustom");
+    $('#giftselect').change(function() {
+	if (this.value == '0'){
+	    txtCustom.disabled = false;
+	    txtCustom.focus();
+	}
+	else {
+	    txtCustom.disabled = true;
+	    txtCustom.value = '';
+	}
     });
 });

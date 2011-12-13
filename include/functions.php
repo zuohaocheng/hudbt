@@ -29,6 +29,31 @@ function get_user_lang($user_id)
   return $lang['site_lang_folder'];
 }
 
+function get_load_uri($type, $script_name ="", $debug=false) {
+  global $CURUSER;
+  $name = ($script_name == "" ? substr(strrchr($_SERVER['SCRIPT_NAME'],'/'),1) : $script_name);
+
+  $addition = '';
+  if ($_GET['purge']) {
+    $addition .= '&purge=1';
+  }
+  if ($_GET['debug']) {
+    $addition .= '&debug=1';
+  }
+  
+  if ($type == 'js') {
+    return '<script type="text/javascript" src=load.php?format=js&name=' . $name . $addition . '></script>';
+  }
+  elseif ($type == 'css') {
+    if ($CURUSER) {
+      $addition .= '&id=' . $CURUSER['id'];
+    }
+    $href= 'load.php?format=css&name=' . $name . $addition;
+    return '<link rel="stylesheet" href="' . $href . '" type="text/css" media="screen" />';
+  }
+  return '';
+}
+
 function get_langfile_path($script_name ="", $target = false, $lang_folder = "")
 {
   global $CURLANGDIR;
@@ -154,10 +179,8 @@ function print_attachment($dlkey, $enableimage = true, $imageresizer = true)
     else{
       $url = $httpdirectory_attachment."/".$row['location'];
     }
-    if($imageresizer == true)
-      $onclick = " onclick=\"Previewurl('".$httpdirectory_attachment."/".$row['location']."')\"";
-    else $onclick = "";
-    $return = "<img id=\"attach".$id."\" alt=\"".htmlspecialchars($row['filename'])."\" src=\"".$url."\"". $onclick .  " onmouseover=\"domTT_activate(this, event, 'content', '".htmlspecialchars("<strong>".$lang_functions['text_size']."</strong>: ".mksize($row['filesize'])."<br />".gettime($row['added']))."', 'styleClass', 'attach', 'x', findPosition(this)[0], 'y', findPosition(this)[1]-58);\" />";
+
+    $return = '<img class="scalable" id=\"attach'.$id."\" alt=\"".htmlspecialchars($row['filename'])."\" src=\"".$url."\"". " onmouseover=\"domTT_activate(this, event, 'content', '".htmlspecialchars("<strong>".$lang_functions['text_size']."</strong>: ".mksize($row['filesize'])."<br />".gettime($row['added']))."', 'styleClass', 'attach', 'x', findPosition(this)[0], 'y', findPosition(this)[1]-58);\" />";
   }
   else $return = "";
       }
@@ -229,7 +252,14 @@ function formatCode($text) {
 }
 
 function formatImg($src, $enableImageResizer, $image_max_width, $image_max_height) {
-  return addTempCode("<img alt=\"image\" src=\"$src\"" .($enableImageResizer ?  " onload=\"Scale(this,$image_max_width,$image_max_height);\" onclick=\"Preview(this);\"" : "") .  " />");
+  $size_limit = '';
+  if ($image_max_height != 0) {
+    $size_limit .= 'max-height:' . $image_max_height . 'px;';
+  }
+  if ($image_max_width != 0) {
+    $size_limit .= 'max-width:' . $image_max_width . 'px;';
+  }
+  return addTempCode("<img class=\"scalable\" style=\"$size_limit\" alt=\"image\" src=\"$src\" />");
 }
 
 function formatFlash($src, $width, $height) {
@@ -254,7 +284,7 @@ function format_urls($text, $newWindow = false) {
   return preg_replace("/((https?|ftp|gopher|news|telnet|mms|rtsp):\/\/[^()\[\]<>\s]+)/ei",
           "formatUrl('\\1', ".($newWindow==true ? 1 : 0).", '', 'faqlink')", $text);
 }
-function format_comment($text, $strip_html = true, $xssclean = false, $newtab = false, $imageresizer = true, $image_max_width = 700, $enableimage = true, $enableflash = true , $imagenum = -1, $image_max_height = 0, $adid = 0)
+function format_comment($text, $strip_html = true, $xssclean = false, $newtab = false, $imageresizer = true, $image_max_width = 800, $enableimage = true, $enableflash = true , $imagenum = -1, $image_max_height = 0, $adid = 0)
 {
   global $lang_functions;
   global $CURUSER, $SITENAME, $BASEURL, $enableattach_attachment;
@@ -2122,14 +2152,18 @@ function simpletag(thetag)
       else return $ss_uri.$file;
     }
 
+function get_font_type() {
+  global $CURUSER;
+  if ($CURUSER['fontsize'] == 'large')
+    $file = 'large';
+  elseif ($CURUSER['fontsize'] == 'small')
+    $file = 'small';
+  else $file = 'medium';
+  return $file;
+}
+
     function get_font_css_uri(){
-      global $CURUSER;
-      if ($CURUSER['fontsize'] == 'large')
-  $file = 'largefont.css';
-      elseif ($CURUSER['fontsize'] == 'small')
-  $file = 'smallfont.css';
-      else $file = 'mediumfont.css';
-      return "styles/".$file;
+      return "styles/" . get_font_type() . 'font.css';
     }
 
     function get_style_addicode()
@@ -2235,35 +2269,6 @@ function simpletag(thetag)
       <title><?php echo $title?></title>
       <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
       <link rel="search" type="application/opensearchdescription+xml" title="<?php echo $SITENAME?> Torrents" href="opensearch.php" />
-      <link rel="stylesheet" href="<?php echo get_font_css_uri().$cssupdatedate?>" type="text/css" />
-      <link rel="stylesheet" href="styles/sprites.css<?php echo $cssupdatedate?>" type="text/css" />
-      <link rel="stylesheet" href="<?php echo get_forum_pic_folder()."/forumsprites.css".$cssupdatedate?>" type="text/css" />
-      <link rel="stylesheet" href="<?php echo $css_uri."theme.css".$cssupdatedate?>" type="text/css" />
-      <link rel="stylesheet" href="<?php echo $css_uri."DomTT.css".$cssupdatedate?>" type="text/css" />
-      <link rel="stylesheet" href="styles/curtain_imageresizer.css<?php echo $cssupdatedate?>" type="text/css" />
-      <link rel="stylesheet" href="<?php echo 'pic/' . get_cat_folder() . "sprite.css"?>" type="text/css" />
-      <?php
-	if ($CURUSER){
-	  $caticonrow = get_category_icon_row($CURUSER['caticon']);
-	  if($caticonrow['cssfile']){
-      ?>
-      <link rel="stylesheet" href="<?php echo htmlspecialchars($caticonrow['cssfile']).$cssupdatedate?>" type="text/css" />
-      <?php
-	  }
-	}
-      ?>
-      <link rel="alternate" type="application/rss+xml" title="Latest Torrents" href="torrentrss.php" />
-      <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
-      <script type="text/javascript" src="curtain_imageresizer.js<?php echo $cssupdatedate?>"></script>
-      <script type="text/javascript" src="ajaxbasic.js<?php echo $cssupdatedate?>"></script>
-      <script type="text/javascript" src="common.js<?php echo $cssupdatedate?>"></script>
-      <script type="text/javascript" src="domLib.js<?php echo $cssupdatedate?>"></script>
-      <script type="text/javascript" src="domTT.js<?php echo $cssupdatedate?>"></script>
-      <script type="text/javascript" src="domTT_drag.js<?php echo $cssupdatedate?>"></script>
-      <script type="text/javascript" src="fadomatic.js<?php echo $cssupdatedate?>"></script>
-      <!--[if lte IE 6]>
-	  <script type="text/javascript" src="js/ie6utf8.js"></script>
-	  <![endif]-->
       <script type="text/javascript">
 	//<![CDATA[
     <?php
@@ -2271,6 +2276,13 @@ function simpletag(thetag)
     ?>
     //]]>
       </script>
+<?php
+echo get_load_uri('css');
+echo get_load_uri('js');
+?>
+      <!--[if lte IE 6]>
+	  <script type="text/javascript" src="js/ie6utf8.js"></script>
+	  <![endif]-->
     </head>
     <body>
       <div id="wrap">
@@ -2418,7 +2430,7 @@ function simpletag(thetag)
 		    <?php if (get_user_class() >= UC_SYSOP) { ?> <li><a href="settings.php"><?php echo $lang_functions['text_site_settings'] ?></a></li><?php } ?>
 		    <li><a href="torrents.php?inclbookmarked=1&amp;allsec=1&amp;incldead=0"><?php echo $lang_functions['text_bookmarks'] ?></a></li>
 		    <li><a href="mybonus.php" title="<?php echo $lang_functions['text_use'] ?>"><span class = 'color_bonus'><?php echo $lang_functions['text_bonus'] ?></span>: <span id="bonus"><?php echo number_format($CURUSER['seedbonus'], 1)?></span></a></li>
-		    <li><a href="invite.php?id=<?php echo $CURUSER['id']?>" title="<?php echo $lang_functions['text_send'] ?>"><span class = 'color_invite'><?php echo $lang_functions['text_invite'] ?></span>: <?php echo $CURUSER['invites']?></a></li></ul></div>
+		    <li><a href="invite.php?id=<?php echo $CURUSER['id']?>" title="<?php echo $lang_functions['text_send'] ?>"><span class = 'color_invite'><?php echo $lang_functions['text_invite'] ?></span>: <span id="invites"><?php echo $CURUSER['invites']?></span></a></li></ul></div>
 		    <div class="minor-list compact"><ul>
 		      <li><span class="color_ratio"><?php echo $lang_functions['text_ratio'] ?></span> <?php echo $ratio?></li>
 		      <li><span class='color_uploaded'><?php echo $lang_functions['text_uploaded'] ?></span><span id="uploaded"><?php echo mksize($CURUSER['uploaded'])?></span></li>
@@ -2581,20 +2593,13 @@ function php_json_encode( $data ) {
 
 function js_hb_config() {
     global $torrentmanage_class;
-    global $lang_functions;
-    static $const;
 
     $class = get_user_class();
     if ($class) {
       $user = array('class' => $class, 'canonicalClass' => get_user_class_name($class, false));
       $config = array('user' => $user);
 
-      if (!$const) {
-  global $promotion_text;
-
-  $const = php_json_encode(array('torrentmanage_class' => $torrentmanage_class, 'cat_class' => get_category_row(), 'lang' => $lang_functions, 'pr' => $promotion_text));
-      }
-      $out = 'hb = {config : ' . php_json_encode($config) . ', constant : ' . $const . '}';
+      $out = 'hb = {config : ' . php_json_encode($config) . '}';
     }
     else {
       $out = '';
@@ -2607,7 +2612,7 @@ function stdfoot() {
   global $SITENAME,$BASEURL,$Cache,$datefounded,$tstart,$icplicense_main,$add_key_shortcut,$query_name, $USERUPDATESET, $CURUSER, $enablesqldebug_tweak, $sqldebug_tweak, $Advertisement, $analyticscode_tweak;
   //$cnzz="<center><script src='http://s94.cnzz.com/stat.php?id=2647714&web_id=2647714&show=pic' language='JavaScript'></script></center>";
   ?>
-</div></div>
+</div><a href="#" id="back-to-top" title="回到页首" style="display:none;"></a></div>
 <div id="footer">
 <?
   if ($Advertisement->enable_ad()){
@@ -4464,7 +4469,7 @@ function valid_class_name($filename)
 function return_avatar_image($url)
 {
   global $CURLANGDIR;
-  return "<img src=\"".$url."\" alt=\"avatar\" width=\"150px\" onload=\"check_avatar(this, '".$CURLANGDIR."');\" />";
+  return "<img src=\"".$url."\" alt=\"avatar\" class=\"avatar\" />";
 }
 function return_category_image($categoryid, $link="")
 {
@@ -4474,7 +4479,6 @@ function return_category_image($categoryid, $link="")
   } else {
     $categoryrow = get_category_row($categoryid);
     $catimgurl = get_cat_folder($categoryid);
-#    $catImg[$categoryid] = $catimg = "<img".($categoryrow['class_name'] ? " class=\"".$categoryrow['class_name']."\"" : "")." src=\"pic/cattrans.gif\" alt=\"" . $categoryrow["name"] . "\" title=\"" .$categoryrow["name"]. "\" style=\"background-image: url(pic/" . $catimgurl . $categoryrow["image"].");\" />";
     $catImg[$categoryid] = $catimg = "<img".($categoryrow['class_name'] ? " class=\"".$categoryrow['class_name']."\"" : "")." src=\"pic/cattrans.gif\" alt=\"" . $categoryrow["name"] . "\" title=\"" .$categoryrow["name"]. "\" />";
   }
   if ($link) {

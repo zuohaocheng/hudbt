@@ -3,7 +3,7 @@ require_once("include/bittorrent.php");
 dbconn();
 require_once(get_langfile_path());
 registration_check('invitesystem', true, false);
-if (get_user_class() < $sendinvite_class)
+if ($CURUSER[invites] <= 0 && get_user_class() < $sendinvite_class)
 stderr($lang_takeinvite['std_error'],$lang_takeinvite['std_invite_denied']);
 $restInvites = (@mysql_fetch_row(@sql_query("select invites from users where id=".$CURUSER['id']))) or die(mysql_error());
 if ($restInvites[0] < 1 || $restInvites[0] > 1000)
@@ -61,8 +61,10 @@ $successed = sent_mail($email,$SITENAME,$SITEEMAIL,change_email_encode(get_langf
 //this email is sent only when someone give out an invitation
 
 if($successed) {
-	sql_query("INSERT INTO invites (inviter, invitee, hash, time_invited) VALUES ('".mysql_real_escape_string($id)."', '".mysql_real_escape_string($email)."', '".mysql_real_escape_string($hash)."', " . sqlesc(date("Y-m-d H:i:s")) . ")");
-	sql_query("UPDATE users SET invites = invites - 1 WHERE id = ".mysql_real_escape_string($id)."") or sqlerr(__FILE__, __LINE__);
+	sql_query("UPDATE users SET invites = invites - 1 WHERE invites > 0 id = ".mysql_real_escape_string($id)."") or sqlerr(__FILE__, __LINE__);
+	if (mysql_affected_rows()) {
+	  sql_query("INSERT INTO invites (inviter, invitee, hash, time_invited) VALUES ('".mysql_real_escape_string($id)."', '".mysql_real_escape_string($email)."', '".mysql_real_escape_string($hash)."', " . sqlesc(date("Y-m-d H:i:s")) . ")");
+	}
 } else {
 	bark('通过 SMTP 服务器发送邮件失败，请稍后重新尝试发送。');
 }

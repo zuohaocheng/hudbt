@@ -20,6 +20,10 @@ table, .table {
     background-color: #bccad6
 }
 
+table.transparent {
+    background-color:transparent;
+}
+
 #page {
     text-align: center;
     position: relative;
@@ -399,7 +403,7 @@ a.altlink_green:hover
     cursor: pointer;
     color: #666;
     padding-top: 1px;
-    border-bottom: #ccc 1px outset
+    border-bottom: #ccc 1px outset;
 }
 .btn
 {
@@ -414,7 +418,8 @@ a.altlink_green:hover
     cursor: pointer;
     color: #666;
     padding-top: 1px;
-    border-bottom: #ccc 1px outset
+    border-bottom: #ccc 1px outset;
+    border-radius: 3px;
 }
 .small
 {
@@ -937,7 +942,14 @@ td.category-icon {
 }
 
 #ksearchbox-simple {
+    position:relative;
     zoom: 1;
+}
+
+#ksearchbox-simple div {
+    position: absolute;
+    zoom: 1;
+    right:2em;
 }
 
 #hotbox {
@@ -955,13 +967,6 @@ td.category-icon {
 
 #hotbox li {
     padding-bottom: 0.3em;
-}
-
-#searchbox-opts {
-    border-top:1px solid #CCC;
-    border-bottom:1px solid #CCC;
-    text-align:left;
-    padding:1em;
 }
 
 .suggestion-count {
@@ -1011,6 +1016,27 @@ td.category-icon {
     margin: 0 auto;
 }
 
+.center {
+    text-align: center;
+    margin: 1em auto;
+}
+
+#hot-search li {
+    white-space: nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    max-width:8em;
+}
+
+#news {
+    padding: 20px 10px;
+}
+
+#poll {
+    margin: 0 auto;
+    width: 60%;
+}
+
 .minor-nav {
     text-align: center;
     margin-top: 0.5em;
@@ -1029,6 +1055,7 @@ input.a {
     border:none;
     background-color:transparent;
     padding:0;
+    vertical-align: 0;
 }
 
 input.a:hover {
@@ -1061,6 +1088,7 @@ input.a:hover {
 
 #header {
     position:relative;
+    background:url(../hustlogo.png) no-repeat 85% bottom;
 }
 
 #donate {

@@ -1,0 +1,3 @@
+$(function() {
+    $('#uploaders-works').tablesorter();
+});

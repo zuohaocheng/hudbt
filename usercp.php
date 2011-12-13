@@ -564,8 +564,8 @@ if ($showaudiocodec) $audiocodecs = searchbox_item_list("audiocodecs");
 				if ($caticon['id'] == $CURUSER['caticon']) $sl = " selected"; else $sl = "";
 				$categoryicons .= "<option value=".$caticon['id'].$sl.">".$caticon['name']."</option>\n";
 			}
-			tr_small($lang_usercp['row_stylesheet'], "<select name=stylesheet>\n$stylesheets\n</select>&nbsp;&nbsp;<font class=small>".$lang_usercp['text_stylesheet_note']."<a href=\"aboutnexus.php#stylesheet\" ><b>".$lang_usercp['text_stylesheet_link']."</b></a></font>.",1);
-			tr_small($lang_usercp['row_category_icons'], "<select name=caticon>".$categoryicons."</select>",1);
+			tr_small($lang_usercp['row_stylesheet'], "<select id=\"stylesheet\" name=\"stylesheet\">\n$stylesheets\n</select>&nbsp;&nbsp;<font class=small>".$lang_usercp['text_stylesheet_note']."<a href=\"aboutnexus.php#stylesheet\" ><b>".$lang_usercp['text_stylesheet_link']."</b></a></font>.",1);
+			tr_small($lang_usercp['row_category_icons'], "<select id==\"caticon\" name=\"caticon\">".$categoryicons."</select>",1);
 			tr_small($lang_usercp['row_font_size'], "<select name=fontsize><option value=small ".($CURUSER['fontsize'] == 'small' ? " selected" : "").">".$lang_usercp['select_small']."</option><option value=medium ".($CURUSER['fontsize'] == 'medium' ? " selected" : "").">".$lang_usercp['select_medium']."</option><option value=large ".($CURUSER['fontsize'] == 'large' ? " selected" : "").">".$lang_usercp['select_large']."</option></select>",1);
 
 
@@ -605,9 +605,11 @@ tr_small($lang_usercp['row_funbox'],"<input type=checkbox name=showfb".($CURUSER
 		<b>".$lang_usercp['text_show_action_icons'].": </b><br />"."<input type=checkbox name=dlicon ".($CURUSER['dlicon'] == 'yes' ? " checked" : "")." value=yes>".$lang_usercp['text_show_download_icon']." <img class=\"download\" src=\"pic/trans.gif\"  alt=\"Download\" /><br /><input type=checkbox name=bmicon ".($CURUSER['bmicon'] == 'yes' ? " checked" : "")." value=yes>".$lang_usercp['text_show_bookmark_icon']." <img class=\"bookmark\" src=\"pic/trans.gif\" alt=\"Bookmark\" /><br />
 		<b>".$lang_usercp['text_comments_reviews'].": </b><br /><input type=checkbox name=showcomnum ".($CURUSER['showcomnum'] == 'yes' ? " checked" : "")." value=yes>".$lang_usercp['text_show_comment_number'].($showtooltipsetting ? "<select name=\"showlastcom\" style=\"width: 70px;\"><option value=\"yes\" ".($CURUSER['showlastcom'] != 'no' ? " selected" : "").">".$lang_usercp['select_with']."</option><option value=\"no\" ".($CURUSER['showlastcom'] == 'no' ? " selected" : "").">".$lang_usercp['select_without']."</option></select>".$lang_usercp['text_last_comment_on_tooltip'] : ""), 1);
 
-			submit();
-			print("</table>");
-			stdfoot();
+			submit();?>
+</table>
+<div style="display:none;" id="hints" title="提示"><p>改变主题后若没有效果，请多刷新几次，或清除缓存后即可。</p>
+<p>Firefox：按住Shift再点击刷新； Safari：点击刷新； Google Chrome / Opera：按住Shift再点击刷新； Internet Explorer：按住Ctrl再点击刷新。</p></div>
+<?php			stdfoot();
 			die;
 			break;
 		case "forum":

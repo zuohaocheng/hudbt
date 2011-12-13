@@ -343,19 +343,19 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 
 	if ($user["ip"] && (get_user_class() >= $torrenthistory_class || $user["id"] == $CURUSER["id"])){
 
-	tr_small($lang_userdetails['row_uploaded_torrents'], "<a href=\"javascript: getusertorrentlistajax('".$user['id']."', 'uploaded', 'ka'); klappe_news('a')\"><img class=\"plus\" src=\"pic/trans.gif\" id=\"pica\" alt=\"Show/Hide\" title=\"".$lang_userdetails['title_show_or_hide'] ."\" />   <u>".$lang_userdetails['text_show_or_hide']."</u></a><div id=\"ka\" style=\"display: none;\"></div>", 1);
+	tr_small($lang_userdetails['row_uploaded_torrents'], "<a href=\"javascript: getusertorrentlistajax('".$user['id']."', 'uploaded', 'ka');\"><img class=\"plus\" src=\"pic/trans.gif\" id=\"pica\" alt=\"Show/Hide\" title=\"".$lang_userdetails['title_show_or_hide'] ."\" />   <u>".$lang_userdetails['text_show_or_hide']."</u></a><div id=\"ka\" style=\"display: none;\"></div>", 1);
 
 
-	tr_small($lang_userdetails['row_current_seeding'], "<a href=\"javascript: getusertorrentlistajax('".$user['id']."', 'seeding', 'ka1'); klappe_news('a1')\"><img class=\"plus\" src=\"pic/trans.gif\" id=\"pica1\" alt=\"Show/Hide\" title=\"".$lang_userdetails['title_show_or_hide']."\" />   <u>".$lang_userdetails['text_show_or_hide']."</u></a><div id=\"ka1\" style=\"display: none;\"></div>", 1);
+	tr_small($lang_userdetails['row_current_seeding'], "<a href=\"javascript: getusertorrentlistajax('".$user['id']."', 'seeding', 'ka1');\"><img class=\"plus\" src=\"pic/trans.gif\" id=\"pica1\" alt=\"Show/Hide\" title=\"".$lang_userdetails['title_show_or_hide']."\" />   <u>".$lang_userdetails['text_show_or_hide']."</u></a><div id=\"ka1\" style=\"display: none;\"></div>", 1);
 
 
-	tr_small($lang_userdetails['row_current_leeching'], "<a href=\"javascript: getusertorrentlistajax('".$user['id']."', 'leeching', 'ka2'); klappe_news('a2')\"><img class=\"plus\" src=\"pic/trans.gif\" id=\"pica2\" alt=\"Show/Hide\" title=\"".$lang_userdetails['title_show_or_hide']."\" />   <u>".$lang_userdetails['text_show_or_hide']."</u></a><div id=\"ka2\" style=\"display: none;\"></div>", 1);
+	tr_small($lang_userdetails['row_current_leeching'], "<a href=\"javascript: getusertorrentlistajax('".$user['id']."', 'leeching', 'ka2');\"><img class=\"plus\" src=\"pic/trans.gif\" id=\"pica2\" alt=\"Show/Hide\" title=\"".$lang_userdetails['title_show_or_hide']."\" />   <u>".$lang_userdetails['text_show_or_hide']."</u></a><div id=\"ka2\" style=\"display: none;\"></div>", 1);
 
 
-	tr_small($lang_userdetails['row_completed_torrents'], "<a href=\"javascript: getusertorrentlistajax('".$user['id']."', 'completed', 'ka3'); klappe_news('a3')\"><img class=\"plus\" src=\"pic/trans.gif\" id=\"pica3\" alt=\"Show/Hide\" title=\"".$lang_userdetails['title_show_or_hide']."\" />   <u>".$lang_userdetails['text_show_or_hide']."</u></a><div id=\"ka3\" style=\"display: none;\"></div>", 1);
+	tr_small($lang_userdetails['row_completed_torrents'], "<a href=\"javascript: getusertorrentlistajax('".$user['id']."', 'completed', 'ka3');\"><img class=\"plus\" src=\"pic/trans.gif\" id=\"pica3\" alt=\"Show/Hide\" title=\"".$lang_userdetails['title_show_or_hide']."\" />   <u>".$lang_userdetails['text_show_or_hide']."</u></a><div id=\"ka3\" style=\"display: none;\"></div>", 1);
 
 
-	tr_small($lang_userdetails['row_incomplete_torrents'], "<a href=\"javascript: getusertorrentlistajax('".$user['id']."', 'incomplete', 'ka4'); klappe_news('a4')\"><img class=\"plus\" src=\"pic/trans.gif\" id=\"pica4\" alt=\"Show/Hide\" title=\"".$lang_userdetails['title_show_or_hide']."\" />   <u>".$lang_userdetails['text_show_or_hide']."</u></a><div id=\"ka4\" style=\"display: none;\"></div>", 1);
+	tr_small($lang_userdetails['row_incomplete_torrents'], "<a href=\"javascript: getusertorrentlistajax('".$user['id']."', 'incomplete', 'ka4');\"><img class=\"plus\" src=\"pic/trans.gif\" id=\"pica4\" alt=\"Show/Hide\" title=\"".$lang_userdetails['title_show_or_hide']."\" />   <u>".$lang_userdetails['text_show_or_hide']."</u></a><div id=\"ka4\" style=\"display: none;\"></div>", 1);
 	}
 	if ($user["info"])
 		print("<tr><td align=\"left\" colspan=\"2\" class=\"text\">" . format_comment($user["info"],false) . "</td></tr>\n");

@@ -12,7 +12,11 @@ $(function() {
 
     var argsFromUri = function(uri) {
 	var args = new Object();
-	$.each(uri.split('?')[1].split('&'), function(idx, obj) {
+	var query = uri.split('?');
+	if (query.length !== 2) {
+	    return [];
+	}
+	$.each(query[1].split('&'), function(idx, obj) {
 	    var t = obj.split('=');
 	    args[t[0]] = t[1];
 	});
@@ -51,7 +55,7 @@ $(function() {
 		if (col === '1' || col ==='4') {
 		    sorttype = 'asc';
 		    if (col === '4' && typeof(sortcol) === 'undefined') {
-			sortclass += 'headSortDown';
+			sortclass += ' headerSortDown';
 		    }
 		}
 		else {
@@ -147,6 +151,7 @@ $(function() {
 	}
 
 	setTitleWidth = function(targets) {
+	    //console.profile();
 	    targets.each(function() {
 		var $this = $(this);
 		var wThis = $this.width();
@@ -171,6 +176,7 @@ $(function() {
 		modifyCss(wThis, $this.find('h2'), wTitleD);
 		modifyCss(wThis, $this.find('h3'), wDescD);
 	    });
+	    //console.profileEnd();
 	};
 	setTitleWidth($('td.torrent div.limit-width.minor-list'));
     }
@@ -326,7 +332,7 @@ $(function() {
 	    var torrent_utitly = '<div class="torrent-utilty-icons minor-list-vertical"><ul><li><a href="download.php?id=' + id + '&hit=1"><img class="download" src="pic/trans.gif" alt="download" title="' + lang.title_download_torrent + '" /></a></li><li><a id="bookmark' + id + '" href="javascript: bookmark(' + id + ');"><img class="' + bookmarkClass + '" alt="bookmark" src="pic/trans.gif" title="' + lang.title_bookmark_torrent + '" /></a></li></ul></div>';
 
 	    title += torrent_utitly;
-	    title_td += title + '</td>';
+	    title_td += title + '</div></td>';
 	    tr += title_td;
 
 	    tr += addNumber(torrent.comments.count, 'comment.php?action=add&pid=' + id + '&type=torrent', 'details.php?id=' + id + '&hit=1&cmtpage=1#startcomments');
@@ -346,7 +352,7 @@ $(function() {
 	    var completed = addNumber(torrent.times_completed, '', 'viewsnatches.php?id=' + id);
 	    tr += completed;
 
-	    var towner = '<td>'
+	    var towner = '<td>';
 	    var owner = torrent.owner;
 	    if (owner.anonymous) {
 		towner += lang.text_anonymous;
@@ -362,6 +368,10 @@ $(function() {
 		    towner += ')';
 		}
 	    }
+	    else if (!owner.anonymous) {
+		towner += lang.text_orphaned;
+	    }
+	    towner += '</td>';
 	    tr += towner;
 
 	    if (isManager) {
@@ -408,17 +418,6 @@ $(function() {
 	}
 	//	    var end = ((new Date()).getTime());
 	//	    console.log(end - start);
-    };
-
-    //Back to top
-    var backtotop = $('#back-to-top');
-    backtotop.click(function(e) {
-	e.preventDefault();
-	scrollToPosition(0);
-    });
-
-    window.onscroll=function() {
-	$document.scrollTop() > 200 ? backtotop.css('display', "") : backtotop.css('display', 'none');
     };
 
     //Auto scroll
@@ -613,23 +612,38 @@ $(function() {
     };
 });
 
-//Persist searchbox status
-(function() {
-    var searchbox = $('#ksearchboxmain');
-    var toggleSearchbox = function() {
-	klappe_news('searchboxmain');
-	klappe_news('searchbox-simple', true);
+//Select all
+var form='searchbox';
+function SetChecked(chkName,ctrlName,checkall_name,uncheckall_name,start,count) {
+    var dml=document.forms[form];
+    var len = dml.elements.length;
+    var begin;
+    var end;
+    var check_state;
+    if (start == -1){
+	begin = 0;
+	end = len;
+    }
+    else{
+	begin = start;
+	end = start + count;
+    }
+    var check_state;
+    var button = document.getElementById(ctrlName)
+
+    if(button.value == checkall_name) {
+	button.value = uncheckall_name;
+	check_state=1;
+    }
+    else {
+	button.value = checkall_name;
+	check_state=0;
     }
 
-    $('#searchbox-header a').click(function(e) {
-	e.preventDefault();
-	$.jStorage.set('hideSearchbox', (searchbox.css('display') === 'none'));
-	toggleSearchbox();
-    });
+    for( i=begin ; i<end ; i++) {
+	if (dml.elements[i].name.indexOf(chkName) != -1) {
+	    dml.elements[i].checked=check_state;
+	}
 
-    if ($.jStorage.get('hideSearchbox', false)) {
-	searchbox.show();
-	$('#ksearchbox-simple').hide();
-	document.getElementById('picsearchboxmain').className = 'minus';
     }
-})();
+}

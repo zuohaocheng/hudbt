@@ -31,7 +31,7 @@ begin_frame($lang_staff['text_firstline_support']."<font class=small> - [<a clas
 ?>
 <?php echo $lang_staff['text_firstline_support_note'] ?>
 <br /><br />
-<table width=100% cellspacing=0 align=center>
+<table width="100%" cellspacing="0" class="transparent">
 	<tr>
 		<td class=embedded><b><?php echo $lang_staff['text_username'] ?></b></td>
 		<td class=embedded align=center><b><?php echo $lang_staff['text_country'] ?></b></td>
@@ -68,7 +68,7 @@ begin_frame($lang_staff['text_movie_critics']."<font class=small> - [<a class=al
 ?>
 <?php echo $lang_staff['text_movie_critics_note'] ?>
 <br /><br />
-<table width=100% cellspacing=0 align=center>
+<table width="100%" cellspacing="0" class="transparent">
 	<tr>
 		<td class=embedded><b><?php echo $lang_staff['text_username'] ?></b></td>
 		<td class=embedded align=center><b><?php echo $lang_staff['text_country'] ?></b></td>
@@ -110,7 +110,7 @@ begin_frame($lang_staff['text_forum_moderators']."<font class=small> - [<a class
 ?>
 <?php echo $lang_staff['text_forum_moderators_note'] ?>
 <br /><br />
-<table width=100% cellspacing=0 align=center>
+<table width="100%" cellspacing="0" class="transparent">
 	<tr>
 		<td class=embedded><b><?php echo $lang_staff['text_username'] ?></b></td>
 		<td class=embedded align=center><b><?php echo $lang_staff['text_country'] ?></b></td>
@@ -161,7 +161,7 @@ begin_frame($lang_staff['text_general_staff']."<font class=small> - [<a class=al
 ?>
 <?php echo $lang_staff['text_general_staff_note'] ?>
 <br /><br />
-<table width=100% cellspacing=0 align=center>
+<table width="100%" cellspacing="0" class="transparent">
 	<?php echo $ppl?>
 </table>
 <?php
@@ -187,7 +187,7 @@ begin_frame($lang_staff['text_vip']);
 ?>
 <?php echo $lang_staff['text_vip_note'] ?>
 <br /><br />
-<table width=100% cellspacing=0 align=center>
+<table width="100%" cellspacing="0" class="transparent">
 	<tr>
 		<td class=embedded><b><?php echo $lang_staff['text_username'] ?></b></td>
 		<td class=embedded><b><?php echo $lang_staff['text_country'] ?></b></td>
