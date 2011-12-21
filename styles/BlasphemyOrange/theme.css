@@ -1,5 +1,4 @@
-body
-{
+body {
     margin-top: 0px;
     background: #e6e6e6 url(./bg.gif) repeat left top;
     margin-bottom: 0px;
@@ -16,7 +15,7 @@ table, .table {
     border-left: medium none;
     border-bottom: medium none;
     border-collapse: collapse;
-    background-color: transparent
+    background-color: transparent;
 }
 
 table.transparent {
@@ -28,6 +27,7 @@ table.transparent {
     text-align: center;
     position: relative;
     padding-bottom: 2em;
+    box-shadow: 0 0 20px white;
 }
 
 #page>form>table, #page>form>div {
@@ -911,7 +911,7 @@ td.category-icon {
     border-radius: 3px;
     background-color: red;
     padding: 0.8em 1.2em;
-    box-shadow:2px 2px 5px black;
+    box-shadow:2px 2px 5px gray;
     margin: 0 1em;
 }
 

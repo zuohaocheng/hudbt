@@ -1,5 +1,4 @@
-body
-{
+body {
     margin-top: 0px;
     margin-bottom: 0px;
     color: #000000;
@@ -29,6 +28,7 @@ table.transparent {
     text-align: center;
     position: relative;
     padding-bottom: 2em;
+    box-shadow: 0 0 20px #f5f4ea;
 }
 
 #page>form>table, #page>form>div {
@@ -885,7 +885,7 @@ td.category-icon {
     border-radius: 3px;
     background-color: red;
     padding: 0.8em 1.2em;
-    box-shadow:2px 2px 5px black;
+    box-shadow:2px 2px 5px gray;
     margin: 0 1em;
 }
 

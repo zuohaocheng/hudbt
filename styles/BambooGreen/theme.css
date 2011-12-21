@@ -1,5 +1,4 @@
-body
-{
+body {
     margin-top: 0px;
     margin-bottom: 0px;
     background: url(./bg.jpg) no-repeat center top;
@@ -31,6 +30,7 @@ table.transparent {
     background-color: #55aa55
     position: relative;
     padding-bottom: 2em;
+    box-shadow: 0 0 20px #55aa55;
 }
 
 #page>form>table, #page>form>div {
@@ -871,7 +871,7 @@ td.category-icon {
     border-radius: 3px;
     background-color: red;
     padding: 0.8em 1.2em;
-    box-shadow:2px 2px 5px black;
+    box-shadow:2px 2px 5px gray;
     margin: 0 1em;
 }
 
