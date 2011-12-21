@@ -895,19 +895,20 @@ td.category-icon {
     text-overflow:ellipsis;
 }
 
-.alert {
+#alert {
     margin: 1.5em auto;
     text-align: center;
 }
 
-.alert span {
+#alert li, #alert li:first-child {
     border-radius: 3px;
     background-color: red;
     padding: 0.8em 1.2em;
     box-shadow:2px 2px 5px black;
+    margin: 0 1em;
 }
 
-.alert a {
+#alert a {
     font-weight: bold;
     color: white;
 }

@@ -173,12 +173,12 @@ function get_last_read_post_id($topicid) {
 }
 
 function dequote($s) {
-  $MAX_LEN = 40;
+#  $MAX_LEN = 40;
   
   $s = preg_replace('/\[quote(=[a-z0-9]+)?\].*\[\/quote\]/smi', '', $s);
-  if (iconv_strlen($s, 'utf-8') > $MAX_LEN) {
-    $s = iconv_substr($s, 0, $MAX_LEN, 'utf-8') . '...';
-  }
+#  if (iconv_strlen($s, 'utf-8') > $MAX_LEN) {
+#    $s = iconv_substr($s, 0, $MAX_LEN, 'utf-8') . '...';
+#  }
   return $s;
 }
 

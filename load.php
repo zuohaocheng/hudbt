@@ -9,8 +9,9 @@ $purge = $_REQUEST['purge'];
 $fullname = strtolower($_REQUEST['name']);
 $format = strtolower($_REQUEST['format']);
 
-#echo '/*t*/';
-list($name, $type) = preg_split('/\./', $fullname);
+$tokens = preg_split('/\./', $fullname);
+$type = array_pop($tokens);
+$name = implode('.', $tokens);
 
 if ($type == 'php') {
   $multifile = true;
@@ -245,7 +246,7 @@ function load_file($name, $type, $debug, $fullpath=false, $minify = true) {
     $f = css_remap($f, $path);
   }
   
-  if ($minify) {
+  if ($minify && !preg_match('/\.min$/', $name)) {
     $f = minify($f, $type, $debug, $path);
   }
   return $f;
