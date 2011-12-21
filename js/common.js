@@ -361,3 +361,16 @@ $(function() {    //Back to top
 	$document.scrollTop() > 200 ? backtotop.css('display', "") : backtotop.css('display', 'none');
     };
 });
+
+var argsFromUri = function(uri) {
+    var args = new Object();
+    var query = uri.split('?');
+    if (query.length !== 2) {
+	return [];
+    }
+    $.each(query[1].split('&'), function(idx, obj) {
+	var t = obj.split('=');
+	args[t[0]] = decodeURIComponent(t[1]);
+    });
+    return args;
+};

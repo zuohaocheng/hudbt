@@ -10,18 +10,6 @@ $(function() {
     var ie = $.browser.msie;
     var ie8 = ie && $.browser.version < 9;
 
-    var argsFromUri = function(uri) {
-	var args = new Object();
-	var query = uri.split('?');
-	if (query.length !== 2) {
-	    return [];
-	}
-	$.each(query[1].split('&'), function(idx, obj) {
-	    var t = obj.split('=');
-	    args[t[0]] = t[1];
-	});
-	return args;
-    };
     var args = argsFromUri(window.location.search);
 
     var $sortHeaders = table.find('thead th:not(.unsortable)');
@@ -44,18 +32,18 @@ $(function() {
 	    if (sortcol === col) {
 		if (sortcoltype === 'desc') {
 		    sorttype = 'asc';
-		    sortclass += ' headerSortDown';
+		    sortclass += ' headerSortUp';
 		}
 		else {
 		    sorttype = 'desc';
-		    sortclass += ' headerSortUp';
+		    sortclass += ' headerSortDown';
 		}
 	    }
 	    else {
 		if (col === '1' || col ==='4') {
 		    sorttype = 'asc';
 		    if (col === '4' && typeof(sortcol) === 'undefined') {
-			sortclass += ' headerSortDown';
+			sortclass += ' headerSortUp';
 		    }
 		}
 		else {

@@ -1,6 +1,6 @@
 <?php
 
-$ip=getenv(REMOTE_ADDR);
+$ip=getenv('REMOTE_ADDR');
 //echo $ip;
 
 require "include/bittorrent.php";

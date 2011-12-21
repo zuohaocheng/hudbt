@@ -16,18 +16,6 @@ function hidepeerlist() {
 $(function() {
     $('#kfilelist table').tablesorter();
     $('#saythanks:enabled').click(function() {
-	var argsFromUri = function(uri) {
-	    var args = new Object();
-	    var query = uri.split('?');
-	    if (query.length !== 2) {
-		return [];
-	    }
-	    $.each(query[1].split('&'), function(idx, obj) {
-		var t = obj.split('=');
-		args[t[0]] = t[1];
-	    });
-	    return args;
-	};
 	var args = argsFromUri(window.location.search);
 
 	var torrentid = args.id;
