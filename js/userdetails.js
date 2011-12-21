@@ -10,7 +10,6 @@ function getusertorrentlistajax(userid, type, blockid) {
     else {
 	klappe_news(blockid.substr(1));
     }
-    return true;
 }
 
 function enabledel(msg){
