@@ -10,12 +10,111 @@ $(function() {
     var ie = $.browser.msie;
     var ie8 = ie && $.browser.version < 9;
 
+    var argsFromUri = function(uri) {
+	var args = new Object();
+	var query = uri.split('?');
+	if (query.length !== 2) {
+	    return [];
+	}
+	$.each(query[1].split('&'), function(idx, obj) {
+	    var t = obj.split('=');
+	    args[t[0]] = t[1];
+	});
+	return args;
+    };
+    var args = argsFromUri(window.location.search);
+
+    var $sortHeaders = table.find('thead th:not(.unsortable)');
+    var sortHeader = function(isJs) {
+	if (isJs) {
+	    $sortHeaders.unbind('click');
+	    table.tablesorter();
+	    return;
+	}
+	var sortcol = args.sort;
+	var sortcoltype = args.type;
+	delete args.sort;
+	delete args.type;
+
+	$sortHeaders.each(function() {
+	    var $this = $(this);
+	    var col = $this.attr('value');
+	    var sorttype;
+	    var sortclass = 'headerSort';
+	    if (sortcol === col) {
+		if (sortcoltype === 'desc') {
+		    sorttype = 'asc';
+		    sortclass += ' headerSortDown';
+		}
+		else {
+		    sorttype = 'desc';
+		    sortclass += ' headerSortUp';
+		}
+	    }
+	    else {
+		if (col === '1' || col ==='4') {
+		    sorttype = 'asc';
+		    if (col === '4' && typeof(sortcol) === 'undefined') {
+			sortclass += ' headerSortDown';
+		    }
+		}
+		else {
+		    sorttype = 'desc';
+		}
+	    }
+
+	    var coltitle;
+	    if (sorttype === 'asc') {
+		coltitle = '升序排序';
+	    }
+	    else {
+		coltitle = '降序排序';
+	    }
+
+	    args.sort = col;
+	    args.type = sorttype;
+	    var sortUri = '?' + $.param(args);
+	    delete args.sort;
+	    delete args.type;
+	    $this.attr({
+		'class': sortclass,
+		title : coltitle
+	    }).unbind('click').click(function() {
+		getFromUriWithHistory(sortUri);
+	    });
+	});
+    };
+    table.find('thead th:not(.unsortable)').each(function() {
+	var $this = $(this);
+	$this.html($this.find('a').html());
+    });
+    sortHeader(!hb.nextpage);
+
+    //Go to content
+    var goToContent = (function() {
+	var $top = $('#content-marker');
+	var top = $top.offset().top;
+	return function() {
+	    scrollToPosition(top);
+	};
+    })();
+
+
+    //Spin loader
     var loader = (function() {
 	var $loader = $('#loader');
 	var loaderInt;
 	var step = 0;
+	var lock = false;
 	return function(show) {
 	    if (show) {
+		if(lock) {
+		    return false;
+		}
+		else {
+		    lock = true;
+		}
+
 		$loader.show();
 		$loader.attr('class', 'loader' + step);
 		loaderInt = setInterval(function() {
@@ -29,10 +128,14 @@ $(function() {
 	    else {
 		$loader.hide();
 		clearInterval(loaderInt);
+		lock = false;
 	    }
+	    return true;
 	};
     })();
 
+    //Auto filling width
+    //CAUTION: This method have critical problems in performance under ie
     var setTitleWidth;
     if (ie) {
     	setTitleWidth = function(targets) {
@@ -48,6 +151,7 @@ $(function() {
 	}
 
 	setTitleWidth = function(targets) {
+	    //console.profile();
 	    targets.each(function() {
 		var $this = $(this);
 		var wThis = $this.width();
@@ -72,21 +176,25 @@ $(function() {
 		modifyCss(wThis, $this.find('h2'), wTitleD);
 		modifyCss(wThis, $this.find('h3'), wDescD);
 	    });
+	    //console.profileEnd();
 	};
 	setTitleWidth($('td.torrent div.limit-width.minor-list'));
     }
 
+    //Handling quick delete
     var quickDelete;
     if (isManager) {
 	quickDelete = function(a) {
 	    a.click(function(e) {
+		var $this = $(this);
 		e.preventDefault();
+		var tr = $this.parent().parent().parent().parent().parent();
 		if (confirm('确认删除本种子?')) {
-		    $.getJSON(a.attr('href') + '&sure=1&format=json', function(res) {
+		    $.post($this.attr('href') + '&sure=1&format=json', function(res) {
 			if (res.success) {
-			    $(this).parent().parent().remove();
+			    tr.remove();
 			}
-		    });
+		    }, 'json');
 		}
 	    });
 	};
@@ -96,7 +204,7 @@ $(function() {
 	quickDelete = function() {};
     }
 
-    //    if (!ie8) {
+    //Convert json to html
     var user_out = function(user) {
 	var userClass = user['class'].canonical;
 	var userCss = userClass.replace(/\s/g, '') + '_Name username';
@@ -159,7 +267,7 @@ $(function() {
 	    var textMainTitle = torrent.name;
 	    var textSubTitle = torrent.desc;
 
-	    if (hb.config.swaph && textSubTitle !== '') {
+	    if (args.swaph && textSubTitle !== '') {
 		var buf = textMainTitle;
 		textMainTitle = textSubTitle;
 		textSubTitle = buf;
@@ -224,7 +332,7 @@ $(function() {
 	    var torrent_utitly = '<div class="torrent-utilty-icons minor-list-vertical"><ul><li><a href="download.php?id=' + id + '&hit=1"><img class="download" src="pic/trans.gif" alt="download" title="' + lang.title_download_torrent + '" /></a></li><li><a id="bookmark' + id + '" href="javascript: bookmark(' + id + ');"><img class="' + bookmarkClass + '" alt="bookmark" src="pic/trans.gif" title="' + lang.title_bookmark_torrent + '" /></a></li></ul></div>';
 
 	    title += torrent_utitly;
-	    title_td += title + '</td>';
+	    title_td += title + '</div></td>';
 	    tr += title_td;
 
 	    tr += addNumber(torrent.comments.count, 'comment.php?action=add&pid=' + id + '&type=torrent', 'details.php?id=' + id + '&hit=1&cmtpage=1#startcomments');
@@ -244,7 +352,7 @@ $(function() {
 	    var completed = addNumber(torrent.times_completed, '', 'viewsnatches.php?id=' + id);
 	    tr += completed;
 
-	    var towner = '<td>'
+	    var towner = '<td>';
 	    var owner = torrent.owner;
 	    if (owner.anonymous) {
 		towner += lang.text_anonymous;
@@ -260,6 +368,10 @@ $(function() {
 		    towner += ')';
 		}
 	    }
+	    else if (!owner.anonymous) {
+		towner += lang.text_orphaned;
+	    }
+	    towner += '</td>';
 	    tr += towner;
 
 	    if (isManager) {
@@ -293,8 +405,8 @@ $(function() {
 	    var targetH = target.height();
 	    $document.scroll(function() {
 		var loc = $document.scrollTop() + $window.height();
-		if(loc > targetH) {
-		    loader(true);
+		if(loc > targetH && loader(true)) {
+		    args = argsFromUri(uri);
 		    $.getJSON(uri, get_func);
 		    $document.unbind('scroll');
 		}
@@ -302,40 +414,21 @@ $(function() {
 	}
 	else {
 	    $('#pagertop').remove();
+	    sortHeader(true);
 	}
 	//	    var end = ((new Date()).getTime());
 	//	    console.log(end - start);
     };
 
+    //Auto scroll
     if (hb.nextpage !== '') {
-	var backtotop = $('#back-to-top');
-	backtotop.click(function(e) {
-	    e.preventDefault();
-
-	    var goTop=setInterval(scrollMove,10);  
-	    function scrollMove(){
-		var pos = $document.scrollTop();
-		$document.scrollTop(pos / 1.15);
-		if(pos < 1) {
-		    clearInterval(goTop);  
-		}
-	    }
-	});
-
-	window.onscroll=function() {
-	    $document.scrollTop() > 200 ? backtotop.css('display', "") : backtotop.css('display', 'none');
-	}
-
 	$document.scroll(function(){
 	    var loc = $document.scrollTop() + $(window).height();
-	    if(loc > targetH) {
+	    if(loc > targetH && loader(true)) {
 		var uri = hb.nextpage + surfix;
-		loader(false);
+		args = argsFromUri(uri);
 		$.getJSON(uri, function(res) {
 		    $('#pagerbottom').remove();
-		    target.after($('<div></div>', {
-			'class' : 'pages'
-		    }));
 		    get_func(res);
 		});
 		$document.unbind('scroll');
@@ -343,56 +436,20 @@ $(function() {
 	});
     }
 
-    var getquerystring = function (form) {
-	var qstr = "";
-	function GetElemValue(name, value) {
-	    qstr += (qstr.length > 0 ? "&" : "")
-		+ encodeURIComponent(name) + "="
-		+ encodeURIComponent(value ? value : "");
-	}
-	var elemArray = form.elements;
-	for (var i = 0; i < elemArray.length; i++) {
-	    var element = elemArray[i];
-	    var elemType = element.type.toUpperCase();
-	    var elemName = element.name;
-	    if (elemName) {
-		if (elemType == "TEXT"
-		    || elemType == "TEXTAREA"
-		    || elemType == "PASSWORD"
-		    || elemType == "BUTTON"
-		    || elemType == "RESET"
-		    || elemType == "SUBMIT"
-		    || elemType == "FILE"
-		    || elemType == "IMAGE"
-		    || elemType == "HIDDEN")
-		    GetElemValue(elemName, element.value);
-		else if (elemType == "CHECKBOX" && element.checked)
-		    GetElemValue(elemName,
-				 element.value ? element.value : "On");
-		else if (elemType == "RADIO" && element.checked)
-		    GetElemValue(elemName, element.value);
-		else if (elemType.indexOf("SELECT") != -1)
-		    for (var j = 0; j < element.options.length; j++) {
-			var option = element.options[j];
-			if (option.selected)
-			    GetElemValue(elemName,
-					 option.value ? option.value : option.text);
-		    }
-	    }
-	}
-	return qstr;
-    } 
-
     var getFromUri = function(uri) {
+	if (!loader(true)) {
+	    return false;
+	}
 	$('.pages').remove();
 	$('#torrents tbody tr').remove();
 	table.hide();
 	$('#stderr').remove();
-	loader(true);
+	args = argsFromUri(uri);
 	$.getJSON(uri + surfix, function(result) {
 	    var targ = $('#outer');
 	    if (result.torrents.length) {
 		table.before(result.pager.top);
+		sortHeader(!result['continue']);
 		table.show();
 
 		$document.unbind('scroll');
@@ -402,13 +459,12 @@ $(function() {
 		loader(false);
 		targ.append('<div id="stderr"><h2>没有结果！</h2><div class="table td frame">没有种子:(</div></div>');
 	    }
+	    goToContent();
 	});
     };
 
-    $('#form-searchbox').submit(function(e) {
-	e.preventDefault();
-	var query = getquerystring(this);
-	var uri = 'torrents.php?' + query;
+    //Ajax search
+    var getFromUriWithHistory = function(uri) {
 	var state = {
 	    title : document.title,
 	    url : uri
@@ -418,6 +474,20 @@ $(function() {
 	}
 
 	getFromUri(uri);
+    };
+
+    var searchboxform = $('#form-searchbox');
+    searchboxform.submit(function(e) {
+	e.preventDefault();
+	var query = searchboxform.serialize();
+	var uri = 'torrents.php?' + query;
+	getFromUriWithHistory(uri);
+    });
+
+    $('a[href^="?"]').click(function(e) {
+	e.preventDefault();
+	var uri = this.href;
+	getFromUriWithHistory(uri);
     });
 
     // var popped = ('state' in window.history);
@@ -433,6 +503,7 @@ $(function() {
     // }, false);
 
 
+    //Check items in searchbox
     var mainCheckClicked = false;
     var dictChecks = [];
 
@@ -508,24 +579,71 @@ $(function() {
 	});
 	return catChecks;
     });
+
+    //Auto complete
+    var cache = {};
+    var lastXhr;
+    $( "#searchinput" ).autocomplete({
+	minLength: 2,
+	source: function( request, response ) {
+	    var term = request.term;
+	    if ( term in cache ) {
+		response( cache[ term ] );
+		return;
+	    }
+
+	    lastXhr = $.getJSON( "suggest.php", request, function( data, status, xhr ) {
+		cache[ term ] = data;
+		if ( xhr === lastXhr ) {
+		    response( data );
+		}
+	    });
+	}
+    }).data( "autocomplete" )._renderItem = function( ul, item ) {
+	var stime = item.count + ' Time';
+	if (item.count > 1) {
+	    stime += 's';
+	}
+
+	return $( "<li></li>" )
+	    .data( "item.autocomplete", item )
+	    .append( "<a>" + item.label + '<span class="suggestion-count">' + stime + "</span></a>" )
+	    .appendTo( ul );
+    };
 });
 
-(function() {
-    var searchbox = $('#ksearchboxmain');
-    var toggleSearchbox = function() {
-	klappe_news('searchboxmain');
-	klappe_news('searchbox-simple', true);
+//Select all
+var form='searchbox';
+function SetChecked(chkName,ctrlName,checkall_name,uncheckall_name,start,count) {
+    var dml=document.forms[form];
+    var len = dml.elements.length;
+    var begin;
+    var end;
+    var check_state;
+    if (start == -1){
+	begin = 0;
+	end = len;
+    }
+    else{
+	begin = start;
+	end = start + count;
+    }
+    var check_state;
+    var button = document.getElementById(ctrlName)
+
+    if(button.value == checkall_name) {
+	button.value = uncheckall_name;
+	check_state=1;
+    }
+    else {
+	button.value = checkall_name;
+	check_state=0;
     }
 
-    $('#searchbox-header a').click(function(e) {
-	e.preventDefault();
-	$.jStorage.set('hideSearchbox', (searchbox.css('display') === 'none'));
-	toggleSearchbox();
-    });
+    for( i=begin ; i<end ; i++) {
+	if (dml.elements[i].name.indexOf(chkName) != -1) {
+	    dml.elements[i].checked=check_state;
+	}
 
-    if ($.jStorage.get('hideSearchbox', false)) {
-	searchbox.show();
-	$('#ksearchbox-simple').hide();
-	document.getElementById('picsearchboxmain').className = 'minus';
     }
-})();
+}

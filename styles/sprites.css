@@ -1,3 +1,5 @@
+
+
 img.female
 {
 width:32px;
@@ -495,3 +497,32 @@ margin: 2px auto;
 .loader10 {background: url("spinner.png") 0 -420px no-repeat;}
 .loader11 {background: url("spinner.png") 0 -462px no-repeat;}
 
+.avatar {
+    width: 150px;
+}
+
+.curtain {
+	display: none;
+	position: fixed;
+	top: 0%;
+	left: 0%;
+	width: 100%;
+	height: 100%;
+	background-color: black;
+	z-index:1001;
+	opacity:.80;
+	filter: alpha(opacity=80);
+}
+
+.lightbox {
+	display: none;
+	position: fixed;
+	text-align: center;
+	top: 5%;
+	left: 5%;
+	width: 90%;
+	height: 90%;
+	padding: 0px;
+	z-index:1002;
+	overflow: auto;
+}

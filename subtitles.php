@@ -258,7 +258,7 @@ if (get_user_class() >= UC_PEASANT)
 		$Cache->cache_value('subtitle_sum_size', $size, 3600);
 	}
 
-	print('<h2 id="page-title">' . $lang_subtitles['text_upload_subtitles'] . '<h2>');
+	print('<h2 id="page-title" class="transparentbg">' . $lang_subtitles['text_upload_subtitles'] . '</h2>');
 	print('<h3 class="page-titles">' . $lang_subtitles['text_uploaded_size'] .mksize($size) . '</h3>');
 
 	print("<h3>".$lang_subtitles['text_rules']."</h3>\n");
@@ -292,7 +292,7 @@ if (get_user_class() >= UC_PEASANT)
 	print("<tr><td class=rowhead>".$lang_subtitles['row_torrent_id'].'<span class="required-field">*</span></td><td class="rowfollow" align="left"><input type=text name=torrent_id style="width:300px"><br />'.$lang_subtitles['text_torrent_id_note']."</td></tr>\n");
 	else
 	{
-		print("<tr><td class=rowhead>".$lang_subtitles['row_torrent_id'].'<span class="required-field">*</span></td><td class=rowfollow align=left><input type=text name=torrent_id value=$detail_torrent_id style="width:300px"><br />'.$lang_subtitles['text_torrent_id_note']."</td></tr>\n");
+		print("<tr><td class=rowhead>".$lang_subtitles['row_torrent_id'].'<span class="required-field">*</span></td><td class=rowfollow align=left><input type=text name=torrent_id value="' . $detail_torrent_id . '" style="width:300px"><br />'.$lang_subtitles['text_torrent_id_note']."</td></tr>\n");
 		$in_detail = "";
 	}
 	print('<tr><td class="rowhead">'.$lang_subtitles['row_title'].'</td><td class="rowfollow" colspan="3" align="left"><input type="text" name="title" style="width:300px"><br />'.$lang_subtitles['text_title_note']."</td></tr>\n");

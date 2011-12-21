@@ -7,7 +7,7 @@ header("Expires: Mon, 26 Jul 1997 05:00:00 GMT" );
 header("Last-Modified: " . gmdate( "D, d M Y H:i:s" ) . "GMT" ); 
 header("Cache-Control: no-cache, must-revalidate" ); 
 header("Pragma: no-cache" );
-header("Content-Type: text/xml; charset=utf-8");
+header("Content-Type: text/html; charset=utf-8");
 function maketable($res, $mode = 'seeding')
 {
 	global $lang_getusertorrentlistajax,$CURUSER,$smalldescription_main;
@@ -85,8 +85,8 @@ function maketable($res, $mode = 'seeding')
 		}
 		default: break;
 	}
-	$ret = "<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\" width=\"800\"><tr><td class=\"colhead\" style=\"padding: 0px\">".$lang_getusertorrentlistajax['col_type']."</td><td class=\"colhead\" align=\"center\">".$lang_getusertorrentlistajax['col_name']."</td>".
-	($showsize ? "<td class=\"colhead\" align=\"center\"><img class=\"size\" src=\"pic/trans.gif\" alt=\"size\" title=\"".$lang_getusertorrentlistajax['title_size']."\" /></td>" : "").($showsenum ? "<td class=\"colhead\" align=\"center\"><img class=\"seeders\" src=\"pic/trans.gif\" alt=\"seeders\" title=\"".$lang_getusertorrentlistajax['title_seeders']."\" /></td>" : "").($showlenum ? "<td class=\"colhead\" align=\"center\"><img class=\"leechers\" src=\"pic/trans.gif\" alt=\"leechers\" title=\"".$lang_getusertorrentlistajax['title_leechers']."\" /></td>" : "").($showuploaded ? "<td class=\"colhead\" align=\"center\">".$lang_getusertorrentlistajax['col_uploaded']."</td>" : "") . ($showdownloaded ? "<td class=\"colhead\" align=\"center\">".$lang_getusertorrentlistajax['col_downloaded']."</td>" : "").($showratio ? "<td class=\"colhead\" align=\"center\">".$lang_getusertorrentlistajax['col_ratio']."</td>" : "").($showsetime ? "<td class=\"colhead\" align=\"center\">".$lang_getusertorrentlistajax['col_se_time']."</td>" : "").($showletime ? "<td class=\"colhead\" align=\"center\">".$lang_getusertorrentlistajax['col_le_time']."</td>" : "").($showcotime ? "<td class=\"colhead\" align=\"center\">".$lang_getusertorrentlistajax['col_time_completed']."</td>" : "").($showanonymous ? "<td class=\"colhead\" align=\"center\">".$lang_getusertorrentlistajax['col_anonymous']."</td>" : "")."</tr>\n";
+	$ret = "<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\" width=\"800\"><thead><tr><th class=\"unsortable\" style=\"padding: 0px\">".$lang_getusertorrentlistajax['col_type']."</th><th align=\"center\">".$lang_getusertorrentlistajax['col_name']."</th>".
+	($showsize ? "<th align=\"center\"><img class=\"size\" src=\"pic/trans.gif\" alt=\"size\" title=\"".$lang_getusertorrentlistajax['title_size']."\" /></th>" : "").($showsenum ? "<th align=\"center\"><img class=\"seeders\" src=\"pic/trans.gif\" alt=\"seeders\" title=\"".$lang_getusertorrentlistajax['title_seeders']."\" /></th>" : "").($showlenum ? "<th align=\"center\"><img class=\"leechers\" src=\"pic/trans.gif\" alt=\"leechers\" title=\"".$lang_getusertorrentlistajax['title_leechers']."\" /></th>" : "").($showuploaded ? "<th align=\"center\">".$lang_getusertorrentlistajax['col_uploaded']."</th>" : "") . ($showdownloaded ? "<th align=\"center\">".$lang_getusertorrentlistajax['col_downloaded']."</th>" : "").($showratio ? "<th align=\"center\">".$lang_getusertorrentlistajax['col_ratio']."</th>" : "").($showsetime ? "<th align=\"center\">".$lang_getusertorrentlistajax['col_se_time']."</th>" : "").($showletime ? "<th align=\"center\">".$lang_getusertorrentlistajax['col_le_time']."</th>" : "").($showcotime ? "<th align=\"center\">".$lang_getusertorrentlistajax['col_time_completed']."</th>" : "").($showanonymous ? "<th align=\"center\">".$lang_getusertorrentlistajax['col_anonymous']."</th>" : "")."</tr></thead><tbody>\n";
 	while ($arr = mysql_fetch_assoc($res))
 	{
 		$catimage = htmlspecialchars($arr["image"]);
@@ -157,7 +157,7 @@ function maketable($res, $mode = 'seeding')
 		$ret .="</tr>\n";
 		
 	}
-	$ret .= "</table>\n";
+	$ret .= "</tbody></table>\n";
 	return $ret;
 }
 

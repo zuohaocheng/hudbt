@@ -119,13 +119,6 @@ else{
 }
 ?>
 </div>
-<script type="text/javascript" src="js/jquery.tablesorter/jquery.tablesorter.js"></script>
-<link rel="stylesheet" href="js/jquery.tablesorter/jquery.tablesorter.css" type="text/css" media="screen" />
-<script type="text/javascript">
-  $(function() {
-    $('#uploaders-works').tablesorter();
-  });
-</script>
 <?php
 end_main_frame();
 stdfoot();

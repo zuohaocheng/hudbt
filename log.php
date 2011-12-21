@@ -239,17 +239,32 @@ else {
 
 		$perpage = 10;
 		list($pagertop, $pagerbottom, $limit) = pager($perpage, $count, "log.php?action=funbox&".$addparam);
-		$res = sql_query("SELECT added, body, title, status FROM fun $wherea ORDER BY added DESC $limit") or sqlerr(__FILE__, __LINE__);
+		$res = sql_query("SELECT id, added, body, title, status FROM fun $wherea ORDER BY added DESC $limit") or sqlerr(__FILE__, __LINE__);
 		if (mysql_num_rows($res) == 0)
 			print($lang_log['text_funbox_empty']);
-		else
-		{
-
+		else {
 		//echo $pagertop;
 			while ($arr = mysql_fetch_assoc($res)){
 				$date = gettime($arr['added'],true,false);
 			print("<table width=940 border=1 cellspacing=0 cellpadding=5>\n");
 			print("<tr><td class=rowhead width='10%'>".$lang_log['col_title']."</td><td class=rowfollow align=left>".$arr["title"]." - <b>".$arr["status"]."</b></td></tr><tr><td class=rowhead width='10%'>".$lang_log['col_date']."</td><td class=rowfollow align=left>".$date."</td></tr><tr><td class=rowhead width='10%'>".$lang_log['col_body']."</td><td class=rowfollow align=left>".format_comment($arr["body"],false,false,true)."</td></tr>\n");
+			if ($CURUSER) {
+			  $returnto = $_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING'];
+			  if ($CURUSER['id'] == $row['userid'] || get_user_class() >= $funmanage_class) {
+			    echo '<tr><td colspan="2"><div class="minor-list list-seperator"><ul>';
+			    echo '<li><a class="altlink" href="fun.php?action=edit&id='.$arr['id'].'&returnto=' . $returnto . '">'.$lang_log['text_edit'].'</a></li>';
+			  }
+
+			  if (get_user_class() >= $funmanage_class) {
+			    echo '<li><a class="altlink" href="fun.php?action=delete&id='.$arr['id'].'&returnto=' . $returnto . '">'.$lang_log['text_delete'].'</a></li>';
+			    echo '<li><a class="altlink" href="fun.php?action=ban&id='.$row['id'].'&returnto=' . $returnto . '">'.$lang_log['text_ban'].'</a></li>';
+			  }
+
+			  if ($CURUSER['id'] == $row['userid'] || get_user_class() >= $funmanage_class) {
+			    echo '</ul></div></td></tr>';
+			  }
+			}
+
 			print("</table><br />");
 			}
 			echo $pagerbottom;

@@ -61,38 +61,16 @@ if ($allsec != 1 || $enablespecial != 'yes'){ //do not print searchbox if showin
       </table>
       </div>
       <?php hotmenu() ?>
-      <div class="rowfollow minor-list" id="searchbox-opts">
-	<ul><li>
-	  <span class="medium"><?php echo $lang_torrents['text_show_dead_active'] ?></span>
-
-			    <select class="med" name="incldead" style="width: 100px;">
-			      <option value="0"><?php echo $lang_torrents['select_including_dead'] ?></option>
-			      <option value="1"<?php print($include_dead == 1 ? " selected=\"selected\"" : ""); ?>><?php echo $lang_torrents['select_active'] ?> </option>
-			      <option value="2"<?php print($include_dead == 2 ? " selected=\"selected\"" : ""); ?>><?php echo $lang_torrents['select_dead'] ?></option>
-			    </select>
-			    </li><li>
-			    <span class="medium"><?php echo $lang_torrents['text_show_bookmarked'] ?></span>
-			    <select class="med" name="inclbookmarked" style="width: 100px;">
-			      <option value="0"><?php echo $lang_torrents['select_all'] ?></option>
-			      <option value="1"<?php print($inclbookmarked == 1 ? " selected=\"selected\"" : ""); ?>><?php echo $lang_torrents['select_bookmarked'] ?></option>
-			      <option value="2"<?php print($inclbookmarked == 2 ? " selected=\"selected\"" : ""); ?>><?php echo $lang_torrents['select_bookmarked_exclude'] ?></option>
-			    </select>
-			    </li><li>
-					<input type="checkbox" id="swaph" name="swaph" value="1" <?php if ($_GET['swaph']){echo 'checked="checked"';}?> />
-			    <a href="?swaph=1">以中文为主标题</a>
-			  </li>
-			</ul>
-			</div>
 		</div>
 		<div class="minor-list"><ul>
-		   <li><?php echo $lang_torrents['text_search'] ?>
-		    <input id="searchinput" name="search" type="text" value="<?php echo  $searchstr_ori ?>" autocomplete="off" style="width: 200px"/ >
-		  <script src="suggest.js" type="text/javascript"></script>
-		  <div id="suggcontainer" class="minor-div-vertical" style="display: none;">
-		    <ul id="suggestions"></ul>
-		  </div></li>
+		    <li>
+		    <select class="med" name="inclbookmarked">
+		      <option value="0"><?php echo $lang_torrents['text_all_bookmarked'] ?></option>
+		      <option value="1"<?php print($inclbookmarked == 1 ? " selected=\"selected\"" : ""); ?>><?php echo $lang_torrents['select_bookmarked'] ?></option>
+		      <option value="2"<?php print($inclbookmarked == 2 ? " selected=\"selected\"" : ""); ?>><?php echo $lang_torrents['select_bookmarked_exclude'] ?></option>
+		    </select>
+		  </li>
 		  <li>
-		  <?php echo $lang_torrents['text_in'] ?>
 		  <select name="search_area">
 		    <option value="0"><?php echo $lang_torrents['select_title'] ?></option>
 		    <option value="1"<?php print($_GET["search_area"] == 1 ? " selected=\"selected\"" : ""); ?>><?php echo $lang_torrents['select_description'] ?></option>
@@ -101,17 +79,44 @@ if ($allsec != 1 || $enablespecial != 'yes'){ //do not print searchbox if showin
 		  </select>
 		</li>
 		<li>
-		  <?php echo $lang_torrents['text_with'] ?>
-		  <select name="search_mode" style="width: 60px;">
+		  <select name="search_mode">
 		    <option value="0"><?php echo $lang_torrents['select_and'] ?></option>
 		    <option value="1"<?php echo $_GET["search_mode"] == 1 ? " selected=\"selected\"" : "" ?>><?php echo $lang_torrents['select_or'] ?></option>
 		    <option value="2"<?php echo $_GET["search_mode"] == 2 ? " selected=\"selected\"" : "" ?>><?php echo $lang_torrents['select_exact'] ?></option>
 		  </select>
 		  <?php echo $lang_torrents['text_mode'] ?>
 		</li>
+		  <li>
+		    <span class="medium">
+		    <select class="med" name="incldead">
+		      <option value="0"><?php echo $lang_torrents['select_including_dead'] ?></option>
+		      <option value="1"<?php print($include_dead == 1 ? " selected=\"selected\"" : ""); ?>><?php echo $lang_torrents['select_active'] ?> </option>
+		      <option value="2"<?php print($include_dead == 2 ? " selected=\"selected\"" : ""); ?>><?php echo $lang_torrents['select_dead'] ?></option>
+		    </select>
+		    </li>
+<li>
+<select name="indate">
+<?php
+  $selections = array('0' => '不限时间', '3' => '3天内', '7' => '一周内', '30' => '一个月内', '90' => '三个月内');
+  foreach ($selections as $days => $text) {
+    echo '<option value="' . $days . '"';
+    if ($indate == $days) {
+      echo ' selected="selected"';
+    }
+    echo '>' . $text . '</option>';
+  }
+  ?>
+</select></li>
+		   <li>
+		    <input id="searchinput" placeholder="<?php echo $lang_torrents['text_search'] ?>" name="search" type="search" value="<?php echo  $searchstr_ori ?>" autocomplete="off" style="width: 200px"/ >
+		  </li>
 		<li>
 		  <input type="submit" class="btn" value="<?php echo $lang_torrents['submit_go'] ?>" />
-		</li></ul></div>
+		</li>
+		  <li>
+		    <input type="checkbox" name="hot" value="1" <?php echo ($wherehot? 'checked="checked"':'') ?>/><a href="?hot=1">热门</a>
+		  </li>
+</ul></div>
 
 <?php
 $Cache->new_page('hot_search', 3670, true);
@@ -132,7 +137,7 @@ if (!$Cache->get_page()){
 	}
 	$Cache->add_whole_row();
 	if ($hotsearch) {
-	  print('<div class="minor-list"><ul>'.$hotsearch.'</ul></div>');
+	  print('<div id="hot-search" class="minor-list"><ul>'.$hotsearch.'</ul></div>');
 	}
 	$Cache->end_whole_row();
 	$Cache->cache_page();
@@ -140,10 +145,7 @@ if (!$Cache->get_page()){
 echo $Cache->next_row();
 ?>
 </div></form>
-<script type="text/javascript" src="js/jquery.json-2.3.min.js"></script>
-<script type="text/javascript" src="js/jstorage.min.js"></script>
-<script src="js/torrents.js" type="text/javascript"></script>
-
+<script type="text/javascript" src="load.php?name=torrents_searchbox.js"></script>
 <?php
 }
 
@@ -158,9 +160,13 @@ if($inclbookmarked == 1) {
 elseif($inclbookmarked == 2) {
 	print("<h1 align=\"center\">" . get_username($CURUSER['id']) . $lang_torrents['text_s_not_bookmarked_torrent'] . "</h1>");
 }
-
+?>
+<a id="content-marker"></a>
+<?php
 if ($count) {
-  print($pagertop);
+  if ($next_page_href != '') {
+    print($pagertop);
+  }
 
   $swap_headings = $_GET["swaph"];
 
@@ -171,14 +177,9 @@ if ($count) {
   else 
     torrenttable($res, "bookmarks", $swap_headings);
 
-  if ($swap_headings) {
-    ?><script type="text/javascript">
-    hb.config.swaph = true;
-</script>
-<?php
+  if ($next_page_href != '') {
+    print($pagerbottom);
   }
-  
-  print($pagerbottom);
 }
 else {
   if (isset($searchstr)) {
@@ -201,10 +202,9 @@ if ($CURUSER){
 	else	$USERUPDATESET[] = "last_music = ".TIMENOW;
 }
 print('<script type="text/javascript">hb.nextpage = "'. $next_page_href .'";');
-	print('hb.constant.maincats = ' . php_json_encode($mainCats) . ';</script>');
-?>
-<a href="#" id="back-to-top" title="回到页首" style="display:none;"></a>
-<?php
+print('hb.constant.maincats = ' . php_json_encode($mainCats) . ';</script>');
+
+
 stdfoot();
 
 function hotmenu(){
@@ -212,21 +212,7 @@ function hotmenu(){
   global $wherehot, $indate, $special_state;
 ?>
   <div id="hotbox" class="table minor-list"><ul>
-    <li><input type="checkbox" name="hot" value="1" <?php echo ($wherehot? 'checked="checked"':'') ?>/><a href="?hot=1">热门</a></li>
 
-<li><span class="title">发布时间:</span>
-<select name="indate">
-<?php
-  $selections = array('0' => '不限', '3' => '3天内', '7' => '一周内', '30' => '一个月内', '90' => '三个月内');
-  foreach ($selections as $days => $text) {
-    echo '<option value="' . $days . '"';
-    if ($indate == $days) {
-      echo ' selected="selected"';
-    }
-    echo '>' . $text . '</option>';
-  }
-  ?>
-</select></li>
 
 <li class="minor-list-vertical"><div class="title" style="margin-bottom:0;">促销:</div><ul>
 <li><input type="radio" name="spstate" value="0" /><?php echo $lang_torrents['select_all'] ?></li>
@@ -246,6 +232,7 @@ function hotmenu(){
   echo '</a></li>';
 }?>
 </ul></li>
+<li><input type="checkbox" id="swaph" name="swaph" value="1" <?php if ($_GET['swaph']){echo 'checked="checked"';}?> /><a href="?swaph=1">中文主标题</a></li>
 </ul></div>
 <?php
 }

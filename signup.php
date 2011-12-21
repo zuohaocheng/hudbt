@@ -54,7 +54,7 @@ lang_choice_before_login($extra);
 ?>
 
 <form method="post" action="takesignup.php">
-<?php if ($type == 'invite') print("<input type=\"hidden\" name=\"inviter\" value=\"".$inviter."\"><input type=hidden name=type value='invite'");?>
+<?php if ($type == 'invite') print("<input type=\"hidden\" name=\"inviter\" value=\"".$inviter."\"><input type=hidden name=type value='invite' />"); ?>
 <table border="1" cellspacing="0" cellpadding="10" style="margin: 0 auto;">
 <?php
 print("<tr><td class=text align=center colspan=2>".$lang_signup['text_cookies_note']."</td></tr>");

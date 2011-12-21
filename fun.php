@@ -20,17 +20,20 @@ if ($action == 'delete')
 		stderr($lang_fun['std_error'], $lang_fun['std_invalid_id']);
 	if (get_user_class() < $funmanage_class)
 		permissiondenied();
-	$sure = 0+$_GET["sure"];
-	$returnto = $_GET["returnto"] ? htmlspecialchars($_GET["returnto"]) : htmlspecialchars($_SERVER["HTTP_REFERER"]);
-	if (!$sure)
-		stderr($lang_fun['std_delete_fun'],$lang_fun['text_please_click'] ."<a class=altlink href=?action=delete&id=$id&returnto=$returnto&sure=1>".$lang_fun['text_here_if_sure'],false);
+	$sure = 0+$_REQUEST["sure"];
+	$returnto = $_GET["returnto"] ? htmlspecialchars($_GET["returnto"]) : 'fun.php';
+	if (!$sure || $_SERVER['REQUEST_METHOD'] != 'POST') {
+		stderr($lang_fun['std_delete_fun'], "<form action=\"?action=delete&id=$id&returnto=$returnto\" method=\"POST\">" . '<input type="hidden" name="sure" value="1" />' . $lang_fun['text_please_click'] . $lang_fun['text_here_if_sure'] . '</form>',false);
+	}
+	
 	sql_query("DELETE FROM fun WHERE id=".sqlesc($id)) or sqlerr(__FILE__, __LINE__);
 	$Cache->delete_value('current_fun_content');
 	$Cache->delete_value('current_fun', true);
 	$Cache->delete_value('current_fun_vote_count');
 	$Cache->delete_value('current_fun_vote_funny_count');
-	if ($returnto != "")
-	header("Location: $returnto");
+	if ($returnto != "") {
+	  header("Location: $returnto");
+	}
 }
 if ($action == 'new')
 {
@@ -85,8 +88,6 @@ if ($action == 'view')
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" href="<?php echo get_font_css_uri()?>" type="text/css">
 <link rel="stylesheet" href="<?php echo get_css_uri()."theme.css"?>" type="text/css">
-<link rel="stylesheet" href="styles/curtain_imageresizer.css" type="text/css">
-<script src="curtain_imageresizer.js" type="text/javascript"></script><style type="text/css">body {overflow-y:scroll; overflow-x: hidden}</style>
 </head><body class='inframe'>
 <?php
 print(get_style_addicode());

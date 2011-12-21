@@ -16,8 +16,6 @@ stderr($lang_invite['std_sorry'],$lang_invite['std_only'].get_user_class_name($s
 $res = sql_query("SELECT username FROM users WHERE id = ".mysql_real_escape_string($id)) or sqlerr();
 $user =  mysql_fetch_assoc($res);
 stdhead($lang_invite['head_invites']);
-print("<table width=700 class=main border=0 cellspacing=0 cellpadding=0><tr><td class=embedded>");
-
 print("<h1 align=center><a href=\"invite.php?id=".$id."\">".$user['username'].$lang_invite['text_invite_system']."</a></h1>");
 	$sent = htmlspecialchars($_GET['sent']);
 	if ($sent == 1){
@@ -145,7 +143,6 @@ if ($type == 'new'){
 		}
 	}
 	print("</table>");
-	print("</td></tr></table>");
 
 }
 stdfoot();

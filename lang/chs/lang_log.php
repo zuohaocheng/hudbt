@@ -27,6 +27,7 @@ $lang_log = array
 	'col_modify' => "行为",
 	'text_edit' => "编辑",
 	'text_delete' => "删除",
+	'text_ban' => '禁止',
 	'submit_add' => "添加",
 	'text_add_chronicle' => "添加史册记录",
 	'std_permission_denied' => "对不起！你没有该权限。",

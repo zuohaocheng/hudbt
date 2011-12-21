@@ -35,7 +35,7 @@ stdhead($lang_upload['head_upload']);
 			<?php
 			print("<p align=\"center\">".$lang_upload['text_red_star_required']."</p>");
 			?>
-			<table border="1" cellspacing="0" cellpadding="5" width="940">
+			<table border="1" cellspacing="0" cellpadding="5" style="width:95%;">
 				<tr>
 					<td class='colhead' colspan='2' align='center'>
 						<?php echo $lang_upload['text_tracker_url'] ?>: &nbsp;&nbsp;&nbsp;&nbsp;<b><?php echo  get_protocol_prefix() . $announce_urls[0]?></b>

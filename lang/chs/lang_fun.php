@@ -4,7 +4,7 @@ $lang_fun = array
 (
 	'std_delete_fun' => "删除趣味内容？",
 	'text_please_click' => "你真的要删除该趣味内容吗？点击\n",
-	'text_here_if_sure' => "这里</a>来确认。",
+	'text_here_if_sure' => '<input type="submit" value="这里" />来确认。',
 	'std_error' => "错误",
 	'std_invalid_id' => "无效的ID",
 	'std_permission_denied' => "访问被拒绝！",
