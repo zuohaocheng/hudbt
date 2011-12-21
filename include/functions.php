@@ -33,12 +33,14 @@ function get_load_uri($type, $script_name ="", $debug=false) {
   global $CURUSER;
   $name = ($script_name == "" ? substr(strrchr($_SERVER['SCRIPT_NAME'],'/'),1) : $script_name);
 
-  $addition = '';
   if ($_GET['purge']) {
     $addition .= '&purge=1';
   }
   if ($_GET['debug']) {
     $addition .= '&debug=1';
+  }
+  else {
+    $addition = '&rev=20111221';
   }
   
   if ($type == 'js') {

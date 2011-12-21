@@ -96,19 +96,15 @@ if ($action == "viewposts")
 
 		$added = gettime($arr["added"], true, false, false);
 
-		print("<p class=sub><table border=0 cellspacing=0 cellpadding=0><tr><td class=embedded>
-	    $added&nbsp;--&nbsp;".$lang_userhistory['text_forum'].
-	    "<a href=forums.php?action=viewforum&forumid=$forumid>$forumname</a>
-	    &nbsp;--&nbsp;".$lang_userhistory['text_topic'].
-	    "<a href=forums.php?action=viewtopic&topicid=$topicid>$topicname</a>
-      &nbsp;--&nbsp;".$lang_userhistory['text_post'].
+		print('<div class="forum-author minor-list"><ul><li>' . $added . '</li><li>' . $lang_userhistory['text_forum'].
+	    "<a href=forums.php?action=viewforum&forumid=$forumid>$forumname</a></li><li>" . $lang_userhistory['text_topic'].
+	    "<a href=forums.php?action=viewtopic&topicid=$topicid>$topicname</a> </li><li>".$lang_userhistory['text_post'].
       "<a href=forums.php?action=viewtopic&topicid=$topicid&page=p$postid#pid$postid>#$postid</a>" .
-      ($newposts ? " &nbsp;<b>(<font class=new>".$lang_userhistory['text_new']."</font>)</b>" : "") .
-      "</td></tr></table></p>\n");
+      ($newposts ? '</li><li><b>(<span class="new">'.$lang_userhistory['text_new']."</span>)</b>" : "") .
+      "</li></ul></div>\n");
 
-      print("<br />");
       
-      print("<table class=main width=100% border=1 cellspacing=0 cellpadding=5>\n");
+      print('<div class="frame table td">');
 
       $body = format_comment($arr["body"]);
 
@@ -118,14 +114,12 @@ if ($action == "viewposts")
       	if (mysql_num_rows($subres) == 1)
       	{
       		$subrow = mysql_fetch_assoc($subres);
-      		$body .= "<p><font size=1 class=small>".$lang_userhistory['text_last_edited'].get_username($arr['editedby']).$lang_userhistory['text_at']."$arr[editdate]</font></p>\n";
+      		$body .= '<div class="post-edited">'.$lang_userhistory['text_last_edited'].get_username($arr['editedby']).$lang_userhistory['text_at']."$arr[editdate]</div>\n";
       	}
       }
 
-      print("<tr valign=top><td class=comment>$body</td></tr>\n");
-
-      print("</td></tr></table>\n");
-      print("<br />");
+      print($body);
+      echo '</div>';
 	}
 
 	end_frame();
