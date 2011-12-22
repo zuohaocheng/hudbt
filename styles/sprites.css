@@ -498,7 +498,8 @@ margin: 2px auto;
 .loader11 {background: url("spinner.png") 0 -462px no-repeat;}
 
 .avatar {
-    width: 150px;
+    max-width: 150px;
+    max-height: 250px;
 }
 
 .curtain {
@@ -525,4 +526,9 @@ margin: 2px auto;
 	padding: 0px;
 	z-index:1002;
 	overflow: auto;
+}
+
+.search{
+	background-image:url(../pic/search.gif);
+	background-repeat:no-repeat;
 }

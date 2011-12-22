@@ -290,7 +290,15 @@ $lang_functions = array
 	'text_please_download_something_within' => "请在",
 	'text_inactive_account_be_deleted' => "内做些下载。没有流量的用户会被删除账号。",
 	'text_forever' => '永远',
-	'text_select_lang' => "Select Site Language: "
+	'text_select_lang' => "Select Site Language: ",
+	'title_edit_post' => "编辑帖子",
+	'title_delete_post' => "删除帖子",
+	'text_last_edit_at' => "编辑于",
+	'text_number' => "",
+	'text_lou' => "楼",
+	'text_view_this_author_only' => "只看该作者",
+	'text_view_all_posts' => "显示全部帖子",
+	'text_posts' => "帖子：",
 );
 
 ?>

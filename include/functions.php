@@ -376,9 +376,7 @@ function format_comment($text, $strip_html = true, $xssclean = false, $newtab = 
   return $s;
 }
 
-function highlight($search,$subject,$hlstart='<b><font class="striking">',$hlend="</font></b>") 
-{
-
+function highlight($search,$subject,$hlstart='<b><font class="striking">',$hlend="</font></b>") {
   $srchlen=strlen($search);    // lenght of searched string
   if ($srchlen==0) return $subject;
   $find = $subject;
@@ -2349,7 +2347,7 @@ function textbbcode($form,$text,$content="",$hastitle=false, $col_num = 130) {
 		  <?php
 		    }
 		    
-		    }
+    }
 
 		    function php_json_encode( $data ) {
 		      if ( !function_exists( 'json_encode' ) || strtolower( json_encode( "\xf0\xa0\x80\x80" ) ) != '"\ud840\udc00"' ) {
@@ -2749,65 +2747,224 @@ function pager($rpp, $count, $href, $opts = array(), $pagename = "page") {
   return array($pagertop, $pagerbottom, "LIMIT $start,$rpp", $next_page_href, $start);
 }
 
+function post_author_stats($id, $idarr) {
+  global $lang_functions;
+  global $Cache;
+  $uploaded = mksize($idarr["uploaded"]);
+  $downloaded = mksize($idarr["downloaded"]);
+  $ratio = get_ratio($id);
+
+  if (!$forumposts = $Cache->get_value('user_'.$id.'_post_count')){
+    $forumposts = get_row_count("posts","WHERE userid=".$id);
+    $Cache->cache_value('user_'.$id.'_post_count', $forumposts, 3600);
+  }
+  
+  $stats = "<li>".$lang_functions['text_posts']."$forumposts</li><li>".$lang_functions['text_uploaded']."$uploaded </li><li>".$lang_functions['text_downloaded']."$downloaded</li><li>".$lang_functions['text_ratio']."$ratio</li>";
+  return $stats;
+}
+
+function user_class_image($class) {
+  $uclass = get_user_class_image($class);
+  $userclassimg = "<img alt=\"".get_user_class_name($class,false,false,true)."\" title=\"".get_user_class_name($class,false,false,true)."\" src=\"".$uclass."\" />";
+  return $userclassimg;
+}
+
+function post_author_toolbox($arr2) {
+  global $lang_functions;
+  $secs = 900;
+  $dt = sqlesc(date("Y-m-d H:i:s",(TIMENOW - $secs))); // calculate date.
+
+  $online_status = ("'".$arr2['last_access']."'") > $dt ? "<img class=\"f_online\" src=\"pic/trans.gif\" alt=\"Online\" title=\"".$lang_functions['title_online']."\" />":"<img class=\"f_offline\" src=\"pic/trans.gif\" alt=\"Offline\" title=\"".$lang_functions['title_offline']."\" />";
+	  
+  $toolbox_user = '<li>' . $online_status . "</li><li><a href=\"sendmessage.php?receiver=".htmlspecialchars(trim($arr2["id"]))."\"><img class=\"f_pm\" src=\"pic/trans.gif\" alt=\"PM\" title=\"".$lang_functions['title_send_message_to'].htmlspecialchars($arr2["username"])."\" /></a></li><li><a href=\"report.php?forumpost=$postid\"><img class=\"f_report\" src=\"pic/trans.gif\" alt=\"Report\" title=\"".$lang_functions['title_report_this_post']."\" /></a></li>";
+  return $toolbox_user;
+}
+
+function post_format_author_info($id, $stat = false) {
+  global $CURUSER;
+  //---- Get poster details
+
+  $arr2 = get_user_row($id);
+
+  $avatar = ($CURUSER["avatars"] == "yes" ? htmlspecialchars($arr2["avatar"]) : "");
+
+  if (!$avatar) {
+    $avatar = "pic/default_avatar.png";
+  }
+  $signature = $arr2["signature"];
+
+  $out = '<div class="forum-author-info">';
+  $out .= '<div class="post-avatar">' . return_avatar_image($avatar) . '</div>';
+  if ($stat) {
+    $out .= '<div class="user-stats minor-list-vertical"><ul><li>' . user_class_image($arr2['class']) . '</li><li>' . post_author_stats($id, $arr2) . '</ul></div>';
+  }
+  $out .= '<div class="forum-user-toolbox minor-list horizon-compact"><ul>' . post_author_toolbox($arr2) . '</ul></div>';
+  $out .= '</div>';
+  return array($out, $signature);
+}
+
+function post_header($type, $authorid, $topicid, $postid, $added, $floor, $showonly = NULL) {
+#!
+  global $lang_functions;
+  $sadded = gettime($added,true,false);
+  $by = get_username($authorid,false,true,true,false,false,true);
+  
+  if ($type == 'post') {
+    $abbrtype = 'p';
+    $href = "forums.php?action=viewtopic&topicid=".$topicid."&page=p".$postid."#pid".$postid;
+  }
+  else {
+    $abbrtype = 'c';
+    #! page
+    $href = 'details.php?id=' . $topicid . '#cid' . $postid;
+  }
+  
+  $header = '<div class="forum-post-header" id="' . $abbrtype . 'id' . $postid. '"><div class="minor-list"><ul><li><a href="' . htmlspecialchars($href).'">#'.$postid.'</a></li><li><span class="gray">'.$lang_functions['text_by'].'</span>'.$by.'<span class="gray">'.$lang_functions['text_at']."</span></li><li>".$sadded;
+
+  if ($type == 'post') {
+    $header .= '<li class="list-seperator">';
+    if ($showonly) {
+      $header .= "<a href=\"?action=viewtopic&topicid=".$topicid."\">".$lang_functions['text_view_all_posts']."</a>";
+    }
+    else {
+      $header .= "<a href=\"".htmlspecialchars("?action=viewtopic&topicid=".$topicid."&authorid=".$posterid)."\">".$lang_functions['text_view_this_author_only']."</a>";
+    }
+    $header .= '</li>';
+  }
+  $header .= '</ul></div>';
+  
+  $header .= '<div class="forum-floor">'.$lang_functions['text_number']. $floor . $lang_functions['text_lou'].'</div>';
+  $header .= '</div>';
+  return $header;
+}
+
+function post_body($postid, $body) {
+  $fbody = format_comment($body);
+  if ($highlight) {
+    $fbody = highlight($highlight, $fbody);
+  }
+  
+  $b = '<div id="pid'. $postid .'body" class="forum-post-body">';
+  $b .= $fbody;
+  $b .= '</div>';
+  return $b;
+}
+
+function post_body_edited($edit) {
+  global $lang_functions;
+  $id = $edit['editor'];
+  $date = $edit['date'];
+  $lastedittime = gettime($date,true,false);
+  return '<div class="post-edited">'.$lang_functions['text_last_edited_by'].get_username($id).$lang_functions['text_last_edit_at'].$lastedittime."</div>\n";
+}
+
+function post_body_toolbox_href($postid, $type, $pid) {
+  if ($type) { //torrent
+    $surfix = '&cid='. $postid . '&type=torrent';
+    return array(
+		 'comment.php?action=add&sub=quote&pid=' . $pid . $surfix,
+		 'comment.php?action=delete' . $surfix,
+		 'comment.php?action=edit' . $surfix
+		 );
+  }
+  else { //forum
+    $surfix = '&postid=' . $postid;
+    return array(
+		 '?action=quotepost' . $surfix,
+		 '?action=deletepost' . $surfix,
+		 '?action=editpost' . $surfix,
+		 );
+  }
+}
+
+function post_body_toolbox($postid, $privilege, $type='', $pid = '') {
+  global $lang_functions;
+  $toolbox_post = '';
+  list($canquote, $candelete, $canedit) = $privilege;
+  $hrefs = post_body_toolbox_href($postid, $type, $pid);
+  if ($canquote) {
+    $toolbox_post .= '<li><a href="'.htmlspecialchars($hrefs[0]).'"><img class="f_quote" src="pic/trans.gif" alt="Quote" title="'.$lang_functions['title_reply_with_quote'].'" /></a></li>';
+  }
+
+  if ($candelete) {
+    $toolbox_post .= ('<li><a href="'.htmlspecialchars($hrefs[1]).'"><img class="f_delete" src="pic/trans.gif" alt="Delete" title="'.$lang_functions['title_delete_post'].'" /></a></li>');
+  }
+
+  if ($canedit) {
+    $toolbox_post .= ('<li><a href="' . htmlspecialchars($hrefs[2]).'"><img class="f_edit" src="pic/trans.gif" alt="Edit" title="' . $lang_functions['title_edit_post'].'" /></a></li>');
+  }
+
+  if ($toolbox_post) {
+    return '<div class="forum-post-toolbox minor-list horizon-compact"><ul>' . $toolbox_post . '</ul></div>';
+  }
+  return '';
+}
+
+function post_body_container($postid, $body, $highlight, $edit, $signature, $privilege, $type, $pid) {
+  global $CURUSER;
+  
+  $container = '<div class="forum-post-body-container">';
+  $container .= post_body($postid, $body);
+  if ($edit) {
+    $container .= post_body_edited($edit);
+  }
+  if ($CURUSER["signatures"] == "yes" && $signature) {
+    $container .= '<div class="signature">' . format_comment($signature,false,false,false,true,500,true,false, 1,200) . '</div>';
+  }
+
+  $container .= post_body_toolbox($postid, $privilege, $type, $pid);
+  $container .= '<div class="forum-post-footer"></div>';
+
+  $container .= '</div>';
+  return $container;
+}
+
+function post_format($args, $privilege) {
+  $post = '<li class="td table">';
+  $type = $args['type'];
+  $post .= post_header($type, $args['posterid'], $args['topicid'], $args['postid'], $args["added"], $args['floor'], $args['authorid']);
+  list($author_info, $signature) = post_format_author_info($args['posterid'], ($type =='post'));
+  $post .= $author_info;
+
+  $post .= post_body_container($args['postid'], $args['body'], $args['highlight'], $args['edit'], $signature, $privilege, $args['ctype'], $args['topicid']);
+
+  $post .= '</li>';
+  return $post;
+}
 
 function commenttable($rows, $type, $parent_id, $review = false, $offset=0) {
   global $lang_functions;
   global $CURUSER, $commanage_class;
   global $Advertisement;
-  begin_main_frame();
+
+  echo '<div class="forum-posts"><ol>';
 
   $count = 0;
   if ($Advertisement->enable_ad())
     $commentad = $Advertisement->get_ad('comment');
-  foreach ($rows as $row)
-  {
+  foreach ($rows as $row) {
     $userRow = get_user_row($row['user']);
     if ($count>=1)
     {
       if ($Advertisement->enable_ad()){
         if ($commentad[$count-1])
-        echo "<div align=\"center\" style=\"margin-top: 10px\" id=\"ad_comment_".$count."\">".$commentad[$count-1]."</div>";
+        echo '<div class="forum-ad table td" id="ad_comment_'.$count."\">".$commentad[$count-1]."</div>";
       }
     }
 
-    $by = get_username($row["user"],false,true,true,false,false,true);
-    $added = gettime($row["added"]);
-    
-    print('<div class="forum-author" id="cid' . $row['id']. '"><div class=" minor-list"><ul><li>#'.$row['id'].'</li><li><span class="gray">'.$lang_forums['text_by'].'</span>'.$by.'<span class="gray">'.$lang_forums['text_at']."</span></li><li>".$added);
-    if ($row["editedby"] && get_user_class() >= $commanage_class) {
-      print("<li class=\"list-seperator\"><a href=\"comment.php?action=vieworiginal&amp;cid=".$row['id']."&amp;type=".$type."\">".$lang_functions['text_view_original']."</a></li>");
+    if ($row["editedby"]) {
+      $edit = array('editor' => $row["editedby"], 'date' => $row['editdate']);
     }
-
-    print('</li></ul></div><div class="forum-floor"><span class="big">#'.$lang_forums['text_number'].($offset+$count+1) . $lang_forums['text_lou']."&nbsp;&nbsp;</span><a href=\"#top\"><img class=\"top\" src=\"pic/trans.gif\" alt=\"Top\" title=\"TOP\" /></a></div>");
-
-    print("</div>\n");
-
-
-    $avatar = ($CURUSER["avatars"] == "yes" ? htmlspecialchars(trim($userRow["avatar"])) : "");
-    if (!$avatar)
-      $avatar = "pic/default_avatar.png";
-    $text = format_comment($row["text"]);
-    $text_editby = "";
-    if ($row["editedby"]){
-      $lastedittime = gettime($row['editdate'],true,false);
-      $text_editby = "<br /><p><font class=\"small\">".$lang_functions['text_last_edited_by'].get_username($row['editedby']).$lang_functions['text_edited_at'].$lastedittime."</font></p>\n";
+    else {
+      $edit = false;
     }
+    $post_f = array('type' => 'comment', 'posterid' => $row['user'], 'topicid' => $parent_id, 'postid' => $row['id'], 'added' => $arr['added'], 'floor' => ($offset+$count+1), 'body' => $row['text'], 'highlight' => false, 'edit' => $edit, 'ctype' => $type);
+    $privilege = array(true, (get_user_class() >= $commanage_class), ($row["user"] == $CURUSER["id"] || get_user_class() >= $commanage_class));
+    echo post_format($post_f, $privilege);
 
-    print("<table class=\"main\" width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"5\">\n");
-    $secs = 900;
-    $dt = sqlesc(date("Y-m-d H:i:s",(TIMENOW - $secs))); // calculate date.
-    print("<tr>\n");
-    print("<td class=\"rowfollow\" width=\"150\" valign=\"top\" style=\"padding: 0px;\">".return_avatar_image($avatar)."</td>\n");
-    print("<td class=\"rowfollow\" valign=\"top\"><br />".$text.$text_editby."</td>\n");
-    print("</tr>\n");
-    $actionbar = "<a href=\"comment.php?action=add&amp;sub=quote&amp;cid=".$row[id]."&amp;pid=".$parent_id."&amp;type=".$type."\"><img class=\"f_quote\" src=\"pic/trans.gif\" alt=\"Quote\" title=\"".$lang_functions['title_reply_with_quote']."\" /></a>".
-    "<a href=\"comment.php?action=add&amp;pid=".$parent_id."&amp;type=".$type."\"><img class=\"f_reply\" src=\"pic/trans.gif\" alt=\"Add Reply\" title=\"".$lang_functions['title_add_reply']."\" /></a>".(get_user_class() >= $commanage_class ? "<a href=\"comment.php?action=delete&amp;cid=".$row[id]."&amp;type=".$type."\"><img class=\"f_delete\" src=\"pic/trans.gif\" alt=\"Delete\" title=\"".$lang_functions['title_delete']."\" /></a>" : "").($row["user"] == $CURUSER["id"] || get_user_class() >= $commanage_class ? "<a href=\"comment.php?action=edit&amp;cid=".$row[id]."&amp;type=".$type."\"><img class=\"f_edit\" src=\"pic/trans.gif\" alt=\"Edit\" title=\"".$lang_functions['title_edit']."\" />"."</a>" : "");
-    print("<tr><td class=\"toolbox\"> ".("'".$userRow['last_access']."'"> $dt ? "<img class=\"f_online\" src=\"pic/trans.gif\" alt=\"Online\" title=\"".$lang_functions['title_online']."\" />":"<img class=\"f_offline\" src=\"pic/trans.gif\" alt=\"Offline\" title=\"".$lang_functions['title_offline']."\" />" )."<a href=\"sendmessage.php?receiver=".htmlspecialchars(trim($row["user"]))."\"><img class=\"f_pm\" src=\"pic/trans.gif\" alt=\"PM\" title=\"".$lang_functions['title_send_message_to'].htmlspecialchars($userRow["username"])."\" /></a><a href=\"report.php?commentid=".htmlspecialchars(trim($row["id"]))."\"><img class=\"f_report\" src=\"pic/trans.gif\" alt=\"Report\" title=\"".$lang_functions['title_report_this_comment']."\" /></a></td><td class=\"toolbox\" align=\"right\">".$actionbar."</td>");
-
-    print("</tr></table>\n");
     $count++;
   }
-  end_main_frame();
+  echo '</ol></div>';
 }
 
 function searchfield($s) {

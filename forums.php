@@ -585,16 +585,15 @@ if ($action == "viewtopic")
 
 	//------ Print table
 
-	print('<div id="forum-header"><div>');
+	print('<div id="forum-header"><div id="post-viewed-count-container">');
 	print($lang_forums['there_is'].'<span id="post-viewed-count">'.$views.'</span>'.$lang_forums['hits_on_this_topic']);
 	print("</div>\n");
 
-	print($pagertop);
-
-	if ($maypost)
-	{
+	if ($maypost) {
 		print('<div id="reply-post"><a href="'.htmlspecialchars("?action=reply&topicid=".$topicid)."\"><img class=\"f_reply\" src=\"pic/trans.gif\" alt=\"Add Reply\" title=\"".$lang_forums['title_reply_directly'].'" /></a></div>');
 	}
+
+	print($pagertop);
 	print("</div>\n");
 
 	$pc = mysql_num_rows($res);
@@ -612,7 +611,7 @@ if ($action == "viewtopic")
 	  if ($pn>=1) {
 	    if ($Advertisement->enable_ad()) {
 	      if ($forumpostad[$pn-1])
-		echo "<div align=\"center\" style=\"margin-top: 10px\" id=\"ad_forumpost_".$pn."\">".$forumpostad[$pn-1]."</div>";
+		echo '<div class="forum-ad table td" id="ad_forumpost_'.$pn."\">".$forumpostad[$pn-1]."</div>";
 	    }
 	  }
 	  ++$pn;
@@ -620,33 +619,9 @@ if ($action == "viewtopic")
 	  $postid = $arr["id"];
 	  $posterid = $arr["userid"];
 
-	  $added = gettime($arr["added"],true,false);
-
-	  //---- Get poster details
-
-	  $arr2 = get_user_row($posterid);
-	  $uploaded = mksize($arr2["uploaded"]);
-	  $downloaded = mksize($arr2["downloaded"]);
-	  $ratio = get_ratio($arr2['id']);
-
-	  if (!$forumposts = $Cache->get_value('user_'.$posterid.'_post_count')){
-	    $forumposts = get_row_count("posts","WHERE userid=".$posterid);
-	    $Cache->cache_value('user_'.$posterid.'_post_count', $forumposts, 3600);
-	  }
-
-	  $signature = ($CURUSER["signatures"] == "yes" ? $arr2["signature"] : "");
-	  $avatar = ($CURUSER["avatars"] == "yes" ? htmlspecialchars($arr2["avatar"]) : "");
-
-	  $uclass = get_user_class_image($arr2["class"]);
-	  $by = get_username($posterid,false,true,true,false,false,true);
-
-	  if (!$avatar)
-	    $avatar = "pic/default_avatar.png";
-
-	  if ($pn == $pc)
-	    {
+	  if ($pn == $pc) {
 	      print("<span id=\"last\"></span>\n");
-	      if ($postid > $lpr){
+	      if ($postid > $lpr) {
 		if ($lpr == $CURUSER['last_catchup']) // There is no record of this topic
 		  sql_query("INSERT INTO readposts(userid, topicid, lastpostread) VALUES (".$userid.", ".$topicid.", ".$postid.")") or sqlerr(__FILE__, __LINE__);
 		elseif ($lpr > $CURUSER['last_catchup']) //There is record of this topic
@@ -655,74 +630,18 @@ if ($action == "viewtopic")
 	      }
 	    }
 
-	  echo '<li class="td table">';
-	  print('<div class="forum-post-header" id="pid' . $postid. '"><div class="minor-list"><ul><li><a href="' . htmlspecialchars("forums.php?action=viewtopic&topicid=".$topicid."&page=p".$postid."#pid".$postid).'">#'.$postid.'</a></li><li><span class="gray">'.$lang_forums['text_by'].'</span>'.$by.'<span class="gray">'.$lang_forums['text_at']."</span></li><li>".$added);
-	  if (is_valid_id($arr['editedby'])) {
-	    print("");
+	  $editor = $arr['editedby'];
+	  if (!is_valid_id($editor)) {
+	    $edit = false;
+	  }
+	  else {
+	    $edit = array('editor' => $editor, 'date' => $arr['editdate']);
 	  }
 
-	  print('<li class="list-seperator">');
-	  if ($authorid)
-	    print("<a href=\"?action=viewtopic&topicid=".$topicid."\">".$lang_forums['text_view_all_posts']."</a>");
-	  else
-	    print("<a href=\"".htmlspecialchars("?action=viewtopic&topicid=".$topicid."&authorid=".$posterid)."\">".$lang_forums['text_view_this_author_only']."</a>");
-	  print('</li></ul></div><div class="forum-floor"><span class="big">'.$lang_forums['text_number'].($pn+$offset) . $lang_forums['text_lou']."&nbsp;&nbsp;</span><a href=\"#top\"><img class=\"top\" src=\"pic/trans.gif\" alt=\"Top\" title=\"".$lang_forums['text_back_to_top']."\" /></a></div>");
+	  $privilege = array($maypost, (get_user_class() >= $postmanage_class || $is_forummod), (($CURUSER["id"] == $posterid && !$locked) || get_user_class() >= $postmanage_class || $is_forummod));
 
-	  print("</div>\n");
-
-	  echo '<div class="forum-author-info">';
-
-	  $body = format_comment($arr["body"]);
-
-	  if ($highlight) {
-	    $body = highlight($highlight,$body);
-	  }
-
-	  $stats = "<li>".$lang_forums['text_posts']."$forumposts</li><li>".$lang_forums['text_ul']."$uploaded </li><li>".$lang_forums['text_dl']."$downloaded</li><li>".$lang_forums['text_ratio']."$ratio</li>";
-
-	  $userclassimg = "<img alt=\"".get_user_class_name($arr2["class"],false,false,true)."\" title=\"".get_user_class_name($arr2["class"],false,false,true)."\" src=\"".$uclass."\" />";
-
-	  $secs = 900;
-	  $dt = sqlesc(date("Y-m-d H:i:s",(TIMENOW - $secs))); // calculate date.
-
-	  $online_status = ("'".$arr2['last_access']."'") > $dt ? "<img class=\"f_online\" src=\"pic/trans.gif\" alt=\"Online\" title=\"".$lang_forums['title_online']."\" />":"<img class=\"f_offline\" src=\"pic/trans.gif\" alt=\"Offline\" title=\"".$lang_forums['title_offline']."\" />";
-	  
-	  $toolbox_user = '<li>' . $online_status . "</li><li><a href=\"sendmessage.php?receiver=".htmlspecialchars(trim($arr2["id"]))."\"><img class=\"f_pm\" src=\"pic/trans.gif\" alt=\"PM\" title=\"".$lang_forums['title_send_message_to'].htmlspecialchars($arr2["username"])."\" /></a></li><li><a href=\"report.php?forumpost=$postid\"><img class=\"f_report\" src=\"pic/trans.gif\" alt=\"Report\" title=\"".$lang_forums['title_report_this_post']."\" /></a></li>";
-
-	  $toolbox_post = '<li>';
-	  if ($maypost) {
-	    $toolbox_post .= "<li><a href=\"".htmlspecialchars("?action=quotepost&postid=".$postid)."\"><img class=\"f_quote\" src=\"pic/trans.gif\" alt=\"Quote\" title=\"".$lang_forums['title_reply_with_quote']."\" /></a></li>";
-	  }
-
-	  if (get_user_class() >= $postmanage_class || $is_forummod) {
-	    $toolbox_post .= ("<li><a href=\"".htmlspecialchars("?action=deletepost&postid=".$postid)."\"><img class=\"f_delete\" src=\"pic/trans.gif\" alt=\"Delete\" title=\"".$lang_forums['title_delete_post']."\" /></a></li>");
-	  }
-
-	  if (($CURUSER["id"] == $posterid && !$locked) || get_user_class() >= $postmanage_class || $is_forummod) {
-	    $toolbox_post .= ('<li><a href="' . htmlspecialchars("?action=editpost&postid=".$postid).'\"><img class="f_edit" src="pic/trans.gif" alt="Edit" title="' . $lang_forums['title_edit_post'].'" /></a></li>');
-	  }
-	  
-	  echo '<div class="post-avatar">' . return_avatar_image($avatar) . '</div>';
-	  echo '<div class="user-stats minor-list-vertical"><ul><li>' . $userclassimg . '</li><li>' . $stats . '</ul></div>';
-	  echo '<div class="forum-user-toolbox minor-list compact"><ul>' . $toolbox_user . '</ul></div>';
-	  echo '</div>';
-
-	  echo '<div class="forum-post-body-container"><div id="pid'.$postid.'body" class="forum-post-body">';
-	  echo $body;
-	  echo '</div>';
-	  if (is_valid_id($arr['editedby'])) {
-	    $lastedittime = gettime($arr['editdate'],true,false);
-	    echo '<div class="post-edited">'.$lang_forums['text_last_edited_by'].get_username($arr['editedby']).$lang_forums['text_last_edit_at'].$lastedittime."</div>\n";
-	  }
-
-	  if ($signature) {
-	    echo '<div class="signature">' . format_comment($signature,false,false,false,true,500,true,false, 1,200) . "</div>";
-	  }
-
-	  echo '<div class="forum-post-toolbox minor-list compact"><ul>' . $toolbox_post . '</ul></div>';
-	  echo '<div class="forum-post-footer"></div>';
-	  echo '</div>';
-	  echo '</li>';
+	  $post_f = array('type' => 'post', 'posterid' => $posterid, 'topicid' => $topicid, 'postid' => $postid, 'added' => $arr['added'], 'floor' => $pn + $offset, 'body' => $arr['ori_body'], 'highlight' => $highlight, 'edit' => $edit);
+	  echo post_format($post_f, $privilege);
 	}
 	echo '</ol></div>';
 
@@ -1411,7 +1330,7 @@ if ($CURUSER)
 	$USERUPDATESET[] = "forum_access = ".sqlesc(date("Y-m-d H:i:s"));
 
 stdhead($lang_forums['head_forums']);
-begin_main_frame();
+
 print("<h1 align=\"center\">".$SITENAME."&nbsp;".$lang_forums['text_forums']."</h1>");
 print('<div class="minor-list list-seperator minor-nav"><ul><li><a href="?action=search">'.$lang_forums['text_search'] . '</a></li><li><a href="?action=viewunread">' . $lang_forums['text_view_unread'] . '</a></li><li><a href="?catchup=1">'.$lang_forums['text_catch_up'].'</a>'.(get_user_class() >= $forummanage_class ? '</li><li><a href="forummanage.php">'.$lang_forums['text_forum_manager'].'</a>':'').'</li></ul></div>');
 print("<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\" width=\"100%\">\n");
@@ -1427,8 +1346,7 @@ $count=0;
 if ($Advertisement->enable_ad())
 	$interoverforumsad=$Advertisement->get_ad('interoverforums');
 
-foreach ($overforums as $a)
-{
+foreach ($overforums as $a) {
 	if (get_user_class() < $a["minclassview"])
 		continue;
 	if ($count>=1)
@@ -1520,21 +1438,16 @@ foreach ($overforums as $a)
 print("</table>");
 if ($showforumstats_main == "yes"){
    forum_stats();
-	print("<h2 align=\"left\"><a href=\"?action=search\"><b>".$lang_forums['text_search']."</b></a> </h2>");
-	print("<div align=\"center\">(新手有疑问请先搜索论坛，不要重复发帖提问)</div>");
-	print("<div align=\"center\">");
+   print('<div style="text-align:center;">');
+   print("<h2><a href=\"?action=search\">".$lang_forums['text_search']."</a> </h2>");
+   print('<div">(新手有疑问请先搜索论坛，不要重复发帖提问)</div>');
    showSearch();
-	print("</div>");
+   print("</div>");
 }
 
-end_main_frame();
+
 stdfoot();
 ?>
-
-
-
-
-
 
 <?php
 function showSearch(){
@@ -1557,32 +1470,8 @@ function showSearch(){
 		}
 	}
 ?>
-<style type="text/css">
-.search{
-	background-image:url(pic/search.gif);
-	background-repeat:no-repeat;
-	width:579px;
-	height:95px;
-	margin:5px 0 5px 0;
-	text-align:left;
-}
-.search_title{
-	color:#0062AE;
-	background-color:#DAF3FB;
-	font-size:12px;
-	font-weight:bold;
-	text-align:left;
-	padding:7px 0 0 15px;
-}
 
-.search_table {
-	border-collapse: collapse;
-	border: none;
-	background-color: #ffffff; 
-}
-
-</style>
-<div class="search" align=\"center\">
+<div class="search">
 	<div class="search_title"><?php echo $lang_forums['text_search_on_forum'] ?> <?php echo ($error && $keywords != "" ? "[<b><font color=striking> ".$lang_forums['text_nothing_found']."</font></b> ]" : $found)?></div>
 	<div style="margin-left: 53px; margin-top: 13px;">
 		<form method="get" action="forums.php" id="search_form" style="margin: 0pt; padding: 0pt; font-family: Tahoma,Arial,Helvetica,sans-serif; font-size: 11px;">

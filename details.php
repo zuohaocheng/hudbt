@@ -560,10 +560,7 @@ else {
   // -----------------COMMENT SECTION ---------------------//
   if ($CURUSER['showcomment'] != 'no'){
     $count = get_row_count("comments","WHERE torrent=".sqlesc($id));
-    if ($count)
-      {
-	print("<br /><br />");
-	print("<h1 align=\"center\" id=\"startcomments\">" .$lang_details['h1_user_comments'] . "</h1>\n");
+    if ($count) {
 	list($pagertop, $pagerbottom, $limit,$next_page ,$offset) = pager(10, $count, "details.php?id=$id&cmtpage=1&", array('lastpagedefault' => 1), "page");
 
 	$subres = sql_query("SELECT id, text, user, added, editedby, editdate FROM comments WHERE torrent = $id ORDER BY id $limit") or sqlerr(__FILE__, __LINE__);
