@@ -76,27 +76,35 @@ $processingid = (0 + $_POST["processing_sel"]);
 $teamid = (0 + $_POST["team_sel"]);
 $audiocodecid = (0 + $_POST["audiocodec_sel"]);
 
-if (!is_valid_id($catid))
-bark($lang_takeupload['std_category_unselected']);
+if (!is_valid_id($catid)) {
+  bark($lang_takeupload['std_category_unselected']);
+}
 
-if (!validfilename($fname))
-bark($lang_takeupload['std_invalid_filename']);
-if (!preg_match('/^(.+)\.torrent$/si', $fname, $matches))
-bark($lang_takeupload['std_filename_not_torrent']);
+if (!validfilename($fname)) {
+  bark($lang_takeupload['std_invalid_filename']);
+}
+if (!preg_match('/^(.+)\.torrent$/si', $fname, $matches)) {
+  bark($lang_takeupload['std_filename_not_torrent']);
+}
 $shortfname = $torrent = $matches[1];
-if (!empty($_POST["name"]))
-$torrent = unesc($_POST["name"]);
-if ($f['size'] > $max_torrent_size)
-bark($lang_takeupload['std_torrent_file_too_big'].number_format($max_torrent_size).$lang_takeupload['std_remake_torrent_note']);
+if (!empty($_POST["name"])) {
+  $torrent = unesc($_POST["name"]);
+}
+if ($f['size'] > $max_torrent_size) {
+  bark($lang_takeupload['std_torrent_file_too_big'].number_format($max_torrent_size).$lang_takeupload['std_remake_torrent_note']);
+}
 $tmpname = $f["tmp_name"];
-if (!is_uploaded_file($tmpname))
-bark("eek");
-if (!filesize($tmpname))
-bark($lang_takeupload['std_empty_file']);
+if (!is_uploaded_file($tmpname)) {
+  bark("eek");
+}
+if (!filesize($tmpname)) {
+  bark($lang_takeupload['std_empty_file']);
+}
 
 $dict = bdec_file($tmpname, $max_torrent_size);
-if (!isset($dict))
-bark($lang_takeupload['std_not_bencoded_file']);
+if (!isset($dict)) {
+  bark($lang_takeupload['std_not_bencoded_file']);
+}
 
 function dict_check($d, $s) {
 	global $lang_takeupload;

@@ -262,7 +262,11 @@ $(function() {
 	    }
 
 	    href = 'details.php?id=' + id + '&hit=1';
-	    var mainTitle = '<h2 class="transparentbg"><a href="' + href + '" title="' + textMainTitle + '">' + textMainTitle + '</a></h2>';
+	    var mainTitle = '';
+	    if (torrent.sticky) {
+		mainTitle += '<img class="sticky" src="pic/trans.gif" alt="Sticky" title="' + lang.text_sticky + '">';
+	    }
+	    mainTitle += '<h2 class="transparentbg"><a href="' + href + '" title="' + textMainTitle + '">' + textMainTitle + '</a></h2>';
 	    var desc;
 	    if (textSubTitle === '') {
 		desc = '<h3 class="placeholder"></h3>';
@@ -275,6 +279,10 @@ $(function() {
 	    var div_desc = '<div class="torrent-title">' + desc;
 
 	    var mainTitleDecorators = '<ul class="prs">';
+
+	    if (torrent['new']) {
+		mainTitleDecorators += '<li>(<span class="new">' + lang.text_new_uppercase + '</span>)</li>';
+	    }
 
 	    var picktype = torrent.picktype;
 	    if (picktype) {

@@ -15,7 +15,7 @@ if ($allsec != 1 || $enablespecial != 'yes'){ //do not print searchbox if showin
   foreach($mainCatsName as $catNo => $name) {
     ?>
     <li><input type="checkbox" value="1" id="cat<?php echo $catNo; ?>" name="cat<?php echo $catNo; ?>" <?php echo ($selectedMainCat[$catNo] ? ' checked="checked"': ''); ?>/><a href="?cat=<?php echo $catNo; ?>"><?php echo $name; ?></a></li>
-<?
+<?php
   }
 ?>
     </ul></div>
@@ -194,7 +194,7 @@ else {
 }
 ?>
 <div id="loader" style="display: none; "></div>
-<?
+<?php
 
 if ($CURUSER){
 	if ($sectiontype == $browsecatmode)

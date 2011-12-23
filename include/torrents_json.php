@@ -176,9 +176,11 @@ function torrenttable_api($res, $variant = "torrent", $swap_headings = false) {
   else $displaysmalldescr = true;
 
   $torrents = array();
-  while ($row = mysql_fetch_assoc($res))  {
-    if($row['banned'] == 'no' || get_user_class() >= $seebanned_class || $CURUSER['id'] == $row['owner']) {
-      $torrents[] = torrentInfoForRow($row);
+  if ($res) {
+    while ($row = mysql_fetch_assoc($res))  {
+      if($row['banned'] == 'no' || get_user_class() >= $seebanned_class || $CURUSER['id'] == $row['owner']) {
+	$torrents[] = torrentInfoForRow($row);
+      }
     }
   }
   return $torrents;

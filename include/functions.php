@@ -3974,48 +3974,6 @@ function get_torrent_bg_color($promotion = 1)
   return $sphighlight;
 }
 
-function get_pr_state($promotion, $added = '', $promotionTimeType = 0, $promotionUntil = '') {
-  //PRCONFIG
-  static $sp_global_table = array(array(1,2,3,4,5,6,7),
-         array(2,2,2,2,2,2,2),
-         array(3,3,3,3,3,3,3),
-         array(4,4,4,4,4,4,4),
-         array(5,5,5,5,5,5,5),
-         array(6,6,6,6,6,6,6));
-/* array(array(1,2,3,4,5,6,7), */
-          /*    array(2,2,4,4,2,4,2), */
-          /*    array(3,4,3,4,6,6,3), */
-          /*    array(4,4,4,4,4,4,4), */
-          /*    array(5,2,6,4,6,6,7), */
-          /*    array(6,4,6,4,6,6,6)); */
-
-  $gstate = get_global_sp_state();
-  $state = $sp_global_table[$gstate-1][$promotion-1];
-
-  if ($state == 1 || $gstate != 1 || $promotionTimeType == 1) {
-    $expire = NULL;
-  }
-  else if ( $promotionTimeType == 2) {
-    $expire = strtotime( $promotionUntil);
-  } 
-  else {
-    global $expire_limits;
-    $expire_day = $expire_limits[$state];
-    if ($expire_day != 0) {
-      $expire = strtotime($added) + $expire_limits[$state] * 86400;
-      if ($expire < TIMENOW && $added != '') {
-  $state = 1;
-  $expire = NULL;
-      }
-    }
-    else {
-      $expire = NULL;
-    }
-  }
-
-  return array($state, $expire);
-}
-
 function get_torrent_promotion_append($promotion = 1,$forcemode = "",$showtimeleft = false, $added = "", $promotionTimeType = 0, $promotionUntil = '') {
   global $CURUSER,$lang_functions, $promotion_text;
 

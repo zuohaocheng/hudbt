@@ -145,12 +145,12 @@ $AUTHORITY=array(	'defaultclass' => '1',
 	'userbar' => '2',
 );
 $BASIC=array(	'SITENAME' => '蝴蝶-HUDBT',
-	'BASEURL' => '211.69.198.67/hudbt',
-	'announce_url' => '211.69.198.67/hudbt/announce.php',
+	'BASEURL' => 'localhost/~zuohaocheng/hudbt',
+	'announce_url' => 'locahost/~zuohaocheng/hudbt/announce.php',
 	'mysql_host' => 'localhost',
-	'mysql_user' => 'root',
-	'mysql_pass' => 'p2p167',
-	'mysql_db' => 'nexus_brucewolf',
+	'mysql_user' => 'hudbt',
+	'mysql_pass' => '123456',
+	'mysql_db' => 'hudbt',
 );
 $BONUS=array(	'donortimes' => '1.5',
 	'perseeding' => '1',
