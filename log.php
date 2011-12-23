@@ -359,8 +359,8 @@ else {
     }
 
     $pollsperpage = 10;
-    list($pagertop, $pagerbottom, $limit) = pager($pollsperpage, $pollcount, "?action=poll");
-    $polls = sql_query("SELECT * FROM polls ORDER BY id DESC " . $limit) or sqlerr();
+    list($pagertop, $pagerbottom, $limit) = pager($pollsperpage, $pollcount, "?action=poll&");
+    $polls = sql_query('SELECT polls.*, pollanswers.selection FROM polls LEFT JOIN pollanswers ON polls.id = pollanswers.pollid AND pollanswers.userid=' .  sqlesc($CURUSER["id"]) . ' ORDER BY id DESC ' . $limit) or sqlerr(__FILE__, __LINE__);
     stdhead($lang_log['head_previous_polls']);
     logmenu("poll");
     echo $pagertop;
@@ -374,62 +374,27 @@ else {
 
     while ($poll = mysql_fetch_assoc($polls)) {
       print('<li class="poll table td">');
-      print("<a id=\"$poll[id]\"></a>");
-      print('<h3>' . $poll["question"] . '</h3>');
-      
-      print('<div>');
-      $added = gettime($poll['added'], true, false);
 
-      print($added);
+      $out = "<a id=\"$poll[id]\"></a>";
+      $out .= '<h3>' . $poll["question"] . '</h3>';
+      
+      $out .= '<div>';
+      $added = gettime($poll['added'], true, false);
+      $out .= $added;
 
       if (get_user_class() >= $pollmanage_class) {
-	echo '<div class="minor-list list-seperator"><ul>';
-	print("<li><a href=makepoll.php?action=edit&pollid=$poll[id]>".$lang_log['text_edit']."</a></li>");
-	print("<li><a href=?action=poll&do=delete&pollid=$poll[id]>".$lang_log['text_delete']."</a></li>");
-	echo '</ul></div>';
+	$out .=  '<div class="minor-list list-seperator"><ul>';
+	$out .= ("<li><a href=makepoll.php?action=edit&pollid=$poll[id]>".$lang_log['text_edit']."</a></li>");
+	$out .= ("<li><a href=?action=poll&do=delete&pollid=$poll[id]>".$lang_log['text_delete']."</a></li>");
+	$out .=  '</ul></div>';
       }
-      print("</div>\n");
-
-
-      $pollanswers_count = sql_query("SELECT selection, COUNT(selection) FROM pollanswers WHERE pollid=" . $poll["id"] . " AND selection < 20 GROUP BY selection") or sqlerr();
-
-      $tvotes = 0;
-
-      $os = array(); // votes and options: array(array(123, "Option 1"), array(45, "Option 2"))
-      for ($i = 0; $i<20; $i += 1) {
-	$text = $poll["option" . $i];
-	if ($text) {
-	  $os[$i] = array(0, $text);
-	}
+      $out .= ("</div>\n");
+      echo $out;
+      $uservote = $poll['selection'];
+      if ($uservote == null) {
+	$uservote = 255;
       }
-
-      // Count votes
-      while ($poll_itm = mysql_fetch_row($pollanswers_count)) {
-	$idx = $poll_itm[0];
-	$count = $poll_itm[1];
-	if (array_key_exists($idx, $os)) {
-	  $os[$idx][0] = $count;
-	}
-	$tvotes += $count;
-      }
-
-      print('<div class="poll-opts minor-list-vertical"><ul>');
-      $i = 0;
-      while ($a = $os[$i]) {
-	if ($tvotes > 0) {
-	  $p = round($a[0] / $tvotes * 100);
-	}
-	else {
-	  $p = 0;
-	}
-	
-	print('<li><span class="opt-text">' . $a[1] . '</span><span class="opt-percent">' . "<img class=\"bar_end\" src=\"pic/trans.gif\" alt=\"\" /><img class=\"unsltbar\" src=\"pic/trans.gif\" style=\"width: " . ($p * 3) . "px\" /><img class=\"bar_end\" src=\"pic/trans.gif\" alt=\"\" /> $p%</span></li>\n");
-	++$i;
-      }
-      print("</ul></div>\n");
-      $tvotes = number_format($tvotes);
-      print("<div>".$lang_log['text_votes']."$tvotes</div>\n");
-
+      echo votes($poll, $uservote);
       print('</li>');
     }
     print("</ol></div>");

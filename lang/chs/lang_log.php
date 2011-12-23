@@ -52,7 +52,6 @@ $lang_log = array
 	'head_previous_polls' => "以前的投票",
 	'text_previous_polls' => "以前的投票",
 	'text_ago' => "以前",
-	'text_votes' => "投票数：",
 	'text_in' => "范围：",
 	'text_funbox_empty' => "<b>趣味盒是空的</b><br />",
 	'text_search_funbox' => "搜索趣味盒",

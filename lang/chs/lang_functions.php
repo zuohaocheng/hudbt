@@ -299,6 +299,7 @@ $lang_functions = array
 	'text_view_this_author_only' => "只看该作者",
 	'text_view_all_posts' => "显示全部帖子",
 	'text_posts' => "帖子：",
+	'text_poll_votes' => "投票数：",
 );
 
 ?>

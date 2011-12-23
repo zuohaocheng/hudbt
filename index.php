@@ -191,16 +191,26 @@ if ($showfunbox_main == "yes" && (!isset($CURUSER) || $CURUSER['showfb'] == "yes
 	}
       print("</h2>");
 
-      print("<table width=\"100%\"><tr><td class=\"text\">");
-      print("<iframe src=\"fun.php?action=view\" width='900' height='360' frameborder='0' name='funbox' marginwidth='0' marginheight='0'></iframe><br /><br />\n");
+      print('<div id="funbox" class="table td text main">');
+      print("<iframe src=\"fun.php?action=view\" width='100%' height='360' frameborder='0' name='funbox' marginwidth='0' marginheight='0'></iframe>\n");
 
-      if ($CURUSER)
-	{
-	  $funonclick = " onclick=\"funvote(".$row['id'].",'fun'".")\"";
-	  $dullonclick = " onclick=\"funvote(".$row['id'].",'dull'".")\"";
-	  print("<span id=\"funvote\"><b>".$funvote."</b>".$lang_index['text_out_of'].$totalvote.$lang_index['text_people_found_it'].($funvoted ? "" : "<font class=\"striking\">".$lang_index['text_your_opinion']."</font>&nbsp;&nbsp;<input type=\"button\" class='btn' name='fun' id='fun' ".$funonclick." value=\"".$lang_index['submit_fun']."\" />&nbsp;<input type=\"button\" class='btn' name='dull' id='dull' ".$dullonclick." value=\"".$lang_index['submit_dull']."\" />")."</span><span id=\"voteaccept\" style=\"display: none;\">".$lang_index['text_vote_accepted']."</span>");
+      if ($CURUSER) {
+	echo '<span id="funvote">';
+	print("<b>".$funvote."</b>" . $lang_index['text_out_of'] . $totalvote . $lang_index['text_people_found_it']);
+
+	if (!$funvoted) {
+	  echo "<span class=\"striking\">".$lang_index['text_your_opinion']."</span>";
+
+	  $id = $row['id'];
+	  echo '<span class="minor-list compact"><ul>';
+	  echo '<li><form action="fun.php?action=vote" method="POST"><input type="hidden" name="id" value=' . $id . ' /><input type="hidden" name="yourvote" value="fun" /><input type="submit" class="btn" value="' . $lang_index['submit_fun'] . '"></form></li>';
+	  echo '<li><form action="fun.php?action=vote" method="POST"><input type="hidden" name="id" value=' . $id . ' /><input type="hidden" name="yourvote" value="dull" /><input type="submit" class="btn" value="' . $lang_index['submit_dull'] . '"></form></li>';
+	  echo '</ul></span></span>';
+	  echo "<span id=\"voteaccept\" style=\"display: none;\">" . $lang_index['text_vote_accepted'];
 	}
-      print("</td></tr></table>");
+	echo '</span>';
+      }
+      print("</div>");
     }
 }
 // ------------- end: funbox ------------------//
@@ -222,21 +232,18 @@ if ($showshoutbox_main == "yes") {
 // ------------- end: shoutbox ------------------//
 // ------------- start: latest forum posts ------------------//
 
-if ($showlastxforumposts_main == "yes" && $CURUSER)
-  {
-    $res = sql_query("SELECT posts.id AS pid, posts.userid AS userpost, posts.added, topics.id AS tid, topics.subject, topics.forumid, topics.views, forums.name FROM posts, topics, forums WHERE posts.topicid = topics.id AND topics.forumid = forums.id AND minclassread <=" . sqlesc(get_user_class()) . " ORDER BY posts.id DESC LIMIT 5") or sqlerr(__FILE__,__LINE__);
-    if(mysql_num_rows($res) != 0)
-      {
-	print('<h2 class="page-titles">'.$lang_index['text_last_five_posts']."</h2>");
-	print("<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"5\"><tr><td class=\"colhead\" width=\"100%\" align=\"left\">".$lang_index['col_topic_title']."</td><td class=\"colhead\" align=\"center\">".$lang_index['col_view']."</td><td class=\"colhead\" align=\"center\">".$lang_index['col_author']."</td><td class=\"colhead\" align=\"left\">".$lang_index['col_posted_at']."</td></tr>");
+if ($showlastxforumposts_main == "yes" && $CURUSER) {
+  $res = sql_query("SELECT posts.id AS pid, posts.userid AS userpost, posts.added, topics.id AS tid, topics.subject, topics.forumid, topics.views, forums.name FROM posts, topics, forums WHERE posts.topicid = topics.id AND topics.forumid = forums.id AND minclassread <=" . sqlesc(get_user_class()) . " ORDER BY posts.id DESC LIMIT 5") or sqlerr(__FILE__,__LINE__);
+  if(mysql_num_rows($res) != 0) {
+    print('<h2 class="page-titles">'.$lang_index['text_last_five_posts']."</h2>");
+    print("<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"5\"><tr><td class=\"colhead\" width=\"100%\" align=\"left\">".$lang_index['col_topic_title']."</td><td class=\"colhead\" align=\"center\">".$lang_index['col_view']."</td><td class=\"colhead\" align=\"center\">".$lang_index['col_author']."</td><td class=\"colhead\" align=\"left\">".$lang_index['col_posted_at']."</td></tr>");
 
-	while ($postsx = mysql_fetch_assoc($res))
-	  {
-	    print("<tr><td><a href=\"forums.php?action=viewtopic&amp;topicid=".$postsx["tid"]."&amp;page=p".$postsx["pid"]."#pid".$postsx["pid"]."\"><b>".htmlspecialchars($postsx["subject"])."</b></a><br />".$lang_index['text_in']."<a href=\"forums.php?action=viewforum&amp;forumid=".$postsx["forumid"]."\">".htmlspecialchars($postsx["name"])."</a></td><td align=\"center\">".$postsx["views"]."</td><td align=\"center\">" . get_username($postsx["userpost"]) ."</td><td>".gettime($postsx["added"])."</td></tr>");
-	  }
-	print("</table>");
-      }
+    while ($postsx = mysql_fetch_assoc($res)) {
+      print("<tr><td><a href=\"forums.php?action=viewtopic&amp;topicid=".$postsx["tid"]."&amp;page=p".$postsx["pid"]."#pid".$postsx["pid"]."\"><b>".htmlspecialchars($postsx["subject"])."</b></a><br />".$lang_index['text_in']."<a href=\"forums.php?action=viewforum&amp;forumid=".$postsx["forumid"]."\">".htmlspecialchars($postsx["name"])."</a></td><td align=\"center\">".$postsx["views"]."</td><td align=\"center\">" . get_username($postsx["userpost"]) ."</td><td>".gettime($postsx["added"])."</td></tr>");
+    }
+    print("</table>");
   }
+}
 
 // ------------- end: latest forum posts ------------------//
 // ------------- start: latest torrents ------------------//
@@ -262,6 +269,7 @@ if ($CURUSER && $showpolls_main == "yes")
     // Get current poll
     if (!$arr = $Cache->get_value('current_poll_content')){
       $res = sql_query("SELECT * FROM polls ORDER BY id DESC LIMIT 1") or sqlerr(__FILE__, __LINE__);
+      
       $arr = mysql_fetch_array($res);
       $Cache->cache_value('current_poll_content', $arr, 7226);
     }
@@ -271,26 +279,20 @@ if ($CURUSER && $showpolls_main == "yes")
 
     print('<h2 class="page-titles">'.$lang_index['text_polls']);
 
-    if (get_user_class() >= $pollmanage_class)
-      {
-	print("<font class=\"small\"> - [<a class=\"altlink\" href=\"makepoll.php?returnto=main\"><b>".$lang_index['text_new']."</b></a>]\n");
-	if ($pollexists)
-	  {
-	    print(" - [<a class=\"altlink\" href=\"makepoll.php?action=edit&amp;pollid=".$arr[id]."&amp;returnto=main\"><b>".$lang_index['text_edit']."</b></a>]\n");
-	    print(" - [<a class=\"altlink\" href=\"log.php?action=poll&amp;do=delete&amp;pollid=".$arr[id]."&amp;returnto=main\"><b>".$lang_index['text_delete']."</b></a>]");
-	    print(" - [<a class=\"altlink\" href=\"polloverview.php?id=".$arr[id]."\"><b>".$lang_index['text_detail']."</b></a>]");
-	  }
-	print("</font>");
+    if (get_user_class() >= $pollmanage_class) {
+      print("<font class=\"small\"> - [<a class=\"altlink\" href=\"makepoll.php?returnto=main\"><b>".$lang_index['text_new']."</b></a>]\n");
+      if ($pollexists) {
+	print(" - [<a class=\"altlink\" href=\"makepoll.php?action=edit&amp;pollid=".$arr[id]."&amp;returnto=main\"><b>".$lang_index['text_edit']."</b></a>]\n");
+	print(" - [<a class=\"altlink\" href=\"log.php?action=poll&amp;do=delete&amp;pollid=".$arr[id]."&amp;returnto=main\"><b>".$lang_index['text_delete']."</b></a>]");
+	print(" - [<a class=\"altlink\" href=\"polloverview.php?id=".$arr[id]."\"><b>".$lang_index['text_detail']."</b></a>]");
       }
+      print("</font>");
+    }
     print("</h2>");
     if ($pollexists) {
       $pollid = 0+$arr["id"];
       $userid = 0+$CURUSER["id"];
       $question = $arr["question"];
-      $o = array($arr["option0"], $arr["option1"], $arr["option2"], $arr["option3"], $arr["option4"],
-		 $arr["option5"], $arr["option6"], $arr["option7"], $arr["option8"], $arr["option9"],
-		 $arr["option10"], $arr["option11"], $arr["option12"], $arr["option13"], $arr["option14"],
-		 $arr["option15"], $arr["option16"], $arr["option17"], $arr["option18"], $arr["option19"]);
 
       print('<div class="text table td" id="poll">');
       print('<h3 class="page-titles">'.$question.'</h3>');
@@ -298,84 +300,21 @@ if ($CURUSER && $showpolls_main == "yes")
       // Check if user has already voted
       $res = sql_query("SELECT selection FROM pollanswers WHERE pollid=".sqlesc($pollid)." AND userid=".sqlesc($CURUSER["id"])) or sqlerr();
       $voted = mysql_fetch_assoc($res);
-      if ($voted) //user has already voted
-	{
-	  $uservote = $voted["selection"];
-	  $Cache->new_page('current_poll_result', 3652, true);
-	  if (!$Cache->get_page())
-	    {
-	      // we reserve 255 for blank vote.
-	      $res = sql_query("SELECT selection FROM pollanswers WHERE pollid=".sqlesc($pollid)." AND selection < 20") or sqlerr();
-
-	      $tvotes = mysql_num_rows($res);
-
-	      $vs = array();
-	      $os = array();
-
-	      // Count votes
-	      while ($arr2 = mysql_fetch_row($res))
-		$vs[$arr2[0]] ++;
-
-	      reset($o);
-	      for ($i = 0; $i < count($o); ++$i){
-		if ($o[$i])
-		  $os[$i] = array($vs[$i], $o[$i], $i);
-	      }
-
-	      function srt($a,$b)
-	      {
-		if ($a[0] > $b[0]) return -1;
-		if ($a[0] < $b[0]) return 1;
-		return 0;
-	      }
-
-	      // now os is an array like this: array(array(123, "Option 1", 1), array(45, "Option 2", 2))
-	      $Cache->add_whole_row();
-	      print("<table class=\"main\" width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n");
-	      $Cache->end_whole_row();
-	      $i = 0;
-	      while ($a = $os[$i])
-		{
-		  if ($tvotes == 0)
-		    $p = 0;
-		  else
-		    $p = round($a[0] / $tvotes * 100);
-		  $Cache->add_row();
-		  $Cache->add_part();
-		  print("<tr><td width=\"1%\" class=\"embedded nowrap\">" . $a[1] . "&nbsp;&nbsp;</td><td width=\"99%\" class=\"embedded nowrap\"><img class=\"bar_end\" src=\"pic/trans.gif\" alt=\"\" /><img ");
-		  $Cache->end_part();
-		  $Cache->add_part();
-		  print(" src=\"pic/trans.gif\" style=\"width: " . ($p * 3) ."px;\" alt=\"\" /><img class=\"bar_end\" src=\"pic/trans.gif\" alt=\"\" /> $p%</td></tr>\n");
-		  $Cache->end_part();
-		  $Cache->end_row();
-		  ++$i;
-		}
-	      $Cache->break_loop();
-	      $Cache->add_whole_row();
-	      print("</table>\n");
-	      $tvotes = number_format($tvotes);
-	      print('<h3 class="page-titles">'.$lang_index['text_votes']." ".$tvotes."</h3>\n");
-	      $Cache->end_whole_row();
-	      $Cache->cache_page();
-	    }
-	  echo $Cache->next_row();
-	  $i = 0;
-	  while($Cache->next_row()){
-	    echo $Cache->next_part();
-	    if ($i == $uservote)
-	      echo "class=\"sltbar\"";
-	    else
-	      echo "class=\"unsltbar\"";
-	    echo $Cache->next_part();
-	    $i++;
-	  }
-	  echo $Cache->next_row();
+      if ($voted) { //user has already voted
+	$uservote = $voted["selection"];
+	$cache_key = 'current_poll_result_' + $uservote;
+	$out = $Cache->get_value($cache_key);
+	if (!$out) {
+	  $out = votes($arr, $uservote);
+	  $Cache->cache_value($cache_key, $out, 3652);
 	}
-      else //user has not voted yet
-	{
+	echo $out;
+	$i = 0;
+      }
+      else {//user has not voted yet
 	  print('<form method="post" action="index.php"><div class="minor-list-vertical"><ul>');
 	  $i = 0;
-	  while ($a = $o[$i]) {
+	  while ($a = $arr['option' . $i]) {
 	    print('<li><input type="radio" name="choice" value="'.$i.'">'.$a.'</li>');
 	    ++$i;
 	  }

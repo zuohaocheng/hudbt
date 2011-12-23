@@ -4508,26 +4508,21 @@ function get_torrent_promotion_append_sub($promotion = 1,$forcemode = "",$showti
 function lang_choice_before_login($extra='') {
   global $lang_functions;
 
-$s = "<select name=\"sitelanguage\" onchange='submit()'>\n";
+  $s = "<select name=\"sitelanguage\" onchange='submit()'>\n";
 
-$langs = langlist("site_lang");
+  $langs = langlist("site_lang");
 
-foreach ($langs as $row)
-{
-  if ($row["site_lang_folder"] == get_langfolder_cookie()) $se = "selected=\"selected\""; else $se = "";
-  $s .= "<option value=\"". $row["id"] ."\" ". $se. ">" . htmlspecialchars($row["lang_name"]) . "</option>\n";
-}
-$s .= "\n</select>";
+  foreach ($langs as $row) {
+    if ($row["site_lang_folder"] == get_langfolder_cookie()) $se = "selected=\"selected\""; else $se = "";
+    $s .= "<option value=\"". $row["id"] ."\" ". $se. ">" . htmlspecialchars($row["lang_name"]) . "</option>\n";
+  }
+  $s .= "\n</select>";
 
-  ?>
-<form method="get" action="<?php echo $_SERVER['PHP_SELF'] ?>">
-<?php
-print($extra);
-print('<div id="lang-choice">'.$lang_functions['text_select_lang']. $s . "</div>");
-?>
-</form>
-<?php
+  echo '<form method="get" action="' . $_SERVER['PHP_SELF'] . '>';
 
+  print($extra);
+  print('<div id="lang-choice">'.$lang_functions['text_select_lang']. $s . "</div>");
+  echo ('</form>');
 }
 
 function a_to_z_index($letter='', $query = '') {
@@ -4552,6 +4547,57 @@ function checkHTTPMethod($method) {
     stderr('No hacking allowed!', 'This method allows ' . $method . ' request only.');
     die();
   }
+}
+
+function votes($poll, $uservote = 255) {
+  global $lang_functions, $pollmanage_class;
+  
+  $pollanswers_count = sql_query("SELECT selection, COUNT(selection) FROM pollanswers WHERE pollid=" . $poll["id"] . " AND selection < 20 GROUP BY selection") or sqlerr();
+
+  $tvotes = 0;
+
+  $os = array(); // votes and options: array(array(123, "Option 1"), array(45, "Option 2"))
+  for ($i = 0; $i<20; $i += 1) {
+    $text = $poll["option" . $i];
+    if ($text) {
+      $os[$i] = array(0, $text, $i);
+    }
+  }
+
+  // Count votes
+  while ($poll_itm = mysql_fetch_row($pollanswers_count)) {
+    $idx = $poll_itm[0];
+    $count = $poll_itm[1];
+    if (array_key_exists($idx, $os)) {
+      $os[$idx][0] = $count;
+    }
+    $tvotes += $count;
+  }
+
+  $out = '<div class="poll-opts minor-list-vertical"><ul>';
+  $i = 0;
+  while ($a = $os[$i]) {
+    if ($tvotes > 0) {
+      $p = round($a[0] / $tvotes * 100);
+    }
+    else {
+      $p = 0;
+    }
+
+    if ($a[2] == $uservote) {
+      $class = 'sltbar';
+    }
+    else {
+      $class = 'unsltbar';
+    }
+    
+    $out .= ('<li><span class="opt-text">' . $a[1] . '</span><span class="opt-percent nowrap">' . "<img class=\"bar_end\" src=\"pic/trans.gif\" alt=\"\" /><img class=\"" . $class . "\" src=\"pic/trans.gif\" style=\"width: " . ($p * 3) . "px\" /><img class=\"bar_end\" src=\"pic/trans.gif\" alt=\"\" /> $p%</span></li>\n");
+    ++$i;
+  }
+  $out .= ("</ul></div>\n");
+  $tvotes = number_format($tvotes);
+  $out .= ("<div>".$lang_functions['text_poll_votes'].$tvotes.'</div>');
+  return $out;
 }
 
 ?>
