@@ -620,7 +620,6 @@ if ($action == "viewtopic")
 	  $posterid = $arr["userid"];
 
 	  if ($pn == $pc) {
-	      print("<span id=\"last\"></span>\n");
 	      if ($postid > $lpr) {
 		if ($lpr == $CURUSER['last_catchup']) // There is no record of this topic
 		  sql_query("INSERT INTO readposts(userid, topicid, lastpostread) VALUES (".$userid.", ".$topicid.", ".$postid.")") or sqlerr(__FILE__, __LINE__);
@@ -640,7 +639,7 @@ if ($action == "viewtopic")
 
 	  $privilege = array($maypost, (get_user_class() >= $postmanage_class || $is_forummod), (($CURUSER["id"] == $posterid && !$locked) || get_user_class() >= $postmanage_class || $is_forummod));
 
-	  $post_f = array('type' => 'post', 'posterid' => $posterid, 'topicid' => $topicid, 'postid' => $postid, 'added' => $arr['added'], 'floor' => $pn + $offset, 'body' => $arr['ori_body'], 'highlight' => $highlight, 'edit' => $edit);
+	  $post_f = array('type' => 'post', 'posterid' => $posterid, 'topicid' => $topicid, 'postid' => $postid, 'added' => $arr['added'], 'floor' => $pn + $offset, 'body' => $arr['ori_body'], 'highlight' => $highlight, 'edit' => $edit, 'last' => ($pn == $pc));
 	  echo post_format($post_f, $privilege);
 	}
 	echo '</ol></div>';

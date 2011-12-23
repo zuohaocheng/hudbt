@@ -376,7 +376,7 @@ if ($CURUSER && $showpolls_main == "yes")
 	  print('<form method="post" action="index.php"><div class="minor-list-vertical"><ul>');
 	  $i = 0;
 	  while ($a = $o[$i]) {
-	    print('<li><input type="radio" name="choice" value="".$i."">'.$a.'</li>');
+	    print('<li><input type="radio" name="choice" value="'.$i.'">'.$a.'</li>');
 	    ++$i;
 	  }
 	  print("<li></li>");

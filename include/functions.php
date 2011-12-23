@@ -2920,7 +2920,10 @@ function post_body_container($postid, $body, $highlight, $edit, $signature, $pri
 }
 
 function post_format($args, $privilege) {
-  $post = '<li class="td table">';
+  $post = '<li class="forum-post td table">';
+  if (array_key_exists('last', $args) && $args['last']) {
+    $post .= '<a id="last"></a>';
+  }
   $type = $args['type'];
   $post .= post_header($type, $args['posterid'], $args['topicid'], $args['postid'], $args["added"], $args['floor'], $args['authorid']);
   list($author_info, $signature) = post_format_author_info($args['posterid'], ($type =='post'));
@@ -2937,16 +2940,15 @@ function commenttable($rows, $type, $parent_id, $review = false, $offset=0) {
   global $CURUSER, $commanage_class;
   global $Advertisement;
 
-  echo '<div class="forum-posts"><ol>';
+  echo '<div id="forum-posts"><ol>';
 
   $count = 0;
   if ($Advertisement->enable_ad())
     $commentad = $Advertisement->get_ad('comment');
   foreach ($rows as $row) {
     $userRow = get_user_row($row['user']);
-    if ($count>=1)
-    {
-      if ($Advertisement->enable_ad()){
+    if ($count>=1) {
+      if ($Advertisement->enable_ad()) {
         if ($commentad[$count-1])
         echo '<div class="forum-ad table td" id="ad_comment_'.$count."\">".$commentad[$count-1]."</div>";
       }

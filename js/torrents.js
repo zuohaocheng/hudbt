@@ -81,8 +81,8 @@ $(function() {
     //Go to content
     var goToContent = (function() {
 	var $top = $('#content-marker');
-	var top = $top.offset().top;
 	return function() {
+	    var top = $top.offset().top;
 	    scrollToPosition(top);
 	};
     })();
