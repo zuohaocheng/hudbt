@@ -56,14 +56,12 @@ function get_load_uri($type, $script_name ="", $debug=false) {
   return '';
 }
 
-function get_langfile_path($script_name ="", $target = false, $lang_folder = "")
-{
+function get_langfile_path($script_name ="", $target = false, $lang_folder = "") {
   global $CURLANGDIR;
   $CURLANGDIR = get_langfolder_cookie();
-  if($lang_folder == "")
-    {
-      $lang_folder = $CURLANGDIR;
-    }
+  if($lang_folder == "") {
+    $lang_folder = $CURLANGDIR;
+  }
   return "lang/" . ($target == false ? $lang_folder : "_target") ."/lang_". ( $script_name == "" ? substr(strrchr($_SERVER['SCRIPT_NAME'],'/'),1) : $script_name);
 }
 
@@ -2651,6 +2649,40 @@ function deletetorrent($id, $deductBonus = false) {
   if ($deductBonus) {
     KPS("-",$uploadtorrent_bonus,$row["owner"]);
   }
+}
+
+function delete_single_torrent($id, $row) {
+  global $CURUSER;
+  require_once(get_langfile_path("delete.php",true));
+  $users_of_torrent_res=sql_query('SELECT snatched.userid, users.accepttdpms FROM snatched LEFT JOIN users ON snatched.userid = users.id WHERE torrentid=' . sqlesc($id) . " AND finished='no'") or sqlerr(__FILE__, __LINE__);
+  while ($users_of_torrent = mysql_fetch_array($users_of_torrent_res)) {
+    if ($user_of_torrent['accepttdpms'] != "no") {
+      $dt = sqlesc(date("Y-m-d H:i:s"));
+      $subject = sqlesc($lang_delete_target[get_user_lang($users_of_torrent["userid"])]['msg_torrent_deleted']);
+      $msg = sqlesc($lang_delete_target[get_user_lang($users_of_torrent["userid"])]['msg_the_torrent_you_downloaded'].$row['name'].$lang_delete_target[get_user_lang($row["owner"])]['msg_was_deleted_by']."[url=userdetails.php?id=".$CURUSER['id']."]".$CURUSER['username']."[/url]".$lang_delete_target[get_user_lang($row["owner"])]['msg_blank']);
+      sql_query("INSERT INTO messages (sender, receiver, subject, added, msg) VALUES(0, $users_of_torrent[userid], $subject, $dt, $msg)") or sqlerr(__FILE__, __LINE__);
+    }
+  }
+  
+  $interval_no_deduct_bonus_on_deletion = 30* 86400;
+  $tadded = strtotime($row['added']);
+
+  deletetorrent($id, ((TIMENOW - $tadded) > $interval_no_deduct_bonus_on_deletion));
+
+  if ($row['anonymous'] == 'yes' && $CURUSER["id"] == $row["owner"]) {
+    write_log("Torrent $id ($row[name]) was deleted by its anonymous uploader ($reasonstr)",'normal');
+  } else {
+    write_log("Torrent $id ($row[name]) was deleted by $CURUSER[username] ($reasonstr)",'normal');
+  }
+
+  //Send pm to torrent uploader
+  if ($CURUSER["id"] != $row["owner"]){
+    $dt = sqlesc(date("Y-m-d H:i:s"));
+    $subject = sqlesc($lang_delete_target[get_user_lang($row["owner"])]['msg_torrent_deleted']);
+    $msg = sqlesc($lang_delete_target[get_user_lang($row["owner"])]['msg_the_torrent_you_uploaded'].$row['name'].$lang_delete_target[get_user_lang($row["owner"])]['msg_was_deleted_by']."[url=userdetails.php?id=".$CURUSER['id']."]".$CURUSER['username']."[/url]".$lang_delete_target[get_user_lang($row["owner"])]['msg_reason_is'].$reasonstr);
+    sql_query("INSERT INTO messages (sender, receiver, subject, added, msg) VALUES(0, $row[owner], $subject, $dt, $msg)") or sqlerr(__FILE__, __LINE__);
+  }
+
 }
 
 function pager($rpp, $count, $href, $opts = array(), $pagename = "page") {
