@@ -6,7 +6,7 @@
 
 ?>
 <tr>
-	<td rowspan=2 id="donating">捐赠魔力值<br /><a href='bonusDonations.php' style="font-weight:normal;">[查看我的捐赠历史]</a></td>
+	<td rowspan=2 id="donating">捐赠魔力值<br /><a href='bonusDonations.php' class="sublink">[查看我的捐赠历史]</a></td>
 	<td id="to_donate">
 <?php
 $torrent_id = (int) $_GET['id'];
