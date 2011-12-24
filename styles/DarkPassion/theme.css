@@ -881,6 +881,41 @@ td.category-icon {
 	background-color: #ffffff; 
 }
 
+pre, code {
+    font-family:Menlo, Monaco, 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Lucida Console', monospace;
+}
+
+.bbcode blockquote {
+    margin: 0;
+}
+
+.bbcode pre {
+    border:dashed 1px silver;
+    padding:0.5em;
+    line-height: 150%;
+}
+
+.bbcode code {
+    background-color:#eee;
+    padding:0.3em;
+    line-height: 150%;
+}
+
+.codebuttons {
+    font-size:11px; 
+    margin-right:3px;
+}
+
+input.text {
+    margin-bottom: 12px;
+    width: 95%;
+    padding: .4em;
+}
+
+.smiles li {
+    width:20px;
+}
+
 .post-edited {
     font-size: 80%;
     margin: 1em auto 0.8em 2.5em;
@@ -926,9 +961,8 @@ td.category-icon {
 
 .forum-post-header {
     margin: 0;
-    padding: 0 1em;
-    /* border-bottom: 1px solid gray; */
     position: relative;
+    zoom: 1;
 }
 
 .forum-floor {
@@ -965,6 +999,11 @@ td.category-icon {
 
 .user-stats {
     margin: 0.8em;
+}
+
+.post-avatar {
+    text-align:center;
+    margin-top:10px;
 }
 
 .forum-post-toolbox {

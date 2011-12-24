@@ -86,7 +86,7 @@ if ($smtptype != 'none'){
 <?php
 }
 ?>
-</div></ul>
+</ul></div>
 <?php
 if ($showhelpbox_main != 'no'){?>
 <table width="700" class="main" border="0" cellspacing="0" cellpadding="0"><tr><td class="embedded">

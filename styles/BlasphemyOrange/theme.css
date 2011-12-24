@@ -194,18 +194,21 @@ td.colhead, thead>tr>th {
     background-color: #ff9718;
     color: #ffffff;
 }
-.nowrap
-{
+.nowrap {
     white-space:nowrap;
 }
-td.rowhead_left
-{
+
+thead.center th {
+    text-align:center;
+}
+
+td.rowhead_left {
     text-align: left
 }
-td.rowhead_center
-{
+td.rowhead_center {
     text-align: center
 }
+
 td.rowhead, tbody>tr>th
 {
     font-weight: bold;
@@ -253,10 +256,8 @@ form
     margin-top: 0px;
     margin-bottom: 0px
 }
-.sublink
-{
+.sublink {
     font-weight: normal;
-    font-style: italic
 }
 .gray
 {
@@ -905,6 +906,60 @@ td.category-icon {
 	background-color: #ffffff; 
 }
 
+.bbcode blockquote {
+    margin: 0;
+}
+
+.codebuttons {
+    font-size:11px; 
+    margin-right:3px;
+}
+
+input.text {
+    margin-bottom: 12px;
+    width: 95%;
+    padding: .4em;
+}
+
+.smiles li {
+    width:20px;
+}
+
+pre, code {
+    font-family:Menlo, Monaco, 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Lucida Console', monospace;
+}
+
+.bbcode blockquote {
+    margin: 0;
+}
+
+.bbcode pre {
+    border:dashed 1px silver;
+    padding:0.5em;
+    line-height: 150%;
+}
+
+.bbcode code {
+    background-color:#eee;
+    padding:0.3em;
+    line-height: 150%;
+}
+
+.codebuttons {
+    font-size:11px; 
+    margin-right:3px;
+}
+
+input.text {
+    margin-bottom: 12px;
+    width: 95%;
+    padding: .4em;
+}
+
+.smiles li {
+    width:20px;
+}
+
 .post-edited {
     font-size: 80%;
     margin: 1em auto 0.8em 2.5em;
@@ -950,9 +1005,8 @@ td.category-icon {
 
 .forum-post-header {
     margin: 0;
-    padding: 0 1em;
-    /* border-bottom: 1px solid gray; */
     position: relative;
+    zoom: 1;
 }
 
 .forum-floor {
@@ -991,6 +1045,11 @@ td.category-icon {
     margin: 0.8em;
 }
 
+.post-avatar {
+    text-align:center;
+    margin-top:10px;
+}
+
 .forum-post-toolbox {
     position: absolute;
     padding: 0;
@@ -1013,6 +1072,7 @@ td.category-icon {
     text-align: center;
     padding: 0 0 1.2em 0;
     width: 55%;
+    margin-top: 1em;
 }
 
 #forum-reply-post h2 {

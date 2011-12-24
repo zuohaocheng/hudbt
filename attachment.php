@@ -17,14 +17,13 @@ $altsize = $_POST['altsize'];
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="stylesheet" href="<?php echo get_font_css_uri()?>" type="text/css">
-<link rel="stylesheet" href="<?php echo $css_uri."theme.css"?>" type="text/css">
+  <?php echo get_load_uri('css'); ?>
 </head>
 <body class="inframe">
-<table width="100%">
+  <form enctype="multipart/form-data" name="attachment" method="post" action="attachment.php">
+<div class="table minor-list"><ul>
 <?php
-if ($Attach->enable_attachment())
-{
+if ($Attach->enable_attachment()) {
 	if ($_SERVER["REQUEST_METHOD"] == "POST")
 	{
 		$file = $_FILES['file'];
@@ -232,32 +231,25 @@ if ($Attach->enable_attachment())
 			}
 		}
 	}
-	print("<form enctype=\"multipart/form-data\" name=\"attachment\" method=\"post\" action=\"attachment.php\">");
-	print("<tr>");
-	print("<td class=\"embedded\" colspan=\"2\" align=left>");
-	print("<input type=\"file\" name=\"file\"".($count_left ? "" : " disabled=\"disabled\"")." />&nbsp;");
-	print("<input type=\"checkbox\" name=\"altsize\" value=\"yes\"".($altsize == 'yes' ? " checked=\"checked\"" : "")." />".$lang_attachment['text_small_thumbnail']."&nbsp;");
-	print("<input type=\"submit\" name=\"submit\" value=\"".$lang_attachment['submit_upload']."\"".($count_left ? "" : " disabled=\"disabled\"")." /> ");
-	if ($warning) {
-		print('<span class="striking">'.$warning.'</span>');
-	} else {
-		print("<b>".$lang_attachment['text_left']."</b><font color=\"red\">".$count_left."</font>".$lang_attachment['text_of'].$count_limit."&nbsp;&nbsp;&nbsp;<b>".$lang_attachment['text_size_limit']."</b>".mksize($size_limit)."&nbsp;&nbsp;&nbsp;<b>".$lang_attachment['text_file_extensions']."</b>");
-		$allowedextsblock = "";
-		foreach($allowed_exts as $ext) {
-			$allowedextsblock .= $ext."/";
-		}
-		$allowedextsblock = rtrim(trim($allowedextsblock), "/");
-		if (!$allowedextsblock) {
-			$allowedextsblock = 'N/A';
-		}
-		print("<span title=\"".htmlspecialchars($allowedextsblock)."\"><i>".$lang_attachment['text_mouse_over_here']."</i></span>");
-	}
 
-	print("</td>");
-	print("</tr>");
-	print("</form>");
+
+	print("<li><input type=\"file\" name=\"file\"".($count_left ? "" : " disabled=\"disabled\"")." /></li>");
+	print('<li><input type="checkbox" name="altsize" value="yes" id="altsize"'.($altsize == 'yes' ? ' checked="checked"' : "").' /><label for="altsize">'.$lang_attachment['text_small_thumbnail']."</label></li>");
+	print('<li><input type="submit" name="submit" value="'.$lang_attachment['submit_upload'].'"'.($count_left ? "" : ' disabled="disabled"').' /></li>');
+	if ($warning) {
+	  print('<li><span class="striking">'.$warning.'</span></li>');
+	}
+	else {
+	  print("<li>".$lang_attachment['text_left'].'<span class="striking">'.$count_left."</span>".$lang_attachment['text_of'].$count_limit.'</li><li>'.$lang_attachment['text_size_limit'] . mksize($size_limit)."</li><li>".$lang_attachment['text_file_extensions']);
+	  $allowedextsblock = implode(', ', $allowed_exts);
+	  if (!$allowedextsblock) {
+	    $allowedextsblock = 'N/A';
+	  }
+	  print('<a onclick="parent.allowedtypes(event, this)" onmouseout="parent.allowedtypes(event, this)" onmouseover="parent.allowedtypes(event, this)" title="'.htmlspecialchars($allowedextsblock).'" href="#">'.$lang_attachment['text_mouse_over_here'].'</a></li>');
+	}
 }
 ?>
-</table>
+</ul></div>
+</form>
 </body>
 </html>

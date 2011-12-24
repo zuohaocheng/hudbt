@@ -102,22 +102,18 @@ function generate_key($name, $type, $multiple) {
 }
 
 function dependence($name, $type) {
-  $jqui = array(
-				       'js' => array('jquery-ui-1.8.16.custom.min'),
-				       'css' => array('jqui/ui-lightness/jquery-ui-1.8.16.custom'));
   $jqsorter = array(
-					 'js' => array('jquery.tablesorter'),
-					 'css' => array('jquery.tablesorter/jquery.tablesorter'));
+		    'js' => array('jquery.tablesorter'),
+		    'css' => array('jquery.tablesorter/jquery.tablesorter'));
   $dependence = array(
 		    'torrents' => array(
-					'js' => array('jquery.json-2.3.min', 'jstorage.min', 'jquery-ui-1.8.16.custom.min', 'jquery.tablesorter'),
-					'css' => array('jquery.tablesorter/jquery.tablesorter', 'jqui/ui-lightness/jquery-ui-1.8.16.custom')),
-		    'mybonus' => $jqui,
-		    'usercp' => $jqui,
+					'js' => array('jquery.json-2.3.min', 'jstorage.min', 'jquery.tablesorter', 'jquery.history.min'),
+					'css' => array('jquery.tablesorter/jquery.tablesorter')),
 		    'uploaders' => $jqsorter,
 		    'userdetails' => $jqsorter,
 		    'details' => $jqsorter,
-		    'topten' => $jqsorter
+		    'topten' => $jqsorter,
+		    'bonusdonations' => $jqsorter
 		    );
 
   $dep = $dependence[$name];
@@ -150,7 +146,7 @@ function load_files_cache($name, $type, $debug, $purge) {
 
   if ($type == 'js') {
     //Mind the sequence of loading
-    $out .= load_files(array('jquery-1.7.1.min'), $type, $debug, $purge, false, false);
+    $out .= load_files(array('jquery-1.7.1.min', 'jquery-ui-1.8.16.custom.min'), $type, $debug, $purge, false, false);
     $out .= load_files(array('ajaxbasic', 'common', 'domLib', 'domTT', 'domTT_drag', 'fadomatic'), $type, $debug, $purge);
 
     $out .= load_files(dependence($name, $type), $type, $debug, $purge);
@@ -160,7 +156,7 @@ function load_files_cache($name, $type, $debug, $purge) {
   }
   elseif ($type == 'css') {
     $css_uri = get_css_uri();
-    $files = array(get_font_css_uri(), 'styles/sprites.css', get_forum_pic_folder().'/forumsprites.css', $css_uri."theme.css", $css_uri."DomTT.css", 'pic/' . get_cat_folder() . "sprite.css");
+    $files = array(get_font_css_uri(), 'styles/sprites.css', get_forum_pic_folder().'/forumsprites.css', $css_uri."theme.css", $css_uri."DomTT.css", 'pic/' . get_cat_folder() . "sprite.css", 'styles/jqui/ui-lightness/jquery-ui-1.8.16.custom.css');
     $out .= load_files($files, $type, $debug, $purge, true);
 
     if ($CURUSER){

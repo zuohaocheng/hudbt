@@ -33,6 +33,7 @@ function get_load_uri($type, $script_name ="", $debug=false) {
   global $CURUSER;
   $name = ($script_name == "" ? substr(strrchr($_SERVER['SCRIPT_NAME'],'/'),1) : $script_name);
 
+  $addition = '';
   if ($_GET['purge']) {
     $addition .= '&purge=1';
   }
@@ -40,7 +41,7 @@ function get_load_uri($type, $script_name ="", $debug=false) {
     $addition .= '&debug=1';
   }
   else {
-    $addition = '&rev=20111221';
+    $addition .= '&rev=20111221';
   }
   
   if ($type == 'js') {
@@ -110,268 +111,30 @@ function stderr($heading, $text, $htmlstrip = true, $head = true, $foot = true, 
   if ($die) die;
 }
 
-function sqlerr($file = '', $line = '')
-{
+function sqlerr($file = '', $line = '') {
   print("<table border=\"0\" bgcolor=\"blue\" align=\"left\" cellspacing=\"0\" cellpadding=\"10\" style=\"background: blue;\">" .
 	"<tr><td class=\"embedded\"><font color=\"white\"><h1>SQL Error</h1>\n" .
 	"<b>" . mysql_error() . ($file != '' && $line != '' ? "<p>in $file, line $line</p>" : "") . "</b></font></td></tr></table>");
   die;
 }
 
-function format_quotes($s)
-{
-  global $lang_functions;
-  preg_match_all('/\\[quote.*?\\]/i', $s, $result, PREG_PATTERN_ORDER);
-  $openquotecount = count($openquote = $result[0]);
-  preg_match_all('/\\[\/quote\\]/i', $s, $result, PREG_PATTERN_ORDER);
-  $closequotecount = count($closequote = $result[0]);
-
-  if ($openquotecount != $closequotecount) return $s; // quote mismatch. Return raw string...
-
-  // Get position of opening quotes
-  $openval = array();
-  $pos = -1;
-
-  foreach($openquote as $val)
-    $openval[] = $pos = strpos($s,$val,$pos+1);
-
-  // Get position of closing quotes
-  $closeval = array();
-  $pos = -1;
-
-  foreach($closequote as $val)
-    $closeval[] = $pos = strpos($s,$val,$pos+1);
-
-
-  for ($i=0; $i < count($openval); $i++)
-    if ($openval[$i] > $closeval[$i]) return $s; // Cannot close before opening. Return raw string...
-
-
-  $s = preg_replace("/\\[quote\\]/i","<fieldset><legend> ".$lang_functions['text_quote']." </legend><br />",$s);
-  $s = preg_replace("/\\[quote=(.+?)\\]/i", "<fieldset><legend> ".$lang_functions['text_quote'].": \\1 </legend><br />", $s);
-  $s = preg_replace("/\\[\\/quote\\]/i","</fieldset><br />",$s);
-  return $s;
-}
-
-function print_attachment($dlkey, $enableimage = true, $imageresizer = true)
-{
-  global $Cache, $httpdirectory_attachment;
-  global $lang_functions;
-  if (strlen($dlkey) == 32){
-    if (!$row = $Cache->get_value('attachment_'.$dlkey.'_content')){
-      $res = sql_query("SELECT * FROM attachments WHERE dlkey=".sqlesc($dlkey)." LIMIT 1") or sqlerr(__FILE__,__LINE__);
-      $row = mysql_fetch_array($res);
-      $Cache->cache_value('attachment_'.$dlkey.'_content', $row, 86400);
-    }
-  }
-  if (!$row)
-    {
-      return "<div style=\"text-decoration: line-through; font-size: 7pt\">".$lang_functions['text_attachment_key'].$dlkey.$lang_functions['text_not_found']."</div>";
-    }
-  else{
-    $id = $row['id'];
-    if ($row['isimage'] == 1)
-      {
-	if ($enableimage){
-	  if ($row['thumb'] == 1){
-	    $url = $httpdirectory_attachment."/".$row['location'].".thumb.jpg";
-	  }
-	  else{
-	    $url = $httpdirectory_attachment."/".$row['location'];
-	  }
-
-	  $return = '<img class="scalable" id=\"attach'.$id."\" alt=\"".htmlspecialchars($row['filename'])."\" src=\"".$url."\"". " onmouseover=\"domTT_activate(this, event, 'content', '".htmlspecialchars("<strong>".$lang_functions['text_size']."</strong>: ".mksize($row['filesize'])."<br />".gettime($row['added']))."', 'styleClass', 'attach', 'x', findPosition(this)[0], 'y', findPosition(this)[1]-58);\" />";
-	}
-	else $return = "";
-      }
-    else
-      {
-	switch($row['filetype'])
-	  {
-	  case 'application/x-bittorrent': {
-	    $icon = "<img alt=\"torrent\" src=\"pic/attachicons/torrent.gif\" />";
-	    break;
-	  }
-	  case 'application/zip':{
-	    $icon = "<img alt=\"zip\" src=\"pic/attachicons/archive.gif\" />";
-	    break;
-	  }
-	  case 'application/rar':{
-	    $icon = "<img alt=\"rar\" src=\"pic/attachicons/archive.gif\" />";
-	    break;
-	  }
-	  case 'application/x-7z-compressed':{
-	    $icon = "<img alt=\"7z\" src=\"pic/attachicons/archive.gif\" />";
-	    break;
-	  }
-	  case 'application/x-gzip':{
-	    $icon = "<img alt=\"gzip\" src=\"pic/attachicons/archive.gif\" />";
-	    break;
-	  }
-	  case 'audio/mpeg':{
-	  }
-	  case 'audio/ogg':{
-	    $icon = "<img alt=\"audio\" src=\"pic/attachicons/audio.gif\" />";
-	    break;
-	  }
-	  case 'video/x-flv':{
-	    $icon = "<img alt=\"flv\" src=\"pic/attachicons/flv.gif\" />";
-	    break;
-	  }
-	  default: {
-	    $icon = "<img alt=\"other\" src=\"pic/attachicons/common.gif\" />";
-	  }
-	  }
-	$return = "<div class=\"attach\">".$icon."&nbsp;&nbsp;<a href=\"".htmlspecialchars("getattachment.php?id=".$id."&dlkey=".$dlkey)."\" target=\"_blank\" id=\"attach".$id."\" onmouseover=\"domTT_activate(this, event, 'content', '".htmlspecialchars("<strong>".$lang_functions['text_downloads']."</strong>: ".number_format($row['downloads'])."<br />".gettime($row['added']))."', 'styleClass', 'attach', 'x', findPosition(this)[0], 'y', findPosition(this)[1]-58);\">".htmlspecialchars($row['filename'])."</a>&nbsp;&nbsp;<font class=\"size\">(".mksize($row['filesize']).")</font></div>";
-      }
-    return $return;
-  }
-}
-
-function addTempCode($value) {
-  global $tempCode, $tempCodeCount;
-  $tempCode[$tempCodeCount] = $value;
-  $return = "<tempCode_$tempCodeCount>";
-  $tempCodeCount++;
-  return $return;
-}
-
-function formatAdUrl($adid, $url, $content, $newWindow=true)
-{
-  return formatUrl("adredir.php?id=".$adid."&amp;url=".rawurlencode($url), $newWindow, $content);
-}
-function formatUrl($url, $newWindow = false, $text = '', $linkClass = '') {
-  if (!$text) {
-    $text = $url;
-  }
-  return addTempCode("<a".($linkClass ? " class=\"$linkClass\"" : '')." href=\"$url\"" . ($newWindow==true? " target=\"_blank\"" : "").">$text</a>");
-}
-function formatCode($text) {
-  global $lang_functions;
-  return addTempCode("<br /><div class=\"codetop\">".$lang_functions['text_code']."</div><div class=\"codemain\">$text</div><br />");
-}
-
-function formatImg($src, $enableImageResizer, $image_max_width, $image_max_height) {
-  $size_limit = '';
-  if ($image_max_height != 0) {
-    $size_limit .= 'max-height:' . $image_max_height . 'px;';
-  }
-  if ($image_max_width != 0) {
-    $size_limit .= 'max-width:' . $image_max_width . 'px;';
-  }
-  return addTempCode("<img class=\"scalable\" style=\"$size_limit\" alt=\"image\" src=\"$src\" />");
-}
-
-function formatFlash($src, $width, $height) {
-  if (!$width) {
-    $width = 500;
-  }
-  if (!$height) {
-    $height = 300;
-  }
-  return addTempCode("<object width=\"$width\" height=\"$height\"><param name=\"movie\" value=\"$src\" /><embed src=\"$src\" width=\"$width\" height=\"$height\" type=\"application/x-shockwave-flash\"></embed></object>");
-}
-function formatFlv($src, $width, $height) {
-  if (!$width) {
-    $width = 320;
-  }
-  if (!$height) {
-    $height = 240;
-  }
-  return addTempCode("<object width=\"$width\" height=\"$height\"><param name=\"movie\" value=\"flvplayer.swf?file=$src\" /><param name=\"allowFullScreen\" value=\"true\" /><embed src=\"flvplayer.swf?file=$src\" type=\"application/x-shockwave-flash\" allowfullscreen=\"true\" width=\"$width\" height=\"$height\"></embed></object>");
-}
-function format_urls($text, $newWindow = false) {
-  return preg_replace("/((https?|ftp|gopher|news|telnet|mms|rtsp):\/\/[^()\[\]<>\s]+)/ei",
-		      "formatUrl('\\1', ".($newWindow==true ? 1 : 0).", '', 'faqlink')", $text);
-}
 function format_comment($text, $strip_html = true, $xssclean = false, $newtab = false, $imageresizer = true, $image_max_width = 800, $enableimage = true, $enableflash = true , $imagenum = -1, $image_max_height = 0, $adid = 0) {
-  global $lang_functions;
-  global $CURUSER, $SITENAME, $BASEURL, $enableattach_attachment;
-  global $tempCode, $tempCodeCount;
-  $tempCode = array();
-  $tempCodeCount = 0;
-  $imageresizer = $imageresizer ? 1 : 0;
-  $s = $text;
-
-  if ($strip_html) {
-    $s = htmlspecialchars($s);
-  }
-  // Linebreaks
-  $s = nl2br($s);
-
-  if (strpos($s,"[code]") !== false && strpos($s,"[/code]") !== false) {
-    $s = preg_replace("/\[code\](.+?)\[\/code\]/eis","formatCode('\\1')", $s);
-  }
-
-  $originalBbTagArray = array('[siteurl]', '[site]','[*]', '[b]', '[/b]', '[i]', '[/i]', '[u]', '[/u]', '[pre]', '[/pre]', '[/color]', '[/font]', '[/size]', "  ");
-  $replaceXhtmlTagArray = array(get_protocol_prefix().$BASEURL, $SITENAME, '<img class="listicon listitem" src="pic/trans.gif" alt="list" />', '<b>', '</b>', '<i>', '</i>', '<u>', '</u>', '<pre>', '</pre>', '</span>', '</font>', '</font>', ' &nbsp;');
-  $s = str_replace($originalBbTagArray, $replaceXhtmlTagArray, $s);
-
-  $originalBbTagArray = array("/\[font=([^\[\(&\\;]+?)\]/is", "/\[color=([#0-9a-z]{1,15})\]/is", "/\[color=([a-z]+)\]/is", "/\[size=([1-7])\]/is");
-  $replaceXhtmlTagArray = array("<font face=\"\\1\">", "<span style=\"color: \\1;\">", "<span style=\"color: \\1;\">", "<font size=\"\\1\">");
-  $s = preg_replace($originalBbTagArray, $replaceXhtmlTagArray, $s);
-
-  if ($enableattach_attachment == 'yes' && $imagenum != 1){
-    $limit = 20;
-    $s = preg_replace("/\[attach\]([0-9a-zA-z][0-9a-zA-z]*)\[\/attach\]/ies", "print_attachment('\\1', ".($enableimage ? 1 : 0).", ".($imageresizer ? 1 : 0).")", $s, $limit);
-  }
-
+  global $SITENAME, $BASEURL, $enableattach_attachment;
+  require_once('HTML/BBCodeParser.php');
+  $filters = array('Extended', 'Basic', 'Email', 'Lists', 'Attachments', 'Smiles');
   if ($enableimage) {
-    $s = preg_replace("/\[img\]([^\<\r\n\"']+?)\[\/img\]/ei", "formatImg('\\1',".$imageresizer.",".$image_max_width.",".$image_max_height.")", $s, $imagenum, $imgReplaceCount);
-    $s = preg_replace("/\[img=([^\<\r\n\"']+?)\]/ei", "formatImg('\\1',".$imageresizer.",".$image_max_width.",".$image_max_height.")", $s, ($imagenum != -1 ? max($imagenum-$imgReplaceCount, 0) : -1));
-  } else {
-    $s = preg_replace("/\[img\]([^\<\r\n\"']+?)\[\/img\]/i", '', $s, -1);
-    $s = preg_replace("/\[img=([^\<\r\n\"']+?)\]/i", '', $s, -1);
+    $filters[] = 'Images';
   }
+  if ($enableflash) {
+    $filters[] = 'Flash';
+  }
+  $filters[] = 'Links';
 
-  // [flash,500,400]http://www/image.swf[/flash]
-  if (strpos($s,"[flash") !== false) { //flash is not often used. Better check if it exist before hand
-    if ($enableflash) {
-      $s = preg_replace("/\[flash(\,([1-9][0-9]*)\,([1-9][0-9]*))?\]((http|ftp):\/\/[^\s'\"<>]+(\.(swf)))\[\/flash\]/ei", "formatFlash('\\4', '\\2', '\\3')", $s);
-    } else {
-      $s = preg_replace("/\[flash(\,([1-9][0-9]*)\,([1-9][0-9]*))?\]((http|ftp):\/\/[^\s'\"<>]+(\.(swf)))\[\/flash\]/i", '', $s);
-    }
-  }
-  //[flv,320,240]http://www/a.flv[/flv]
-  if (strpos($s,"[flv") !== false) { //flv is not often used. Better check if it exist before hand
-    if ($enableflash) {
-      $s = preg_replace("/\[flv(\,([1-9][0-9]*)\,([1-9][0-9]*))?\]((http|ftp):\/\/[^\s'\"<>]+(\.(flv)))\[\/flv\]/ei", "formatFlv('\\4', '\\2', '\\3')", $s);
-    } else {
-      $s = preg_replace("/\[flv(\,([1-9][0-9]*)\,([1-9][0-9]*))?\]((http|ftp):\/\/[^\s'\"<>]+(\.(flv)))\[\/flv\]/i", '', $s);
-    }
-  }
-
-  // [url=http://www.example.com]Text[/url]
-  if ($adid) {
-    $s = preg_replace("/\[url=([^\[\s]+?)\](.+?)\[\/url\]/ei", "formatAdUrl(".$adid." ,'\\1', '\\2', ".($newtab==true ? 1 : 0).", 'faqlink')", $s);
-  } else {
-    $s = preg_replace("/\[url=([^\[\s]+?)\](.+?)\[\/url\]/ei", "formatUrl('\\1', ".($newtab==true ? 1 : 0).", '\\2', 'faqlink')", $s);
-  }
-
-  // [url]http://www.example.com[/url]
-  $s = preg_replace("/\[url\]([^\[\s]+?)\[\/url\]/ei",
-		    "formatUrl('\\1', ".($newtab==true ? 1 : 0).", '', 'faqlink')", $s);
-
-  $s = format_urls($s, $newtab);
-  // Quotes
-  if (strpos($s,"[quote") !== false && strpos($s,"[/quote]") !== false) { //format_quote is kind of slow. Better check if [quote] exists beforehand
-    $s = format_quotes($s);
-  }
-
-  $s = preg_replace("/\[em([1-9][0-9]*)\]/ie", "(\\1 < 192 ? '<img src=\"pic/smilies/\\1.gif\" alt=\"[em\\1]\" />' : '[em\\1]')", $s);
-  reset($tempCode);
-  $j = 0;
-  while(count($tempCode) || $j > 5) {
-    foreach($tempCode as $key=>$code) {
-      $s = str_replace("<tempCode_$key>", $code, $s, $count);
-      if ($count) {
-	unset($tempCode[$key]);
-	$i = $i+$count;
-      }
-    }
-    $j++;
-  }
-  return $s;
+  $text = htmlspecialchars($text, ENT_HTML401 | ENT_NOQUOTES);
+  $text = preg_replace("/\n/s", "<br />", $text);
+  
+  $parser = new HTML_BBCodeParser(array('filters' => $filters));
+  return '<div class="bbcode">' . $parser->qparse($text) . '</div>';
 }
 
 function highlight($search,$subject,$hlstart='<b><font class="striking">',$hlend="</font></b>") {
@@ -644,137 +407,32 @@ function textbbcode($form,$text,$content="",$hastitle=false, $col_num = 130) {
   global $subject, $BASEURL, $CURUSER, $enableattach_attachment;
   $config = array('form' => $form, 'text' => $text);
   echo '<script type="text/javascript">hb.bbcode = ' . php_json_encode($config) . ';</script>';
-  echo get_load_uri('js', 'bbcode.js');
 ?>
-<table width="100%" cellspacing="0" cellpadding="5" border="0">
-  <tr><td align="left" colspan="2">
-    <table cellspacing="1" cellpadding="2" border="0">
-      <tr>
-	<td class="embedded"><input style="font-weight: bold;font-size:11px; margin-right:3px" type="button" name="b" value="B" onclick="javascript: simpletag('b')" /></td>
-	<td class="embedded"><input class="codebuttons" style="font-style: italic;font-size:11px;margin-right:3px" type="button" name="i" value="I" onclick="javascript: simpletag('i')" /></td>
-	<td class="embedded"><input class="codebuttons" style="text-decoration: underline;font-size:11px;margin-right:3px" type="button" name="u" value="U" onclick="javascript: simpletag('u')" /></td>
-	<?php
-	  print("<td class=\"embedded\"><input class=\"codebuttons\" style=\"font-size:11px;margin-right:3px\" type=\"button\" name='url' value='URL' onclick=\"javascript:tag_url('" . $lang_functions['js_prompt_enter_url'] . "','" . $lang_functions['js_prompt_enter_title'] . "','" . $lang_functions['js_prompt_error'] . "')\" /></td>");
-	  print("<td class=\"embedded\"><input class=\"codebuttons\" style=\"font-size:11px;margin-right:3px\" type=\"button\" name=\"IMG\" value=\"IMG\" onclick=\"javascript: tag_image('" . $lang_functions['js_prompt_enter_image_url'] . "','" . $lang_functions['js_prompt_error'] . "')\" /></td>");
-	  print("<td class=\"embedded\"><input type=\"button\" style=\"font-size:11px;margin-right:3px\" name=\"list\" value=\"List\" onclick=\"tag_list('" . addslashes($lang_functions['js_prompt_enter_item']) . "','" . $lang_functions['js_prompt_error'] . "')\" /></td>");
-	?>
-	<td class="embedded"><input class="codebuttons" style="font-size:11px;margin-right:3px" type="button" name="quote" value="QUOTE" onclick="javascript: simpletag('quote')" /></td>
-	<td class="embedded"><input style="font-size:11px;margin-right:3px" type="button" onclick='javascript:closeall();' name='tagcount' value="Close all tags" /></td>
-	<td class="embedded"><select class="med codebuttons" style="margin-right:3px" name='color' onchange="alterfont(this.options[this.selectedIndex].value, 'color')">
-	  <option value='0'>--- <?php echo $lang_functions['select_color'] ?> ---</option>
-	  <option style="background-color: black" value="Black">Black</option>
-	  <option style="background-color: sienna" value="Sienna">Sienna</option>
-	  <option style="background-color: darkolivegreen" value="DarkOliveGreen">Dark Olive Green</option>
-	  <option style="background-color: darkgreen" value="DarkGreen">Dark Green</option>
-	  <option style="background-color: darkslateblue" value="DarkSlateBlue">Dark Slate Blue</option>
-	  <option style="background-color: navy" value="Navy">Navy</option>
-	  <option style="background-color: indigo" value="Indigo">Indigo</option>
-	  <option style="background-color: darkslategray" value="DarkSlateGray">Dark Slate Gray</option>
-	  <option style="background-color: darkred" value="DarkRed">Dark Red</option>
-	  <option style="background-color: darkorange" value="DarkOrange">Dark Orange</option>
-	  <option style="background-color: olive" value="Olive">Olive</option>
-	  <option style="background-color: green" value="Green">Green</option>
-	  <option style="background-color: teal" value="Teal">Teal</option>
-	  <option style="background-color: blue" value="Blue">Blue</option>
-	  <option style="background-color: slategray" value="SlateGray">Slate Gray</option>
-	  <option style="background-color: dimgray" value="DimGray">Dim Gray</option>
-	  <option style="background-color: red" value="Red">Red</option>
-	  <option style="background-color: sandybrown" value="SandyBrown">Sandy Brown</option>
-	  <option style="background-color: yellowgreen" value="YellowGreen">Yellow Green</option>
-	  <option style="background-color: seagreen" value="SeaGreen">Sea Green</option>
-	  <option style="background-color: mediumturquoise" value="MediumTurquoise">Medium Turquoise</option>
-	  <option style="background-color: royalblue" value="RoyalBlue">Royal Blue</option>
-	  <option style="background-color: purple" value="Purple">Purple</option>
-	  <option style="background-color: gray" value="Gray">Gray</option>
-	  <option style="background-color: magenta" value="Magenta">Magenta</option>
-	  <option style="background-color: orange" value="Orange">Orange</option>
-	  <option style="background-color: yellow" value="Yellow">Yellow</option>
-	  <option style="background-color: lime" value="Lime">Lime</option>
-	  <option style="background-color: cyan" value="Cyan">Cyan</option>
-	  <option style="background-color: deepskyblue" value="DeepSkyBlue">Deep Sky Blue</option>
-	  <option style="background-color: darkorchid" value="DarkOrchid">Dark Orchid</option>
-	  <option style="background-color: silver" value="Silver">Silver</option>
-	  <option style="background-color: pink" value="Pink">Pink</option>
-	  <option style="background-color: wheat" value="Wheat">Wheat</option>
-	  <option style="background-color: lemonchiffon" value="LemonChiffon">Lemon Chiffon</option>
-	  <option style="background-color: palegreen" value="PaleGreen">Pale Green</option>
-	  <option style="background-color: paleturquoise" value="PaleTurquoise">Pale Turquoise</option>
-	  <option style="background-color: lightblue" value="LightBlue">Light Blue</option>
-	  <option style="background-color: plum" value="Plum">Plum</option>
-	  <option style="background-color: white" value="White">White</option>
-	</select></td>
-	<td class="embedded">
-	  <select class="med codebuttons" name='font' onchange="alterfont(this.options[this.selectedIndex].value, 'font')">
-	    <option value="0">--- <?php echo $lang_functions['select_font'] ?> ---</option>
-	    <option value="Arial">Arial</option>
-	    <option value="Arial Black">Arial Black</option>
-	    <option value="Arial Narrow">Arial Narrow</option>
-	    <option value="Book Antiqua">Book Antiqua</option>
-	    <option value="Century Gothic">Century Gothic</option>
-	    <option value="Comic Sans MS">Comic Sans MS</option>
-	    <option value="Courier New">Courier New</option>
-	    <option value="Fixedsys">Fixedsys</option>
-	    <option value="Garamond">Garamond</option>
-	    <option value="Georgia">Georgia</option>
-	    <option value="Impact">Impact</option>
-	    <option value="Lucida Console">Lucida Console</option>
-	    <option value="Lucida Sans Unicode">Lucida Sans Unicode</option>
-	    <option value="Microsoft Sans Serif">Microsoft Sans Serif</option>
-	    <option value="Palatino Linotype">Palatino Linotype</option>
-	    <option value="System">System</option>
-	    <option value="Tahoma">Tahoma</option>
-	    <option value="Times New Roman">Times New Roman</option>
-	    <option value="Trebuchet MS">Trebuchet MS</option>
-	    <option value="Verdana">Verdana</option>
-	  </select>
-	</td>
-	<td class="embedded">
-	  <select class="med codebuttons" name='size' onchange="alterfont(this.options[this.selectedIndex].value, 'size')">
-	    <option value="0">--- <?php echo $lang_functions['select_size'] ?> ---</option>
-	    <option value="1">1</option>
-	    <option value="2">2</option>
-	    <option value="3">3</option>
-	    <option value="4">4</option>
-	    <option value="5">5</option>
-	    <option value="6">6</option>
-	    <option value="7">7</option>
-	  </select></td></tr>
-	</table>
-      </td>
-    </tr>
+<div id="bbcode-toolbar"></div>
+
     <?php
 	  if ($enableattach_attachment == 'yes'){
     ?>
-    <tr>
-      <td colspan="2" valign="middle">
-	<iframe src="<?php echo get_protocol_prefix() . $BASEURL?>/attachment.php" width="100%" height="24" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe>
-      </td>
-    </tr>
+	<iframe src="attachment.php" width="100%" height="24" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe>
+
     <?php
 	  }
-	  print("<tr>");
-	  print("<td align=\"left\"><textarea class=\"bbcode\" cols=\"100\" style=\"width: 650px;\" name=\"".$text."\" id=\"".$text."\" rows=\"20\" onkeydown=\"ctrlenter(event,'compose','qr')\">".$content."</textarea>");
     ?>
-  </td>
-  <td align="center" width="99%">
-    <table cellspacing="1" cellpadding="3">
-      <tr>
+    <div style="margin:1.5em 3em; width:20%; float:right; text-align:center;"><div class="minor-list smiles" style="margin-bottom: 1.5em;"><ul>
 	<?php
 	  $i = 0;
 	  $quickSmilies = array(1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 13, 16, 17, 19, 20, 21, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 39, 40, 41);
 	  foreach ($quickSmilies as $smily) {
-	    if ($i%4 == 0 && $i > 0) {
-	      print('</tr><tr>');
-	    }
-	    print("<td class=\"embedded\" style=\"padding: 3px;\">".getSmileIt($form, $text, $smily)."</td>");
+	    print('<li>'.getSmileIt($form, $text, $smily)."</li>");
 	    $i++;
 	  }
 	?>
-    </tr></table>
-    <br />
-    <a href="javascript:winop();"><?php echo $lang_functions['text_more_smilies'] ?></a>
-  </td></tr></table>
-  <?php
+      </ul></div>
+    <a id="showmoresmilies" href="#"><?php echo $lang_functions['text_more_smilies'] ?></a><div id="moresmilies" style="display:none;" title="<?php echo $lang_functions['text_more_smilies'] ?>"></div>
+    </div>
+    <?php
+	  print("<textarea class=\"bbcode\" cols=\"100\" style=\"width: 70%;\" name=\"".$text."\" id=\"".$text."\" rows=\"20\" onkeydown=\"ctrlenter(event,'compose','qr')\">".$content."</textarea>");
+	  echo get_load_uri('js', 'bbcode.js');
 }
 
   function begin_compose($title = "",$type="new", $body="", $hassubject=true, $subject="", $maxsubjectlength=100){
@@ -820,10 +478,7 @@ function textbbcode($form,$text,$content="",$hastitle=false, $col_num = 130) {
 
     function end_compose(){
       global $lang_functions;
-      print("<tr><td colspan=\"2\" align=\"center\"><table><tr><td class=\"embedded\"><input id=\"qr\" type=\"submit\" class=\"btn\" value=\"".$lang_functions['submit_submit']."\" /></td><td class=\"embedded\">");
-      print("<input type=\"button\" class=\"btn2\" name=\"previewbutton\" id=\"previewbutton\" value=\"".$lang_functions['submit_preview']."\" onclick=\"javascript:preview(this.parentNode);\" />");
-      print("<input type=\"button\" class=\"btn2\" style=\"display: none;\" name=\"unpreviewbutton\" id=\"unpreviewbutton\" value=\"".$lang_functions['submit_edit']."\" onclick=\"javascript:unpreview(this.parentNode);\" />");
-      print("</td></tr></table>");
+      print("<tr><td colspan=\"2\" align=\"center\"><div id=\"commit-btn\"><input id=\"qr\" type=\"submit\" class=\"btn\" value=\"".$lang_functions['submit_submit']."\" /></div>");
       print("</td></tr>");
       print("</table>\n");
       end_frame();
@@ -2340,80 +1995,80 @@ function textbbcode($form,$text,$content="",$hastitle=false, $col_num = 130) {
 		    print("<font color=\"white\">".$lang_functions['text_website_offline_warning']."</font>");
 		    print("</td></tr></table></p><br />\n");
 		  }
-		?>
-		<div id="outer">
-		  <?php
-		    }
-		    
+
+		  echo '<div id="outer">';	    
+
+	      }
     }
 
-		    function php_json_encode( $data ) {
-		      if ( !function_exists( 'json_encode' ) || strtolower( json_encode( "\xf0\xa0\x80\x80" ) ) != '"\ud840\udc00"' ) {
-			if( is_array($data) || is_object($data) ) {
-			  $islist = is_array($data) && ( empty($data) || array_keys($data) === range(0,count($data)-1) );
-			  if( $islist ) $json = '[' . implode(',', array_map('php_json_encode', $data) ) . ']';
-			  else {
-			    $items = Array();
-			    foreach( $data as $key => $value ) $items[] = php_json_encode("$key") . ':' . php_json_encode($value);
-			    $json = '{' . implode(',', $items) . '}';
-			  }
-			} elseif( is_string($data) ) {
-			  $string = '"' . addcslashes($data, "\\\"\n\r\t/" . chr(8) . chr(12)) . '"';
+    function php_json_encode( $data ) {
+      if ( !function_exists( 'json_encode' ) || strtolower( json_encode( "\xf0\xa0\x80\x80" ) ) != '"\ud840\udc00"' ) {
+	if( is_array($data) || is_object($data) ) {
+	  $islist = is_array($data) && ( empty($data) || array_keys($data) === range(0,count($data)-1) );
+	  if( $islist ) $json = '[' . implode(',', array_map('php_json_encode', $data) ) . ']';
+	  else {
+	    $items = Array();
+	    foreach( $data as $key => $value ) $items[] = php_json_encode("$key") . ':' . php_json_encode($value);
+	    $json = '{' . implode(',', $items) . '}';
+	  }
+	} elseif( is_string($data) ) {
+	  $string = '"' . addcslashes($data, "\\\"\n\r\t/" . chr(8) . chr(12)) . '"';
 
-			  $json    = '';
-			  $len    = strlen($string);
-			  for( $i = 0; $i < $len; $i++ ) {
-			    $char = $string[$i];
+	  $json    = '';
+	  $len    = strlen($string);
+	  for( $i = 0; $i < $len; $i++ ) {
+	    $char = $string[$i];
 
-			    $c1 = ord($char);
-			    if( $c1 <128 ) { $json .= ($c1 > 31) ? $char : sprintf("\\u%04x", $c1); continue; }
-			    $c2 = ord($string[++$i]);
-			    if ( ($c1 & 32) === 0 ) { $json .= sprintf("\\u%04x", ($c1 - 192) * 64 + $c2 - 128); continue; }
-			    $c3 = ord($string[++$i]);
-			    if( ($c1 & 16) === 0 ) { $json .= sprintf("\\u%04x", (($c1 - 224) <<12) + (($c2 - 128) << 6) + ($c3 - 128)); continue; }
-			    $c4 = ord($string[++$i]);
-			    if( ($c1 & 8 ) === 0 ) {
-			      $u = (($c1 & 15) << 2) + (($c2>>4) & 3) - 1;
-			      $w1 = (54<<10) + ($u<<6) + (($c2 & 15) << 2) + (($c3>>4) & 3);
-			      $w2 = (55<<10) + (($c3 & 15)<<6) + ($c4-128);
-			      $json .= sprintf("\\u%04x\\u%04x", $w1, $w2);
-			    }
-			  }
-			}
-			else $json = strtolower(var_export( $data, true ));
+	    $c1 = ord($char);
+	    if( $c1 <128 ) { $json .= ($c1 > 31) ? $char : sprintf("\\u%04x", $c1); continue; }
+	    $c2 = ord($string[++$i]);
+	    if ( ($c1 & 32) === 0 ) { $json .= sprintf("\\u%04x", ($c1 - 192) * 64 + $c2 - 128); continue; }
+	    $c3 = ord($string[++$i]);
+	    if( ($c1 & 16) === 0 ) { $json .= sprintf("\\u%04x", (($c1 - 224) <<12) + (($c2 - 128) << 6) + ($c3 - 128)); continue; }
+	    $c4 = ord($string[++$i]);
+	    if( ($c1 & 8 ) === 0 ) {
+	      $u = (($c1 & 15) << 2) + (($c2>>4) & 3) - 1;
+	      $w1 = (54<<10) + ($u<<6) + (($c2 & 15) << 2) + (($c3>>4) & 3);
+	      $w2 = (55<<10) + (($c3 & 15)<<6) + ($c4-128);
+	      $json .= sprintf("\\u%04x\\u%04x", $w1, $w2);
+	    }
+	  }
+	}
+	else $json = strtolower(var_export( $data, true ));
 
-			return $json;
-		      }
-		      else {
-			return json_encode( $data );
-		      }
-		    }
+	return $json;
+      }
+      else {
+	return json_encode( $data );
+      }
+    }
 
-		    function js_hb_config() {
-		      global $torrentmanage_class;
+    function js_hb_config() {
+      global $torrentmanage_class;
 
-		      $class = get_user_class();
-		      if ($class) {
-			$user = array('class' => $class, 'canonicalClass' => get_user_class_name($class, false));
-			$config = array('user' => $user);
+      $class = get_user_class();
+      if ($class) {
+	$user = array('class' => $class, 'canonicalClass' => get_user_class_name($class, false));
+	$config = array('user' => $user);
 
-			$out = 'hb = {config : ' . php_json_encode($config) . '}';
-		      }
-		      else {
-			$out = '';
-		      }
+	$out = 'hb = {config : ' . php_json_encode($config) . '}';
+      }
+      else {
+	$out = '';
+      }
 
-		      return $out;
-		    }
+      return $out;
+    }
 
 
 function stdfoot() {
   global $SITENAME,$BASEURL,$Cache,$datefounded,$tstart,$icplicense_main,$add_key_shortcut,$query_name, $USERUPDATESET, $CURUSER, $enablesqldebug_tweak, $sqldebug_tweak, $Advertisement, $analyticscode_tweak;
-  //$cnzz="<center><script src='http://s94.cnzz.com/stat.php?id=2647714&web_id=2647714&show=pic' language='JavaScript'></script></center>";
   ?>
-</div><a href="#" id="back-to-top" title="回到页首" style="display:none;"></a></div>
-<div id="footer">
+  </div><a href="#" id="back-to-top" title="回到页首" style="display:none;"></a>
+  </div>
+  <div id="footer">
 <?php
+
   if ($Advertisement->enable_ad()){
     $footerad=$Advertisement->get_ad('footer');
       if ($footerad)
@@ -2851,7 +2506,7 @@ function post_header($type, $authorid, $topicid, $postid, $added, $floor, $showo
     $href = 'details.php?cmtpage=1&page=p' . $postid . '&id=' . $topicid . '#cid' . $postid;
   }
   
-  $header = '<div class="forum-post-header" id="' . $abbrtype . 'id' . $postid. '"><div class="minor-list"><ul><li><a href="' . htmlspecialchars($href).'">#'.$postid.'</a></li><li><span class="gray">'.$lang_functions['text_by'].'</span>'.$by.'<span class="gray">'.$lang_functions['text_at']."</span></li><li>".$sadded;
+  $header = '<div class="forum-post-header" id="' . $abbrtype . 'id' . $postid. '"><div class="minor-list"><ul><li><span class="gray">'.$lang_functions['text_by'].'</span>'.$by."</li>";
 
   if ($type == 'post') {
     $header .= '<li class="list-seperator">';
@@ -2865,7 +2520,7 @@ function post_header($type, $authorid, $topicid, $postid, $added, $floor, $showo
   }
   $header .= '</ul></div>';
   
-  $header .= '<div class="forum-floor">'.$lang_functions['text_number']. $floor . $lang_functions['text_lou'].'</div>';
+  $header .= '<div class="forum-floor minor-list list-seperator"><ul><li><span class="gray">'.$lang_functions['text_at'].'</span>'.$sadded.'</li><li><a href="' . htmlspecialchars($href).'">'.$lang_functions['text_number']. $floor . $lang_functions['text_lou'].'</a></li></ul></div>';
   $header .= '</div>';
   return $header;
 }
@@ -4508,7 +4163,7 @@ function lang_choice_before_login($extra='') {
   }
   $s .= "\n</select>";
 
-  echo '<form method="get" action="' . $_SERVER['PHP_SELF'] . '>';
+  echo '<form method="get" action="' . $_SERVER['PHP_SELF'] . '">';
 
   print($extra);
   print('<div id="lang-choice">'.$lang_functions['text_select_lang']. $s . "</div>");

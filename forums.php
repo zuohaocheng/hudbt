@@ -636,7 +636,7 @@ if ($action == "viewtopic")
 
 	  $privilege = array($maypost, (get_user_class() >= $postmanage_class || $is_forummod), (($CURUSER["id"] == $posterid && !$locked) || get_user_class() >= $postmanage_class || $is_forummod));
 
-	  $post_f = array('type' => 'post', 'posterid' => $posterid, 'topicid' => $topicid, 'postid' => $postid, 'added' => $arr['added'], 'floor' => $pn + $offset, 'body' => $arr['ori_body'], 'highlight' => $highlight, 'edit' => $edit, 'last' => ($pn == $pc));
+	  $post_f = array('type' => 'post', 'posterid' => $posterid, 'topicid' => $topicid, 'postid' => $postid, 'added' => $arr['added'], 'floor' => $pn + $offset, 'body' => $arr['body'], 'highlight' => $highlight, 'edit' => $edit, 'last' => ($pn == $pc));
 	  echo post_format($post_f, $privilege);
 	}
 	echo '</ol></div>';
@@ -1013,14 +1013,16 @@ if ($action == "viewforum")
 	print("<br />");
 	$maypost = get_user_class() >= $row["minclasswrite"] && get_user_class() >= $row["minclasscreate"] && $CURUSER["forumpost"] == 'yes';
 
-	if (!$maypost)
-		print("<p><i>".$lang_forums['text_unpermitted_starting_new_topics']."</i></p>\n");
-
 	print('<div id="forum-header"><div>');
 	print($forummoderators ? "<img class=\"forum_mod\" src=\"pic/trans.gif\" alt=\"Moderator\" title=\"".$lang_forums['col_moderator']."\">".$forummoderators : "");
 
-	if ($maypost)
-		print('</div><div id="reply-post"><a href="'.htmlspecialchars("?action=newtopic&forumid=".$forumid)."\"><img class=\"f_new\" src=\"pic/trans.gif\" alt=\"New Topic\" title=\"".$lang_forums['title_new_topic']."\" /></a>");
+	echo '</div><div id="reply-post">';
+	if ($maypost) {
+	  print('<a href="'.htmlspecialchars("?action=newtopic&forumid=".$forumid)."\"><img class=\"f_new\" src=\"pic/trans.gif\" alt=\"New Topic\" title=\"".$lang_forums['title_new_topic']."\" /></a>");
+	}
+	else {
+	  echo $lang_forums['text_unpermitted_starting_new_topics'];
+	}
 	print("</div></div>\n");
 	if ($numtopics > 0)
 	{

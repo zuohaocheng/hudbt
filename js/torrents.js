@@ -10,6 +10,10 @@ $(function() {
     var ie = $.browser.msie;
     var ie8 = ie && $.browser.version < 9;
 
+
+    var History = window.History;
+    var History = History.enabled;
+
     var args = argsFromUri(window.location.search);
 
     var $sortHeaders = table.find('thead th:not(.unsortable)');
@@ -465,7 +469,7 @@ $(function() {
 	    title : document.title,
 	    url : uri
 	}
-	if (!ie) {
+	if (History) {
 	    window.history.pushState(state, document.title, uri);
 	}
 
@@ -486,18 +490,44 @@ $(function() {
 	getFromUriWithHistory(uri);
     });
 
-    // var popped = ('state' in window.history);
-    // var initialURL = location.href;
-    // window.addEventListener('popstate', function(e){
-    //     var initialPop = !popped && location.href == initialURL
-    //     if (!initialPop) return;
-    //     var state = e.state;
-    //     if (state) {
-    // 	getFromUri(state.url);
-    // 	console.log(state);
-    //     }
-    // }, false);
+    if (History) {
+	var initialURL = window.location.href;
+	var state = {
+	    title : document.title,
+	    url : initialURL
+	}
+	window.addEventListener('popstate', function(e){
+            var initialPop = !(('state' in e) && e.state) && location.href == initialURL;
+	    console.log(initialPop);
+            if (initialPop) return;
+    	    getFromUri(window.location.href);
+	}, false);
+	window.history.replaceState(state, document.title, initialURL);
 
+	(function() {
+	    var rowHeight = target.find('tr').height() || 42;
+	    var offsetT = target.offset().top;
+	    var page = argsFromUri(document.location.search).page || 0;
+	    var onscroll = function() {
+		var loc = $document.scrollTop() - offsetT;
+		var row = loc / rowHeight + 5;
+		var npage = Math.floor(row / 50);
+		if (npage != page && npage >= 0) {
+		    args = argsFromUri(document.location.search);
+		    page = npage;
+		    args.page = page;
+		    var uri = '?' + $.param(args);
+		    var state = {
+			title : document.title,
+			url : uri
+		    }
+		    window.history.replaceState(state, document.title, uri);
+		}
+	    };
+
+	    $window.scroll(onscroll);
+	})();
+    }
 
     //Check items in searchbox
     var mainCheckClicked = false;

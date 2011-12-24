@@ -103,21 +103,12 @@ else {
 
 print(donationsHtmlFromResult(donationsForKey($key, $CURUSER['id'])));
 
-
-
 /* if ($count == 0) { */
 /*   print($lang_donations['text_not_available']; */
 /* } */
 /* else */ {
 
 ?>
-<script type="text/javascript" src="js/jquery.tablesorter/jquery.tablesorter.js"></script>
-<link rel="stylesheet" href="js/jquery.tablesorter/jquery.tablesorter.css" type="text/css" media="screen" />
-<script type="text/javascript">
-$(function() {
-    $('#donations').tablesorter();
-});
-</script>
 
 <?php
 }

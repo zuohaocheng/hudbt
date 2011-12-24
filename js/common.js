@@ -16,26 +16,54 @@ function confirm_delete(id, note, addon) {
 // smileit.js
 
 function SmileIT(smile,form,text){
-    document.forms[form].elements[text].value = document.forms[form].elements[text].value+" "+smile+" ";
-    document.forms[form].elements[text].focus();
+    doInsert(smile, '', false, document.forms[form].elements[text]);
 }
 
-// preview.js
-function preview(obj) {
-    var poststr = encodeURIComponent( document.getElementById("body").value );
-    var result=ajax.posts('preview.php','body='+poststr);
-    document.getElementById("previewouter").innerHTML=result;
-    document.getElementById("previewouter").style.display = 'block';
-    document.getElementById("editorouter").style.display = 'none';
-    document.getElementById("unpreviewbutton").style.display = 'block';
-    document.getElementById("previewbutton").style.display = 'none';
-}
-
-function unpreview(obj){
-    document.getElementById("previewouter").style.display = 'none';
-    document.getElementById("editorouter").style.display = 'block';
-    document.getElementById("unpreviewbutton").style.display = 'none';
-    document.getElementById("previewbutton").style.display = 'block';
+var myAgent = navigator.userAgent.toLowerCase();
+var is_ie = ((myAgent.indexOf("msie") != -1) && (myAgent.indexOf("opera") == -1));
+var is_win = ((myAgent.indexOf("win")!=-1) || (myAgent.indexOf("16bit")!=-1));
+var myVersion = parseInt(navigator.appVersion);
+function doInsert(ibTag, ibClsTag, isSingle, obj_ta) {
+    var isClose = false;
+    obj_ta = obj_ta || document[hb.bbcode.form][hb.bbcode.text];
+    if ( (myVersion >= 4) && is_ie && is_win)
+    {
+	if(obj_ta.isTextEdit)
+	{
+	    obj_ta.focus();
+	    var sel = document.selection;
+	    var rng = sel.createRange();
+	    rng.colapse;
+	    if((sel.type == "Text" || sel.type == "None") && rng != null)
+	    {
+		if(ibClsTag != "" && rng.text.length > 0)
+		    ibTag += rng.text + ibClsTag;
+		else if(isSingle) isClose = true;
+		rng.text = ibTag;
+	    }
+	}
+	else
+	{
+	    if(isSingle) isClose = true;
+	    obj_ta.value += ibTag;
+	}
+    }
+    else if (obj_ta.selectionStart || obj_ta.selectionStart == '0')
+    {
+	var startPos = obj_ta.selectionStart;
+	var endPos = obj_ta.selectionEnd;
+	obj_ta.value = obj_ta.value.substring(0, startPos) + ibTag + obj_ta.value.substring(endPos, obj_ta.value.length);
+	obj_ta.selectionEnd = startPos + ibTag.length;
+	if(isSingle) isClose = true;
+    }
+    else
+    {
+	if(isSingle) isClose = true;
+	obj_ta.value += ibTag;
+    }
+    obj_ta.focus();
+    // obj_ta.value = obj_ta.value.replace(/ /, " ");
+    return isClose;
 }
 
 // java_klappe.js
