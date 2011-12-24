@@ -191,6 +191,10 @@ td.colhead, thead>tr>th {
     white-space:nowrap;
 }
 
+thead.center th {
+    text-align:center;
+}
+
 td.rowhead_left {
     text-align: left;
 }
@@ -232,10 +236,8 @@ form
     margin-top: 0px;
     margin-bottom: 0px
 }
-.sublink
-{
+.sublink {
     font-weight: normal;
-    font-style: italic
 }
 .gray
 {

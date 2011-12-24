@@ -1,18 +1,3 @@
-//viewpeerlist.js
-function viewpeerlist(torrentid) {
-    var list=ajax.gets('viewpeerlist.php?id='+torrentid);
-    document.getElementById("showpeer").style.display = 'none';
-    document.getElementById("hidepeer").style.display = 'block';
-    document.getElementById("peercount").style.display = 'none';
-    document.getElementById("peerlist").innerHTML=list;
-}
-function hidepeerlist() {
-    document.getElementById("hidepeer").style.display = 'none';
-    document.getElementById("peerlist").innerHTML="";
-    document.getElementById("showpeer").style.display = 'block';
-    document.getElementById("peercount").style.display = 'block';
-}
-
 $(function() {
     $('#kfilelist table').tablesorter();
     $('#saythanks:enabled').click(function() {
@@ -24,4 +9,37 @@ $(function() {
 	document.getElementById("nothanks").innerHTML = "";
 	document.getElementById("addcuruser").innerHTML = document.getElementById("curuser").innerHTML;
     });
+
+    var showpeer = $('#showpeer');
+    var hidepeer = $('#hidepeer');
+    var peercount = $('#peercount');
+    var peerlist = $('#peerlist');
+
+    var showpeerlist = function(href) {
+	$.get(href, function(res) {
+	    peerlist.html(res);
+	    peerlist.slideDown();
+	    peercount.slideUp();
+	    showpeer.fadeOut(function() {
+		hidepeer.fadeIn();
+	    });
+	}, 'html');
+    };
+    showpeer.click(function(e) {
+	e.preventDefault();
+	showpeerlist(this.href);
+    });
+
+    hidepeer.click(function(e) {
+	e.preventDefault();
+	peerlist.slideUp();
+	peercount.slideDown();
+	hidepeer.fadeOut(function() {
+ 	    showpeer.fadeIn();
+	});
+    });
+
+    if (argsFromUri(window.location.search).dllist) {
+	showpeerlist(showpeer.attr('href'));
+    }
 });
