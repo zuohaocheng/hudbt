@@ -168,20 +168,18 @@ if (!in_array($include_dead,array(0,1,2)))
     $include_dead = 0;
     write_log("User " . $CURUSER["username"] . "," . $CURUSER["ip"] . " is hacking incldead field in" . $_SERVER['SCRIPT_NAME'], 'mod');
   }
-if ($include_dead == 0)  //all(active,dead)
-  {
-    $addparam .= "incldead=0&";
-  }
-elseif ($include_dead == 1)		//active
-  {
-    $addparam .= "incldead=1&";
-    $wherea[] = "visible = 'yes'";
-  }
-elseif ($include_dead == 2)		//dead
-  {
-    $addparam .= "incldead=2&";
-    $wherea[] = "visible = 'no'";
-  }
+if ($include_dead == 0) { //all(active,dead)
+  $addparam .= "incldead=0&";
+}
+elseif ($include_dead == 1) {		//active
+  $addparam .= "incldead=1&";
+  $wherea[] = "visible = 'yes'";
+  $wherea[] = "startseed = 'yes'";
+}
+elseif ($include_dead == 2) {		//dead
+  $addparam .= "incldead=2&";
+  $wherea[] = "visible = 'no'";
+}
 // ----------------- end include dead ---------------------//
 if ($_GET)
   $special_state = 0 + $_GET["spstate"];

@@ -217,7 +217,9 @@ $lang_details = array
 	'row_uploader_bandwidth' => "发布者带宽",
 	'text_and_more' => "……（这里只显示最新记录。共",
 	'text_users_in_total' => "个用户表示了感谢）",
-	'col_path' => "路径"
+	'col_path' => "路径",
+	'text_startseed' => '已经有人做过种了',
+	'text_no_startseed' => '看，占坑党'
 );
 
 ?>
