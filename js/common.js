@@ -226,20 +226,6 @@ function check(field,checkall_name,uncheckall_name) {
 	return checkall_name; }
 }
 
-// funvote.js
-function funvote(funid,yourvote)
-{
-    var result=ajax.gets('fun.php?action=vote&id='+funid+"&yourvote="+yourvote);
-    voteaccept(yourvote);
-}
-function voteaccept(yourvote)
-{
-    if (yourvote=="fun" || yourvote=="dull"){
-	document.getElementById("funvote").style.display = 'none';
-	document.getElementById("voteaccept").style.display = 'block';
-    }
-}
-
 // in upload.php
 function getname()
 {
