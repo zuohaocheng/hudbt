@@ -2816,7 +2816,7 @@ function post_header($type, $authorid, $topicid, $postid, $added, $floor, $showo
   else {
     $abbrtype = 'c';
     #! page
-    $href = 'details.php?id=' . $topicid . '#cid' . $postid;
+    $href = 'details.php?cmtpage=1&page=p' . $postid . '&id=' . $topicid . '#cid' . $postid;
   }
   
   $header = '<div class="forum-post-header" id="' . $abbrtype . 'id' . $postid. '"><div class="minor-list"><ul><li><a href="' . htmlspecialchars($href).'">#'.$postid.'</a></li><li><span class="gray">'.$lang_functions['text_by'].'</span>'.$by.'<span class="gray">'.$lang_functions['text_at']."</span></li><li>".$sadded;
@@ -3996,7 +3996,7 @@ function get_torrent_promotion_append($promotion = 1,$forcemode = "",$showtimele
     $ret = '[<span class="' . $prDict['name'] . '">' . $text . '</span>]';
   }
   else if ($mode == 'icon') {
-    $ret = '<img class="pro_' . $prDict['name'] . '" alt="' . $text . '" src="pic/trans.gif" />';
+    $ret = '<img class="' . $prDict['name'] . '" alt="' . $text . '" src="pic/trans.gif" />';
   }
   return $ret;
 }

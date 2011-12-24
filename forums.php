@@ -536,41 +536,38 @@ if ($action == "viewtopic")
 
 	//------ Make page menu
 
-
-
-	/* $pagerarr = array(); */
-
-	/* $perpage = $postsperpage; */
-
 	$pages = ceil($postcount / $postsperpage);
 
 	if ($page[0] == "p") {
-		$findpost = substr($page, 1);
-		$res = sql_query("SELECT id FROM posts $where ORDER BY added") or sqlerr(__FILE__, __LINE__);
-		$i = 0;
-		while ($arr = mysql_fetch_row($res)) {
-		  if ($arr[0] == $findpost) {
-		    break;
-		  }
-		  ++$i;
-		}
-		$page = floor($i / $postsperpage);
+	  $findpost = substr($page, 1);
+	  $res = sql_query("SELECT id FROM posts $where ORDER BY added") or sqlerr(__FILE__, __LINE__);
+	  $i = 0;
+	  while ($arr = mysql_fetch_row($res)) {
+	    if ($arr[0] == $findpost) {
+	      break;
+	    }
+	    ++$i;
+	  }
+	  $page = floor($i / $postsperpage);
 	}
-	elseif ($page === "last"){
-	$page = $pages-1;
+	elseif ($page === "last") {
+	  $page = $pages-1;
 	}
-	elseif(isset($page))
-	{
-		if($page < 0){
+	elseif(isset($page)) {
+	  if($page < 0){
+	    $page = 0;
+	  }
+	  elseif ($page > $pages - 1){
+	    $page = $pages - 1;
+	  }
+	}
+	else {
+	  if ($CURUSER["clicktopic"] == "firstpage") {
 		$page = 0;
-		}
-		elseif ($page > $pages - 1){
-		$page = $pages - 1;
-		}
-	}
-	else {if ($CURUSER["clicktopic"] == "firstpage")
-		$page = 0;
-		else $page = $pages-1;
+	  }
+	  else {
+	    $page = $pages-1;
+	  }
 	}
 	list($pagertop, $pagerbottom, $limit, $next_page_href, $offset) = pager($postsperpage, $postcount, "?".$addparam . '&' , array('page' => $page));
 	//------ Get posts

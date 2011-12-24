@@ -216,7 +216,7 @@ $lang_usercp = array
 	'text_torrents_on_promotion' => "促銷種子：",
 	'text_highlight' => "高亮顯示",
 	'text_append_words' => "添加標記，如'2X免費'",
-	'text_append_icon' => "添加圖標，如<img class=\"pro_free\" src=\"pic/trans.gif\" alt=\"free\" />",
+	'text_append_icon' => "添加圖標，如" . get_torrent_promotion_append(2, 'icon'),
 	'text_no_mark' => "無標記",
 	'text_signature_note' => "允許使用<a class=faqlink href=tags.php target=_new>BBCode代碼</a>。最大圖片尺寸為500*200，只有第一張圖片會顯示。",
 	'row_click_on_topic' => "點擊主題時",

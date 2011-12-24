@@ -216,7 +216,7 @@ $lang_usercp = array
 	'text_torrents_on_promotion' => "Torrents on promotion: ",
 	'text_highlight' => "Highlight",
 	'text_append_words' => "Append words, e.g. '2X Free'",
-	'text_append_icon' => "Append icon, e.g. <img class=\"pro_free\" src=\"pic/trans.gif\" alt=\"free\" />",
+	'text_append_icon' => "Append icon, e.g. " . get_torrent_promotion_append(2, 'icon'),
 	'text_no_mark' => "Off",
 	'text_signature_note' => "May contain <a class=\"faqlink\" href=\"tags.php\" target=\"_new\">BB codes</a>. Max image size is 500*200 and only the first image would be displayed.",
 	'row_click_on_topic' => "Click on topic",

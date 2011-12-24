@@ -561,7 +561,23 @@ else {
   if ($CURUSER['showcomment'] != 'no'){
     $count = get_row_count("comments","WHERE torrent=".sqlesc($id));
     if ($count) {
-	list($pagertop, $pagerbottom, $limit,$next_page ,$offset) = pager(10, $count, "details.php?id=$id&cmtpage=1&", array('lastpagedefault' => 1), "page");
+      	$page = $_GET["page"];
+	$pager_opts = array('lastpagedefault' => 1);
+	if ($page[0] == 'p') {
+	  $findpost = substr($page, 1);
+	  $res = sql_query("SELECT id FROM comments WHERE torrent = $id ORDER BY id") or sqlerr(__FILE__, __LINE__);
+	  $i = 0;
+	  while ($arr = mysql_fetch_row($res)) {
+	    if ($arr[0] == $findpost) {
+	      break;
+	    }
+	    ++$i;
+	  }
+	  $page = floor($i / 10);
+	  $pager_opts['page'] = $page;
+	}
+
+	list($pagertop, $pagerbottom, $limit,$next_page ,$offset) = pager(10, $count, "details.php?id=$id&cmtpage=1&", $pager_opts, "page");
 
 	$subres = sql_query("SELECT id, text, user, added, editedby, editdate FROM comments WHERE torrent = $id ORDER BY id $limit") or sqlerr(__FILE__, __LINE__);
 	$allrows = array();

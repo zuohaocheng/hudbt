@@ -227,7 +227,7 @@ function hotmenu(){
     echo $lang_functions[$pr['lang']];
   }
   else {
-    echo '<img class="pro_' . $pr['name'] . '" alt="' . $lang_functions[$pr['lang']] . '" title="' . $lang_functions[$pr['lang']] . '" src="pic/trans.gif"/ >';
+    echo '<img class="' . $pr['name'] . '" alt="' . $lang_functions[$pr['lang']] . '" title="' . $lang_functions[$pr['lang']] . '" src="pic/trans.gif"/ >';
   }
   echo '</a></li>';
 }?>

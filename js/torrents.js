@@ -295,7 +295,7 @@ $(function() {
 	    if (pr) {
 		var state = pr.state;
 		var prDict = hb.constant.pr[state - 1];
-		var prLabel = '<li><img class="pro_' + prDict.name + '" alt="' + lang[prDict.lang] + '" src="pic/trans.gif" /></li>'
+		var prLabel = '<li><img class="' + prDict.name + '" alt="' + lang[prDict.lang] + '" src="pic/trans.gif" /></li>'
 		mainTitleDecorators += prLabel;
 
 		var expire = pr.expire;

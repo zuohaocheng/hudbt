@@ -274,25 +274,30 @@ $nr = mysql_num_rows($res);
 }
 else {
 ?>
-<h2 class=transparentbg align=center><?php echo $lang_forummanage['text_forum_management']?></h2>
-<table border=0 class=main cellspacing=0 cellpadding=5 width=1%><tr>
-<td class=embedded align=left><form method="get" action="moforums.php"><input type="submit" value="<?php echo $lang_forummanage['submit_overforum_management']?>" class="btn"></form></td><td class=embedded align=left><form method="get" action="forummanage.php"><input type=hidden name="action" value="newforum"><input type="submit" value="<?php echo $lang_forummanage['submit_add_forum']?>" class="btn"></form></td>
-</tr></table>
+<h2 class="transparentbg" id="page-title"><?php echo $lang_forummanage['text_forum_management']?></h2>
+<div class="minor-list list-seperator minor-nav"><ul>
+  <li><a href="moforums.php"><?php echo $lang_forummanage['submit_overforum_management']?></a></li>
+  <li><a href="?action=newforum"><?php echo $lang_forummanage['submit_add_forum']?></a></li>
+</ul></div>
 <?php
-echo '<table width="100%"  border="0" align="center" cellpadding="2" cellspacing="0">';
-echo "<tr><td class=colhead align=left>".$lang_forummanage['col_name']."</td><td class=colhead>".$lang_forummanage['col_overforum']."</td><td class=colhead>".$lang_forummanage['col_read']."</td><td class=colhead>".$lang_forummanage['col_write']."</td><td class=colhead>".$lang_forummanage['col_create_topic']."</td><td class=colhead>".$lang_forummanage['col_moderator']."</td><td class=colhead>".$lang_forummanage['col_modify']."</td></tr>";
+echo '<table width="100%"  border="0" align="center" cellpadding="2" cellspacing="0"><thead>';
+echo "<tr><th align=left>".$lang_forummanage['col_name']."</th><th>".$lang_forummanage['col_overforum']."</th><th>".$lang_forummanage['col_read']."</th><th>".$lang_forummanage['col_write']."</th><th>".$lang_forummanage['col_create_topic']."</th><th>".$lang_forummanage['col_moderator']."</th><th>".$lang_forummanage['col_modify']."</th></tr></thead><tbody>";
 $result = sql_query ("SELECT forums.*, overforums.name AS of_name FROM forums LEFT JOIN overforums ON forums.forid=overforums.id ORDER BY forums.sort ASC");
 if ($row = mysql_fetch_array($result)) {
-do {
-$name = $row['of_name'];
-$moderators = get_forum_moderators($row['id'],false);
-if (!$moderators)
-	$moderators = $lang_forummanage['text_not_available'];
-echo "<tr><td><a href=forums.php?action=viewforum&forumid=".$row["id"]."><b>".htmlspecialchars($row["name"])."</b></a><br />".htmlspecialchars($row["description"])."</td>";
-echo "<td>".htmlspecialchars($name)."</td><td>" . get_user_class_name($row["minclassread"],false,true,true) . "</td><td>" . get_user_class_name($row["minclasswrite"],false,true,true) . "</td><td>" . get_user_class_name($row["minclasscreate"],false,true,true) . "</td><td>".$moderators."</td><td><b><a href=\"".$PHP_SELF."?action=editforum&id=".$row["id"]."\">".$lang_forummanage['text_edit']."</a>&nbsp;|&nbsp;<a href=\"javascript:confirm_delete('".$row["id"]."', '".$lang_forummanage['js_sure_to_delete_forum']."', '');\"><font color=red>".$lang_forummanage['text_delete']."</font></a></b></td></tr>";
-} while($row = mysql_fetch_array($result));
-} else {print "<tr><td colspan=6>".$lang_forummanage['text_no_records_found']."</td></tr>";}
-echo "</table>";
+  do {
+    $name = $row['of_name'];
+    $moderators = get_forum_moderators($row['id'],false);
+    if (!$moderators) {
+      $moderators = $lang_forummanage['text_not_available'];
+    }
+    echo "<tr><td><a href=forums.php?action=viewforum&forumid=".$row["id"]."><b>".htmlspecialchars($row["name"])."</b></a><br />".htmlspecialchars($row["description"])."</td>";
+    echo "<td>".htmlspecialchars($name)."</td><td>" . get_user_class_name($row["minclassread"],false,true,true) . "</td><td>" . get_user_class_name($row["minclasswrite"],false,true,true) . "</td><td>" . get_user_class_name($row["minclasscreate"],false,true,true) . "</td><td>".$moderators."</td><td><div class=\"minor-list list-seperator\"><ul><li><a href=\"".$PHP_SELF."?action=editforum&id=".$row["id"]."\">".$lang_forummanage['text_edit']."</a></li><li><a href=\"javascript:confirm_delete('".$row["id"]."', '".$lang_forummanage['js_sure_to_delete_forum']."', '');\"><span class=\"striking\">".$lang_forummanage['text_delete']."</span></a></li></ul></div></td></tr>";
+  } while($row = mysql_fetch_array($result));
+}
+else {
+  print "<tr><td colspan=6>".$lang_forummanage['text_no_records_found']."</td></tr>";
+}
+echo "</tbody></table>";
 }
 
 end_main_frame();
