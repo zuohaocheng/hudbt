@@ -23,6 +23,7 @@ $(function() {
 	    showpeer.fadeOut(function() {
 		hidepeer.fadeIn();
 	    });
+	    $('#peerlist table').tablesorter();
 	}, 'html');
     };
     showpeer.click(function(e) {

@@ -218,7 +218,7 @@ $lang_usercp = array
 	'text_append_words' => "添加标记，如'2X免费'",
 	'text_append_icon' => "添加图标，如" . get_torrent_promotion_append(2, 'icon'),
 	'text_no_mark' => "无标记",
-	'text_signature_note' => "允许使用<a class=faqlink href=tags.php target=_new>BBCode代码</a>。最大图片尺寸为500*200，只有第一张图片会显示。",
+	'text_signature_note' => "允许使用<a class=faqlink href=tags.php target=_new>BBCode代码</a>。最大图片尺寸为500*150，总高度不超过200px，否则会杯具。",
 	'row_click_on_topic' => "点击主题时",
 	'text_go_to_first_page' => "查看第一页",
 	'text_go_to_last_page' => "查看最后页",

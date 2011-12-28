@@ -56,7 +56,7 @@ class HTML_BBCodeParser_Filter_Links extends HTML_BBCodeParser_Filter
         'url' => array(
             'htmlopen'  => 'a',
             'htmlclose' => 'a',
-            'allowed'   => 'none^img,color,font,size',
+            'allowed'   => 'none^img,color,font,size,b,i,u,s',
             'attributes'=> array('url' => 'href=%2$s%1$s%2$s')
         )
     );
@@ -92,11 +92,30 @@ class HTML_BBCodeParser_Filter_Links extends HTML_BBCodeParser_Filter
         $pattern = array(   "/(?<![\"'=".$ce."\/])(".$oe."[^".$ce."]*".$ce.")?(((".$schemes."):\/\/|www)[@-a-z0-9.]+\.[a-z]{2,4}[^\s()\[\]]*)/i",
                             "!".$oe."url(".$ce."|\s.*".$ce.")(.*)".$oe."/url".$ce."!iU",
                             "!".$oe."url=((([a-z]*:(//)?)|www)[@-a-z0-9.]+)([^\s\[\]]*)".$ce."(.*)".$oe."/url".$ce."!i");
-
-        $pp = preg_replace_callback($pattern[0], array($this, 'smarterPPLinkExpand'), $this->_text);
+	$pp = preg_replace_callback('!'.$oe.'url=([^'.$ce.']+)'.$ce.'([^'.$oe.']+)'.$oe.'/url'.$ce.'!Ui', array($this, 'removeDupe'), $this->_text);
+	$pp = preg_replace_callback($pattern[0], array($this, 'smarterPPLinkExpand'), $pp);
         $pp = preg_replace($pattern[1], $o."url=\$2\$1\$2".$o."/url".$c, $pp);
-        $this->_preparsed = preg_replace_callback($pattern[2], array($this, 'smarterPPLink'), $pp);
+	$this->_preparsed = preg_replace_callback($pattern[2], array($this, 'smarterPPLink'), $pp);
+    }
 
+    function removeDupe($s) {
+      $options = PEAR::getStaticProperty('HTML_BBCodeParser', '_options');
+      $o = $options['open'];
+      $c = $options['close'];
+      if ($s[1] == $s[2]) {
+	return $o.'url'.$c.$s[1] . $o.'/url'.$c;
+      }
+      else {
+      	$schemes = implode('|', $this->_allowedSchemes);
+      	$url_re = "!^(((".$schemes."):\/\/|www)[@-a-z0-9.]+\.[a-z]{2,4}[^\s()\[\]]*)$!i";
+      	if (preg_match($url_re, $s[2], $matches)) {
+      	  return $o.'url='.$s[1].$c.$s[1].$o.'/url'.$c;
+      	}
+      	else {
+	  $text = preg_replace('!/!', '&#47;', $s[2]);
+      	  return $o.'url='.$s[1].$c.$text.$o.'/url'.$c;
+      	}
+      }
     }
 
     /**

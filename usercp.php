@@ -622,7 +622,7 @@ tr_small($lang_usercp['row_funbox'],"<input type=checkbox name=showfb".($CURUSER
 				$avatars = ($_POST["avatars"] != "" ? "yes" : "no");
 				$ttlastpost = ($_POST["ttlastpost"] != "" ? "yes" : "no");
 				$signatures = ($_POST["signatures"] != "" ? "yes" : "no");
-				$signature = htmlspecialchars( trim($_POST["signature"]) );
+				$signature = trim($_POST["signature"]);
 
 				$updateset[] = "topicsperpage = " . min(100, 0 + $_POST["topicsperpage"]);
 				$updateset[] = "postsperpage = " . min(100, 0 + $_POST["postsperpage"]);

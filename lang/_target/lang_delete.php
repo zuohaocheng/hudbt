@@ -9,7 +9,7 @@ $lang_delete_target = array
 	'msg_the_torrent_you_downloaded' => "The torrent you downloaded'",//Added by bluemonster 20111110
 	'msg_was_deleted_by' => "' was delete by ",
 	'msg_reason_is' => ". The reason: ",
-	'msg_blank' = > '.'
+	'msg_blank' => '.',
 	),
 	'chs' => array
 	(
@@ -18,7 +18,7 @@ $lang_delete_target = array
 	'msg_the_torrent_you_downloaded' => "你下载过的种子'",//Added by bluemonster 20111110
 	'msg_was_deleted_by' => "'被",
 	'msg_reason_is' => "删除。原因：",
-	'msg_blank' = > '删除。'
+	'msg_blank' => '删除。',
 	),
 	'cht' => array
 	(

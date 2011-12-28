@@ -916,9 +916,15 @@ input.text {
     width:20px;
 }
 
+.scalable {
+    max-width: 800px;
+    max-height: 800px;
+}
+
 .post-edited {
+    text-align: left;
     font-size: 80%;
-    margin: 1em auto 0.8em 2.5em;
+    margin: 1em 2.5em 0.8em 2.5em;
 }
 
 .forum-post-body-container {
@@ -931,9 +937,16 @@ input.text {
 .signature {
     vertical-align:bottom;
     border-top: 1px solid gray;
-    margin-bottom:0.8em;
+    margin:1.2em 0 0.8em 0;
     padding-top: 0.4em;
     min-width: 15em;
+    max-height:200px;
+    max-width:550px;
+    overflow:hidden;
+}
+
+.forum-post-postfix {
+    min-height: 30px;
 }
 
 #forum-header {
@@ -1036,7 +1049,6 @@ input.text {
 }
 
 .forum-post-body {
-    width:80%;
     overflow:hidden;
     text-overflow:ellipsis;
     margin-bottom: 1em;

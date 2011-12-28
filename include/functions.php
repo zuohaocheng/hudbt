@@ -23,9 +23,9 @@ function get_langfolder_cookie()
   }
 }
 
-function get_user_lang($user_id)
-{
-  $lang = mysql_fetch_assoc(sql_query("SELECT site_lang_folder FROM language LEFT JOIN users ON language.id = users.lang WHERE language.site_lang=1 AND users.id= ". sqlesc($user_id) ." LIMIT 1")) or sqlerr(__FILE__, __LINE__);
+function get_user_lang($user_id) {
+  $lang_res = sql_query("SELECT site_lang_folder FROM language LEFT JOIN users ON language.id = users.lang WHERE language.site_lang=1 AND users.id= ". sqlesc($user_id) ." LIMIT 1") or sqlerr(__FILE__, __LINE__);
+  $lang = mysql_fetch_assoc($lang_res);
   return $lang['site_lang_folder'];
 }
 
@@ -41,7 +41,7 @@ function get_load_uri($type, $script_name ="", $debug=false) {
     $addition .= '&debug=1';
   }
   else {
-    $addition .= '&rev=20111221';
+    $addition .= '&rev=20111228g';
   }
   
   if ($type == 'js') {
@@ -118,7 +118,7 @@ function sqlerr($file = '', $line = '') {
   die;
 }
 
-function format_comment($text, $strip_html = true, $xssclean = false, $newtab = false, $imageresizer = true, $image_max_width = 800, $enableimage = true, $enableflash = true , $imagenum = -1, $image_max_height = 0, $adid = 0) {
+function format_comment($text, $strip_html = true, $xssclean = false, $newtab = false, $imageresizer = true, $image_max_width = 0, $enableimage = true, $enableflash = true , $imagenum = -1, $image_max_height = 0, $adid = 0) {
   global $SITENAME, $BASEURL, $enableattach_attachment;
   require_once('HTML/BBCodeParser.php');
   $filters = array('Extended', 'Basic', 'Email', 'Lists', 'Attachments', 'Smiles');
@@ -133,7 +133,7 @@ function format_comment($text, $strip_html = true, $xssclean = false, $newtab = 
   $text = htmlspecialchars($text, ENT_HTML401 | ENT_NOQUOTES);
   $text = preg_replace("/\n/s", "<br />", $text);
   
-  $parser = new HTML_BBCodeParser(array('filters' => $filters));
+  $parser = new HTML_BBCodeParser(array('filters' => $filters, 'imgMaxW' => $image_max_width, 'imgMaxH' => $image_max_height));
   return '<div class="bbcode">' . $parser->qparse($text) . '</div>';
 }
 
@@ -2309,12 +2309,13 @@ function deletetorrent($id, $deductBonus = false) {
 function delete_single_torrent($id, $row) {
   global $CURUSER;
   require_once(get_langfile_path("delete.php",true));
-  $users_of_torrent_res=sql_query('SELECT snatched.userid, users.accepttdpms FROM snatched LEFT JOIN users ON snatched.userid = users.id WHERE torrentid=' . sqlesc($id) . " AND finished='no'") or sqlerr(__FILE__, __LINE__);
+  $users_of_torrent_res=sql_query('SELECT snatched.userid, users.accepttdpms FROM snatched INNER JOIN users ON snatched.userid = users.id WHERE torrentid=' . sqlesc($id) . " AND finished='no'") or sqlerr(__FILE__, __LINE__);
   while ($users_of_torrent = mysql_fetch_array($users_of_torrent_res)) {
     if ($user_of_torrent['accepttdpms'] != "no") {
+      $lang = get_user_lang($users_of_torrent["userid"]);
       $dt = sqlesc(date("Y-m-d H:i:s"));
-      $subject = sqlesc($lang_delete_target[get_user_lang($users_of_torrent["userid"])]['msg_torrent_deleted']);
-      $msg = sqlesc($lang_delete_target[get_user_lang($users_of_torrent["userid"])]['msg_the_torrent_you_downloaded'].$row['name'].$lang_delete_target[get_user_lang($row["owner"])]['msg_was_deleted_by']."[url=userdetails.php?id=".$CURUSER['id']."]".$CURUSER['username']."[/url]".$lang_delete_target[get_user_lang($row["owner"])]['msg_blank']);
+      $subject = sqlesc($lang_delete_target[$lang]['msg_torrent_deleted']);
+      $msg = sqlesc($lang_delete_target[$lang]['msg_the_torrent_you_downloaded'].$row['name'].$lang_delete_target[$lang]['msg_was_deleted_by']."[url=userdetails.php?id=".$CURUSER['id']."]".$CURUSER['username']."[/url]".$lang_delete_target[$lang]['msg_blank']);
       sql_query("INSERT INTO messages (sender, receiver, subject, added, msg) VALUES(0, $users_of_torrent[userid], $subject, $dt, $msg)") or sqlerr(__FILE__, __LINE__);
     }
   }
@@ -2333,8 +2334,9 @@ function delete_single_torrent($id, $row) {
   //Send pm to torrent uploader
   if ($CURUSER["id"] != $row["owner"]){
     $dt = sqlesc(date("Y-m-d H:i:s"));
-    $subject = sqlesc($lang_delete_target[get_user_lang($row["owner"])]['msg_torrent_deleted']);
-    $msg = sqlesc($lang_delete_target[get_user_lang($row["owner"])]['msg_the_torrent_you_uploaded'].$row['name'].$lang_delete_target[get_user_lang($row["owner"])]['msg_was_deleted_by']."[url=userdetails.php?id=".$CURUSER['id']."]".$CURUSER['username']."[/url]".$lang_delete_target[get_user_lang($row["owner"])]['msg_reason_is'].$reasonstr);
+    $lang = get_user_lang($row["owner"]);
+    $subject = sqlesc($lang_delete_target[$lang]['msg_torrent_deleted']);
+    $msg = sqlesc($lang_delete_target[$lang]['msg_the_torrent_you_uploaded'].$row['name'].$lang_delete_target[$lang]['msg_was_deleted_by']."[url=userdetails.php?id=".$CURUSER['id']."]".$CURUSER['username']."[/url]".$lang_delete_target[$lang]['msg_reason_is'].$reasonstr);
     sql_query("INSERT INTO messages (sender, receiver, subject, added, msg) VALUES(0, $row[owner], $subject, $dt, $msg)") or sqlerr(__FILE__, __LINE__);
   }
 
@@ -2514,7 +2516,7 @@ function post_header($type, $authorid, $topicid, $postid, $added, $floor, $showo
       $header .= "<a href=\"?action=viewtopic&topicid=".$topicid."\">".$lang_functions['text_view_all_posts']."</a>";
     }
     else {
-      $header .= "<a href=\"".htmlspecialchars("?action=viewtopic&topicid=".$topicid."&authorid=".$posterid)."\">".$lang_functions['text_view_this_author_only']."</a>";
+      $header .= "<a href=\"".htmlspecialchars("?action=viewtopic&topicid=".$topicid."&authorid=".$authorid)."\">".$lang_functions['text_view_this_author_only']."</a>";
     }
     $header .= '</li>';
   }
@@ -2592,12 +2594,14 @@ function post_body_container($postid, $body, $highlight, $edit, $signature, $pri
   
   $container = '<div class="forum-post-body-container">';
   $container .= post_body($postid, $body);
+  $container .= '<div class="forum-post-postfix">';
   if ($edit) {
     $container .= post_body_edited($edit);
   }
   if ($CURUSER["signatures"] == "yes" && $signature) {
-    $container .= '<div class="signature">' . format_comment($signature,false,false,false,true,500,true,false, 1,200) . '</div>';
+    $container .= '<div class="signature">' . format_comment($signature,false,false,false,true,550,true,false, 1,150) . '</div>';
   }
+  $container .= '</div>';
 
   $container .= post_body_toolbox($postid, $privilege, $type, $pid);
   $container .= '<div class="forum-post-footer"></div>';
@@ -2647,7 +2651,7 @@ function commenttable($rows, $type, $parent_id, $review = false, $offset=0) {
     else {
       $edit = false;
     }
-    $post_f = array('type' => 'comment', 'posterid' => $row['user'], 'topicid' => $parent_id, 'postid' => $row['id'], 'added' => $arr['added'], 'floor' => ($offset+$count+1), 'body' => $row['text'], 'highlight' => false, 'edit' => $edit, 'ctype' => $type);
+    $post_f = array('type' => 'comment', 'posterid' => $row['user'], 'topicid' => $parent_id, 'postid' => $row['id'], 'added' => $row['added'], 'floor' => ($offset+$count+1), 'body' => $row['text'], 'highlight' => false, 'edit' => $edit, 'ctype' => $type);
     $privilege = array(true, (get_user_class() >= $commanage_class), ($row["user"] == $CURUSER["id"] || get_user_class() >= $commanage_class));
     echo post_format($post_f, $privilege);
 
@@ -3091,7 +3095,7 @@ while ($row = mysql_fetch_assoc($res))
 
       if ($row["anonymous"] == "yes" && get_user_class() >= $torrentmanage_class)
       {
-        print("<td class=\"rowfollow\" align=\"center\"><i>".$lang_functions['text_anonymous']."</i><br />".(isset($row["owner"]) ? "(" . get_username($row["owner"]) .")" : "<i>".$lang_functions['text_orphaned']."</i>") . "</td>\n");
+        print("<td class=\"rowfollow\" align=\"center\">".$lang_functions['text_anonymous']."<br />".(isset($row["owner"]) ? "(" . get_username($row["owner"]) .")" : $lang_functions['text_orphaned']) . "</td>\n");
       }
       elseif ($row["anonymous"] == "yes")
       {

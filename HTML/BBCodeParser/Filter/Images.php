@@ -36,7 +36,7 @@ class HTML_BBCodeParser_Filter_Images extends HTML_BBCodeParser_Filter
     */
     var $_definedTags = array(
         'img' => array(
-            'htmlopen'  => 'img class="scalable"',
+            /* 'htmlopen'  => 'img class="scalable"', */
             'htmlclose' => '',
             'allowed'   => 'none',
             'attributes'=> array(
@@ -44,9 +44,28 @@ class HTML_BBCodeParser_Filter_Images extends HTML_BBCodeParser_Filter
                 'w'     => 'width=%2$s%1$d%2$s',
                 'h'     => 'height=%2$s%1$d%2$s',
                 'alt'   => 'alt=%2$s%1$s%2$s',
-            )
+				 ),
+	    'htmlopencallback' => array('HTML_BBCodeParser_Filter_Images', 'imgCallback')
         )
     );
+
+    static function imgCallback() {
+      $options = PEAR::getStaticProperty('HTML_BBCodeParser','_options');
+      $h = $options['imgMaxH'];
+      $w = $options['imgMaxW'];
+      $style = '';
+      if ($h != 0) {
+	$style .= 'max-height: '.$h.'px;';
+      }
+      if ($w != 0) {
+	$style .= 'max-width: '.$w.'px;';
+      }
+      if ($style) {
+	$style = ' style="' . $style . '"';
+      }
+
+      return 'img class="scalable"' . $style;
+    }
 
     /**
     * Executes statements before the actual array building starts

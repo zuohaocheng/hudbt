@@ -25,14 +25,17 @@ $test = $_POST["test"];
 ?>
 <p><?php echo $lang_tags['text_bb_tags_note'] ?></p>
 
-<form method=post action=?>
-<textarea name=test cols=60 rows=3><?php print($test ? htmlspecialchars($test) : "")?></textarea>
-<input type=submit style='height: 23px; margin-left: 5px' value=<?php echo $lang_tags['submit_test_this_code'] ?>>
+<form id="test-form" method="POST" action="?">
+<textarea id="test" name="test" cols="60" rows="3"><?php print($test ? htmlspecialchars($test) : "")?></textarea>
+<input type="submit" style='height: 23px; margin-left: 5px' value=<?php echo $lang_tags['submit_test_this_code'] ?>>
 </form>
 <?php
 
-if ($test != "")
-  print("<p><hr>" . format_comment($test) . "</hr></p>\n");
+  echo '<div id="test-result">';
+if ($test != "") {
+  print("<fieldset>" . format_comment($test) . "</fieldset>");
+}
+echo '</div>';
 
 insert_tag(
 	$lang_tags['text_bold'],

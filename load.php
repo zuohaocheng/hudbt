@@ -107,7 +107,7 @@ function dependence($name, $type) {
 		    'css' => array('jquery.tablesorter/jquery.tablesorter'));
   $dependence = array(
 		    'torrents' => array(
-					'js' => array('jquery.json-2.3.min', 'jstorage.min', 'jquery.tablesorter', 'jquery.history.min'),
+					'js' => array('jquery.json-2.3.min', 'jstorage.min', 'jquery.tablesorter'),
 					'css' => array('jquery.tablesorter/jquery.tablesorter')),
 		    'uploaders' => $jqsorter,
 		    'userdetails' => $jqsorter,

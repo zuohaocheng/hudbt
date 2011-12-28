@@ -49,6 +49,7 @@ function torrentInfoForRow($row) {
     $info['oday'] = true;
   }
 
+  $last_browse = $CURUSER['last_browse'];
   if (strtotime($row["added"]) >= $last_browse) {
     $info['new'] = true;
   }

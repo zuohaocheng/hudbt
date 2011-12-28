@@ -10,9 +10,7 @@ $(function() {
     var ie = $.browser.msie;
     var ie8 = ie && $.browser.version < 9;
 
-
-    var History = window.History;
-    var History = History.enabled;
+    var History = !ie;
 
     var args = argsFromUri(window.location.search);
 
@@ -83,13 +81,13 @@ $(function() {
     sortHeader(!hb.nextpage);
 
     //Go to content
-    var goToContent = (function() {
-	var $top = $('#content-marker');
-	return function() {
-	    var top = $top.offset().top;
-	    scrollToPosition(top);
-	};
-    })();
+    // var goToContent = (function() {
+    // 	var $top = $('#content-marker');
+    // 	return function() {
+    // 	    var top = $top.offset().top;
+    // 	    scrollToPosition(top);
+    // 	};
+    // })();
 
 
     //Spin loader
@@ -445,12 +443,14 @@ $(function() {
 	table.hide();
 	$('#stderr').remove();
 	args = argsFromUri(uri);
-	$.getJSON(uri + surfix, function(result) {
+	args.format = 'json';
+	$.getJSON('?' + $.param(args), function(result) {
 	    var targ = $('#outer');
 	    if (result.torrents.length) {
 		table.before(result.pager.top);
 		sortHeader(!result['continue']);
 		table.show();
+		table.after(result.pager.bottom);
 
 		$document.unbind('scroll');
 		get_func(result);
@@ -459,7 +459,7 @@ $(function() {
 		loader(false);
 		targ.append('<div id="stderr"><h2>没有结果！</h2><div class="table td frame">没有种子:(</div></div>');
 	    }
-	    goToContent();
+	    // goToContent();
 	});
     };
 
@@ -508,10 +508,11 @@ $(function() {
 	    var rowHeight = target.find('tr').height() || 42;
 	    var offsetT = target.offset().top;
 	    var page = argsFromUri(document.location.search).page || 0;
+	    var oripage = parseInt(page);
 	    var onscroll = function() {
 		var loc = $document.scrollTop() - offsetT;
 		var row = loc / rowHeight + 5;
-		var npage = Math.floor(row / 50);
+		var npage = Math.floor(row / 50) + oripage;
 		if (npage != page && npage >= 0) {
 		    args = argsFromUri(document.location.search);
 		    page = npage;

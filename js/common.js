@@ -380,7 +380,7 @@ var argsFromUri = function(uri) {
     var args = new Object();
     var query = uri.split('?');
     if (query.length !== 2) {
-	return [];
+	return {};
     }
     $.each(query[1].split('&'), function(idx, obj) {
 	var t = obj.split('=');

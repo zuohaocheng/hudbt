@@ -456,11 +456,11 @@ class HTML_BBCodeParser
             // tnx to Onno for the regex
             // validate the arguments
             $attributeArray = array();
-            $regex = "![\s$oe]([a-z0-9]+)=(\"[^\s$ce]+\"|[^\s$ce]";
+            $regex = "![\s$oe]([a-z0-9]+)=(\"[^\s$ce]+\"|[^\s$ce";
             if ($tag['tag'] != 'url') {
-                $regex .= "[^=]";
+                $regex .= "=";
             }
-            $regex .= "+)(?=[\s$ce])!i";
+            $regex .= "]+)(?=[\s$ce])!i";
             preg_match_all($regex, $str, $attributeArray, PREG_SET_ORDER);
             foreach ($attributeArray as $attribute) {
                 $attNam = strtolower($attribute[1]);
@@ -726,7 +726,6 @@ class HTML_BBCodeParser
     function _buildParsedString()
     {
         $this->_parsed = '';
-#	echo json_encode($this->_tagArray);
         foreach ($this->_tagArray as $tag) {
             switch ($tag['type']) {
 
