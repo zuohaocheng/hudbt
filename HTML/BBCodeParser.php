@@ -731,7 +731,7 @@ class HTML_BBCodeParser
 
             // just text
             case 0:
-                $this->_parsed .= $tag['text'];
+	      $this->_parsed .= preg_replace('/ /', '&nbsp;', $tag['text']);
                 break;
 
             // opening tag

@@ -4,8 +4,8 @@ body {
     color: #000000;
     font-family: tahoma, arial, helvetica, sans-serif;
     background-color: #0f5475;
-    background-image: url(./bg.png);
-    background-repeat: repeat-x;
+    /* background-image: url(./bg.png); 
+    background-repeat: repeat-x;*/
 }
 
 body.inframe {

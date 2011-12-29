@@ -108,29 +108,37 @@ $(function() {
 		}
 	    }
 
+	    var onok = function() {
+		allFields.removeClass( "ui-state-error" );
+		var valid = true;
+		valid = valid && checkLength(urlfield, "URL");
+		if (valid) {
+		    var url = urlfield.val();
+		    var title = $('#tag-url-title').val();
+		    if (title.length === 0) {
+			title = url;
+		    }
+
+		    if (dialog_type === 'url') {
+			doInsert("[url="+url+"]"+title+"[/url]", "", false);
+		    }
+		    else if (dialog_type === 'image') {
+			doInsert("[img]"+url+"[/img]", "", false);
+		    }
+		    dialog.dialog( "close" );
+		}
+	    };
+
+	    allFields.keypress(function(e) {
+		if (e.keyCode === 13) {
+		    onok();
+		}
+	    });
+
 	    dialog.dialog({
 		modal: true,
 		buttons: {
-		    OK: function() {
-			allFields.removeClass( "ui-state-error" );
-			var valid = true;
-			valid = valid && checkLength(urlfield, "URL");
-			if (valid) {
-			    var url = urlfield.val();
-			    var title = $('#tag-url-title').val();
-			    if (title.length === 0) {
-				title = url;
-			    }
-
-			    if (dialog_type === 'url') {
-				doInsert("[url="+url+"]"+title+"[/url]", "", false);
-			    }
-			    else if (dialog_type === 'image') {
-				doInsert("[img]"+url+"[/img]", "", false);
-			    }
-			    $( this ).dialog( "close" );
-			}
-		    },
+		    OK: onok,
 		    Cancel: function() {
 			$( this ).dialog( "close" );
 		    }

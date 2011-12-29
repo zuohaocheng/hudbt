@@ -41,7 +41,7 @@ function get_load_uri($type, $script_name ="", $debug=false) {
     $addition .= '&debug=1';
   }
   else {
-    $addition .= '&rev=20111228g';
+    $addition .= '&rev=20111229';
   }
   
   if ($type == 'js') {
@@ -1748,7 +1748,7 @@ function textbbcode($form,$text,$content="",$hastitle=false, $col_num = 130) {
 	      {
 	  ?>
 	  
-	  <div class="logo_img"><a href="<?php echo "//$BASEURL/index.php" ?>"><img src="<?php echo $logo_main?>" alt="<?php echo htmlspecialchars($SITENAME)?>" title="<?php echo htmlspecialchars($SITENAME)?> - <?php echo htmlspecialchars($SLOGAN)?>" /></a></div>  
+	  <div><a href="<?php echo "//$BASEURL/index.php" ?>"><img id="logo-img" src="<?php echo $logo_main?>" alt="<?php echo htmlspecialchars($SITENAME)?>" title="<?php echo htmlspecialchars($SITENAME)?> - <?php echo htmlspecialchars($SLOGAN)?>" /></a></div>  
 	  
 	  <?php
 	      }
@@ -2378,7 +2378,7 @@ function pager($rpp, $count, $href, $opts = array(), $pagename = "page") {
   if ($page >= 1) {
     $pagerprev = "<a href=\"".htmlspecialchars($href.$pagename."=" . ($page - 1) ). "\" title=\"".($is_presto ? $lang_functions['text_shift_pageup_shortcut'] : $lang_functions['text_alt_pageup_shortcut'])."\">";
     $pagerprev .= $as;
-    $pagerprev = "</a>";
+    $pagerprev .= "</a>";
   }
   else {
     $pagerprev = "<span class=\"selected\">".$as."</span>";
@@ -2399,11 +2399,12 @@ function pager($rpp, $count, $href, $opts = array(), $pagename = "page") {
     $pagerarr = array($pagerprev);
     $dotted = 0;
     $dotspace = 3;
-    $dotend = $pages - $dotspace;
+    $startdotspace = 2;
+    $dotend = $pages - $startdotspace;
     $curdotend = $page - $dotspace;
     $curdotstart = $page + $dotspace;
     for ($i = 0; $i < $pages; $i++) {
-      if (($i >= $dotspace && $i <= $curdotend) || ($i >= $curdotstart && $i < $dotend)) {
+      if (($i >= $startdotspace && $i <= $curdotend) || ($i >= $curdotstart && $i < $dotend)) {
         if (!$dotted)
         $pagerarr[] = "...";
         $dotted = 1;
@@ -2448,7 +2449,7 @@ function post_author_stats($id, $idarr) {
     $Cache->cache_value('user_'.$id.'_post_count', $forumposts, 3600);
   }
   
-  $stats = "<li>".$lang_functions['text_posts']."$forumposts</li><li>".$lang_functions['text_uploaded']."$uploaded </li><li>".$lang_functions['text_downloaded']."$downloaded</li><li>".$lang_functions['text_ratio']."$ratio</li>";
+  $stats = '<li>'.$lang_functions['text_posts'].$forumposts . '</li><li>'.$lang_functions['text_uploaded'].$uploaded.'</li><li>'.$lang_functions['text_downloaded'].$downloaded.'</li><li>'.$lang_functions['text_ratio'].$ratio.'</li>';
   return $stats;
 }
 
@@ -2485,7 +2486,7 @@ function post_format_author_info($id, $stat = false) {
   $out = '<div class="forum-author-info">';
   $out .= '<div class="post-avatar">' . return_avatar_image($avatar) . '</div>';
   if ($stat) {
-    $out .= '<div class="user-stats minor-list-vertical"><ul><li>' . user_class_image($arr2['class']) . '</li><li>' . post_author_stats($id, $arr2) . '</ul></div>';
+    $out .= '<div class="user-stats minor-list-vertical"><ul><li>' . user_class_image($arr2['class']) . '</li><li>' . post_author_stats($id, $arr2) . '</li></ul></div>';
   }
   $out .= '<div class="forum-user-toolbox minor-list horizon-compact"><ul>' . post_author_toolbox($arr2) . '</ul></div>';
   $out .= '</div>';
@@ -2598,7 +2599,7 @@ function post_body_container($postid, $body, $highlight, $edit, $signature, $pri
   if ($edit) {
     $container .= post_body_edited($edit);
   }
-  if ($CURUSER["signatures"] == "yes" && $signature) {
+  if ($CURUSER["signatures"] == "yes" && $signature && !$type) {
     $container .= '<div class="signature">' . format_comment($signature,false,false,false,true,550,true,false, 1,150) . '</div>';
   }
   $container .= '</div>';

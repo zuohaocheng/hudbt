@@ -19,50 +19,38 @@ function SmileIT(smile,form,text){
     doInsert(smile, '', false, document.forms[form].elements[text]);
 }
 
-var myAgent = navigator.userAgent.toLowerCase();
-var is_ie = ((myAgent.indexOf("msie") != -1) && (myAgent.indexOf("opera") == -1));
-var is_win = ((myAgent.indexOf("win")!=-1) || (myAgent.indexOf("16bit")!=-1));
-var myVersion = parseInt(navigator.appVersion);
+var is_ie = $.browser.msie;
 function doInsert(ibTag, ibClsTag, isSingle, obj_ta) {
     var isClose = false;
     obj_ta = obj_ta || document[hb.bbcode.form][hb.bbcode.text];
-    if ( (myVersion >= 4) && is_ie && is_win)
-    {
-	if(obj_ta.isTextEdit)
-	{
-	    obj_ta.focus();
-	    var sel = document.selection;
-	    var rng = sel.createRange();
-	    rng.colapse;
-	    if((sel.type == "Text" || sel.type == "None") && rng != null)
-	    {
-		if(ibClsTag != "" && rng.text.length > 0)
-		    ibTag += rng.text + ibClsTag;
-		else if(isSingle) isClose = true;
-		rng.text = ibTag;
-	    }
-	}
-	else
-	{
-	    if(isSingle) isClose = true;
-	    obj_ta.value += ibTag;
-	}
-    }
-    else if (obj_ta.selectionStart || obj_ta.selectionStart == '0')
-    {
+    if (obj_ta.selectionStart || obj_ta.selectionStart == '0') {
 	var startPos = obj_ta.selectionStart;
 	var endPos = obj_ta.selectionEnd;
-	obj_ta.value = obj_ta.value.substring(0, startPos) + ibTag + obj_ta.value.substring(endPos, obj_ta.value.length);
-	obj_ta.selectionEnd = startPos + ibTag.length;
-	if(isSingle) isClose = true;
+	var val = obj_ta.value;
+	obj_ta.value = val.substring(0, startPos) + ibTag + val.substring(startPos, endPos) + ibClsTag + obj_ta.value.substring(endPos, obj_ta.value.length);
+	obj_ta.selectionStart = startPos + ibTag.length;
+	obj_ta.selectionEnd = ibTag.length + endPos;
     }
-    else
-    {
+    else if (is_ie && obj_ta.isTextEdit) {
+	obj_ta.focus();
+	var sel = document.selection;
+	var rng = sel.createRange();
+	rng.colapse;
+	if ((sel.type == "Text" || sel.type == "None") && rng != null) {
+	    if(ibClsTag != "" && rng.text.length > 0) {
+		ibTag += rng.text + ibClsTag;
+	    }
+	    else if (isSingle) {
+		isClose = true;
+	    }
+	    rng.text = ibTag;
+	}
+    }
+    else {
 	if(isSingle) isClose = true;
 	obj_ta.value += ibTag;
     }
     obj_ta.focus();
-    // obj_ta.value = obj_ta.value.replace(/ /, " ");
     return isClose;
 }
 
@@ -388,3 +376,21 @@ var argsFromUri = function(uri) {
     });
     return args;
 };
+
+$(function() {
+    var logo = $('#logo-img');
+    logo.attr({
+	'src' : 'pic/trans.gif'
+    });
+    var step = 0;
+    var interval = [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 1];
+    var change = function() {
+	step += 1;
+	if (step > interval.length) {
+	    step = 1;
+	}
+	logo.attr('class', 'logo-2012-' + step);
+	setTimeout(change, interval[step - 1] * 1000);
+    };
+    change();
+});
