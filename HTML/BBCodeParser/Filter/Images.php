@@ -44,6 +44,7 @@ class HTML_BBCodeParser_Filter_Images extends HTML_BBCodeParser_Filter
                 'w'     => 'width=%2$s%1$d%2$s',
                 'h'     => 'height=%2$s%1$d%2$s',
                 'alt'   => 'alt=%2$s%1$s%2$s',
+		'full' => 'full=%2$s%1$s%2$s'
 				 ),
 	    'htmlopencallback' => array('HTML_BBCodeParser_Filter_Images', 'imgCallback')
         )

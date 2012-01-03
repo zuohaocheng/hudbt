@@ -31,7 +31,10 @@ function get_pr_state($promotion, $added = '', $promotionTimeType = 0, $promotio
           /*    array(5,2,6,4,6,6,7), */
           /*    array(6,4,6,4,6,6,6)); */
 
-  $gstate = get_global_sp_state() || 1;
+  $gstate = get_global_sp_state();
+  if (!$gstate) {
+    $gstate = 1;
+  }
   $state = $sp_global_table[$gstate-1][$promotion-1];
 
   if ($state == 1 || $gstate != 1 || $promotionTimeType == 1) {

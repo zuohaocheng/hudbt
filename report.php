@@ -162,27 +162,21 @@ elseif (isset($forumpost))
 elseif (isset($commentid))
 {
 	int_check($commentid);
-	$res = sql_query("SELECT id, user, torrent, request, offer FROM comments WHERE id=".sqlesc($commentid));
-	if (mysql_num_rows($res) == 0)
-	{
+	$res = sql_query("SELECT id, user, torrent, offer FROM comments WHERE id=".sqlesc($commentid));
+	if (mysql_num_rows($res) == 0) {
 		stderr($lang_report['std_error'],$lang_report['std_invalid_comment_id']);
 	}
 	$arr = mysql_fetch_array($res);
-	if ($arr['torrent']){ //Comment of torrent. BTW, this is shitty code!
+	if ($arr['torrent']) { //Comment of torrent. BTW, this is shitty code!
 		$name = get_single_value("torrents","name","WHERE id=".sqlesc($arr['torrent']));
 		$url = "details.php?id=".$arr['torrent']."#".$commentid;
 		$of = $lang_report['text_of_torrent'];
 	}
-	elseif ($arr['offer']){ //Comment of offer
+	elseif ($arr['offer']) { //Comment of offer
 		$name = get_single_value("offers","name","WHERE id=".sqlesc($arr['offer']));
 		$url = "offers.php?id=".$arr['offer']."&off_details=1#".$commentid;
 		$of = $lang_report['text_of_offer'];
 	}
-	/*elseif ($arr['request']){ //Comment of request
-		$name = get_single_value("requests","request","WHERE id=".sqlesc($arr['request']));
-		$url = "viewrequests.php?id=".$arr['request']."&req_details=1#".$commentid;
-		$of = $lang_report['text_of_request'];
-	}*/
 	else //Comment belongs to no one
 		stderr($lang_report['std_error'], $lang_report['std_orphaned_comment']);
 

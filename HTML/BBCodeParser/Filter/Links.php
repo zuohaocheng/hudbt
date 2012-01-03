@@ -88,7 +88,6 @@ class HTML_BBCodeParser_Filter_Links extends HTML_BBCodeParser_Filter
         $ce = $options['close_esc'];
 
         $schemes = implode('|', $this->_allowedSchemes);
-
         $pattern = array(   "/(?<![\"'=".$ce."\/])(".$oe."[^".$ce."]*".$ce.")?(((".$schemes."):\/\/|www)[@-a-z0-9.]+\.[a-z]{2,4}[^\s()\[\]]*)/i",
                             "!".$oe."url(".$ce."|\s.*".$ce.")(.*)".$oe."/url".$ce."!iU",
                             "!".$oe."url=((([a-z]*:(//)?)|www)[@-a-z0-9.]+)([^\s\[\]]*)".$ce."(.*)".$oe."/url".$ce."!i");
@@ -109,7 +108,7 @@ class HTML_BBCodeParser_Filter_Links extends HTML_BBCodeParser_Filter
       	$schemes = implode('|', $this->_allowedSchemes);
       	$url_re = "!^(((".$schemes."):\/\/|www)[@-a-z0-9.]+\.[a-z]{2,4}[^\s()\[\]]*)$!i";
       	if (preg_match($url_re, $s[2], $matches)) {
-      	  return $o.'url='.$s[1].$c.$s[1].$o.'/url'.$c;
+      	  return $o.'url'.$c.$s[1].$o.'/url'.$c;
       	}
       	else {
 	  $text = preg_replace('!/!', '&#47;', $s[2]);

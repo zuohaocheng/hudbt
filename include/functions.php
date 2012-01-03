@@ -41,11 +41,11 @@ function get_load_uri($type, $script_name ="", $debug=false) {
     $addition .= '&debug=1';
   }
   else {
-    $addition .= '&rev=20111229';
+    $addition .= '&rev=20120106';
   }
   
   if ($type == 'js') {
-    return '<script type="text/javascript" src=load.php?format=js&name=' . $name . $addition . '></script>';
+    return '<script type="text/javascript" src="load.php?format=js&name=' . $name . $addition . '"></script>';
   }
   elseif ($type == 'css') {
     if ($CURUSER) {
@@ -131,7 +131,8 @@ function format_comment($text, $strip_html = true, $xssclean = false, $newtab = 
   $filters[] = 'Links';
 
   $text = htmlspecialchars($text, ENT_HTML401 | ENT_NOQUOTES);
-  $text = preg_replace("/\n/s", "<br />", $text);
+  /* $text = preg_replace("/ /", "&nbsp;", $text); */
+  $text = preg_replace("/\n/s", " <br />", $text);
   
   $parser = new HTML_BBCodeParser(array('filters' => $filters, 'imgMaxW' => $image_max_width, 'imgMaxH' => $image_max_height));
   return '<div class="bbcode">' . $parser->qparse($text) . '</div>';
@@ -149,14 +150,12 @@ function highlight($search,$subject,$hlstart='<b><font class="striking">',$hlend
   return $subject;
 }
 
-function get_user_class()
-{
+function get_user_class() {
   global $CURUSER;
   return $CURUSER["class"];
 }
 
-function get_user_class_name($class, $compact = false, $b_colored = false, $I18N = false)
-{
+function get_user_class_name($class, $compact = false, $b_colored = false, $I18N = false) {
   static $en_lang_functions;
   static $current_user_lang_functions;
   if (!$en_lang_functions) {
@@ -220,11 +219,10 @@ function get_user_class_name($class, $compact = false, $b_colored = false, $I18N
     }
   
   $class_name = ( $compact == true ? str_replace(" ", "",$class_name) : $class_name);
-  if ($class_name) return ($b_colored == true ? "<b class='" . str_replace(" ", "",$class_name_color) . "_Name'>" . $class_name . "</b>" : $class_name);
+  if ($class_name) return ($b_colored == true ? "<span class='" . str_replace(" ", "",$class_name_color) . "_Name'>" . $class_name . "</span>" : $class_name);
 }
 
-function is_valid_user_class($class)
-{
+function is_valid_user_class($class) {
   return is_numeric($class) && floor($class) == $class && $class >= UC_PEASANT && $class <= UC_STAFFLEADER;
 }
 
@@ -1718,6 +1716,7 @@ function textbbcode($form,$text,$content="",$hastitle=false, $col_num = 130) {
       ?>
       <title><?php echo $title?></title>
       <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+      <link rel="apple-touch-icon" href="pic/icon.png" />
       <link rel="search" type="application/opensearchdescription+xml" title="<?php echo $SITENAME?> Torrents" href="opensearch.php" />
       <script type="text/javascript">
 	//<![CDATA[
@@ -2044,17 +2043,17 @@ function textbbcode($form,$text,$content="",$hastitle=false, $col_num = 130) {
     }
 
     function js_hb_config() {
-      global $torrentmanage_class;
+      global $torrentmanage_class, $CURUSER;
 
       $class = get_user_class();
       if ($class) {
-	$user = array('class' => $class, 'canonicalClass' => get_user_class_name($class, false));
+	$user = array('class' => $class, 'canonicalClass' => get_user_class_name($class, false), 'bonus' => $CURUSER['seedbonus']);
 	$config = array('user' => $user);
 
 	$out = 'hb = {config : ' . php_json_encode($config) . '}';
       }
       else {
-	$out = '';
+	$out = 'hb={}';
       }
 
       return $out;
@@ -2072,7 +2071,7 @@ function stdfoot() {
   if ($Advertisement->enable_ad()){
     $footerad=$Advertisement->get_ad('footer');
       if ($footerad)
-      echo '<style="margin-top: 10px; text-align:center;" id="ad_footer">'.$footerad[0].'</div>';
+      echo '<div style="margin-top: 10px; text-align:center;" id="ad_footer">'.$footerad[0].'</div>';
   }
   print('<div style="margin-top: 10px; margin-bottom: 30px; text-align: center;
 ">');
@@ -2115,7 +2114,7 @@ function stdfoot() {
   if ($cnzz)
       print("\n".$cnzz."\n");
 
-  print("<div></body></html>");
+  print("</body></html>");
 
   //echo replacePngTags(ob_get_clean());
 
@@ -2306,7 +2305,7 @@ function deletetorrent($id, $deductBonus = false) {
   }
 }
 
-function delete_single_torrent($id, $row) {
+function delete_single_torrent($id, $row, $reasonstr='') {
   global $CURUSER;
   require_once(get_langfile_path("delete.php",true));
   $users_of_torrent_res=sql_query('SELECT snatched.userid, users.accepttdpms FROM snatched INNER JOIN users ON snatched.userid = users.id WHERE torrentid=' . sqlesc($id) . " AND finished='no'") or sqlerr(__FILE__, __LINE__);
@@ -2466,7 +2465,7 @@ function post_author_toolbox($arr2) {
 
   $online_status = ("'".$arr2['last_access']."'") > $dt ? "<img class=\"f_online\" src=\"pic/trans.gif\" alt=\"Online\" title=\"".$lang_functions['title_online']."\" />":"<img class=\"f_offline\" src=\"pic/trans.gif\" alt=\"Offline\" title=\"".$lang_functions['title_offline']."\" />";
 	  
-  $toolbox_user = '<li>' . $online_status . "</li><li><a href=\"sendmessage.php?receiver=".htmlspecialchars(trim($arr2["id"]))."\"><img class=\"f_pm\" src=\"pic/trans.gif\" alt=\"PM\" title=\"".$lang_functions['title_send_message_to'].htmlspecialchars($arr2["username"])."\" /></a></li><li><a href=\"report.php?forumpost=$postid\"><img class=\"f_report\" src=\"pic/trans.gif\" alt=\"Report\" title=\"".$lang_functions['title_report_this_post']."\" /></a></li>";
+  $toolbox_user = '<li>' . $online_status . "</li><li><a href=\"sendmessage.php?receiver=".htmlspecialchars(trim($arr2["id"]))."\"><img class=\"f_pm\" src=\"pic/trans.gif\" alt=\"PM\" title=\"".$lang_functions['title_send_message_to'].htmlspecialchars($arr2["username"])."\" /></a></li>";
   return $toolbox_user;
 }
 
@@ -2486,9 +2485,9 @@ function post_format_author_info($id, $stat = false) {
   $out = '<div class="forum-author-info">';
   $out .= '<div class="post-avatar">' . return_avatar_image($avatar) . '</div>';
   if ($stat) {
-    $out .= '<div class="user-stats minor-list-vertical"><ul><li>' . user_class_image($arr2['class']) . '</li><li>' . post_author_stats($id, $arr2) . '</li></ul></div>';
+    $out .= '<div class="user-stats minor-list-vertical"><ul><li>' . user_class_image($arr2['class']) . '</li>' . post_author_stats($id, $arr2) . '</ul></div>';
   }
-  $out .= '<div class="forum-user-toolbox minor-list horizon-compact"><ul>' . post_author_toolbox($arr2) . '</ul></div>';
+  $out .= '<div class="forum-user-toolbox minor-list horizon-compact compact"><ul>' . post_author_toolbox($arr2) . '</ul></div>';
   $out .= '</div>';
   return array($out, $signature);
 }
@@ -2554,7 +2553,8 @@ function post_body_toolbox_href($postid, $type, $pid) {
     return array(
 		 'comment.php?action=add&sub=quote&pid=' . $pid . $surfix,
 		 'comment.php?action=delete' . $surfix,
-		 'comment.php?action=edit' . $surfix
+		 'comment.php?action=edit' . $surfix,
+		 'report.php?commentid=' . $postid
 		 );
   }
   else { //forum
@@ -2563,6 +2563,7 @@ function post_body_toolbox_href($postid, $type, $pid) {
 		 '?action=quotepost' . $surfix,
 		 '?action=deletepost' . $surfix,
 		 '?action=editpost' . $surfix,
+		 'report.php?forumpost=' . $postid
 		 );
   }
 }
@@ -2572,6 +2573,9 @@ function post_body_toolbox($postid, $privilege, $type='', $pid = '') {
   $toolbox_post = '';
   list($canquote, $candelete, $canedit) = $privilege;
   $hrefs = post_body_toolbox_href($postid, $type, $pid);
+
+  $toolbox_post .= '<li><a href="' . $hrefs[3] . '"><img class="f_report" src="pic/trans.gif" alt="Report" title="'.$lang_functions['title_report_this_post'].'" /></a></li>';
+  
   if ($canquote) {
     $toolbox_post .= '<li><a href="'.htmlspecialchars($hrefs[0]).'"><img class="f_quote" src="pic/trans.gif" alt="Quote" title="'.$lang_functions['title_reply_with_quote'].'" /></a></li>';
   }
@@ -3126,8 +3130,7 @@ create_tooltip_container($lastcom_tooltip, 400);
 create_tooltip_container($torrent_tooltip, 500);
 }
 
-function get_username($id, $big = false, $link = true, $bold = true, $target = false, $bracket = false, $withtitle = false, $link_ext = "", $underline = false)
-{
+function get_username($id, $big = false, $link = true, $bold = true, $target = false, $bracket = false, $withtitle = false, $link_ext = "", $underline = false) {
   static $usernameArray = array();
   global $lang_functions;
   $id = 0+$id;
@@ -3137,16 +3140,14 @@ function get_username($id, $big = false, $link = true, $bold = true, $target = f
   }
   $arr = get_user_row($id);
   if ($arr){
-    if ($big)
-    {
+    if ($big) {
       $donorpic = "starbig";
       $leechwarnpic = "leechwarnedbig";
       $warnedpic = "warnedbig";
       $disabledpic = "disabledbig";
       $style = "style='margin-left: 4pt'";
     }
-    else
-    {
+    else {
       $donorpic = "star";
       $leechwarnpic = "leechwarned";
       $warnedpic = "warned";
@@ -3160,17 +3161,40 @@ function get_username($id, $big = false, $link = true, $bold = true, $target = f
     else
       $pics .= "<img class=\"".$disabledpic."\" src=\"pic/trans.gif\" alt=\"Disabled\" ".$style." />\n";
 
-    $username = ($underline == true ? "<u>" . $arr['username'] . "</u>" : $arr['username']);
-    $username = ($bold == true ? "<b>" . $username . "</b>" : $username);
-    $username = ($link == true ? "<a ". $link_ext . " href=\"userdetails.php?id=" . $id . "\"" . ($target == true ? " target=\"_blank\"" : "") . " class='". get_user_class_name($arr['class'],true) . "_Name'>" . $username . "</a>" : $username) . $pics . ($withtitle == true ? " (" . ($arr['title'] == "" ?  get_user_class_name($arr['class'],false,true,true) : "<span class='".get_user_class_name($arr['class'],true) . "_Name'><b>".htmlspecialchars($arr['title'])) . "</b></span>)" : "");
+    $username = $arr['username'];
+    $name_style = '';
+    if ($bold) {
+      $name_style .= 'font-weight:bold;';
+    }
+    if ($underline) {
+      $name_style .= 'text-decoration:underline;';
+    }
+    if ($name_style) {
+      $link_ext .= ' style="' . $name_style . '"';
+    }
 
-    $username = "<span class=\"nowrap\">" . ( $bracket == true ? "(" . $username . ")" : $username) . "</span>";
+    if ($link) {
+      $link_ext .= ' class="'. get_user_class_name($arr['class'],true) . '_Name"';
+      $username = '<a ' . $link_ext . ' href="userdetails.php?id=' . $id . '">' . $username . '</a>';
+    }
+    $username .= $pics;
+
+    if ($withtitle) {
+      $username .= "(";
+      if ($arr['title'] == "") {
+	$username .= get_user_class_name($arr['class'],false,true,true);
+      }
+      else {
+	$username .= "<span class='".get_user_class_name($arr['class'],true) . "_Name'>".htmlspecialchars($arr['title']) . "</span>";
+      }
+      $username .= ")";
+    }
   }
-  else
-  {
-    $username = "<i>".$lang_functions['text_orphaned']."</i>";
-    $username = "<span class=\"nowrap\">" . ( $bracket == true ? "(" . $username . ")" : $username) . "</span>";
+  else {
+    $username = $lang_functions['text_orphaned'];
   }
+  $username = "<span class=\"nowrap\">" . ( $bracket == true ? "(" . $username . ")" : $username) . "</span>";
+  
   if (func_num_args() == 1) { //One argument=is default display of username, save it in static array
     $usernameArray[$id] = $username;
   }

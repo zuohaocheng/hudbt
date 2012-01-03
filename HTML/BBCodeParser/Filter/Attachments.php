@@ -33,15 +33,16 @@ class HTML_BBCodeParser_Filter_Attachments extends HTML_BBCodeParser_Filter {
     $id = $row['id'];
     if ($row['isimage'] == 1) {
 	if ($enableimage){
+	  $fullurl = '';
 	  if ($row['thumb'] == 1){
 	    $url = $httpdirectory_attachment."/".$row['location'].".thumb.jpg";
+	    $fullurl = ' full="' . $httpdirectory_attachment."/".$row['location'] . '"';
 	  }
 	  else{
 	    $url = $httpdirectory_attachment."/".$row['location'];
 	  }
 
-#	  $return = '<img class="scalable" id="attach'.$id."\" alt=\"".htmlspecialchars($row['filename'])."\" src=\"".$url."\"". " onmouseover=\"domTT_activate(this, event, 'content', '".htmlspecialchars("<strong>".$lang_functions['text_size']."</strong>: ".mksize($row['filesize'])."<br />".gettime($row['added']))."', 'styleClass', 'attach', 'x', findPosition(this)[0], 'y', findPosition(this)[1]-58);\" />";
-	  $return = '[img]' . $url . '[/img]';
+	  $return = '[img' . $fullurl . ']' . $url . '[/img]';
 	}
 	else $return = "";
       }

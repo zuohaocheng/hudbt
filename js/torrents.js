@@ -13,6 +13,8 @@ $(function() {
     var History = !ie;
 
     var args = argsFromUri(window.location.search);
+    var oripage = parseInt(args.page) || 0;
+
 
     var $sortHeaders = table.find('thead th:not(.unsortable)');
     var sortHeader = function(isJs) {
@@ -61,16 +63,13 @@ $(function() {
 		coltitle = '降序排序';
 	    }
 
-	    args.sort = col;
-	    args.type = sorttype;
-	    var sortUri = '?' + $.param(args);
-	    delete args.sort;
-	    delete args.type;
 	    $this.attr({
 		'class': sortclass,
 		title : coltitle
 	    }).unbind('click').click(function() {
-		getFromUriWithHistory(sortUri);
+		args.sort = col;
+		args.type = sorttype;
+		getFromUriWithHistory(args);
 	    });
 	});
     };
@@ -80,14 +79,14 @@ $(function() {
     });
     sortHeader(!hb.nextpage);
 
-    //Go to content
-    // var goToContent = (function() {
-    // 	var $top = $('#content-marker');
-    // 	return function() {
-    // 	    var top = $top.offset().top;
-    // 	    scrollToPosition(top);
-    // 	};
-    // })();
+//    Go to content
+    var goToContent = (function() {
+    	var $top = $('#content-marker');
+    	return function() {
+    	    var top = $top.offset().top;
+    	    scrollToPosition(top);
+    	};
+    })();
 
 
     //Spin loader
@@ -235,6 +234,22 @@ $(function() {
 	var catDict = hb['constant'].cat_class;
 	var targetsAppearance = [];
 	var tableLength = target.find('tr').length - 1;
+	var returnto = document.location.pathname + document.location.search;
+	if (isManager) {
+	    var page = argsFromUri(this.url).page;
+	    var pagesurfix = '';
+	    if (page) {
+		pagesurfix = 'page=' + page;
+
+		if (document.location.search) {
+		    returnto += '&' + pagesurfix;
+		}
+		else {
+		    returnto += '?' + pagesurfix;
+		}
+	    }
+	}
+	returnto = encodeURIComponent(returnto);
 	$.each(res.torrents, function(idx, torrent) {
 	    var id = torrent.id;
 	    var tr = '<tr>';
@@ -376,7 +391,7 @@ $(function() {
 		href = 'fastdelete.php?id=' + id;
 		var fastdelete = '<li><a href="' + href + '" class="staff-quick-delete"><img class="staff_delete" alt="D" src="pic/trans.gif" title="' + lang.text_delete + '" /></a></li>';
 
-		href = 'edit.php?id=' + id + '&returnto=' + encodeURIComponent(document.location.pathname + document.location.search);
+		href = 'edit.php?id=' + id + '&returnto=' + returnto;
 		var fastedit = '<li><a href="' + href + '"><img class="staff_edit" alt="E" src="pic/trans.gif" title="' + lang.text_edit + '" /></a></li>';
 
 		var edit = '<td><div class="minor-list-vertical"><ul>' + fastdelete + fastedit + '</ul></div></td>';
@@ -427,7 +442,7 @@ $(function() {
 		args = argsFromUri(uri);
 		$.getJSON(uri, function(res) {
 		    $('#pagerbottom').remove();
-		    get_func(res);
+		    $.proxy(get_func, this)(res);
 		});
 		$document.unbind('scroll');
     	    }
@@ -442,29 +457,34 @@ $(function() {
 	$('#torrents tbody tr').remove();
 	table.hide();
 	$('#stderr').remove();
-	args = argsFromUri(uri);
-	args.format = 'json';
-	$.getJSON('?' + $.param(args), function(result) {
+	$.getJSON('?' + $.param(uri), {format : 'json'}, function(result) {
 	    var targ = $('#outer');
 	    if (result.torrents.length) {
 		table.before(result.pager.top);
 		sortHeader(!result['continue']);
 		table.show();
 		table.after(result.pager.bottom);
+		$('.pages a').click(function(e) {
+		    e.preventDefault();
+		    var uri = argsFromUri(this.href);
+		    getFromUriWithHistory(uri);
+		});
 
 		$document.unbind('scroll');
-		get_func(result);
+		$.proxy(get_func, this)(result);
 	    }
 	    else {
 		loader(false);
 		targ.append('<div id="stderr"><h2>没有结果！</h2><div class="table td frame">没有种子:(</div></div>');
 	    }
-	    // goToContent();
+	    goToContent();
+	    oripage = parseInt(argsFromUri(document.location.search).page) || 0;
 	});
     };
 
     //Ajax search
-    var getFromUriWithHistory = function(uri) {
+    var getFromUriWithHistory = function(args) {
+	var uri = '?' + $.param(args);
 	var state = {
 	    title : document.title,
 	    url : uri
@@ -473,20 +493,19 @@ $(function() {
 	    window.history.pushState(state, document.title, uri);
 	}
 
-	getFromUri(uri);
+	getFromUri(args);
     };
 
     var searchboxform = $('#form-searchbox');
     searchboxform.submit(function(e) {
 	e.preventDefault();
-	var query = searchboxform.serialize();
-	var uri = 'torrents.php?' + query;
-	getFromUriWithHistory(uri);
+	var query = searchboxform.serializeArray();
+	getFromUriWithHistory(query);
     });
 
     $('a[href^="?"]').click(function(e) {
 	e.preventDefault();
-	var uri = this.href;
+	var uri = argsFromUri(this.href);
 	getFromUriWithHistory(uri);
     });
 
@@ -498,9 +517,8 @@ $(function() {
 	}
 	window.addEventListener('popstate', function(e){
             var initialPop = !(('state' in e) && e.state) && location.href == initialURL;
-	    console.log(initialPop);
             if (initialPop) return;
-    	    getFromUri(window.location.href);
+    	    getFromUri(argsFromUri(window.location.href));
 	}, false);
 	window.history.replaceState(state, document.title, initialURL);
 
@@ -508,12 +526,11 @@ $(function() {
 	    var rowHeight = target.find('tr').height() || 42;
 	    var offsetT = target.offset().top;
 	    var page = argsFromUri(document.location.search).page || 0;
-	    var oripage = parseInt(page);
 	    var onscroll = function() {
 		var loc = $document.scrollTop() - offsetT;
 		var row = loc / rowHeight + 5;
 		var npage = Math.floor(row / 50) + oripage;
-		if (npage != page && npage >= 0) {
+		if (npage != page && npage >= oripage) {
 		    args = argsFromUri(document.location.search);
 		    page = npage;
 		    args.page = page;

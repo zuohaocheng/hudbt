@@ -55,7 +55,7 @@ else {
   }
 }
 
-delete_single_torrent($id, $row);
+delete_single_torrent($id, $row, $reasonstr);
 
 stdhead($lang_delete['head_torrent_deleted']);
 

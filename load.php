@@ -156,7 +156,7 @@ function load_files_cache($name, $type, $debug, $purge) {
   }
   elseif ($type == 'css') {
     $css_uri = get_css_uri();
-    $files = array(get_font_css_uri(), 'styles/sprites.css', get_forum_pic_folder().'/forumsprites.css', $css_uri."theme.css", $css_uri."DomTT.css", 'pic/' . get_cat_folder() . "sprite.css", 'styles/jqui/ui-lightness/jquery-ui-1.8.16.custom.css', 'pic/2012newyear_logo.css');
+    $files = array(get_font_css_uri(), 'styles/sprites.css', get_forum_pic_folder().'/forumsprites.css', $css_uri."theme.css", $css_uri."DomTT.css", 'pic/' . get_cat_folder() . "sprite.css", 'styles/jqui/ui-lightness/jquery-ui-1.8.16.custom.css');
     $out .= load_files($files, $type, $debug, $purge, true);
 
     if ($CURUSER){
@@ -177,6 +177,7 @@ function load_files_cache($name, $type, $debug, $purge) {
 }
 
 function load_constant() {
+  //Consider lang
   global $Cache, $CURUSER;
   if (!$CURUSER) {
     return;

@@ -75,7 +75,8 @@ else {
 print("<pre style=\"font-size:10pt; font-family: 'Courier New', monospace;\">");
 }
 // Writes the (eventually modified) nfo data to output, first formating urls.
-print(format_urls($nfo));
+#print(format_urls($nfo));
+echo $nfo;
 print("</pre>\n");
 ?>
 </td></tr></table>

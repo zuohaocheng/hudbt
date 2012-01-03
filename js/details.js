@@ -15,7 +15,7 @@ $(function() {
     var peercount = $('#peercount');
     var peerlist = $('#peerlist');
 
-    var showpeerlist = function(href) {
+    var showpeerlist = function(href, scrollToTable) {
 	$.get(href, function(res) {
 	    peerlist.html(res);
 	    peerlist.slideDown();
@@ -24,6 +24,13 @@ $(function() {
 		hidepeer.fadeIn();
 	    });
 	    $('#peerlist table').tablesorter();
+	    if (scrollToTable && window.location.hash) {
+    		var scrollTar = $(window.location.hash);
+		if (scrollTar.length) {
+    		    var top = scrollTar.offset().top - 50;
+    		    scrollToPosition(top);
+		}
+	    }
 	}, 'html');
     };
     showpeer.click(function(e) {
@@ -41,6 +48,6 @@ $(function() {
     });
 
     if (argsFromUri(window.location.search).dllist) {
-	showpeerlist(showpeer.attr('href'));
+	showpeerlist(showpeer.attr('href'), true);
     }
 });

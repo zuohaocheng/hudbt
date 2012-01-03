@@ -47,7 +47,7 @@ else {
 	print("<input type=\"hidden\" name=\"id\" value=\"$id\" />");
 	if (isset($_GET["returnto"]))
 	print("<input type=\"hidden\" name=\"returnto\" value=\"" . htmlspecialchars($_GET["returnto"]) . "\" />");
-	print("<table style=\"margin:0 auto;\" border=\"1\" cellspacing=\"0\" cellpadding=\"5\" width=\"940\">\n");
+	print('<table style="margin:0 auto;width:95%;" border="1" cellspacing="0" cellpadding="5">');
 	print("<tr><td class='colhead' colspan='2' align='center'>".htmlspecialchars($row["name"])."</td></tr>");
 	tr($lang_edit['row_torrent_name']."<font color=\"red\">*</font>", "<input type=\"text\" style=\"width: 650px;\" name=\"name\" value=\"" . htmlspecialchars($row["name"]) . "\" />", 1);
 	if ($smalldescription_main == 'yes')

@@ -31,15 +31,16 @@ if ($action == 'delete')
 
 //  Add News Item    /////////////////////////////////////////////////////////
 
-if ($action == 'add')
-{
-	$body = htmlspecialchars($_POST['body'],ENT_QUOTES);
-	if (!$body)
-	stderr($lang_news['std_error'], $lang_news['std_news_body_empty']);
+if ($action == 'add') {
+	$body = $_POST['body'];
+	if (!$body) {
+	  stderr($lang_news['std_error'], $lang_news['std_news_body_empty']);
+	}
 
 	$title = htmlspecialchars($_POST['subject']);
-	if (!$title)
-	stderr($lang_news['std_error'], $lang_news['std_news_title_empty']);
+	if (!$title) {
+	  stderr($lang_news['std_error'], $lang_news['std_news_title_empty']);
+	}
 
 	$added = $_POST["added"];
 	if (!$added)
@@ -49,16 +50,15 @@ if ($action == 'add')
 		$notify = 'no'; 
 	sql_query("INSERT INTO news (userid, added, body, title, notify) VALUES (".sqlesc($CURUSER['id']) . ", $added, " . sqlesc($body) . ", " . sqlesc($title) . ", " . sqlesc($notify).")") or sqlerr(__FILE__, __LINE__);
 	$Cache->delete_value('recent_news',true);
-	if (mysql_affected_rows() != 1)
-	stderr($lang_news['std_error'], $lang_news['std_something_weird_happened']);	
+	if (mysql_affected_rows() != 1) {
+	  stderr($lang_news['std_error'], $lang_news['std_something_weird_happened']);
+	}
 	header("Location: " . get_protocol_prefix() . "$BASEURL/index.php");
 }
 
 //  Edit News Item    ////////////////////////////////////////////////////////
 
-if ($action == 'edit')
-{
-
+if ($action == 'edit') {
 	$newsid = 0+$_GET["newsid"];
 	int_check($newsid,true);
 
@@ -71,7 +71,7 @@ if ($action == 'edit')
 
 	if ($_SERVER['REQUEST_METHOD'] == 'POST')
 	{
-		$body = htmlspecialchars($_POST['body'],ENT_QUOTES);
+		$body = $_POST['body'];
 
 		if ($body == "")
 		stderr($lang_news['std_error'], $lang_news['std_news_body_empty']);

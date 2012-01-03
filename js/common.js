@@ -284,11 +284,17 @@ var scrollToPosition = (function() {
     return function(top) {
     	var goTop=setInterval(scrollMove,10);  
 	var buf = -1000;
-
+	var buf_pos = -1000;
+	
 	function scrollMove(){
 	    var pos = $document.scrollTop();
+	    if (pos != buf_pos && buf_pos >= 0) {
+		clearInterval(goTop);  
+	    }
+
 	    var diff = pos - top;
-	    $document.scrollTop(diff / 1.15 + top);
+	    $document.scrollTop(diff / 1.2 + top);
+	    buf_pos = $document.scrollTop();
 	    if(Math.abs(diff) < 1 || Math.abs(buf - pos) <1) {
 		clearInterval(goTop);  
 	    }
@@ -315,19 +321,9 @@ $(function() {
     if (navigator.appName=="Netscape") {
 	$('body').css('overflow-y', 'scroll');
     }
-    var ie6 = $.browser.msie && $.browser.version < 9;
+    var ie6 = $.browser.msie && $.browser.version < 7;
     var lightbox = $('#lightbox');
     var curtain = $('#curtain');
-
-    function Previewurl(url) {
-	if (!ie6){
-	    lightbox.html("<img src=\"" + url + "\" />").fadeIn();
-	    curtain.fadeIn();
-	}
-	else{
-	    window.open(url);
-	}
-    }
 
     lightbox.click(function () {
 	lightbox.hide();
@@ -335,7 +331,14 @@ $(function() {
     });
 
     $('img.scalable').click(function() {
-    	Previewurl(this.src);
+	var url = $(this).attr('full') || this.src;
+	if (!ie6){
+	    lightbox.html("<img src=\"" + url + "\" />").fadeIn();
+	    curtain.fadeIn();
+	}
+	else{
+	    window.open(url);
+	}
     });
 });
 
@@ -376,21 +379,3 @@ var argsFromUri = function(uri) {
     });
     return args;
 };
-
-$(function() {
-    var logo = $('#logo-img');
-    logo.attr({
-	'src' : 'pic/trans.gif'
-    });
-    var step = 0;
-    var interval = [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 1];
-    var change = function() {
-	step += 1;
-	if (step > interval.length) {
-	    step = 1;
-	}
-	logo.attr('class', 'logo-2012-' + step);
-	setTimeout(change, interval[step - 1] * 1000);
-    };
-    change();
-});

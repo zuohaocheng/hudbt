@@ -11,7 +11,7 @@ header("Content-Type: text/html; charset=utf-8");
 
 $id = 0 + $_GET['id'];
 if(isset($CURUSER)) {
-  function dltable($name, $res, $torrent) {
+  function dltable($name, $res, $torrent, $title_id) {
     global $lang_viewpeerlist,$viewanonymous_class,$userprofile_class,$enablelocation_tweak;
     global $CURUSER;
 
@@ -87,7 +87,7 @@ if(isset($CURUSER)) {
     }
     $s .= "</tbody></table>\n";
 
-    $out = "<b>" . $count . " $name</b>\n";
+    $out = '<h3 id="' . $title_id . '">' . $count . " $name</h3>\n";
     if ($count) {
       $out .= $s;
     }
@@ -100,7 +100,7 @@ if(isset($CURUSER)) {
   $res = sql_query("SELECT torrents.id, torrents.owner, torrents.size, torrents.anonymous FROM torrents WHERE torrents.id = $id LIMIT 1") or sqlerr();
   $row = mysql_fetch_array($res);
 
-  print(dltable($lang_viewpeerlist['text_seeders'], $seeders_res, $row));
-  print(dltable($lang_viewpeerlist['text_leechers'], $downloaders_res, $row));
+  print(dltable($lang_viewpeerlist['text_seeders'], $seeders_res, $row, 'seeders'));
+  print(dltable($lang_viewpeerlist['text_leechers'], $downloaders_res, $row, 'leechers'));
 }
 ?>

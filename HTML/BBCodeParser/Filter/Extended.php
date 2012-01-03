@@ -66,7 +66,7 @@ class HTML_BBCodeParser_Filter_Extended extends HTML_BBCodeParser_Filter
                                                 'attributes'=> array()),
 				'pre' => array('htmlopen'  => 'pre',
                                                 'htmlclose' => 'pre',
-                                                'allowed'   => 'none',
+                                                'allowed'   => 'none^url',
                                                 'attributes'=> array()),
                                 'h1' => array('htmlopen'  => 'h1',
                                                 'htmlclose' => 'h1',
@@ -118,7 +118,7 @@ class HTML_BBCodeParser_Filter_Extended extends HTML_BBCodeParser_Filter
    }
 
    function removeBr($s) {
-     $so = preg_replace('!<br />!', '', $s[1]);
+     $so = preg_replace('!<br />!', "\n", $s[1]);
      $so = preg_replace('!\[!', '&#91;', $so);
      $options = PEAR::getStaticProperty('HTML_BBCodeParser','_options');
      $o  = $options['open'];

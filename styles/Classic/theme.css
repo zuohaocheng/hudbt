@@ -910,6 +910,47 @@ input.text {
     padding: .4em;
 }
 
+#bonuses {
+    -moz-column-width:450px; 
+    -webkit-column-width:450px; 
+    column-width:450px;
+    margin-bottom: 2em;
+}
+
+.bonus-sub-group:first-child {
+    border-right: dashed 1px silver;
+}
+
+.bonus-item {
+    border-top: dotted 1px silver;
+    list-style: none;
+    list-style-type: none;
+    list-style-image: none;
+    margin: 1.5em 0 0 0;
+    padding: 0 1em;
+}
+
+.bonus-item:first-child {
+    border-top: none;
+    margin-top: 0.5em;
+}
+
+.bonus-item h3, .bonus-item h4 {
+    position: relative;
+    zoom: 1;
+}
+
+.bonus-price {
+    font-size: normal;
+    position: absolute;
+    top: 0;
+    right: 4em;
+}
+
+.bonus-opts {
+    margin-left: 1em;
+}
+
 .smiles li {
     width:20px;
 }
@@ -963,7 +1004,7 @@ input.text {
 .forum-post-body-container {
     position: relative;
     zoom: 1;
-    margin-left: 165px;
+    margin-left: 160px;
     margin-top: 0.5em;
 }
 
@@ -1040,7 +1081,7 @@ input.text {
 
 .forum-author-info {
     float:left;
-    width:150px;
+    width:130px;
 }
 
 .user-stats {
@@ -1055,6 +1096,10 @@ input.text {
 .post-avatar {
     text-align:center;
     margin-top:10px;
+}
+
+.forum-user-toolbox {
+    text-align:center;
 }
 
 .forum-post-toolbox {
