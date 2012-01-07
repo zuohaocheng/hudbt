@@ -53,6 +53,7 @@ else {
   if (!$reason[3]) {
     bark($lang_delete['std_enter_reason']);
   }
+  $reasonstr = $reason[3];
 }
 
 delete_single_torrent($id, $row, $reasonstr);

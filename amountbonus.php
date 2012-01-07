@@ -4,13 +4,13 @@ dbconn();
 loggedinorreturn();
 if (get_user_class() < UC_MODERATOR)
 stderr("Error", "Access denied.");
-if ($_SERVER["REQUEST_METHOD"] == "POST")
-{
-	if ($_POST['doit'] == 'yes') {
-		sql_query("UPDATE users SET seedbonus = seedbonus + 25.0 WHERE status='confirmed'");
-		stderr("Bonus", "25.0 bonus point is sent to everyone...");
-		die;
-	}
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  if ($_POST['doit'] == 'yes') {
+    $amount = 0 + $_POST['amount'];
+    sql_query("UPDATE users SET seedbonus = seedbonus + " . $amount . " WHERE status='confirmed'");
+    stderr("Bonus", $amount . " bonus point is sent to everyone...");
+    die;
+  }
 
 	if ($_POST["username"] == "" || $_POST["seedbonus"] == "" || $_POST["seedbonus"] == "")
 	stderr("Error", "Missing form data.");
@@ -40,15 +40,11 @@ print("<table width=100% border=1 cellspacing=0 cellpadding=5>\n");
 <?php end_table();?>
 </form>
 <?php end_main_frame();?>
-<?php begin_main_frame("Send 25.0 bonus point to everyone",false,30);?>
+<?php begin_main_frame("Send bonus point to everyone",false,30);?>
 <form action="amountbonus.php" method="post">
-<table width=100% border=1 cellspacing=0 cellpadding=5>
-<tr><td class="rowfollow" width="100%">
-Are you sure you want to give all confirmed users 25.0 extra bonus point?<br /><br /></td></tr>
-<tr><td class="toolbox" align="center"><input type = "hidden" name = "doit" value = "yes" />
-<input type="submit" class="btn" value="Yes" />
-</td></tr>
-<?php end_table();?>
+<input type="hidden" name = "doit" value = "yes" />
+<label for="bonus-amount">Amount: </label><input type="text" id="bonus-amount" name="amount" value="25" />
+<input type="submit" class="btn" value="OK" />
 </form>
 <?php
 end_main_frame();
