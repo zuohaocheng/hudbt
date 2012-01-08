@@ -1086,6 +1086,16 @@ input.text {
     top: 2px;
 }
 
+.forum-floor a {
+    display:inline-block;
+    max-width:300px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow: ellipsis;
+    display:inline !ie;
+    zoom: 1;
+}
+
 .forum-post, .forum-ad {
     width: 95%;
     margin: 0 auto;

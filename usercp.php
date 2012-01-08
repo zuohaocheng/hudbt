@@ -108,7 +108,7 @@ if ($action){
 					$avatar = htmlspecialchars( trim( $avatar ) );
 					$updateset[] = "avatar = " . sqlesc($avatar);
 				}
-				$info = htmlspecialchars(trim($_POST["info"]));
+				$info = trim($_POST["info"]);
 
 				$updateset[] = "parked = " . sqlesc($parked);
 				$updateset[] = "acceptpms = " . sqlesc($acceptpms);
@@ -175,7 +175,7 @@ if ($action){
 			,1);
 			//Modified by bluemonster 20111107
 			//tr_small($lang_usercp['row_pms'],$lang_usercp['text_accept_pms']."<input type=radio name=acceptpms" . ($CURUSER["acceptpms"] == "yes" ? " checked" : "") . " value=yes>".$lang_usercp['radio_all_except_blocks']."<input type=radio name=acceptpms" .  ($CURUSER["acceptpms"] == "friends" ? " checked" : "") . " value=friends>".$lang_usercp['radio_friends_only']."<input type=radio name=acceptpms" .  ($CURUSER["acceptpms"] == "no" ? " checked" : "") . " value=no>".$lang_usercp['radio_staff_only']."<br /><input type=checkbox name=deletepms" . ($CURUSER["deletepms"] == "yes" ? " checked" : "") . "> ".$lang_usercp['checkbox_delete_pms']."<br /><input type=checkbox name=savepms" . ($CURUSER["savepms"] == "yes" ? " checked" : "") . "> ".$lang_usercp['checkbox_save_pms']."<br /><input type=checkbox name=commentpm" . ($CURUSER["commentpm"] == "yes" ? " checked" : "") . " value=yes> ".$lang_usercp['checkbox_pm_on_comments'],1);
-			tr_small($lang_usercp['row_pms'],$lang_usercp['text_accept_pms']."<input type=radio name=acceptpms" . ($CURUSER["acceptpms"] == "yes" ? " checked" : "") . " value=yes>".$lang_usercp['radio_all_except_blocks']."<input type=radio name=acceptpms" .  ($CURUSER["acceptpms"] == "friends" ? " checked" : "") . " value=friends>".$lang_usercp['radio_friends_only']."<input type=radio name=acceptpms" .  ($CURUSER["acceptpms"] == "no" ? " checked" : "") . " value=no>".$lang_usercp['radio_staff_only']."<br /><input type=checkbox name=deletepms" . ($CURUSER["deletepms"] == "yes" ? " checked" : "") . "> ".$lang_usercp['checkbox_delete_pms']."<br /><input type=checkbox name=savepms" . ($CURUSER["savepms"] == "yes" ? " checked" : "") . "> ".$lang_usercp['checkbox_save_pms']."<br /><input type=checkbox name=commentpm" . ($CURUSER["commentpm"] == "yes" ? " checked" : "") . " value=yes>.".$lang_usercp['checkbox_pm_on_comments']."<br /><input type=checkbox name=accepttdpms".($CURUSER["accepttdpms"] == "yes" ? " checked" : "").">".$lang_usercp['checkbox_accepttdpms'],1);
+			tr_small($lang_usercp['row_pms'],$lang_usercp['text_accept_pms']."<input type=radio name=acceptpms" . ($CURUSER["acceptpms"] == "yes" ? " checked" : "") . " value=yes>".$lang_usercp['radio_all_except_blocks']."<input type=radio name=acceptpms" .  ($CURUSER["acceptpms"] == "friends" ? " checked" : "") . " value=friends>".$lang_usercp['radio_friends_only']."<input type=radio name=acceptpms" .  ($CURUSER["acceptpms"] == "no" ? " checked" : "") . " value=no>".$lang_usercp['radio_staff_only']."<br /><input type=checkbox name=deletepms" . ($CURUSER["deletepms"] == "yes" ? " checked" : "") . "> ".$lang_usercp['checkbox_delete_pms']."<br /><input type=checkbox name=savepms" . ($CURUSER["savepms"] == "yes" ? " checked" : "") . "> ".$lang_usercp['checkbox_save_pms']."<br /><input type=checkbox name=commentpm" . ($CURUSER["commentpm"] == "yes" ? " checked" : "") . " value=yes>".$lang_usercp['checkbox_pm_on_comments']."<br /><input type=checkbox name=accepttdpms".($CURUSER["accepttdpms"] == "yes" ? " checked" : "").">".$lang_usercp['checkbox_accepttdpms'],1);
 			
 			tr_small($lang_usercp['row_gender'],
 			"<input type=radio name=gender" . ($CURUSER["gender"] == "N/A" ? " checked" : "") . " value=N/A>".$lang_usercp['radio_not_available']."
@@ -605,11 +605,9 @@ tr_small($lang_usercp['row_funbox'],"<input type=checkbox name=showfb".($CURUSER
 		<b>".$lang_usercp['text_show_action_icons'].": </b><br />"."<input type=checkbox name=dlicon ".($CURUSER['dlicon'] == 'yes' ? " checked" : "")." value=yes>".$lang_usercp['text_show_download_icon']." <img class=\"download\" src=\"pic/trans.gif\"  alt=\"Download\" /><br /><input type=checkbox name=bmicon ".($CURUSER['bmicon'] == 'yes' ? " checked" : "")." value=yes>".$lang_usercp['text_show_bookmark_icon']." <img class=\"bookmark\" src=\"pic/trans.gif\" alt=\"Bookmark\" /><br />
 		<b>".$lang_usercp['text_comments_reviews'].": </b><br /><input type=checkbox name=showcomnum ".($CURUSER['showcomnum'] == 'yes' ? " checked" : "")." value=yes>".$lang_usercp['text_show_comment_number'].($showtooltipsetting ? "<select name=\"showlastcom\" style=\"width: 70px;\"><option value=\"yes\" ".($CURUSER['showlastcom'] != 'no' ? " selected" : "").">".$lang_usercp['select_with']."</option><option value=\"no\" ".($CURUSER['showlastcom'] == 'no' ? " selected" : "").">".$lang_usercp['select_without']."</option></select>".$lang_usercp['text_last_comment_on_tooltip'] : ""), 1);
 
-			submit();?>
-</table>
-<div style="display:none;" id="hints" title="提示"><p>改变主题后若没有效果，请多刷新几次，或清除缓存后即可。</p>
-<p>Firefox：按住Shift再点击刷新； Safari：点击刷新； Google Chrome / Opera：按住Shift再点击刷新； Internet Explorer：按住Ctrl再点击刷新。</p></div>
-<?php			stdfoot();
+			  submit();
+echo '</table>';
+			stdfoot();
 			die;
 			break;
 		case "forum":
@@ -849,6 +847,18 @@ if($CURUSER['id'] == GUEST_UID) {
 usercpmenu ();
 //Comment Results
 $commentcount = get_row_count("comments", "WHERE user=" . sqlesc($CURUSER["id"]));
+$res = sql_query('SELECT COUNT(*) FROM comments c INNER JOIN comments c1 ON c.quote = c1.id WHERE c1.user=' . sqlesc($CURUSER["id"])) or sqlerr(__FILE__, __LINE__);
+$a = mysql_fetch_row($res) or die(mysql_error());
+$quotedcommentcount = $a[0];
+
+$select = 'COUNT(*)';
+$from = 'posts p INNER JOIN posts p1 ON p.quote = p1.id INNER JOIN topics t ON p.topicid = t.id';
+$where = 'p1.userid = ' . $CURUSER['id'];
+$order = 'p.id DESC';
+$query = "SELECT $select FROM $from WHERE $where ORDER BY $order";
+$res = sql_query($query) or sqlerr(__FILE__, __LINE__);
+$arr = mysql_fetch_row($res);
+$quotedforumposts = $arr[0];
 
 //Join Date
 if ($CURUSER['added'] == "0000-00-00 00:00:00")
@@ -898,8 +908,11 @@ if ($prolinkpoint_bonus)
 tr_small($lang_usercp['row_invitations'],$CURUSER[invites]." [<a href=\"invite.php?id=".$CURUSER[id]."\" title=\"".$lang_usercp['link_send_invitation']."\">".$lang_usercp['text_send']."</a>]",1);
 tr_small($lang_usercp['row_karma_points'], $CURUSER['seedbonus']." [<a href=\"mybonus.php\" title=\"".$lang_usercp['link_use_karma_points']."\">".$lang_usercp['text_use']."</a>]", 1);
 tr_small($lang_usercp['row_written_comments'], $commentcount." [<a href=\"userhistory.php?action=viewcomments&id=".$CURUSER[id]."\" title=\"".$lang_usercp['link_view_comments']."\">".$lang_usercp['text_view']."</a>]", 1);
-if ($forumposts)
-	tr($lang_usercp['row_forum_posts'], $forumposts." [<a href=\"userhistory.php?action=viewposts&id=".$CURUSER[id]."\" title=\"".$lang_usercp['link_view_posts']."\">".$lang_usercp['text_view']."</a>] (".$dayposts.$lang_usercp['text_posts_per_day']."; ".$percentages.$lang_usercp['text_of_total_posts'].")", 1);
+tr_small($lang_usercp['row_quoted_comments'], $quotedcommentcount." [<a href=\"userhistory.php?action=viewquotedcomments&id=".$CURUSER[id]."\" title=\"".$lang_usercp['link_view_comments']."\">".$lang_usercp['text_view']."</a>]", 1);
+if ($forumposts) {
+  tr($lang_usercp['row_forum_posts'], $forumposts." [<a href=\"userhistory.php?action=viewposts&id=".$CURUSER[id]."\" title=\"".$lang_usercp['link_view_posts']."\">".$lang_usercp['text_view']."</a>] (".$dayposts.$lang_usercp['text_posts_per_day']."; ".$percentages.$lang_usercp['text_of_total_posts'].")", 1);
+  tr($lang_usercp['row_quoted_posts'], $quotedforumposts." [<a href=\"userhistory.php?action=viewquotedposts&id=".$CURUSER[id]."\" title=\"".$lang_usercp['link_view_posts']."\">".$lang_usercp['text_view']."</a>]", 1);
+}
 ?>
 </table>
 <table border="0" cellspacing="0" cellpadding="5" width=940>

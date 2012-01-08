@@ -12,7 +12,9 @@ $lang_comment_target = array
 	'msg_new_comment' => "新评论",
 	'msg_torrent_receive_comment' => "你发布的种子收到了新评论 ",
 	'msg_offer_receive_comment' => "你发布的候选收到了新评论 ",
-	'msg_request_receive_comment' => "你发布的求种收到了新评论 "
+	'msg_request_receive_comment' => "你发布的求种收到了新评论 ",
+	'msg_new_quotation' => "新引用",
+	'msg_new_comment_quotation' => "你的评论被引用了 ",
 	),
 	'cht' => array(
 	'msg_new_comment' => "新評論",

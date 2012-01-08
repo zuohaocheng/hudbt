@@ -12,7 +12,7 @@ $res = sql_query("SELECT seeders, last_reseed FROM torrents WHERE id=".sqlesc($r
 $row = mysql_fetch_array($res);
 if ($row['seeders'] > 0)
 	stderr($lang_takereseed['std_error'], $lang_takereseed['std_torrent_not_dead']);
-elseif (strtotime($row['last_reseed']) > (TIMENOW - 900))
+elseif (strtotime($row['last_reseed']) > (TIMENOW - 86400))
 	stderr($lang_takereseed['std_error'], $lang_takereseed['std_reseed_sent_recently']);
 else{
 $res = sql_query("SELECT snatched.userid, snatched.torrentid, torrents.name as torrent_name, users.id FROM snatched inner join users on snatched.userid = users.id inner join torrents on snatched.torrentid = torrents.id  where snatched.finished = 'Yes' AND snatched.torrentid = $reseedid") or sqlerr();

@@ -62,7 +62,7 @@ class HTML_BBCodeParser_Filter_Extended extends HTML_BBCodeParser_Filter
 						 'htmlopencallback' => array('HTML_BBCodeParser_Filter_Extended', 'quoteCallback')),
                                 'code' => array('htmlopen'  => 'code',
                                                 'htmlclose' => 'code',
-                                                'allowed'   => 'all',
+                                                'allowed'   => 'none^url',
                                                 'attributes'=> array()),
 				'pre' => array('htmlopen'  => 'pre',
                                                 'htmlclose' => 'pre',

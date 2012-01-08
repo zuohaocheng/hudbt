@@ -454,13 +454,13 @@ $limit = isset($_GET["lim"]) ? 0 + $_GET["lim"] : false;
 $subtype = isset($_GET["subtype"]) ? $_GET["subtype"] : false;
 
 print('<div class="minor-list list-seperator minor-nav"><ul><li>'  .
-($type == 1 && !$limit ? '<span class="gray">'.$lang_topten['text_users'].'</span>' : "<a href=\"topten.php?type=1\">".$lang_topten['text_users']."</a>") .	'</li><li>' .
-($type == 2 && !$limit ? '<span class="gray">'.$lang_topten['text_torrents'].'</span>' : "<a href=\"topten.php?type=2\">".$lang_topten['text_torrents']."</a>") . '</li><li>' .
-($type == 3 && !$limit ? '<span class="gray">'.$lang_topten['text_countries'].'</span>' : "<a href=\"topten.php?type=3\">".$lang_topten['text_countries']."</a>") . '</li><li>' .
-//($type == 4 && !$limit ? '<span class="gray">'.$lang_topten['text_peers'].'</span>' : "<a href=\"topten.php?type=4\">".$lang_topten['text_peers']."</a>")  . '</li><li>' .
-($type == 5 && !$limit ? '<span class="gray">'.$lang_topten['text_community'].'</span>' : "<a href=\"topten.php?type=5\">".$lang_topten['text_community']."</a>")  . '</li><li>' .
-//($type == 7 && !$limit ? '<span class="gray">'.$lang_topten['text_search'].'</span>' : "<a href=\"topten.php?type=7\">".$lang_topten['text_search']."</a>")  . '</li><li>' .
-($type == 6 && !$limit ? '<span class="gray">'.$lang_topten['text_other'].'</span>' : "<a href=\"topten.php?type=6\">".$lang_topten['text_other']."</a>")  . "</li></ul></div>\n");
+($type == 1 && !$limit ? '<span class="selected">'.$lang_topten['text_users'].'</span>' : "<a href=\"topten.php?type=1\">".$lang_topten['text_users']."</a>") .	'</li><li>' .
+($type == 2 && !$limit ? '<span class="selected">'.$lang_topten['text_torrents'].'</span>' : "<a href=\"topten.php?type=2\">".$lang_topten['text_torrents']."</a>") . '</li><li>' .
+($type == 3 && !$limit ? '<span class="selected">'.$lang_topten['text_countries'].'</span>' : "<a href=\"topten.php?type=3\">".$lang_topten['text_countries']."</a>") . '</li><li>' .
+//($type == 4 && !$limit ? '<span class="selected">'.$lang_topten['text_peers'].'</span>' : "<a href=\"topten.php?type=4\">".$lang_topten['text_peers']."</a>")  . '</li><li>' .
+($type == 5 && !$limit ? '<span class="selected">'.$lang_topten['text_community'].'</span>' : "<a href=\"topten.php?type=5\">".$lang_topten['text_community']."</a>")  . '</li><li>' .
+//($type == 7 && !$limit ? '<span class="selected">'.$lang_topten['text_search'].'</span>' : "<a href=\"topten.php?type=7\">".$lang_topten['text_search']."</a>")  . '</li><li>' .
+($type == 6 && !$limit ? '<span class="selected">'.$lang_topten['text_other'].'</span>' : "<a href=\"topten.php?type=6\">".$lang_topten['text_other']."</a>")  . "</li></ul></div>\n");
 
 if (!$limit || $limit > 250)
 $limit = 10;

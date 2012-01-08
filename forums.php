@@ -10,8 +10,7 @@ if ($enableextforum == 'yes') //check whether internal forum is disabled
 
 // ------------- start: functions ------------------//
 //print forum stats
-function forum_stats ()
-{
+function forum_stats () {
 	global $lang_forums, $Cache, $today_date;
 
 	if (!$activeforumuser_num = $Cache->get_value('active_forum_user_count')){
@@ -87,15 +86,15 @@ function get_topic_image($status= "read"){
 	}
 }
 
-function highlight_topic($subject, $hlcolor=0)
-{
+function highlight_topic($subject, $hlcolor=0) {
 	$colorname=get_hl_color($hlcolor);
-	if ($colorname)
-		$subject = "<b><font color=\"".$colorname."\">".$subject."</font></b>";
+	if ($colorname) {
+	  $subject = '<span style="font-weight:bold;color:' . $colorname . '">'.$subject."</span>";
+	}
 	return $subject;
 }
 
-function check_whether_exist($id, $place='forum'){
+function check_whether_exist($id, $place='forum') {
 	global $lang_forums;
 	int_check($id,true);
 	switch ($place){
@@ -137,20 +136,6 @@ function update_topic_last_post($topicid)
 	sql_query("UPDATE topics SET lastpost=".sqlesc($postid)." WHERE id=".sqlesc($topicid)) or sqlerr(__FILE__, __LINE__);
 }
 
-function get_forum_row($forumid = 0)
-{
-	global $Cache;
-	if (!$forums = $Cache->get_value('forums_list')){
-		$forums = array();
-		$res2 = sql_query("SELECT * FROM forums ORDER BY forid ASC, sort ASC") or sqlerr(__FILE__, __LINE__);
-		while ($row2 = mysql_fetch_array($res2))
-			$forums[$row2['id']] = $row2;
-		$Cache->cache_value('forums_list', $forums, 86400);
-	}
-	if (!$forumid)
-		return $forums;
-	else return $forums[$forumid];
-}
 function get_last_read_post_id($topicid) {
 	global $CURUSER, $Cache;
 	static $ret;
@@ -191,6 +176,7 @@ function insert_compose_frame($id, $type = 'new')
 	$subject = "";
 	$body = "";
 	print("<form id=\"compose\" method=\"post\" name=\"compose\" action=\"?action=post\">\n");
+	echo $addition;
 	switch ($type){
 		case 'new':
 		{
@@ -211,12 +197,16 @@ function insert_compose_frame($id, $type = 'new')
 			$topicname = get_single_value("topics","subject","WHERE id=".sqlesc($topicid));
 			$title = $lang_forums['text_reply_to_topic']." <a href=\"".htmlspecialchars("?action=viewtopic&topicid=".$topicid)."\">".htmlspecialchars($topicname)."</a> ";
 			$res = sql_query("SELECT posts.body, users.username FROM posts LEFT JOIN users ON posts.userid = users.id WHERE posts.id=$id") or sqlerr(__FILE__, __LINE__);
-			if (mysql_num_rows($res) != 1)
-				stderr($lang_forums['std_error'], $lang_forums['std_no_post_id']);
+			if (mysql_num_rows($res) != 1) {
+			  stderr($lang_forums['std_error'], $lang_forums['std_no_post_id']);
+			}
+
+			echo '<input type="hidden" name="quote" value="' . $id . '" />';
 			$arr = mysql_fetch_assoc($res);
 			$body = "[quote=".htmlspecialchars($arr["username"])."]".htmlspecialchars(dequote(unesc($arr["body"])))."[/quote]";
 			$id = $topicid;
 			$type = 'reply';
+
 			break;
 		}
 		case 'edit':
@@ -266,8 +256,7 @@ $today_date = date("Y-m-d",TIMENOW);
 $action = htmlspecialchars(trim($_GET["action"]));
 
 //-------- Action: New topic
-if ($action == "newtopic")
-{
+if ($action == "newtopic") {
 	$forumid = 0+$_GET["forumid"];
 	check_whether_exist($forumid, 'forum');
 	stdhead($lang_forums['head_new_topic']);
@@ -277,9 +266,8 @@ if ($action == "newtopic")
 	stdfoot();
 	die;
 }
-if ($action == "quotepost")
-{
-	$postid = 0+$_GET["postid"];
+elseif ($action == "quotepost") {
+	$postid = 0 + $_GET["postid"];
 	check_whether_exist($postid, 'post');
 	stdhead($lang_forums['head_post_reply']);
 	begin_main_frame();
@@ -291,8 +279,7 @@ if ($action == "quotepost")
 
 //-------- Action: Reply
 
-if ($action == "reply")
-{
+elseif ($action == "reply") {
 	$topicid = 0+$_GET["topicid"];
 	check_whether_exist($topicid, 'topic');
 	stdhead($lang_forums['head_post_reply']);
@@ -305,8 +292,7 @@ if ($action == "reply")
 
 //-------- Action: Edit post
 
-if ($action == "editpost")
-{
+elseif ($action == "editpost") {
 	$postid = 0+$_GET["postid"];
 	check_whether_exist($postid, 'post');
 
@@ -330,18 +316,19 @@ if ($action == "editpost")
 }
 
 //-------- Action: Post
-if ($action == "post")
-{
+elseif ($action == "post") {
 	if ($CURUSER["forumpost"] == 'no')
 	{
 		stderr($lang_forums['std_sorry'], $lang_forums['std_unauthorized_to_post'],false);
 		die;
 	}
-	$id = $_POST["id"];
+	$id = 0 + $_REQUEST["id"];
 	$type = $_POST["type"];
 	$subject = $_POST["subject"];
 	$body = trim($_POST["body"]);
 	$hassubject = false;
+	$quote = 'NULL';
+
 	switch ($type){
 		case 'new':
 		{
@@ -355,6 +342,16 @@ if ($action == "post")
 			check_whether_exist($id, 'topic');
 			$topicid = $id;
 			$forumid = get_single_value("topics", "forumid", "WHERE id=".sqlesc($topicid));
+
+			if (array_key_exists('quote', $_REQUEST)) {
+			  $quote = 0 + $_REQUEST['quote'];
+			  $res = sql_query('SELECT p.userid FROM posts p INNER JOIN users u ON p.userid=u.id WHERE p.id=' . $quote . ' AND p.topicid=' . $id) or sqlerr(__FILE__, __LINE__);
+			  if (mysql_num_rows($res) != 1) {
+			    $quote = 'NULL';
+			  }
+			  $quoteduser = mysql_fetch_array($res);
+			}
+
 			break;
 		}
 		case 'edit':
@@ -429,7 +426,7 @@ if ($action == "post")
 				stderr($lang_forums['std_error'],$lang_forums['std_post_flooding'].$secs.$lang_forums['std_seconds_before_making'],false);
 			}
 		}
-		if ($type == 'new'){ //new topic
+		if ($type == 'new') { //new topic
 			//add bonus
 			KPS("+",$starttopic_bonus,$userid);
 
@@ -438,14 +435,14 @@ if ($action == "post")
 			$topicid = mysql_insert_id() or stderr($lang_forums['std_error'],$lang_forums['std_no_topic_id_returned']);
 			sql_query("UPDATE forums SET topiccount=topiccount+1, postcount=postcount+1 WHERE id=".sqlesc($forumid));
 		}
-		else // new post
-		{
+		else { // new post
 			//add bonus
 			KPS("+",$makepost_bonus,$userid);
 			sql_query("UPDATE forums SET postcount=postcount+1 WHERE id=".sqlesc($forumid));
 		}
 
-		sql_query("INSERT INTO posts (topicid, userid, added, body, ori_body) VALUES ($topicid, $userid, ".sqlesc($date).", ".sqlesc($body).", ".sqlesc($body).")") or sqlerr(__FILE__, __LINE__);
+		$values = array($topicid, $userid, sqlesc($date), sqlesc($body), sqlesc($body), $quote);
+		sql_query("INSERT INTO posts (topicid, userid, added, body, ori_body, quote) VALUES (" . implode(',', $values) . ')') or sqlerr(__FILE__, __LINE__);
 		$postid = mysql_insert_id() or die($lang_forums['std_post_id_not_available']);
 		$Cache->delete_value('forum_'.$forumid.'_post_'.$today_date.'_count');
 		$Cache->delete_value('today_'.$today_date.'_posts_count');
@@ -453,8 +450,7 @@ if ($action == "post")
 		$Cache->delete_value('topic_'.$topicid.'_post_count');
 		$Cache->delete_value('user_'.$userid.'_post_count');
 
-		if ($type == 'new')
-		{
+		if ($type == 'new') {
 			// update the first post of topic
 			sql_query("UPDATE topics SET firstpost=$postid, lastpost=$postid WHERE id=".sqlesc($topicid)) or sqlerr(__FILE__, __LINE__);
 		}
@@ -478,8 +474,7 @@ if ($action == "post")
 
 //-------- Action: View topic
 
-if ($action == "viewtopic")
-{
+elseif ($action == "viewtopic") {
 	$highlight = htmlspecialchars(trim($_GET["highlight"]));
 
 	$topicid = 0+$_GET["topicid"];
@@ -518,14 +513,13 @@ if ($action == "viewtopic")
 	$row = get_forum_row($forumid);
 	//------ Get forum name, moderators
 	$forumname = $row['name'];
-	$is_forummod = is_forum_moderator($forumid,'forum');
 
-	if (get_user_class() < $row["minclassread"])
-		stderr($lang_forums['std_error'], $lang_forums['std_unpermitted_viewing_topic']);
-	if (((get_user_class() >= $row["minclasswrite"] && !$locked) || get_user_class() >= $postmanage_class || $is_forummod) && $CURUSER["forumpost"] == 'yes')
-		$maypost = true;
-	else $maypost = false;
-
+	list($read, $maypost, $maymodify) = get_forum_privilege($forumid, $locked);
+	if (!$read) {
+	  stderr($lang_forums['std_error'], $lang_forums['std_unpermitted_viewing_topic']);
+	}
+	
+	
 	//------ Update hits column
 	sql_query("UPDATE topics SET views = views + 1 WHERE id=$topicid") or sqlerr(__FILE__, __LINE__);
 
@@ -539,15 +533,10 @@ if ($action == "viewtopic")
 	$pages = ceil($postcount / $postsperpage);
 
 	if ($page[0] == "p") {
-	  $findpost = substr($page, 1);
-	  $res = sql_query("SELECT id FROM posts $where ORDER BY added") or sqlerr(__FILE__, __LINE__);
-	  $i = 0;
-	  while ($arr = mysql_fetch_row($res)) {
-	    if ($arr[0] == $findpost) {
-	      break;
-	    }
-	    ++$i;
-	  }
+	  $findpost = 0 + substr($page, 1);
+	  $res = sql_query("SELECT COUNT(*) FROM posts $where AND id < $findpost ORDER BY added") or sqlerr(__FILE__, __LINE__);
+	  $arr = mysql_fetch_row($res);
+	  $i = $arr[0];
 	  $page = floor($i / $postsperpage);
 	}
 	elseif ($page === "last") {
@@ -617,33 +606,25 @@ if ($action == "viewtopic")
 	  $posterid = $arr["userid"];
 
 	  if ($pn == $pc) {
-	      if ($postid > $lpr) {
-		if ($lpr == $CURUSER['last_catchup']) // There is no record of this topic
-		  sql_query("INSERT INTO readposts(userid, topicid, lastpostread) VALUES (".$userid.", ".$topicid.", ".$postid.")") or sqlerr(__FILE__, __LINE__);
-		elseif ($lpr > $CURUSER['last_catchup']) //There is record of this topic
-		  sql_query("UPDATE readposts SET lastpostread=$postid WHERE userid=$userid AND topicid=$topicid") or sqlerr(__FILE__, __LINE__);
-		$Cache->delete_value('user_'.$CURUSER['id'].'_last_read_post_list');
+	    if ($postid > $lpr) {
+	      if ($lpr == $CURUSER['last_catchup']) { // There is no record of this topic
+		sql_query("INSERT INTO readposts(userid, topicid, lastpostread) VALUES (".$userid.", ".$topicid.", ".$postid.")") or sqlerr(__FILE__, __LINE__);
 	      }
+	      elseif ($lpr > $CURUSER['last_catchup']) { //There is record of this topic
+		sql_query("UPDATE readposts SET lastpostread=$postid WHERE userid=$userid AND topicid=$topicid") or sqlerr(__FILE__, __LINE__);
+	      }
+	      $Cache->delete_value('user_'.$CURUSER['id'].'_last_read_post_list');
 	    }
-
-	  $editor = $arr['editedby'];
-	  if (!is_valid_id($editor)) {
-	    $edit = false;
-	  }
-	  else {
-	    $edit = array('editor' => $editor, 'date' => $arr['editdate']);
 	  }
 
-	  $privilege = array($maypost, (get_user_class() >= $postmanage_class || $is_forummod), (($CURUSER["id"] == $posterid && !$locked) || get_user_class() >= $postmanage_class || $is_forummod));
-
-	  $post_f = array('type' => 'post', 'posterid' => $posterid, 'topicid' => $topicid, 'postid' => $postid, 'added' => $arr['added'], 'floor' => $pn + $offset, 'body' => $arr['body'], 'highlight' => $highlight, 'edit' => $edit, 'last' => ($pn == $pc));
-	  echo post_format($post_f, $privilege);
+	  $arr['topicid'] = $topicid;
+	  single_post($arr, $maypost, $maymodify, $locked, $highlight, ($pn == $pc), ($pn + $offset));
 	}
 	echo '</ol></div>';
 
 	//------ Mod options
 
-	if (get_user_class() >= $postmanage_class || $is_forummod) {
+	if ($maymodify) {
 		print('<div id="forum-toolbox" class="minor-list"><ul>');
 		print("<li><form method=\"post\" action=\"?action=setsticky\">\n");
 		print("<input type=\"hidden\" name=\"topicid\" value=\"".$topicid."\" />\n");
@@ -734,8 +715,7 @@ if ($action == "viewtopic")
 
 //-------- Action: Move topic
 
-if ($action == "movetopic")
-{
+elseif ($action == "movetopic") {
 	$forumid = 0+$_POST["forumid"];
 
 	$topicid = 0+$_GET["topicid"];
@@ -790,8 +770,7 @@ if ($action == "movetopic")
 
 //-------- Action: Delete topic
 
-if ($action == "deletetopic")
-{
+elseif ($action == "deletetopic") {
 	$topicid = 0+$_GET["topicid"];
 	$res1 = sql_query("SELECT forumid, userid FROM topics WHERE id=".sqlesc($topicid)." LIMIT 1") or sqlerr(__FILE__, __LINE__);
 	$row1 = mysql_fetch_array($res1);
@@ -834,8 +813,7 @@ if ($action == "deletetopic")
 
 //-------- Action: Delete post
 
-if ($action == "deletepost")
-{
+elseif ($action == "deletepost") {
 	$postid = 0+$_GET["postid"];
 	$sure = 0+$_GET["sure"];
 
@@ -893,8 +871,7 @@ if ($action == "deletepost")
 
 //-------- Action: Set locked on/off
 
-if ($action == "setlocked")
-{
+elseif ($action == "setlocked") {
 	$topicid = 0 + $_POST["topicid"];
 	$ismod = is_forum_moderator($topicid,'topic');
 	if (!$topicid || (get_user_class() < $postmanage_class && !$ismod))
@@ -907,8 +884,7 @@ if ($action == "setlocked")
 	die;
 }
 
-if ($action == 'hltopic')
-{
+elseif ($action == 'hltopic') {
 	$topicid = 0 + $_GET["topicid"];
 	$ismod = is_forum_moderator($topicid,'topic');
 	if (!$topicid || (get_user_class() < $postmanage_class && !$ismod))
@@ -927,8 +903,7 @@ if ($action == 'hltopic')
 
 //-------- Action: Set sticky on/off
 
-if ($action == "setsticky")
-{
+elseif ($action == "setsticky") {
 	$topicid = 0 + $_POST["topicid"];
 	$ismod = is_forum_moderator($topicid,'topic');
 	if (!topicid || (get_user_class() < $postmanage_class && !$ismod))
@@ -943,8 +918,7 @@ if ($action == "setsticky")
 
 //-------- Action: View forum
 
-if ($action == "viewforum")
-{
+elseif ($action == "viewforum") {
 	$forumid = 0+$_GET["forumid"];
 	int_check($forumid,true);
 	$userid = 0+$CURUSER["id"];
@@ -1164,8 +1138,7 @@ if ($action == "viewforum")
 
 //-------- Action: View unread posts
 
-if ($action == "viewunread")
-{
+elseif ($action == "viewunread") {
 	$userid = $CURUSER['id'];
 
 	$beforepostid = 0+$_GET['beforepostid'];
@@ -1224,8 +1197,7 @@ if ($action == "viewunread")
 	die;
 }
 
-if ($action == "search")
-{
+elseif ($action == "search") {
 	stdhead($lang_forums['head_forum_search']);
 	unset($error);
 	$error = true;
@@ -1312,20 +1284,22 @@ if ($action == "search")
 stdfoot();
 die;
 }
-
+else {
 if ($_GET["catchup"] == 1){
 	catch_up();
 }
 
 //-------- Handle unknown action
-if ($action != "")
-	stderr($lang_forums['std_forum_error'], $lang_forums['std_unknown_action']);
+/* elseif ($action != "") { */
+/* 	stderr($lang_forums['std_forum_error'], $lang_forums['std_unknown_action']); */
+/* } */
 
 //-------- Default action: View forums
 
 //-------- Get forums
-if ($CURUSER)
+if ($CURUSER) {
 	$USERUPDATESET[] = "forum_access = ".sqlesc(date("Y-m-d H:i:s"));
+}
 
 stdhead($lang_forums['head_forums']);
 
@@ -1445,9 +1419,9 @@ if ($showforumstats_main == "yes"){
 
 
 stdfoot();
-?>
 
-<?php
+}
+
 function showSearch(){
    global $lang_forums, $Cache, $today_date;
 //	stdhead($lang_forums['head_forum_search']);

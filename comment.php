@@ -19,11 +19,23 @@ function check_comment_type($type)
 
 check_comment_type($type);
 
-if ($action == "add")
-{
+if ($action == "add") {
 
-	if ($_SERVER["REQUEST_METHOD"] == "POST")
-	{
+  if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    function href() {
+      global $type, $arr, $parent_id, $BASEURL, $newid;
+      if($type == "torrent") {
+	return get_protocol_prefix() . "$BASEURL/details.php?id=$parent_id&page=p$newid#cid$newid";
+      }
+      elseif($type == "offer") {
+	return get_protocol_prefix() . "$BASEURL/offers.php?id=$parent_id&off_details=1";
+      }
+      elseif($type == "request") {
+	return get_protocol_prefix() . "$BASEURL/viewrequests.php?id=$parent_id&off_details=1";
+      }
+      return '';
+    }
+      
 		// Anti Flood Code
 		// This code ensures that a member can only send one comment per minute.
 		if (get_user_class() < $commanage_class) {
@@ -52,43 +64,75 @@ if ($action == "add")
 		if (!$text)
 			stderr($lang_comment['std_error'], $lang_comment['std_comment_body_empty']);
 
-		if($type == "torrent"){
-			sql_query("INSERT INTO comments (user, torrent, added, text, ori_text) VALUES (" .$CURUSER["id"] . ",$parent_id, '" . date("Y-m-d H:i:s") . "', " . sqlesc($text) . "," . sqlesc($text) . ")");
-			$Cache->delete_value('torrent_'.$parent_id.'_last_comment_content');
+		$quote = 'NULL';
+		if (array_key_exists('quote', $_REQUEST)) {
+		  $quote = 0 + $_REQUEST['quote'];
+		  $where = '';
+		  if($type == "torrent") {
+		    $where = ' AND c.torrent=' . $parent_id;
+		  }
+		  elseif($type == "offer") {
+		    $where = ' AND c.offer=' . $parent_id;
+		  }
+		  elseif($type == "request") {
+		    $where = ' AND c.request=' . $parent_id;
+		  }
+		  $res = sql_query('SELECT c.user, u.commentpm FROM comments c INNER JOIN users u ON c.user = u.id WHERE c.id=' . $quote . $where ) or sqlerr(__FILE__, __LINE__);
+		  if (mysql_num_rows($res) != 1) {
+		    $quote = 'NULL';
+		  }
+		  $quoteduser = mysql_fetch_array($res);
 		}
-		elseif($type == "offer"){
-			sql_query("INSERT INTO comments (user, offer, added, text, ori_text) VALUES (" .$CURUSER["id"] . ",$parent_id, '" . date("Y-m-d H:i:s") . "', " . sqlesc($text) . "," . sqlesc($text) . ")");
+		
+		$values = array($CURUSER["id"], $parent_id, "'" . date("Y-m-d H:i:s") . "'", sqlesc($text), sqlesc($text), $quote);
+		if ($type == "torrent"){
+		  sql_query("INSERT INTO comments (user, torrent, added, text, ori_text, quote) VALUES (" . implode(',', $values) . ")");
+		  $Cache->delete_value('torrent_'.$parent_id.'_last_comment_content');
+		}
+		elseif ($type == "offer") {
+		  sql_query("INSERT INTO comments (user, offer, added, text, ori_text, quote) VALUES (" . implode(',', $values) . ")");
 			$Cache->delete_value('offer_'.$parent_id.'_last_comment_content');
 		}
-		elseif($type == "request")
-			sql_query("INSERT INTO comments (user, request, added, text, ori_text) VALUES (" .$CURUSER["id"] . ",$parent_id, '" . date("Y-m-d H:i:s") . "', " . sqlesc($text) . "," . sqlesc($text) . ")");
+		elseif ($type == "request") {
+		  sql_query("INSERT INTO comments (user, request, added, text, ori_text, quote) VALUES (" . implode(',', $values) . ")");
+		}
 
 		$newid = mysql_insert_id();
+		if($type == "torrent") {
+		  sql_query("UPDATE torrents SET comments = comments + 1 WHERE id = $parent_id");
+		}
+		elseif($type == "offer") {
+		  sql_query("UPDATE offers SET comments = comments + 1 WHERE id = $parent_id");
+		}
+		elseif($type == "request") {
+		  sql_query("UPDATE requests SET comments = comments + 1 WHERE id = $parent_id");
+		}
 
-		if($type == "torrent")
-			sql_query("UPDATE torrents SET comments = comments + 1 WHERE id = $parent_id");
-		else if($type == "offer")
-			sql_query("UPDATE offers SET comments = comments + 1 WHERE id = $parent_id");
-		else if($type == "request")
-			sql_query("UPDATE requests SET comments = comments + 1 WHERE id = $parent_id");
+		if($quoteduser["commentpm"] == 'yes' && $quoteduser['user'] != $CURUSER['id'] && $quoteduser['user'] != $arr['owner']) {
+		  $target = $quoteduser['user'];
+		  $content = $lang_comment_target[get_user_lang($target)]['msg_new_comment_quotation'] . '[url=' . href() . ']' . $arr['name'] . '[/url]';
+
+		  send_pm($CURUSER['id'], $quoteduser['user'], $lang_comment_target[get_user_lang($target)]['msg_new_quotation'], $content);
+		}
 
 		$ras = sql_query("SELECT commentpm FROM users WHERE id = $arr[owner]") or sqlerr(__FILE__,__LINE__);
 		$arg = mysql_fetch_array($ras);
 
-		if($arg["commentpm"] == 'yes' && $CURUSER['id'] != $arr["owner"])
-		{
-			$added = sqlesc(date("Y-m-d H:i:s"));
-			$subject = sqlesc($lang_comment_target[get_user_lang($arr["owner"])]['msg_new_comment']);
-			if($type == "torrent")
-			$notifs = sqlesc($lang_comment_target[get_user_lang($arr["owner"])]['msg_torrent_receive_comment'] . " [url=" . get_protocol_prefix() . "$BASEURL/details.php?id=$parent_id] " . $arr['name'] . "[/url].");
-			if($type == "offer")
-			$notifs = sqlesc($lang_comment_target[get_user_lang($arr["owner"])]['msg_torrent_receive_comment'] . " [url=" . get_protocol_prefix() . "$BASEURL/offers.php?id=$parent_id&off_details=1] " . $arr['name'] . "[/url].");
-			if($type == "request")
-			$notifs = sqlesc($lang_comment_target[get_user_lang($arr["owner"])]['msg_torrent_receive_comment'] . " [url=" . get_protocol_prefix() . "$BASEURL/viewrequests.php?id=$parent_id&req_details=1] " . $arr['name'] . "[/url].");
+		if($arg["commentpm"] == 'yes' && $CURUSER['id'] != $arr["owner"]) {
+		  $subject = $lang_comment_target[get_user_lang($arr["owner"])]['msg_new_comment'];
+		  if($type == "torrent") {
+		    $notifs = $lang_comment_target[get_user_lang($arr["owner"])]['msg_torrent_receive_comment'] . " [url=" . href() . ']' . $arr['name'] . "[/url].";
+		  }
+		  elseif($type == "offer") {
+		    $notifs = $lang_comment_target[get_user_lang($arr["owner"])]['msg_torrent_receive_comment'] . " [url=" . href() . "] " . $arr['name'] . "[/url].";
+		  }
+		  elseif($type == "request") {
+		    $notifs = $lang_comment_target[get_user_lang($arr["owner"])]['msg_torrent_receive_comment'] .  " [url=" . href() . "] " . $arr['name'] . "[/url].";
+		  }
 
-			sql_query("INSERT INTO messages (sender, receiver, subject, msg, added) VALUES(0, " . $arr['owner'] . ", $subject, $notifs, $added)") or sqlerr(__FILE__, __LINE__);
-			$Cache->delete_value('user_'.$arr['owner'].'_unread_message_count');
-			$Cache->delete_value('user_'.$arr['owner'].'_inbox_count');
+		  send_pm($CURUSER['id'], $arr['owner'], $subject, $notifs);
+		  $Cache->delete_value('user_'.$arr['owner'].'_unread_message_count');
+		  $Cache->delete_value('user_'.$arr['owner'].'_inbox_count');
 		}
 
 		KPS("+",$addcomment_bonus,$CURUSER["id"]);
@@ -96,20 +140,23 @@ if ($action == "add")
 		// Update Last comment sent...
 		sql_query("UPDATE users SET last_comment = NOW() WHERE id = ".sqlesc($CURUSER['id'])) or sqlerr(__FILE__, __LINE__);
 
-		if($type == "torrent")
-			header("Refresh: 0; url=details.php?id=$parent_id#$newid");
-		else if($type == "offer")
-			header("Refresh: 0; url=offers.php?id=$parent_id&off_details=1#$newid");
-		else if($type == "request")
-			header("Refresh: 0; url=viewrequests.php?id=$parent_id&req_details=1#$newid");
+		if($type == "torrent") {
+		  header("Refresh: 0; url=details.php?id=$parent_id#cid$newid");
+		}
+		else if($type == "offer") {
+		  header("Refresh: 0; url=offers.php?id=$parent_id&off_details=1#cid$newid");
+		}
+		else if($type == "request") {
+		  header("Refresh: 0; url=viewrequests.php?id=$parent_id&req_details=1#cid$newid");
+		}
 		die;
 	}
 
 	$parent_id = 0 + $_GET["pid"];
 	int_check($parent_id,true);
 
-	if($sub == "quote")
-	{
+	$quote_input = '';
+	if($sub == "quote") {
 		$commentid = 0 + $_GET["cid"];
 		int_check($commentid,true);
 
@@ -119,6 +166,7 @@ if ($action == "add")
 			stderr($lang_forums['std_error'], $lang_forums['std_no_comment_id']);
 
 		$arr2 = mysql_fetch_assoc($res2);
+		$quote_input = '<input type="hidden" name="quote" value="' . $commentid . '" />';
 	}
 
 	if($type == "torrent"){
@@ -142,6 +190,9 @@ if ($action == "add")
 	$title = $lang_comment['text_add_comment_to']."<a href=$url>". htmlspecialchars($arr["name"]) . "</a>";
 	print("<form id=compose method=post name=\"compose\" action=\"comment.php?action=add&type=$type\">\n");
 	print("<input type=\"hidden\" name=\"pid\" value=\"$parent_id\"/>\n");
+	if ($sub == "quote") {
+	  echo $quote_input;
+	}
 	begin_compose($title, ($sub == "quote" ? "quote" : "reply"), ($sub == "quote" ? htmlspecialchars("[quote=".htmlspecialchars($arr2["username"])."]".unesc($arr2["text"])."[/quote]") : ""), false);
 	end_compose();
 	print("</form>");

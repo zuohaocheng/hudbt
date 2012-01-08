@@ -13,7 +13,7 @@ $tokens = preg_split('/\./', $fullname);
 $type = array_pop($tokens);
 $name = implode('.', $tokens);
 
-if ($type == 'php') {
+if ($type == 'php' || $fullname == '') {
   $multifile = true;
   $type = $format;
 }
@@ -23,6 +23,9 @@ if ($type == 'js') {
 }
 elseif ($type == 'css') {
   header('Content-type: text/css');
+  $font = $_REQUEST['font'];
+  $theme = 0 + $_REQUEST['theme'];
+  $caticon = 0 + $_REQUEST['caticon'];
 }
 else {
   die('Invalid format');
@@ -90,38 +93,28 @@ if (!$lastMode && !$debug) {
 echo $out;
 
 function generate_key($name, $type, $multiple) {
-    $key = 'load_';
+  $key = 'load_';
   if ($multiple) {
     $key .= 'm_';
   }
-  $key .= $name . $type;
   if ($type =='css' && $multiple) {
-    $key .= '_' . get_font_type() . '-' . get_css_uri() . '-' . get_cat_folder();
+    global $font, $theme, $caticon;
+    $key .= 'css_' . $font . '-' . $theme . '-' . $caticon;
+  }
+  else {
+    $key .= $name . $type;
   }
   return $key;
 }
 
-function dependence($name, $type) {
-  $jqsorter = array(
-		    'js' => array('jquery.tablesorter'),
-		    'css' => array('jquery.tablesorter/jquery.tablesorter'));
+function dependence($name) {
   $dependence = array(
-		    'torrents' => array(
-					'js' => array('jquery.json-2.3.min', 'jstorage.min', 'jquery.tablesorter'),
-					'css' => array('jquery.tablesorter/jquery.tablesorter')),
-		    'uploaders' => $jqsorter,
-		    'userdetails' => $jqsorter,
-		    'details' => $jqsorter,
-		    'topten' => $jqsorter,
-		    'bonusdonations' => $jqsorter
+		    'torrents' => array('jquery.json-2.3.min', 'jstorage.min'),
 		    );
 
   $dep = $dependence[$name];
   if ($dep) {
-    $dep_t = $dep[$type];
-    if ($dep_t) {
-      return $dep_t;
-    }
+    return $dep;
   }
   return array();
 }
@@ -146,17 +139,18 @@ function load_files_cache($name, $type, $debug, $purge) {
 
   if ($type == 'js') {
     //Mind the sequence of loading
-    $out .= load_files(array('jquery-1.7.1.min', 'jquery-ui-1.8.16.custom.min'), $type, $debug, $purge, false, false);
+    $out .= load_files(array('jquery-1.7.1.min', 'jquery-ui-1.8.16.custom.min', 'jquery.tablesorter'), $type, $debug, $purge, false, false);
     $out .= load_files(array('ajaxbasic', 'common', 'domLib', 'domTT', 'domTT_drag', 'fadomatic'), $type, $debug, $purge);
 
-    $out .= load_files(dependence($name, $type), $type, $debug, $purge);
+    $out .= load_files(dependence($name), $type, $debug, $purge);
     $out .= load_files(array($name), $type, $debug, $purge);
     $out .= ";/* constants */";
     $out .= load_constant();
   }
   elseif ($type == 'css') {
-    $css_uri = get_css_uri();
-    $files = array(get_font_css_uri(), 'styles/sprites.css', get_forum_pic_folder().'/forumsprites.css', $css_uri."theme.css", $css_uri."DomTT.css", 'pic/' . get_cat_folder() . "sprite.css", 'styles/jqui/ui-lightness/jquery-ui-1.8.16.custom.css');
+    global $font, $theme, $caticon;
+    $css_uri = get_css_uri('', $theme);
+    $files = array(get_font_css_uri($font), 'styles/sprites.css', get_forum_pic_folder().'/forumsprites.css', $css_uri."theme.css", $css_uri."DomTT.css", 'pic/' . get_cat_folder(401, $caticon) . "sprite.css", 'styles/jqui/ui-lightness/jquery-ui-1.8.16.custom.css', 'styles/jquery.tablesorter/jquery.tablesorter.css');
     $out .= load_files($files, $type, $debug, $purge, true);
 
     if ($CURUSER){
@@ -166,7 +160,6 @@ function load_files_cache($name, $type, $debug, $purge) {
 	load_file_cache($file, $type, $debug, $purge, true);
       }
     }
-    $out .= load_files(dependence($name, $type), $type, $debug, $purge);
   }
 
   if (!$debug) {

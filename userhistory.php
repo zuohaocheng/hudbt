@@ -5,11 +5,15 @@ require_once(get_langfile_path());
 loggedinorreturn();
 
 parked();
-$userid = $_GET["id"];
+$userid = $_REQUEST["id"];
+if (!$userid) {
+  $userid = $CURUSER['id'];
+}
 int_check($userid,true);
 
-if ($CURUSER["id"] != $userid && get_user_class() < $viewhistory_class)
-permissiondenied();
+if ($CURUSER["id"] != $userid && get_user_class() < $viewhistory_class) {
+  permissiondenied();
+}
 
 $action = htmlspecialchars($_GET["action"]);
 
@@ -19,8 +23,66 @@ $perpage = 15;
 
 //-------- Action: View posts
 
-if ($action == "viewposts")
-{
+function navbar() {
+  global $action, $lang_userhistory, $userid;
+  $texts = array($lang_userhistory['head_posts_history'],
+		 $lang_userhistory['head_quoted_posts_history'],
+		 $lang_userhistory['head_comments_history'],
+		 $lang_userhistory['head_quoted_comments_history']
+		 );
+  $actions = array('viewposts',
+		 'viewquotedposts',
+		 'viewcomments',
+		 'viewquotedcomments');
+  for ($i=0; $i < count($actions); $i+=1) {
+    if ($action == $actions[$i]) {
+      $actions[$i] = '';
+    }
+  }
+
+  $list = array();
+  for ($i=0; $i < count($texts); $i += 1) {
+    $item = '<li>';
+    if ($actions[$i]) {
+      $item .= '<a href="?action=' . $actions[$i] . '&id=' . $userid . '">';
+    }
+    else {
+      $item .= '<span class="gray">';
+    }
+    $item .= $texts[$i];
+    if ($actions[$i]) {
+      $item .= '</a>';
+    }
+    else {
+      $item .= '</span>';
+    }
+    $list[] = $item;
+  }
+  
+  echo '<div class="minor-list list-seperator minor-nav"><ul>';
+  echo implode('', $list);
+  echo '</ul></div>';
+}
+
+function show_single_comment($arr) {
+  $type = '';
+  if ($arr['t_id']) {
+    $id = $arr['t_id'];
+    $arr['postname'] = $arr['t_name'];
+    $type = 'torrent';
+  }
+  elseif ($arr['o_id']) {
+    $id = $arr['o_id'];
+    $arr['postname'] = $arr['o_name'];
+    $type = 'offer';
+  }
+
+  if ($type) {
+    single_comment($arr, $id, $type);
+  }
+}
+
+if ($action == "viewposts") {
 	$select_is = "COUNT(DISTINCT p.id)";
 
 	$from_is = "posts AS p LEFT JOIN topics as t ON p.topicid = t.id LEFT JOIN forums AS f ON t.forumid = f.id";
@@ -69,6 +131,7 @@ if ($action == "viewposts")
 	stdhead($lang_userhistory['head_posts_history']);
 
 	print("<h1>".$lang_userhistory['text_posts_history_for'].$subject."</h1>\n");
+	navbar();
 
 	if ($postcount > $perpage) echo $pagertop;
 
@@ -78,8 +141,7 @@ if ($action == "viewposts")
 
 	begin_frame();
 
-	while ($arr = mysql_fetch_assoc($res))
-	{
+	while ($arr = mysql_fetch_assoc($res)) {
 		$postid = $arr["id"];
 
 		$posterid = $arr["userid"];
@@ -128,130 +190,145 @@ if ($action == "viewposts")
 
 	if ($postcount > $perpage) echo $pagerbottom;
 
-	stdfoot();
 
-	die;
+
+}
+elseif ($action == 'viewquotedposts') {
+  $select = 'COUNT(*)';
+  $from = 'posts p INNER JOIN posts p1 ON p.quote = p1.id INNER JOIN topics t ON p.topicid = t.id';
+  $where = 'p1.userid = ' . $userid;
+  $order = 'p.id DESC';
+  $query = "SELECT $select FROM $from WHERE $where ORDER BY $order";
+  $res = sql_query($query) or sqlerr(__FILE__, __LINE__);
+  $arr = mysql_fetch_row($res) or stderr($lang_userhistory['std_error'], $lang_userhistory['std_no_posts_found']);
+  $postcount = $arr[0];
+  list($pagertop, $pagerbottom, $limit) = pager($perpage, $postcount, "?action=viewquotedposts&id=$userid&");
+  
+  $select = 'p.userid, p.topicid, p.id, p.added, p.body, p.editedby, p.editdate, t.subject AS postname, t.forumid, t.locked';
+  $subres = sql_query("SELECT $select FROM $from WHERE $where ORDER BY $order $limit") or sqlerr(__FILE__, __LINE__);
+  
+  stdhead($lang_userhistory['head_quoted_posts_history']);
+  navbar();
+  if ($postcount > $perpage) {
+    echo $pagertop;
+  }
+  echo '<div id="forum-posts"><ol>';
+  while ($arr = mysql_fetch_assoc($subres)) {
+    list($read, $post, $modify) = get_forum_privilege($arr['forumid']);
+    if (!$read) {
+      continue;
+    }
+    $forum = get_forum_row($arr['forumid']);
+    $arr['postname'] = $forum['name'] . ' - ' . $arr['postname'];
+    $locked = ($arr["locked"] == 'yes');
+    single_post($arr, $post, $modify, $locked);
+  }
+  echo '</ol></div>';
+  if ($postcount > $perpage) {
+    echo $pagerbottom;
+  }			      
+  stdfoot();
 }
 
 //-------- Action: View comments
 
-if ($action == "viewcomments")
-{
-	$select_is = "COUNT(*)";
+elseif ($action == "viewcomments") {
+  $select_is = "COUNT(*)";
 
-	// LEFT due to orphan comments
-	$from_is = "comments AS c LEFT JOIN torrents as t
-	            ON c.torrent = t.id";
+  // LEFT due to orphan comments
+  $from_is = "comments AS c LEFT JOIN torrents as t ON c.torrent = t.id LEFT JOIN offers o ON c.offer = o.id";
 
-	$where_is = "c.user = $userid";
-	$order_is = "c.id DESC";
+  $where_is = "c.user = $userid";
+  $order_is = "c.id DESC";
 
-	$query = "SELECT $select_is FROM $from_is WHERE $where_is ORDER BY $order_is";
+  $query = "SELECT $select_is FROM $from_is WHERE $where_is ORDER BY $order_is";
 
-	$res = sql_query($query) or sqlerr(__FILE__, __LINE__);
+  $res = sql_query($query) or sqlerr(__FILE__, __LINE__);
 
-	$arr = mysql_fetch_row($res) or stderr($lang_userhistory['std_error'], $lang_userhistory['std_no_comments_found']);
+  $arr = mysql_fetch_row($res) or stderr($lang_userhistory['std_error'], $lang_userhistory['std_no_comments_found']);
 
-	$commentcount = $arr[0];
+  $commentcount = $arr[0];
 
-	//------ Make page menu
+  //------ Make page menu
 
-	list($pagertop, $pagerbottom, $limit) = pager($perpage, $commentcount, $_SERVER["PHP_SELF"] . "?action=viewcomments&id=$userid&");
+  list($pagertop, $pagerbottom, $limit) = pager($perpage, $commentcount, $_SERVER["PHP_SELF"] . "?action=viewcomments&id=$userid&");
 
-	//------ Get user data
+  //------ Get user data
 
-	$res = sql_query("SELECT username, donor, warned, enabled FROM users WHERE id=$userid") or sqlerr(__FILE__, __LINE__);
+  $res = sql_query("SELECT username, donor, warned, enabled FROM users WHERE id=$userid") or sqlerr(__FILE__, __LINE__);
 
-	if (mysql_num_rows($res) == 1)
-	{
-		$arr = mysql_fetch_assoc($res);
+  if (mysql_num_rows($res) == 1) {
+    $arr = mysql_fetch_assoc($res);
+    $subject = get_username($userid);
+  }
+  else {
+    $subject = "unknown[$userid]";
+  }
 
-		$subject = get_username($userid);
-	}
-	else
-	$subject = "unknown[$userid]";
+  //------ Get comments
 
-	//------ Get comments
+  $select_is = "c.torrent AS t_id, c.offer AS o_id, c.id, c.text, c.user, c.added, c.editedby, c.editdate, t.name AS t_name, o.name AS o_name";
 
-	$select_is = "t.name, c.torrent AS t_id, c.id, c.added, c.text";
+  $query = "SELECT $select_is FROM $from_is WHERE $where_is ORDER BY $order_is $limit";
 
-	$query = "SELECT $select_is FROM $from_is WHERE $where_is ORDER BY $order_is $limit";
+  $res = sql_query($query) or sqlerr(__FILE__, __LINE__);
 
-	$res = sql_query($query) or sqlerr(__FILE__, __LINE__);
+  if (mysql_num_rows($res) == 0) stderr($lang_userhistory['std_error'], $lang_userhistory['std_no_comments_found']);
 
-	if (mysql_num_rows($res) == 0) stderr($lang_userhistory['std_error'], $lang_userhistory['std_no_comments_found']);
+  stdhead($lang_userhistory['head_comments_history']);
 
-	stdhead($lang_userhistory['head_comments_history']);
+  print("<h1>".$lang_userhistory['text_comments_history_for']."$subject</h1>\n");
+  navbar();
 
-	print("<h1>".$lang_userhistory['text_comments_history_for']."$subject</h1>\n");
+  if ($commentcount > $perpage) echo $pagertop;
 
-	if ($commentcount > $perpage) echo $pagertop;
+  //------ Print table
 
-	//------ Print table
+  echo '<div id="forum-posts"><ol>';
+  while ($arr = mysql_fetch_assoc($res)) {
+    show_single_comment($arr);
+  }
+  echo '</ol></div>';
 
-	begin_main_frame();
-
-	begin_frame();
-
-	while ($arr = mysql_fetch_assoc($res))
-	{
-
-		$commentid = $arr["id"];
-
-		$torrent = $arr["name"];
-
-		// make sure the line doesn't wrap
-		if (strlen($torrent) > 55) $torrent = substr($torrent,0,52) . "...";
-
-		$torrentid = $arr["t_id"];
-
-		//find the page; this code should probably be in details.php instead
-
-		$subres = sql_query("SELECT COUNT(*) FROM comments WHERE torrent = $torrentid AND id < $commentid")
-		or sqlerr(__FILE__, __LINE__);
-		$subrow = mysql_fetch_row($subres);
-		$count = $subrow[0];
-		$comm_page = floor($count/20);
-		$page_url = $comm_page?"&page=$comm_page":"";
-
-		$added = gettime($arr["added"], true, false, false);
-
-		print("<p class=sub><table border=0 cellspacing=0 cellpadding=0><tr><td class=embedded>".
-		"$added&nbsp;---&nbsp;".$lang_userhistory['text_torrent'].
-		($torrent?("<a href=details.php?id=$torrentid&tocomm=1&hit=1>$torrent</a>"):" [Deleted] ").
-		"&nbsp;---&nbsp;".$lang_userhistory['text_comment']."</b>#<a href=details.php?id=$torrentid&tocomm=1&hit=1$page_url>$commentid</a>
-	  </td></tr></table></p>\n");
-		print("<br />");
-		
-		print("<table class=main width=100% border=1 cellspacing=0 cellpadding=5>\n");
-
-		$body = format_comment($arr["text"]);
-
-		print("<tr valign=top><td class=comment>$body</td></tr>\n");
-
-		print("</td></tr></table>\n");
-		
-		print("<br />");
-	}
-
-	end_frame();
-
-	end_main_frame();
-
-	if ($commentcount > $perpage) echo $pagerbottom;
-
-	stdfoot();
-
-	die;
+  if ($commentcount > $perpage) echo $pagerbottom;
 }
+elseif ($action == 'viewquotedcomments') {
+  $res = sql_query('SELECT COUNT(*) AS postname FROM comments c INNER JOIN comments c1 ON c.quote = c1.id WHERE c1.user=' . $userid . ' ORDER BY c.id') or sqlerr(__FILE__, __LINE__);
+  $arr = mysql_fetch_row($res) or stderr($lang_userhistory['std_error'], $lang_userhistory['std_no_comments_found']);
+  $commentcount = $arr[0];
+  $perpage = 10;
+  list($pagertop, $pagerbottom, $limit) = pager($perpage, $commentcount, $_SERVER["PHP_SELF"] . "?action=viewquotedcomments&id=$userid&");
+
+
+  $subres = sql_query('SELECT c.torrent AS t_id, c.offer AS o_id, c.id, c.text, c.user, c.added, c.editedby, c.editdate, t.name AS t_name, o.name AS o_name FROM comments c INNER JOIN comments c1 ON c.quote = c1.id LEFT JOIN torrents t ON c.torrent = t.id LEFT JOIN offers o ON c.offer = o.id WHERE c1.user=' . $userid . ' ORDER BY c.id ' . $limit) or sqlerr(__FILE__, __LINE__);
+  $allrows = array();
+  stdhead($lang_userhistory['head_quoted_comments_history']);
+  print("<h1>".$lang_userhistory['text_quoted_comments_history_for']."</h1>\n");
+
+  navbar();
+  if ($commentcount > $perpage) echo $pagertop;
+  echo '<div id="forum-posts"><ol>';
+  while ($arr = mysql_fetch_assoc($subres)) {
+    show_single_comment($arr);
+  }
+  echo '</ol></div>';
+  if ($commentcount > $perpage) echo $pagerbottom;
+}
+else {
+  stdhead($lang_userhistory['head']);
+  echo '<h1>' . $lang_userhistory['head'] . '</h1>';
+  navbar();
+}
+
+stdfoot();
 
 //-------- Handle unknown action
 
-if ($action != "")
-stderr($lang_userhistory['std_history_error'], $lang_userhistory['std_unkown_action']);
+/* if ($action != "") */
+/* stderr($lang_userhistory['std_history_error'], $lang_userhistory['std_unkown_action']); */
 
-//-------- Any other case
+/* //-------- Any other case */
 
-stderr($lang_userhistory['std_history_error'], $lang_userhistory['std_invalid_or_no_query']);
+/* stderr($lang_userhistory['std_history_error'], $lang_userhistory['std_invalid_or_no_query']); */
 
 ?>

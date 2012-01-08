@@ -48,10 +48,12 @@ function get_load_uri($type, $script_name ="", $debug=false) {
     return '<script type="text/javascript" src="load.php?format=js&name=' . $name . $addition . '"></script>';
   }
   elseif ($type == 'css') {
+    $addition .= '&font=' . get_font_type();
+    $addition .= '&theme=' . get_css_id();
     if ($CURUSER) {
-      $addition .= '&id=' . $CURUSER['id'];
+      $addition .= '&caticon=' . $CURUSER['caticon'];
     }
-    $href= 'load.php?format=css&name=' . $name . $addition;
+    $href= 'load.php?format=css' . $addition;
     return '<link rel="stylesheet" href="' . $href . '" type="text/css" media="screen" />';
   }
   return '';
@@ -66,8 +68,7 @@ function get_langfile_path($script_name ="", $target = false, $lang_folder = "")
   return "lang/" . ($target == false ? $lang_folder : "_target") ."/lang_". ( $script_name == "" ? substr(strrchr($_SERVER['SCRIPT_NAME'],'/'),1) : $script_name);
 }
 
-function get_row_count($table, $suffix = "")
-{
+function get_row_count($table, $suffix = "") {
   $r = sql_query("SELECT COUNT(*) FROM $table $suffix") or sqlerr(__FILE__, __LINE__);
   $a = mysql_fetch_row($r) or die(mysql_error());
   return $a[0];
@@ -1575,10 +1576,18 @@ function textbbcode($form,$text,$content="",$hastitle=false, $col_num = 130) {
 	  $USERUPDATESET[] = "page = ".sqlesc($selected);
       }
     }
-    function get_css_row() {
-      global $CURUSER, $defcss, $Cache;
+function get_css_id() {
+  global $CURUSER, $defcss, $Cache;
+  $cssid = $CURUSER ? $CURUSER["stylesheet"] : $defcss;
+  return $cssid;
+}
+    function get_css_row($cssid = -1) {
+      global $Cache;
       static $rows;
-      $cssid = $CURUSER ? $CURUSER["stylesheet"] : $defcss;
+      if ($cssid == -1) {
+	$cssid = get_css_id();
+      }
+
       if (!$rows && !$rows = $Cache->get_value('stylesheet_content')){
 	$rows = array();
 	$res = sql_query("SELECT * FROM stylesheets ORDER BY id ASC");
@@ -1589,9 +1598,9 @@ function textbbcode($form,$text,$content="",$hastitle=false, $col_num = 130) {
       }
       return $rows[$cssid];
     }
-    function get_css_uri($file = "")
-    {
-      $cssRow = get_css_row();
+function get_css_uri($file = "", $theme = -1) {
+  $cssRow = get_css_row($theme);
+
       $ss_uri = $cssRow['uri'];
       if (!$ss_uri)
 	$ss_uri = get_single_value("stylesheets","uri","WHERE id=".sqlesc($defcss));
@@ -1610,24 +1619,28 @@ function textbbcode($form,$text,$content="",$hastitle=false, $col_num = 130) {
       return $file;
     }
 
-    function get_font_css_uri(){
-      return "styles/" . get_font_type() . 'font.css';
+    function get_font_css_uri($type = '') {
+      if (!$type) {
+	$type = get_font_type();
+      }
+      return "styles/" . $type . 'font.css';
     }
 
-    function get_style_addicode()
-    {
+    function get_style_addicode() {
       $cssRow = get_css_row();
       return $cssRow['addicode'];
     }
 
-    function get_cat_folder($cat = 401)
-    {
+function get_cat_folder($cat = 401, $caticon = -1) {
       static $catPath = array();
       if (!$catPath[$cat]) {
 	global $CURUSER, $CURLANGDIR;
 	$catrow = get_category_row($cat);
 	$catmode = $catrow['catmodename'];
-	$caticonrow = get_category_icon_row($CURUSER['caticon']);
+	if ($caticon == -1) {
+	  $caticon = $CURUSER['caticon'];
+	}
+	$caticonrow = get_category_icon_row($caticon);
 	$catPath[$cat] = "category/".$catmode."/".$caticonrow['folder'] . ($caticonrow['multilang'] == 'yes' ? $CURLANGDIR."/" : "");
       }
       return $catPath[$cat];
@@ -2324,10 +2337,14 @@ function delete_single_torrent($id, $row, $reasonstr='') {
 
   deletetorrent($id, ((TIMENOW - $tadded) > $interval_no_deduct_bonus_on_deletion));
 
+  if ($reasonstr) {
+    $reasonstr = ' (' . $reasonstr . ')';
+  }
+  
   if ($row['anonymous'] == 'yes' && $CURUSER["id"] == $row["owner"]) {
-    write_log("Torrent $id ($row[name]) was deleted by its anonymous uploader ($reasonstr)",'normal');
+    write_log("Torrent $id ($row[name]) was deleted by its anonymous uploader" . $reasonstr,'normal');
   } else {
-    write_log("Torrent $id ($row[name]) was deleted by $CURUSER[username] ($reasonstr)",'normal');
+    write_log("Torrent $id ($row[name]) was deleted by $CURUSER[username]" . $reasonstr,'normal');
   }
 
   //Send pm to torrent uploader
@@ -2339,6 +2356,11 @@ function delete_single_torrent($id, $row, $reasonstr='') {
     sql_query("INSERT INTO messages (sender, receiver, subject, added, msg) VALUES(0, $row[owner], $subject, $dt, $msg)") or sqlerr(__FILE__, __LINE__);
   }
 
+}
+
+function send_pm($from, $to, $subject, $msg) {
+  $added = sqlesc(date("Y-m-d H:i:s"));
+  sql_query("INSERT INTO messages (sender, receiver, subject, msg, added) VALUES($from, $to, " . sqlesc($subject) . ", " . sqlesc($msg) . ", $added)") or sqlerr(__FILE__, __LINE__);
 }
 
 function pager($rpp, $count, $href, $opts = array(), $pagename = "page") {
@@ -2492,7 +2514,7 @@ function post_format_author_info($id, $stat = false) {
   return array($out, $signature);
 }
 
-function post_header($type, $authorid, $topicid, $postid, $added, $floor, $showonly = NULL) {
+function post_header($type, $authorid, $topicid, $postid, $added, $floor, $showonly = NULL, $postname = '') {
 #!
   global $lang_functions;
   $sadded = gettime($added,true,false);
@@ -2505,7 +2527,16 @@ function post_header($type, $authorid, $topicid, $postid, $added, $floor, $showo
   else {
     $abbrtype = 'c';
     #! page
-    $href = 'details.php?cmtpage=1&page=p' . $postid . '&id=' . $topicid . '#cid' . $postid;
+    if ($type == 'torrent') {
+      $href = 'details.php?cmtpage=1';
+    }
+    elseif ($type == 'offer') {
+      $href = 'offers.php?off_details=1';
+    }
+    elseif ($type == 'request') {
+      $href = 'viewrequests.php?req_details=1';
+    }
+    $href .= '&page=p' . $postid . '&id=' . $topicid . '#cid' . $postid;
   }
   
   $header = '<div class="forum-post-header" id="' . $abbrtype . 'id' . $postid. '"><div class="minor-list"><ul><li><span class="gray">'.$lang_functions['text_by'].'</span>'.$by."</li>";
@@ -2521,8 +2552,14 @@ function post_header($type, $authorid, $topicid, $postid, $added, $floor, $showo
     $header .= '</li>';
   }
   $header .= '</ul></div>';
-  
-  $header .= '<div class="forum-floor minor-list list-seperator"><ul><li><span class="gray">'.$lang_functions['text_at'].'</span>'.$sadded.'</li><li><a href="' . htmlspecialchars($href).'">'.$lang_functions['text_number']. $floor . $lang_functions['text_lou'].'</a></li></ul></div>';
+
+  if ($floor == -1) {
+    $floor_text = $postname;
+  }
+  else {
+    $floor_text = $lang_functions['text_number']. $floor . $lang_functions['text_lou'];
+  }
+  $header .= '<div class="forum-floor minor-list list-seperator"><ul><li><span class="gray">'.$lang_functions['text_at'].'</span>'.$sadded.'</li><li><a href="' . htmlspecialchars($href).'" title="' . $floor_text . '">'.$floor_text.'</a></li></ul></div>';
   $header .= '</div>';
   return $header;
 }
@@ -2548,23 +2585,24 @@ function post_body_edited($edit) {
 }
 
 function post_body_toolbox_href($postid, $type, $pid) {
-  if ($type) { //torrent
-    $surfix = '&cid='. $postid . '&type=torrent';
+  if ($type == 'post') { //forum
+    $surfix = '&postid=' . $postid;
+    return array(
+		 'forums.php?action=quotepost' . $surfix,
+		 'forums.php?action=deletepost' . $surfix,
+		 'forums.php?action=editpost' . $surfix,
+		 'report.php?forumpost=' . $postid
+		 );
+  }
+  else {
+    $surfix = '&cid='. $postid . '&type=' . $type;
     return array(
 		 'comment.php?action=add&sub=quote&pid=' . $pid . $surfix,
 		 'comment.php?action=delete' . $surfix,
 		 'comment.php?action=edit' . $surfix,
 		 'report.php?commentid=' . $postid
 		 );
-  }
-  else { //forum
-    $surfix = '&postid=' . $postid;
-    return array(
-		 '?action=quotepost' . $surfix,
-		 '?action=deletepost' . $surfix,
-		 '?action=editpost' . $surfix,
-		 'report.php?forumpost=' . $postid
-		 );
+
   }
 }
 
@@ -2603,7 +2641,7 @@ function post_body_container($postid, $body, $highlight, $edit, $signature, $pri
   if ($edit) {
     $container .= post_body_edited($edit);
   }
-  if ($CURUSER["signatures"] == "yes" && $signature && !$type) {
+  if ($CURUSER["signatures"] == "yes" && $signature && $type == 'post') {
     $container .= '<div class="signature">' . format_comment($signature,false,false,false,true,550,true,false, 1,150) . '</div>';
   }
   $container .= '</div>';
@@ -2621,45 +2659,96 @@ function post_format($args, $privilege) {
     $post .= '<a id="last"></a>';
   }
   $type = $args['type'];
-  $post .= post_header($type, $args['posterid'], $args['topicid'], $args['postid'], $args["added"], $args['floor'], $args['authorid']);
+  $post .= post_header($type, $args['posterid'], $args['topicid'], $args['postid'], $args["added"], $args['floor'], $args['authorid'], $args['postname']);
   list($author_info, $signature) = post_format_author_info($args['posterid'], ($type =='post'));
   $post .= $author_info;
 
-  $post .= post_body_container($args['postid'], $args['body'], $args['highlight'], $args['edit'], $signature, $privilege, $args['ctype'], $args['topicid']);
+  $post .= post_body_container($args['postid'], $args['body'], $args['highlight'], $args['edit'], $signature, $privilege, $args['type'], $args['topicid']);
 
   $post .= '</li>';
   return $post;
 }
 
+function get_forum_privilege($id, $locked = false) {
+  global $postmanage_class, $CURUSER;
+  $is_forummod = is_forum_moderator($id,'forum');
+  $row = get_forum_row($id);
+
+  $read = (get_user_class() >= $row["minclassread"]);
+  $post = (((get_user_class() >= $row["minclasswrite"] && !$locked) || get_user_class() >= $postmanage_class || $is_forummod) && $CURUSER["forumpost"] == 'yes');
+  $modify = get_user_class() >= $postmanage_class || $is_forummod;
+  return array($read, $post, $modify);
+}
+
+function get_forum_row($forumid = 0) {
+  global $Cache;
+  if (!$forums = $Cache->get_value('forums_list')){
+    $forums = array();
+    $res2 = sql_query("SELECT * FROM forums ORDER BY forid ASC, sort ASC") or sqlerr(__FILE__, __LINE__);
+    while ($row2 = mysql_fetch_array($res2))
+      $forums[$row2['id']] = $row2;
+    $Cache->cache_value('forums_list', $forums, 86400);
+  }
+  if (!$forumid)
+    return $forums;
+  else return $forums[$forumid];
+}
+
+function single_post($arr, $maypost, $maymodify, $locked, $highlight = '', $last = false, $floor = -1) {
+  global $CURUSER;
+  $editor = $arr['editedby'];
+  if (!is_valid_id($editor)) {
+    $edit = false;
+  }
+  else {
+    $edit = array('editor' => $editor, 'date' => $arr['editdate']);
+  }
+  $posterid = $arr['userid'];
+
+  $privilege = array($maypost, $maymodify, $maymodify || ($CURUSER["id"] == $posterid && !$locked));
+  $post_f = array('type' => 'post', 'posterid' => $posterid, 'topicid' => $arr['topicid'], 'postid' => $arr['id'], 'added' => $arr['added'], 'floor' => $floor, 'body' => $arr['body'], 'highlight' => $highlight, 'edit' => $edit, 'last' => $last, 'postname' => $arr['postname']);
+  echo post_format($post_f, $privilege);
+}
+
+function single_comment($row, $parent_id, $type, $floor = -1) {
+  global $commanage_class, $CURUSER;
+
+  $userRow = get_user_row($row['user']);
+
+  if ($row["editedby"]) {
+    $edit = array('editor' => $row["editedby"], 'date' => $row['editdate']);
+  }
+  else {
+    $edit = false;
+  }
+
+  $post_f = array('type' => $type, 'posterid' => $row['user'], 'topicid' => $parent_id, 'postid' => $row['id'], 'added' => $row['added'], 'floor' => $floor, 'body' => $row['text'], 'highlight' => false, 'edit' => $edit, 'postname' => $row['postname']);
+  $maymodify = (get_user_class() >= $commanage_class);
+  $privilege = array(true, $maymodify, ($row["user"] == $CURUSER["id"] || $maymodify));
+  echo post_format($post_f, $privilege);
+}
+
 function commenttable($rows, $type, $parent_id, $review = false, $offset=0) {
   global $lang_functions;
-  global $CURUSER, $commanage_class;
-  global $Advertisement;
+  global $CURUSER, $Advertisement;
 
   echo '<div id="forum-posts"><ol>';
 
   $count = 0;
-  if ($Advertisement->enable_ad())
+  if ($Advertisement->enable_ad()) {
     $commentad = $Advertisement->get_ad('comment');
+  }
+  
   foreach ($rows as $row) {
-    $userRow = get_user_row($row['user']);
     if ($count>=1) {
       if ($Advertisement->enable_ad()) {
-        if ($commentad[$count-1])
-        echo '<div class="forum-ad table td" id="ad_comment_'.$count."\">".$commentad[$count-1]."</div>";
+	if ($commentad[$count-1])
+	  echo '<div class="forum-ad table td" id="ad_comment_'.$count."\">".$commentad[$count-1]."</div>";
       }
     }
 
-    if ($row["editedby"]) {
-      $edit = array('editor' => $row["editedby"], 'date' => $row['editdate']);
-    }
-    else {
-      $edit = false;
-    }
-    $post_f = array('type' => 'comment', 'posterid' => $row['user'], 'topicid' => $parent_id, 'postid' => $row['id'], 'added' => $row['added'], 'floor' => ($offset+$count+1), 'body' => $row['text'], 'highlight' => false, 'edit' => $edit, 'ctype' => $type);
-    $privilege = array(true, (get_user_class() >= $commanage_class), ($row["user"] == $CURUSER["id"] || get_user_class() >= $commanage_class));
-    echo post_format($post_f, $privilege);
-
+    $floor = $offset+$count+1;
+    single_comment($row, $parent_id, $type, $floor);
     $count++;
   }
   echo '</ol></div>';
@@ -3128,6 +3217,24 @@ if ($CURUSER['appendpromotion'] == 'highlight')
 if($enabletooltip_tweak == 'yes' && (!isset($CURUSER) || $CURUSER['showlastcom'] == 'yes'))
 create_tooltip_container($lastcom_tooltip, 400);
 create_tooltip_container($torrent_tooltip, 500);
+}
+
+function get_user_prop($id) {
+  $user = get_user_row($id);
+  if ($user) {
+    $out = array();
+    $out['id'] = $user['id'];
+    $out['username'] = $user['username'];
+    $out['class'] = array('raw' => $user['class'], 'canonical' => get_user_class_name($user['class'],false));
+
+    if ($user['donor'] == 'yes') {
+      $out['donor'] = true;
+    }
+  }
+  else {
+    $out = null;
+  }
+  return $out;
 }
 
 function get_username($id, $big = false, $link = true, $bold = true, $target = false, $bracket = false, $withtitle = false, $link_ext = "", $underline = false) {

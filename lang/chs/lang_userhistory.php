@@ -20,7 +20,12 @@ $lang_userhistory = array
 	'text_comment' => "<b>评论:&nbsp;",
 	'std_history_error' => "错误",
 	'std_unkown_action' => "未知行为",
-	'std_invalid_or_no_query' => "无效或没有该项。"
+	'std_invalid_or_no_query' => "无效或没有该项。",
+	'text_quoted_comments_history_for' => '被引评论',
+	'head_quoted_comments_history' => '被引用的评论',
+	'text_quoted_posts_history_for' => '被引帖子',
+	'head_quoted_posts_history' => '被引用的帖子',
+	'head' => '用户历史',
 );
 
 ?>

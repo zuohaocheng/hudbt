@@ -9,12 +9,14 @@ define('PM_DELETED',0); // Message was deleted
 define('PM_INBOX',1); // Message located in Inbox for reciever
 define('PM_SENTBOX',-1); // GET value for sent box
 // Determine action
-$action = (string) $_GET['action'];
-if (!$action)
-{
-	$action = (string) $_POST['action'];
-	if (!$action)
-		$action = 'viewmailbox';
+$action = strtolower($_REQUEST['action']);
+if (!$action) {
+  $action = 'viewmailbox';
+}
+
+$format = strtolower($_REQUEST['format']);
+if ($format != 'json') {
+  $format = 'html';
 }
 
 // View listing of Messages in mail box
@@ -22,41 +24,36 @@ if ($action == "viewmailbox")
 {
 // Get Mailbox Number
 $mailbox = (int) $_GET['box'];
-if (!$mailbox)
-	$mailbox = PM_INBOX;
+if (!$mailbox) {
+  $mailbox = PM_INBOX;
+}
 
 // Get Mailbox Name
-if ($mailbox != PM_INBOX && $mailbox != PM_SENTBOX)
-{
-$res = sql_query('SELECT name FROM pmboxes WHERE userid=' . sqlesc($CURUSER['id']) . ' AND boxnumber=' . sqlesc($mailbox) . ' LIMIT 1') or sqlerr(__FILE__,__LINE__);
-if (mysql_num_rows($res) == 0)
-	stderr($lang_messages['std_error'],$lang_messages['std_invalid_mailbox']);
+if ($mailbox != PM_INBOX && $mailbox != PM_SENTBOX) {
+  $res = sql_query('SELECT name FROM pmboxes WHERE userid=' . sqlesc($CURUSER['id']) . ' AND boxnumber=' . sqlesc($mailbox) . ' LIMIT 1') or sqlerr(__FILE__,__LINE__);
+  if (mysql_num_rows($res) == 0) {
+    stderr($lang_messages['std_error'],$lang_messages['std_invalid_mailbox']);
+  }
 
-$mailbox_name = mysql_fetch_array($res);
-$mailbox_name = htmlspecialchars($mailbox_name[0]);
+  $mailbox_name = mysql_fetch_array($res);
+  $mailbox_name = htmlspecialchars($mailbox_name[0]);
 }
-else
-{
-if ($mailbox == PM_INBOX)
-	$mailbox_name = $lang_messages['text_inbox'];
-else
-	$mailbox_name = $lang_messages['text_sentbox'];
+else {
+  if ($mailbox == PM_INBOX) {
+    $mailbox_name = $lang_messages['text_inbox'];
+  }
+  else {
+    $mailbox_name = $lang_messages['text_sentbox'];
+  }
 }
 
-if ($mailbox != PM_SENTBOX)
-	$sender_receiver = $lang_messages['text_sender'];
-else
-	$sender_receiver = $lang_messages['text_receiver'];
-// Start Page
-stdhead($mailbox_name);
-?>
-<?php messagemenu($mailbox)?>
-<table border="0" cellpadding="4" cellspacing="0" width="737">
-<tr><td class=colhead align=left><?php echo $lang_messages['col_search_message'] ?></td></tr>
-<tr><td class=toolbox align=center><?php echo insertJumpTo($mailbox);?></td></tr>
-</table>
+if ($mailbox != PM_SENTBOX) {
+  $sender_receiver = $lang_messages['text_sender'];
+}
+else {
+  $sender_receiver = $lang_messages['text_receiver'];
+}
 
-<?php
 //search
 		$keyword = mysql_real_escape_string(trim($_GET["keyword"]));
 		$place = $_GET["place"];
@@ -100,94 +97,124 @@ else
 $res = sql_query('SELECT * FROM messages WHERE sender=' . sqlesc($CURUSER['id']) . ' AND saved=\'yes\''.$wherea.' ORDER BY id DESC '.$limit) or sqlerr(__FILE__,__LINE__);
 }
 
-if (mysql_num_rows($res) == 0)
-{
-echo("<p align=\"center\">".$lang_messages['text_no_messages']."</p>\n");
+$content = '';
+$messages = array();
+#if (mysql_num_rows($res) == 0) {
+#  $content .= ("<p align=\"center\">".$lang_messages['text_no_messages']."</p>\n");
+#}
+if (mysql_num_rows($res) != 0) {
+  while ($row = mysql_fetch_assoc($res)) {
+
+    $messages[] = $row;
+
+  }
+
 }
-else
-{
-echo $pagertop;
+
+// Start Page
+
+if ($format == 'html') {
+  stdhead($mailbox_name);
+  messagemenu($mailbox);
 ?>
+<div style="text-align:center;width:750px;padding:0.8em 0;" class="table td"><?php echo insertJumpTo($mailbox);?></div>
+
+<?php
+  $content .= $pagertop;
+  $content .= '
 <form action="messages.php" method="post">
 <input type="hidden" name="action" value="moveordel">
-<table border="0" cellpadding="4" cellspacing="0" width="737">
-<tr>
-<td width="1%" class="colhead" align="center"><?php echo $lang_messages['col_status'] ?></td>
-<td class="colhead" align="left"><?php echo $lang_messages['col_subject'] ?> </td>
-<?php
-print("<td width=\"35%\" class=\"colhead\" align=\"left\">$sender_receiver</td>");
-?>
-<td width="1%" class="colhead" align="center"><img class="time" src="pic/trans.gif" alt="time" title="<?php echo $lang_messages['col_date'] ?>" /></td>
-<td width="1%" class="colhead" align="center"><?php echo $lang_messages['col_act'] ?></td>
-</tr>
-<?php
-while ($row = mysql_fetch_assoc($res))
-{
-// Get Sender Username
-if ($row['sender'] != 0)
-{
-if ($mailbox != PM_SENTBOX)
+<table border="0" cellpadding="4" cellspacing="0" style="width:750px;"><thead><tr>
+<th style="text-align:center;width:1%">' . $lang_messages['col_status'] .'</th>';
+  $content .= '<th style="text-align:left;">' . $lang_messages['col_subject'] . '</th>';
+  $content .= '<th style="text-align:left;width:35%">' . $sender_receiver . '</th>';
+  $content .= '<th style="text-align:center;width:1%;"><img class="time" src="pic/trans.gif" alt="time" title="' . $lang_messages['col_date'] . '" /></th>';
+$content .= '<th style="text-align:center;width:1%;">' . $lang_messages['col_act'] .'</th></tr></thead><tbody>';
+
+if ($messages) {
+  foreach ($messages as $row) {
+      // Get Sender Username
+    if ($row['sender'] != 0) {
+      if ($mailbox != PM_SENTBOX)
 	$username = get_username($row['sender']);
-else
+      else
 	$username = get_username($row['receiver']);
-}
-else
-{
-$username = $lang_messages['text_system'];
-}
-$subject = htmlspecialchars($row['subject']);
+    }
+    else {
+      $username = $lang_messages['text_system'];
+    }
+    $subject = htmlspecialchars($row['subject']);
 
-if (strlen($subject) <= 0)
-{
-$subject = $lang_messages['text_no_subject'];
+    if (strlen($subject) <= 0) {
+      $subject = $lang_messages['text_no_subject'];
+    }
+
+    if ($row['unread'] == 'yes') {
+      $content .= "<tr>\n<td class=rowfollow align=center><img class=\"unreadpm\" src=\"pic/trans.gif\" alt=\"Unread\" title=".$lang_messages['title_unread']." /></td>\n";
+    }
+    else {
+      $content .= "<tr>\n<td class=rowfollow align=center><img class=\"readpm\" src=\"pic/trans.gif\" alt=\"Read\" title=".$lang_messages['title_read']." /></td>\n";
+    }
+    $content .= "<td class=rowfollow align=left><a href=\"messages.php?action=viewmessage&id=" . $row['id'] . "\">" .$subject . "</a></td>\n";
+    $content .= ("<td class=rowfollow align=left>$username</td>\n");
+    $content .= ("<td class=rowfollow nowrap>" . gettime($row['added'],true,false) . "</td>\n");
+    $content .= ("<td class=rowfollow><input class=checkbox type=\"checkbox\" name=\"messages[]\" value=\"" . $row['id'] . "\"></td>\n</tr>\n");
+  }
+
+  $content .= '</tbody><tfoot><tr>';
+  $onclick = "this.value=check(form, '" . $lang_messages['input_check_all'] . "', '" . $lang_messages['input_uncheck_all'] . "');";
+  $content .= '<td class="colhead" colspan="5" style="text-align:right;"><input class=btn type="button" value="' . $lang_messages['input_check_all'] . '" id="" onClick="' . $onclick . '"> ';
+  if($mailbox != PM_SENTBOX) {
+    $content .= ("<input class=btn type=\"submit\" name=\"markread\" value=\"".$lang_messages['submit_mark_as_read']."\">");
+  }
+  $content .= '<input class=btn type="submit" name="delete" value=' .  $lang_messages['submit_delete'] . ' />';
+
+  if($mailbox != PM_SENTBOX){
+    $content .=  $lang_messages['text_or'];
+    $content .= ("<input class=btn type=\"submit\" name=\"move\" value=\"".$lang_messages['submit_move_to']."\"> <select name=\"box\"><option value=\"1\">".$lang_messages['text_inbox']."</option>");
+    $res = sql_query('SELECT * FROM pmboxes WHERE userid=' . sqlesc($CURUSER['id']) . ' ORDER BY boxnumber') or sqlerr(__FILE__,__LINE__);
+    while ($row = mysql_fetch_assoc($res)) {
+      $content .= ("<option value=\"" . $row['boxnumber'] . "\">" . htmlspecialchars($row['name']) . "</option>\n");
+    }
+  }
+
+  $content .= '</select></td></tr></form><tr><td class="toolbox" colspan=5>
+<div class="minor-list" style="text-align:center;"><ul><li><img class="unreadpm" src="pic/trans.gif" alt="Unread" title="' .  $lang_messages['title_unread'] . '" /><a href="messages.php?action=viewmailbox&box=' .  $mailbox . '&unread=yes">' .  $lang_messages['text_unread_messages']  . '</a></li>
+<li><img class="readpm" src="pic/trans.gif" alt="Read" title="' .  $lang_messages['title_read']  . '" /><a href="messages.php?action=viewmailbox&box=' .  $mailbox . '&unread=no">' .  $lang_messages['text_read_messages']  . '</a></li>
+<li><a href="messages.php?action=editmailboxes">' .  $lang_messages['text_mailbox_manager']  . '</a></li></ul></div></td></tr></table>';
+}
+else {
+  $content .= ("<div>".$lang_messages['text_no_messages']."</div>\n");
 }
 
-if ($row['unread'] == 'yes')
-{
-echo("<tr>\n<td class=rowfollow align=center><img class=\"unreadpm\" src=\"pic/trans.gif\" alt=\"Unread\" title=".$lang_messages['title_unread']." /></td>\n");
+  echo $content;
+  stdfoot();
 }
-else
-{
-echo("<tr>\n<td class=rowfollow align=center><img class=\"readpm\" src=\"pic/trans.gif\" alt=\"Read\" title=".$lang_messages['title_read']." /></td>\n");
-}
-echo("<td class=rowfollow align=left><a href=\"messages.php?action=viewmessage&id=" . $row['id'] . "\">" .
-$subject . "</a></td>\n");
-echo("<td class=rowfollow align=left>$username</td>\n");
-echo("<td class=rowfollow nowrap>" . gettime($row['added'],true,false) . "</td>\n");
-echo("<td class=rowfollow><input class=checkbox type=\"checkbox\" name=\"messages[]\" value=\"" . $row['id'] . "\"></td>\n</tr>\n");
-}
-?>
-<tr class="colhead">
-<td colspan="5" align="right" class="colhead"><input class=btn type="button" value="<?php echo $lang_messages['input_check_all']; ?>" onClick="this.value=check(form,'<?php echo $lang_messages['input_check_all'] ?>','<?php echo $lang_messages['input_uncheck_all'] ?>')"> 
-<?php if($mailbox != PM_SENTBOX) print("<input class=btn type=\"submit\" name=\"markread\" value=\"".$lang_messages['submit_mark_as_read']."\">") ?>
-<input class=btn type="submit" name="delete" value=<?php echo $lang_messages['submit_delete']?>>
-<?php
-if($mailbox != PM_SENTBOX){
-	echo $lang_messages['text_or'];
-	print("<input class=btn type=\"submit\" name=\"move\" value=\"".$lang_messages['submit_move_to']."\"> <select name=\"box\"><option value=\"1\">".$lang_messages['text_inbox']."</option>");
-        $res = sql_query('SELECT * FROM pmboxes WHERE userid=' . sqlesc($CURUSER['id']) . ' ORDER BY boxnumber') or sqlerr(__FILE__,__LINE__);
-        while ($row = mysql_fetch_assoc($res))
-        {
-          echo("<option value=\"" . $row['boxnumber'] . "\">" . htmlspecialchars($row['name']) . "</option>\n");
-        }
-}
-?>
-      <?php /*
-      print("<p align=right><input type=button value=\"Check All\" onClick=\"this.value=check(form)\"><input type=submit value=\"Delete selected\"></p>");
-print("</form>");
-     */ ?>
-        </select>
-      </td>
-    </tr>
+elseif ($format == 'json') {
+  header('Content-type: application/json; charset=utf-8');
+  header('');
+  function get_user_prop_msg($id) {
+    if ($id == 0) {
+      global $lang_messages;
+      return array('id' => 0, 'username' => $lang_messages['text_system']);
+    }
+    else {
+      return get_user_prop($id);
+    }
+  }
   
-  </form><tr><td class=toolbox colspan=5>
-<div align="center"><img class="unreadpm" src="pic/trans.gif" alt="Unread" title="<?php echo $lang_messages['title_unread'] ?>" /><a href="messages.php?action=viewmailbox&box=<?php echo $mailbox?>&unread=yes"><?php echo $lang_messages['text_unread_messages'] ?></a>
-<img class="readpm" src="pic/trans.gif" alt="Read" title="<?php echo $lang_messages['title_read'] ?>" /><a href="messages.php?action=viewmailbox&box=<?php echo $mailbox?>&unread=no"><?php echo $lang_messages['text_read_messages'] ?></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="messages.php?action=editmailboxes"><b><?php echo $lang_messages['text_mailbox_manager'] ?></a></b></div></td></tr></table>
-<?php
+  function msg_json_pre($message) {
+    $message['receiver'] = get_user_prop_msg($message['receiver']);
+    $message['sender'] = get_user_prop_msg($message['sender']);
+    return $message;
+  }
+  echo php_json_encode(array_map('msg_json_pre',$messages));
 }
-stdfoot();
+
+
 }
+
+
 if ($action == "viewmessage")
 {
 $pm_id = (int) $_GET['id'];

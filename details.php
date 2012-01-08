@@ -564,15 +564,10 @@ else {
       	$page = $_GET["page"];
 	$pager_opts = array('lastpagedefault' => 1);
 	if ($page[0] == 'p') {
-	  $findpost = substr($page, 1);
-	  $res = sql_query("SELECT id FROM comments WHERE torrent = $id ORDER BY id") or sqlerr(__FILE__, __LINE__);
-	  $i = 0;
-	  while ($arr = mysql_fetch_row($res)) {
-	    if ($arr[0] == $findpost) {
-	      break;
-	    }
-	    ++$i;
-	  }
+	  $findpost = 0 + substr($page, 1);
+	  $res = sql_query("SELECT COUNT(*) FROM comments WHERE torrent = $id AND id < $findpost ORDER BY id") or sqlerr(__FILE__, __LINE__);
+	  $arr = mysql_fetch_row($res);
+	  $i = $arr[0];
 	  $page = floor($i / 10);
 	  $pager_opts['page'] = $page;
 	}
