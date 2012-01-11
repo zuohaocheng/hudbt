@@ -14,7 +14,27 @@ $(function() {
 
     var args = argsFromUri(window.location.search);
     var oripage = parseInt(args.page) || 0;
+    var disableAutoPaging = false;
 
+    //Auto paging switch
+    var auto_paging_switch = $('<input />', {
+	type : 'checkbox',
+	id : 'disable-autopaging',
+	title : '换了浏览器要重新设置的亲'
+    }).click(function() {
+	disableAutoPaging = (auto_paging_switch.attr('checked') === 'checked');
+	console.log(disableAutoPaging);
+	$.jStorage.set('disableAutoPaging', disableAutoPaging);
+    });
+    if ($.jStorage.get('disableAutoPaging', false)) {
+	disableAutoPaging = true;
+	auto_paging_switch.attr('checked', 'checked');
+    }
+    $('#hotbox>ul').append($('<li></li>').append(auto_paging_switch).append($('<label></label>', {
+	text : '禁用自动翻页',
+	'for' : 'disable-autopaging',
+	title : '刷新后生效'
+    })));
 
     var $sortHeaders = table.find('thead th:not(.unsortable)');
     var sortHeader = function(isJs) {
@@ -23,10 +43,30 @@ $(function() {
 	    table.tablesorter();
 	    return;
 	}
-	var sortcol = args.sort;
-	var sortcoltype = args.type;
-	delete args.sort;
-	delete args.type;
+	var sortcol;
+	var sortcoltype;
+	if ($.isArray(args)) {
+	    var deletes = [];
+	    $.each(args, function(idx, obj) {
+		if (obj.name === 'sort') {
+		    sortcol = obj.value;
+		    deletes.push(idx);
+		}
+		else if (obj.name === 'type') {
+		    sortcoltype = obj.value
+		    deletes.push(idx);
+		}
+	    });
+	    $.each(deletes.sort(), function(idx, obj) {
+		args.splice(obj, 1);
+	    });
+	}
+	else {
+	    sortcol = args.sort;
+	    sortcoltype = args.type;
+	    delete args.sort;
+	    delete args.type;
+	}
 
 	$sortHeaders.each(function() {
 	    var $this = $(this);
@@ -67,8 +107,30 @@ $(function() {
 		'class': sortclass,
 		title : coltitle
 	    }).unbind('click').click(function() {
-		args.sort = col;
-		args.type = sorttype;
+		if ($.isArray(args)) {
+		    var sort = false;
+		    var type = false;
+		    $.each(args, function(idx, obj) {
+			if (obj.name === 'sort') {
+			    obj.value = col;
+			    sort = true;
+			}
+			else if (obj.name === 'type') {
+			    obj.value = sorttype;
+			    type = true;
+			}
+		    });
+		    if (!sort) {
+			args.push({name : 'sort', value :col});
+		    }
+		    if (!type) {
+			args.push({name : 'type', value : sorttype});
+		    }
+		}
+		else {
+		    args.sort = col;
+		    args.type = sorttype;
+		}
 		getFromUriWithHistory(args);
 	    });
 	});
@@ -412,7 +474,7 @@ $(function() {
 	}
 
 	var cont = res['continue'];
-	if (cont) {
+	if (cont && !disableAutoPaging) {
 	    var uri = cont + surfix;
 
 	    var targetH = target.height();
@@ -434,7 +496,7 @@ $(function() {
     };
 
     //Auto scroll
-    if (hb.nextpage !== '') {
+    if (hb.nextpage !== '' && !disableAutoPaging) {
 	$document.scroll(function(){
 	    var loc = $document.scrollTop() + $(window).height();
 	    if(loc > targetH && loader(true)) {
@@ -483,8 +545,8 @@ $(function() {
     };
 
     //Ajax search
-    var getFromUriWithHistory = function(args) {
-	var uri = '?' + $.param(args);
+    var getFromUriWithHistory = function(argu) {
+	var uri = '?' + $.param(argu);
 	var state = {
 	    title : document.title,
 	    url : uri
@@ -493,6 +555,7 @@ $(function() {
 	    window.history.pushState(state, document.title, uri);
 	}
 
+	args = argu;
 	getFromUri(args);
     };
 
@@ -518,6 +581,15 @@ $(function() {
 	window.addEventListener('popstate', function(e){
             var initialPop = !(('state' in e) && e.state) && location.href == initialURL;
             if (initialPop) return;
+	    var t;
+	    if (hb.config.torrents_query !== '') {
+		t = '?' + hb.config.torrents_query;
+	    }
+	    else {
+		t = '';
+	    }
+	    var backPop = (t === location.search);
+	    if (backPop) return;
     	    getFromUri(argsFromUri(window.location.href));
 	}, false);
 	window.history.replaceState(state, document.title, initialURL);
@@ -654,6 +726,8 @@ $(function() {
 	    .append( "<a>" + item.label + '<span class="suggestion-count">' + stime + "</span></a>" )
 	    .appendTo( ul );
     };
+
+
 });
 
 //Select all

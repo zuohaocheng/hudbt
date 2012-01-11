@@ -201,8 +201,9 @@ if ($CURUSER){
 		$USERUPDATESET[] = "last_browse = ".TIMENOW;
 	else	$USERUPDATESET[] = "last_music = ".TIMENOW;
 }
-print('<script type="text/javascript">hb.nextpage = "'. $next_page_href .'";');
-print('hb.constant.maincats = ' . php_json_encode($mainCats) . ';</script>');
+echo '<script type="text/javascript">hb.nextpage = "'. $next_page_href .'";';
+echo 'hb.config.torrents_query = (' . php_json_encode($_SERVER['QUERY_STRING']) . ');';
+echo 'hb.constant.maincats = ' . php_json_encode($mainCats) . ';</script>';
 
 
 stdfoot();

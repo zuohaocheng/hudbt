@@ -887,6 +887,14 @@ pre, code {
     line-height: 150%;
 }
 
+.bbcode dt {
+    font-weight: bold;
+}
+
+.bbcode dt:after {
+    content: ': ';
+}
+
 .codebuttons {
     font-size:11px; 
     margin-right:3px;
@@ -1208,7 +1216,7 @@ input.text {
     top:0;
     right:0;
     padding: 2em 2em 0 2em;
-    width: 100px;
+    width: 120px;
     text-align: left;
 }
 

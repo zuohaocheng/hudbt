@@ -56,7 +56,25 @@ class HTML_BBCodeParser_Filter_Lists extends HTML_BBCodeParser_Filter
                                                     'allowed'   => 'all',
                                                     'parent'    => 'none^ulist,list',
                                                     'attributes'=> array()
-                                                    )
+                                                    ),
+				'dl' => array(   'htmlopen'  => 'dl',
+                                                    'htmlclose' => 'dl',
+                                                    'allowed'   => 'all',
+                                                    'child'     => 'none^dt,dd',
+                                                    'attributes'=> array('list'  => 'style=%2$slist-style-type:%1$s;%2$s')
+                                                    ),
+                                'dt'    => array(   'htmlopen'  => 'dt',
+                                                    'htmlclose' => 'dt',
+                                                    'allowed'   => 'all',
+                                                    'parent'    => 'none^dl',
+                                                    'attributes'=> array()
+                                                    ),
+				'dd'    => array(   'htmlopen'  => 'dd',
+                                                    'htmlclose' => 'dd',
+                                                    'allowed'   => 'all',
+                                                    'parent'    => 'none^dl',
+                                                    'attributes'=> array()
+                                                    ),
                                 );
 
 
