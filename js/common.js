@@ -214,13 +214,12 @@ else{
 }
 
 // bookmark.js
-function bookmark(torrentid)
-{
+function bookmark(torrentid) {
     var result=ajax.gets('bookmark.php?torrentid='+torrentid);
     bmicon(result,torrentid);
 }
-function bmicon(status,torrentid)
-{
+
+function bmicon(status,torrentid) {
     if (status=="added")
 	document.getElementById("bookmark"+torrentid).innerHTML="<img class=\"bookmark\" src=\"pic/trans.gif\" alt=\"Bookmarked\" />";
     else if (status=="deleted")

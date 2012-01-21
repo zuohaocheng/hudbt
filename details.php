@@ -13,7 +13,7 @@ int_check($id);
 if (!isset($id) || !$id)
   die();
 
-$res = sql_query("SELECT torrents.cache_stamp, torrents.sp_state, torrents.url, torrents.small_descr, torrents.seeders, torrents.banned, torrents.leechers, torrents.info_hash, torrents.filename, nfo, LENGTH(torrents.nfo) AS nfosz, torrents.last_action, torrents.name, torrents.owner, torrents.save_as, torrents.descr, torrents.visible, torrents.size, torrents.added, torrents.views, torrents.hits, torrents.times_completed, torrents.id, torrents.type, torrents.numfiles, torrents.anonymous, torrents.startseed, categories.name AS cat_name, sources.name AS source_name, media.name AS medium_name, codecs.name AS codec_name, standards.name AS standard_name, processings.name AS processing_name, teams.name AS team_name, audiocodecs.name AS audiocodec_name FROM torrents LEFT JOIN categories ON torrents.category = categories.id LEFT JOIN sources ON torrents.source = sources.id LEFT JOIN media ON torrents.medium = media.id LEFT JOIN codecs ON torrents.codec = codecs.id LEFT JOIN standards ON torrents.standard = standards.id LEFT JOIN processings ON torrents.processing = processings.id LEFT JOIN teams ON torrents.team = teams.id LEFT JOIN audiocodecs ON torrents.audiocodec = audiocodecs.id WHERE torrents.id = $id LIMIT 1")
+$res = sql_query("SELECT torrents.cache_stamp, torrents.sp_state, torrents.url, torrents.small_descr, torrents.seeders, torrents.banned, torrents.leechers, torrents.info_hash, torrents.filename, nfo, LENGTH(torrents.nfo) AS nfosz, torrents.last_action, torrents.name, torrents.owner, torrents.save_as, torrents.descr, torrents.visible, torrents.size, torrents.added, torrents.promotion_time_type, torrents.promotion_until, torrents.views, torrents.hits, torrents.times_completed, torrents.id, torrents.type, torrents.numfiles, torrents.anonymous, torrents.startseed, categories.name AS cat_name, sources.name AS source_name, media.name AS medium_name, codecs.name AS codec_name, standards.name AS standard_name, processings.name AS processing_name, teams.name AS team_name, audiocodecs.name AS audiocodec_name FROM torrents LEFT JOIN categories ON torrents.category = categories.id LEFT JOIN sources ON torrents.source = sources.id LEFT JOIN media ON torrents.medium = media.id LEFT JOIN codecs ON torrents.codec = codecs.id LEFT JOIN standards ON torrents.standard = standards.id LEFT JOIN processings ON torrents.processing = processings.id LEFT JOIN teams ON torrents.team = teams.id LEFT JOIN audiocodecs ON torrents.audiocodec = audiocodecs.id WHERE torrents.id = $id LIMIT 1")
   or sqlerr();
 $row = mysql_fetch_array($res);
 
@@ -37,21 +37,35 @@ else {
 
     if ($_GET["uploaded"])
       {
-	print('<h1 id="page-title">'.$lang_details['text_successfully_uploaded']."</h1>");
+	print('<h1 class="page-titles">'.$lang_details['text_successfully_uploaded']."</h1>");
 	print('<div style="text-align:center">'.$lang_details['text_redownload_torrent_note']."</div>");
 	header("refresh: 1; url=download.php?id=$id");
 	//header("refresh: 1; url=getimdb.php?id=$id&type=1");
       }
     elseif ($_GET["edited"]) {
-      print("<h1 align=\"center\">".$lang_details['text_successfully_edited']."</h1>");
+      print('<h1 class="page-titles">'.$lang_details['text_successfully_edited']."</h1>");
       if (isset($_GET["returnto"]))
 	print("<p><b>".$lang_details['text_go_back'] . "<a href=\"".htmlspecialchars($_GET["returnto"])."\">" . $lang_details['text_whence_you_came']."</a></b></p>");
     }
-    $sp_torrent = get_torrent_promotion_append($row[sp_state],'word');
+    $sp_torrent = get_torrent_promotion_append($row['sp_state'],'word');
 
-    $s=htmlspecialchars($row["name"]).($sp_torrent ? "&nbsp;&nbsp;&nbsp;".$sp_torrent : "");
-    print("<h1 align=\"center\" id=\"top\">".$s."</h1>\n");
-    print("<table width=\"940\" cellspacing=\"0\" cellpadding=\"5\">\n");
+    $s=htmlspecialchars($row["name"]);
+    print('<h1 id="page-title">'.$s.'</h1><a id="top"></a>');
+    echo '<div class="minor-list" style="text-align:center;font-size:120%;"><ul>';
+
+    if ($sp_torrent) {
+      echo '<li>' . $sp_torrent; 
+      $sp_torrent_sub = get_torrent_promotion_append_sub($row['sp_state'],"",true,$row["added"], $row['promotion_time_type'], $row['promotion_until']);
+      if ($sp_torrent_sub != '') {
+	echo $sp_torrent_sub;
+      }
+      echo '</li>';
+    }
+    if ($row['banned'] == 'yes') {
+      echo "<li>(<span class=\"striking\">".$lang_functions['text_banned']."</span>)</li>";
+    }
+    echo '</ul></div>';
+    print('<table style="width:940px;margin-top:1.5em;" cellspacing="0" cellpadding="5">');
 
     $url = "edit.php?id=" . $row["id"];
     if (isset($_GET["returnto"])) {
@@ -78,7 +92,7 @@ else {
 	if ($CURUSER['timetype'] != 'timealive')
 	  $uploadtime = $lang_details['text_at'].$row['added'];
 	else $uploadtime = $lang_details['text_blank'].gettime($row['added'],true,false);
-	print("<a class=\"index\" href=\"download.php?id=$id\">" . htmlspecialchars($torrentnameprefix ."." .$row["save_as"]) . ".torrent</a>&nbsp;&nbsp;<a id=\"bookmark0\" href=\"javascript: bookmark(".$row['id'].",0);\">".get_torrent_bookmark_state($CURUSER['id'], $row['id'], false)."</a>&nbsp;&nbsp;&nbsp;".$lang_details['row_upped_by']."&nbsp;".$uprow.$uploadtime);
+	print("<a class=\"index\" href=\"download.php?id=$id\">" . htmlspecialchars($torrentnameprefix ."." .$row["save_as"]) . ".torrent</a>&nbsp;&nbsp;<a id=\"bookmark" . $row['id'] . "\" href=\"javascript: bookmark(".$row['id'].",0);\">".get_torrent_bookmark_state($CURUSER['id'], $row['id'], false)."</a>&nbsp;&nbsp;&nbsp;".$lang_details['row_upped_by']."&nbsp;".$uprow.$uploadtime);
 	print("</td></tr>");
       }
     else
