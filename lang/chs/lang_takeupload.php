@@ -26,6 +26,7 @@ $lang_takeupload = array
 	'std_torrent_existed' => "该种子已存在！",
 	'std_torrent_file_too_big' => "种子文件过大！最大允许",
 	'std_remake_torrent_note' => " bytes。请使用更大的区块大小重新制作种子文件，或者将内容分为多个种子发布。",
+	'std_contains_torrent' => '文件中包含了torrent文件，请检查后重新制作种子',
 );
 
 // Added by BruceWolf

@@ -248,6 +248,15 @@ else //upload to unknown section
 	die("Upload to unknown section.");
 // ------------- end: check upload authority ------------------//
 
+foreach ($filelist as $file) {
+  $filename = $file[0];
+  $tokens = explode('.', $filename);
+  $extension = array_pop($tokens);
+  if (strtolower($extension) == 'torrent') {
+    bark($lang_takeupload['std_contains_torrent']);
+  }
+}
+
 // Replace punctuation characters with spaces
 
 //$torrent = str_replace("_", " ", $torrent);

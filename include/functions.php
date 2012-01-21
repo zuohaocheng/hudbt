@@ -2137,7 +2137,7 @@ function stdfoot() {
 function genbark($x,$y) {
   stdhead($y);
   print("<h1>" . htmlspecialchars($y) . "</h1>\n");
-  print("<p>" . htmlspecialchars($x) . "</p>\n");
+  print('<div style="text-align:center;">' . htmlspecialchars($x) . "</div>\n");
   stdfoot();
   exit();
 }
