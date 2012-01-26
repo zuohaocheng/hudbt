@@ -122,6 +122,7 @@ $lang_forums = array
 	'text_more_than' => "找到超过",
 	'text_items_found_displaying_first' => "个项目，显示最近",
 	'text_catch_up' => "全部设置已读",
+	'text_quoted_posts' => "被引用的帖子",
 	'text_nothing_found' => "没有结果",
 	'head_forum_search' => "论坛搜索",
 	'col_post' => "帖子",

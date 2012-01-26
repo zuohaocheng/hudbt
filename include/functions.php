@@ -2060,7 +2060,7 @@ function get_cat_folder($cat = 401, $caticon = -1) {
 
       $class = get_user_class();
       if ($class) {
-	$user = array('class' => $class, 'canonicalClass' => get_user_class_name($class, false), 'bonus' => $CURUSER['seedbonus']);
+	$user = array('id' => $CURUSER['id'], 'class' => $class, 'canonicalClass' => get_user_class_name($class, false), 'bonus' => $CURUSER['seedbonus']);
 	$config = array('user' => $user);
 
 	$out = 'hb = {config : ' . php_json_encode($config) . '}';

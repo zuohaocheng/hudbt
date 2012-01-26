@@ -1215,72 +1215,27 @@ elseif ($action == "search") {
 			$found = "[<b><font class=\"striking\"> ".$lang_forums['text_found'].$hits.$lang_forums['text_num_posts']." </font></b>]";
 		}
 	}
-?>
-<style type="text/css">
-.search{
-	background-image:url(pic/search.gif);
-	background-repeat:no-repeat;
-	width:579px;
-	height:95px;
-	margin:5px 0 5px 0;
-	text-align:left;
-}
-.search_title{
-	color:#0062AE;
-	background-color:#DAF3FB;
-	font-size:12px;
-	font-weight:bold;
-	text-align:left;
-	padding:7px 0 0 15px;
-}
 
-.search_table {
-	border-collapse: collapse;
-	border: none;
-	background-color: #ffffff; 
-}
+	echo '<div style="text-align:center;"><form action="?" method="GET"><input type="hidden" name="action" value="search" /><input type="search" placeholder="' . $lang_forums['text_search'] . '" name="keywords" value="' . $keywords . '" /><input type="submit" class="btn" value="' . $lang_forums['text_go'] . '" /></form></div>';
 
-</style>
-<div class="search">
-	<div class="search_title"><?php echo $lang_forums['text_search_on_forum'] ?> <?php echo ($error && $keywords != "" ? "[<b><font color=striking> ".$lang_forums['text_nothing_found']."</font></b> ]" : $found)?></div>
-	<div style="margin-left: 53px; margin-top: 13px;">
-		<form method="get" action="forums.php" id="search_form" style="margin: 0pt; padding: 0pt; font-family: Tahoma,Arial,Helvetica,sans-serif; font-size: 11px;">
-		<input type="hidden" name="action" value="search" />
-		<table border="0" cellpadding="0" cellspacing="0" width="512" class="search_table">
-		<tbody>
-		<tr>
-		<td style="padding-bottom: 3px; border: 0;" valign="top"><?php echo $lang_forums['text_by_keyword'] ?></td>
-		</tr>
-		<tr>
-		<td style="padding-bottom: 3px; border: 0;" valign="top">			
-			<input name="keywords" type="text" value="<?php echo $keywords?>" style="width: 400px;" /></td>
-			<td style="padding-bottom: 3px; border: 0;" valign="top"><input name="image" type="image" style="vertical-align: middle; padding-bottom: 0px; margin-left: 0px;" src="<?php echo get_forum_pic_folder()?>/search_button.gif" alt="Search" /></td>
-		</tr>
-		</tbody>
-		</table>
-		</form>
-	</div>
-</div>
-<?php
-
-	if (!$error)
-	{
+	if (!$error) {
 		$perpage = $topicsperpage;
 		list($pagertop, $pagerbottom, $limit) = pager($perpage, $hits, "forums.php?action=search&keywords=".rawurlencode($keywords)."&");
 		$res = sql_query("SELECT posts.id, posts.topicid, posts.userid, posts.added, topics.subject, topics.hlcolor, forums.id AS forumid, forums.name AS forumname FROM posts LEFT JOIN topics ON posts.topicid = topics.id LEFT JOIN forums ON topics.forumid = forums.id WHERE forums.minclassread <= ".sqlesc(get_user_class())." AND ((topics.subject $extraSql AND posts.id=topics.firstpost) OR posts.body $extraSql) ORDER BY posts.id DESC $limit") or sqlerr(__FILE__, __LINE__);
 
 		print($pagertop);
-		print("<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\" style=\"width:95%\">\n");
-		print("<tr><td class=\"colhead\" align=\"center\">".$lang_forums['col_post']."</td><td class=\"colhead\" align=\"center\" width=\"70%\">".$lang_forums['col_topic']."</td><td class=\"colhead\" align=\"left\">".$lang_forums['col_forum']."</td><td class=\"colhead\" align=\"left\">".$lang_forums['col_posted_by']."</td></tr>\n");
+		print("<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\" style=\"width:95%\"><thead>\n");
+		print("<tr><th align=\"center\">".$lang_forums['col_post']."</th><th align=\"center\" width=\"70%\">".$lang_forums['col_topic']."</th><th align=\"left\">".$lang_forums['col_forum']."</th><th align=\"left\">".$lang_forums['col_posted_by']."</th></tr></thead><tbody>\n");
 
 		while ($post = mysql_fetch_array($res))
 		{
 			print("<tr><td class=\"rowfollow\" align=\"center\" width=\"1%\">".$post[id]."</td><td class=\"rowfollow\" align=\"left\"><a href=\"".htmlspecialchars("?action=viewtopic&topicid=".$post[topicid]."&highlight=".rawurlencode($keywords)."&page=p".$post[id]."#pid".$post[id])."\">" . highlight_topic(highlight($keywords,htmlspecialchars($post['subject'])), $post['hlcolor']) . "</a></td><td class=\"rowfollow nowrap\" align=\"left\"><a href=\"".htmlspecialchars("?action=viewforum&forumid=".$post['forumid'])."\"><b>" . htmlspecialchars($post["forumname"]) . "</b></a></td><td class=\"rowfollow nowrap\" align=\"left\">" . gettime($post['added'],true,false) . "&nbsp;|&nbsp;". get_username($post['userid']) ."</td></tr>\n");
 		}
 
-		print("</table>\n");
+		print("</tbody></table>\n");
 		print($pagerbottom);
 	}
+	echo '<script>$("table").tablesorter()</script>';
 stdfoot();
 die;
 }
@@ -1304,7 +1259,10 @@ if ($CURUSER) {
 stdhead($lang_forums['head_forums']);
 
 print("<h1 align=\"center\">".$SITENAME."&nbsp;".$lang_forums['text_forums']."</h1>");
-print('<div class="minor-list list-seperator minor-nav"><ul><li><a href="?action=search">'.$lang_forums['text_search'] . '</a></li><li><a href="?action=viewunread">' . $lang_forums['text_view_unread'] . '</a></li><li><a href="?catchup=1">'.$lang_forums['text_catch_up'].'</a>'.(get_user_class() >= $forummanage_class ? '</li><li><a href="forummanage.php">'.$lang_forums['text_forum_manager'].'</a>':'').'</li></ul></div>');
+echo '<div class="minor-list list-seperator minor-nav"><ul><li>';
+#      <a href="?action=search">'.$lang_forums['text_search'] . '</a>';
+echo '<form action="?" method="GET"><input type="hidden" name="action" value="search" /><input type="search" placeholder="' . $lang_forums['text_search'] . '" name="keywords" /><input type="submit" class="btn" value="' . $lang_forums['text_go'] . '" /></form>';
+ echo '</li><li><a href="?action=viewunread">' . $lang_forums['text_view_unread'] . '</a></li><li><a href="?catchup=1">'.$lang_forums['text_catch_up'].'</a></li><li><a href="userhistory.php?action=viewquotedposts">' . $lang_forums['text_quoted_posts'] . '</a>'.(get_user_class() >= $forummanage_class ? '</li><li><a href="forummanage.php">'.$lang_forums['text_forum_manager'].'</a>':'').'</li></ul></div>';
 print("<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\" width=\"100%\">\n");
 
 if (!$overforums = $Cache->get_value('overforums_list')){
@@ -1410,11 +1368,11 @@ foreach ($overforums as $a) {
 print("</table>");
 if ($showforumstats_main == "yes"){
    forum_stats();
-   print('<div style="text-align:center;">');
-   print("<h2><a href=\"?action=search\">".$lang_forums['text_search']."</a> </h2>");
-   print('<div">(新手有疑问请先搜索论坛，不要重复发帖提问)</div>');
-   showSearch();
-   print("</div>");
+   /* print('<div style="text-align:center;">'); */
+   /* print("<h2><a href=\"?action=search\">".$lang_forums['text_search']."</a> </h2>"); */
+   /* print('<div">(新手有疑问请先搜索论坛，不要重复发帖提问)</div>'); */
+   /* showSearch(); */
+   /* print("</div>"); */
 }
 
 
@@ -1422,71 +1380,6 @@ stdfoot();
 
 }
 
-function showSearch(){
-   global $lang_forums, $Cache, $today_date;
-//	stdhead($lang_forums['head_forum_search']);
-	unset($error);
-	$error = true;
-	$found = "";
-	$keywords = htmlspecialchars(trim($_GET["keywords"]));
-	if ($keywords != "")
-	{
-		$extraSql 	= " LIKE '%".mysql_real_escape_string($keywords)."%'";
-
-		$res = sql_query("SELECT COUNT(posts.id) FROM posts LEFT JOIN topics ON posts.topicid = topics.id LEFT JOIN forums ON topics.forumid = forums.id WHERE forums.minclassread <= ".sqlesc(get_user_class())." AND ((topics.subject $extraSql AND posts.id=topics.firstpost) OR posts.body $extraSql)") or sqlerr(__FILE__, __LINE__);
-		$arr = mysql_fetch_row($res);
-		$hits = 0 + $arr[0];
-		if ($hits){
-			$error = false;
-			$found = "[<b><font class=\"striking\"> ".$lang_forums['text_found'].$hits.$lang_forums['text_num_posts']." </font></b>]";
-		}
-	}
-?>
-
-<div class="search">
-	<div class="search_title"><?php echo $lang_forums['text_search_on_forum'] ?> <?php echo ($error && $keywords != "" ? "[<b><font color=striking> ".$lang_forums['text_nothing_found']."</font></b> ]" : $found)?></div>
-	<div style="margin-left: 53px; margin-top: 13px;">
-		<form method="get" action="forums.php" id="search_form" style="margin: 0pt; padding: 0pt; font-family: Tahoma,Arial,Helvetica,sans-serif; font-size: 11px;">
-		<input type="hidden" name="action" value="search" />
-		<table border="0" cellpadding="0" cellspacing="0" width="512" class="search_table">
-		<tbody>
-		<tr>
-		<td style="padding-bottom: 3px; border: 0;" valign="top"><?php echo $lang_forums['text_by_keyword'] ?></td>
-		</tr>
-		<tr>
-		<td style="padding-bottom: 3px; border: 0;" valign="top">			
-			<input name="keywords" type="text" value="<?php echo $keywords?>" style="width: 400px;" /></td>
-			<td style="padding-bottom: 3px; border: 0;" valign="top"><input name="image" type="image" style="vertical-align: middle; padding-bottom: 0px; margin-left: 0px;" src="<?php echo get_forum_pic_folder()?>/search_button.gif" alt="Search" /></td>
-		</tr>
-		</tbody>
-		</table>
-		</form>
-	</div>
-</div>
-<?php
-
-	if (!$error)
-	{
-		$perpage = $topicsperpage;
-		list($pagertop, $pagerbottom, $limit) = pager($perpage, $hits, "forums.php?action=search&keywords=".rawurlencode($keywords)."&");
-		$res = sql_query("SELECT posts.id, posts.topicid, posts.userid, posts.added, topics.subject, topics.hlcolor, forums.id AS forumid, forums.name AS forumname FROM posts LEFT JOIN topics ON posts.topicid = topics.id LEFT JOIN forums ON topics.forumid = forums.id WHERE forums.minclassread <= ".sqlesc(get_user_class())." AND ((topics.subject $extraSql AND posts.id=topics.firstpost) OR posts.body $extraSql) ORDER BY posts.id DESC $limit") or sqlerr(__FILE__, __LINE__);
-
-		print($pagertop);
-		print("<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\" style=\"width:95%\">\n");
-		print("<tr><td class=\"colhead\" align=\"center\">".$lang_forums['col_post']."</td><td class=\"colhead\" align=\"center\" width=\"70%\">".$lang_forums['col_topic']."</td><td class=\"colhead\" align=\"left\">".$lang_forums['col_forum']."</td><td class=\"colhead\" align=\"left\">".$lang_forums['col_posted_by']."</td></tr>\n");
-
-		while ($post = mysql_fetch_array($res))
-		{
-			print("<tr><td class=\"rowfollow\" align=\"center\" width=\"1%\">".$post[id]."</td><td class=\"rowfollow\" align=\"left\"><a href=\"".htmlspecialchars("?action=viewtopic&topicid=".$post[topicid]."&highlight=".rawurlencode($keywords)."&page=p".$post[id]."#pid".$post[id])."\">" . highlight_topic(highlight($keywords,htmlspecialchars($post['subject'])), $post['hlcolor']) . "</a></td><td class=\"rowfollow nowrap\" align=\"left\"><a href=\"".htmlspecialchars("?action=viewforum&forumid=".$post['forumid'])."\"><b>" . htmlspecialchars($post["forumname"]) . "</b></a></td><td class=\"rowfollow nowrap\" align=\"left\">" . gettime($post['added'],true,false) . "&nbsp;|&nbsp;". get_username($post['userid']) ."</td></tr>\n");
-		}
-
-		print("</table>\n");
-		print($pagerbottom);
-	}
-print("</table>\n");
-stdfoot();
-die;
-}
 
 ?>
 

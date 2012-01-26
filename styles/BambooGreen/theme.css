@@ -748,6 +748,8 @@ ul.prs {
     display:inline-block;
     position:absolute;
     right:0;
+    padding-top: 2px;
+    background-color: #c6e3c6;
     display:inline !ie;
 }
 

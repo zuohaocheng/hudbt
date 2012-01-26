@@ -16,15 +16,15 @@ if ($CURUSER["id"] != $userid && get_user_class() < $viewhistory_class) {
 }
 
 $action = htmlspecialchars($_GET["action"]);
+$page = array();
 
 //-------- Global variables
 
 $perpage = 15;
 
 //-------- Action: View posts
-
-function navbar() {
-  global $action, $lang_userhistory, $userid;
+function navbar_json() {
+  global $action, $lang_userhistory;
   $texts = array($lang_userhistory['head_posts_history'],
 		 $lang_userhistory['head_quoted_posts_history'],
 		 $lang_userhistory['head_comments_history'],
@@ -36,21 +36,27 @@ function navbar() {
 		 'viewquotedcomments');
   for ($i=0; $i < count($actions); $i+=1) {
     if ($action == $actions[$i]) {
-      $actions[$i] = '';
+      $selected = $i;
     }
   }
+  return array($texts, $actions, $selected);
+}
+
+function navbar() {
+  global $userid;
+  list($texts, $actions, $selected) = navbar_json();
 
   $list = array();
   for ($i=0; $i < count($texts); $i += 1) {
     $item = '<li>';
-    if ($actions[$i]) {
+    if ($i != $selected) {
       $item .= '<a href="?action=' . $actions[$i] . '&id=' . $userid . '">';
     }
     else {
       $item .= '<span class="gray">';
     }
     $item .= $texts[$i];
-    if ($actions[$i]) {
+    if ($i != $selected) {
       $item .= '</a>';
     }
     else {
@@ -59,7 +65,7 @@ function navbar() {
     $list[] = $item;
   }
   
-  echo '<div class="minor-list list-seperator minor-nav"><ul>';
+  echo '<div id="navbar" class="minor-list list-seperator minor-nav"><ul>';
   echo implode('', $list);
   echo '</ul></div>';
 }
@@ -128,10 +134,9 @@ if ($action == "viewposts") {
 
 	if (mysql_num_rows($res) == 0) stderr($lang_userhistory['std_error'], $lang_userhistory['std_no_posts_found']);
 
-	stdhead($lang_userhistory['head_posts_history']);
-
-	print("<h1>".$lang_userhistory['text_posts_history_for'].$subject."</h1>\n");
-	navbar();
+	$page['title'] = $lang_userhistory['head_posts_history'];
+	$page['h1'] = $lang_userhistory['text_posts_history_for'].$subject;
+	ob_start();
 
 	if ($postcount > $perpage) echo $pagertop;
 
@@ -143,19 +148,12 @@ if ($action == "viewposts") {
 
 	while ($arr = mysql_fetch_assoc($res)) {
 		$postid = $arr["id"];
-
 		$posterid = $arr["userid"];
-
 		$topicid = $arr["t_id"];
-
 		$topicname = $arr["subject"];
-
 		$forumid = $arr["f_id"];
-
 		$forumname = $arr["name"];
-
 		$newposts = ($arr["lastpostread"] < $arr["lastpost"]) && $CURUSER["id"] == $userid;
-
 		$added = gettime($arr["added"], true, false, false);
 
 		print('<div class="forum-author minor-list"><ul><li>' . $added . '</li><li>' . $lang_userhistory['text_forum'].
@@ -190,7 +188,7 @@ if ($action == "viewposts") {
 
 	if ($postcount > $perpage) echo $pagerbottom;
 
-
+  $page['content'] = ob_get_clean();
 
 }
 elseif ($action == 'viewquotedposts') {
@@ -207,8 +205,9 @@ elseif ($action == 'viewquotedposts') {
   $select = 'p.userid, p.topicid, p.id, p.added, p.body, p.editedby, p.editdate, t.subject AS postname, t.forumid, t.locked';
   $subres = sql_query("SELECT $select FROM $from WHERE $where ORDER BY $order $limit") or sqlerr(__FILE__, __LINE__);
   
-  stdhead($lang_userhistory['head_quoted_posts_history']);
-  navbar();
+  $page['title'] = $lang_userhistory['head_quoted_posts_history'];
+  $page['h1'] = $lang_userhistory['text_quoted_posts_history_for'];
+  ob_start();
   if ($postcount > $perpage) {
     echo $pagertop;
   }
@@ -226,8 +225,9 @@ elseif ($action == 'viewquotedposts') {
   echo '</ol></div>';
   if ($postcount > $perpage) {
     echo $pagerbottom;
-  }			      
-  stdfoot();
+  }
+  $page['content'] = ob_get_clean();
+
 }
 
 //-------- Action: View comments
@@ -275,10 +275,9 @@ elseif ($action == "viewcomments") {
 
   if (mysql_num_rows($res) == 0) stderr($lang_userhistory['std_error'], $lang_userhistory['std_no_comments_found']);
 
-  stdhead($lang_userhistory['head_comments_history']);
-
-  print("<h1>".$lang_userhistory['text_comments_history_for']."$subject</h1>\n");
-  navbar();
+  $page['title'] = $lang_userhistory['head_comments_history'];
+  $page['h1'] = $lang_userhistory['text_comments_history_for']."$subject</h1>\n";
+  ob_start();
 
   if ($commentcount > $perpage) echo $pagertop;
 
@@ -291,6 +290,7 @@ elseif ($action == "viewcomments") {
   echo '</ol></div>';
 
   if ($commentcount > $perpage) echo $pagerbottom;
+  $page['content'] = ob_get_clean();
 }
 elseif ($action == 'viewquotedcomments') {
   $res = sql_query('SELECT COUNT(*) AS postname FROM comments c INNER JOIN comments c1 ON c.quote = c1.id WHERE c1.user=' . $userid . ' ORDER BY c.id') or sqlerr(__FILE__, __LINE__);
@@ -302,10 +302,12 @@ elseif ($action == 'viewquotedcomments') {
 
   $subres = sql_query('SELECT c.torrent AS t_id, c.offer AS o_id, c.id, c.text, c.user, c.added, c.editedby, c.editdate, t.name AS t_name, o.name AS o_name FROM comments c INNER JOIN comments c1 ON c.quote = c1.id LEFT JOIN torrents t ON c.torrent = t.id LEFT JOIN offers o ON c.offer = o.id WHERE c1.user=' . $userid . ' ORDER BY c.id ' . $limit) or sqlerr(__FILE__, __LINE__);
   $allrows = array();
-  stdhead($lang_userhistory['head_quoted_comments_history']);
-  print("<h1>".$lang_userhistory['text_quoted_comments_history_for']."</h1>\n");
+  
+  $page['title'] = $lang_userhistory['head_quoted_comments_history'];
+  $page['h1'] = $lang_userhistory['text_quoted_comments_history_for'];
 
-  navbar();
+  ob_start();
+
   if ($commentcount > $perpage) echo $pagertop;
   echo '<div id="forum-posts"><ol>';
   while ($arr = mysql_fetch_assoc($subres)) {
@@ -313,14 +315,26 @@ elseif ($action == 'viewquotedcomments') {
   }
   echo '</ol></div>';
   if ($commentcount > $perpage) echo $pagerbottom;
+  $page['content'] = ob_get_clean();
 }
 else {
-  stdhead($lang_userhistory['head']);
-  echo '<h1>' . $lang_userhistory['head'] . '</h1>';
-  navbar();
+  $page['title'] = $lang_userhistory['head'];
+  $page['h1'] = $lang_userhistory['head'];
 }
 
-stdfoot();
+if ($_REQUEST['format'] == 'json') {
+  header('Content-type:application/json');
+  $page['title'] = $SITENAME . ' ' . $page['title'];
+  $page['navbar'] = navbar_json();
+  echo php_json_encode($page);
+}
+else {
+  stdhead($page['title']);
+  echo '<h1 id="page-title">' . $page['h1'] . '</h1>';
+  navbar();
+  echo '<div id="contents">' . $page['content'] . '</div>';
+  stdfoot();
+}
 
 //-------- Handle unknown action
 

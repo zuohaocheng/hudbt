@@ -16,7 +16,7 @@ table, .table {
     border-left: medium none;
     border-bottom: medium none;
     border-collapse: collapse;
-    background-color: #bccad6
+    background-color: #bccad6;
 }
 
 table.transparent {
@@ -782,6 +782,8 @@ ul.prs {
     display:inline-block;
     position:absolute;
     right:0;
+    padding-top: 2px;
+    background-color: #bccad6;
     display:inline !ie;
 }
 

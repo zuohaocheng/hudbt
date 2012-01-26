@@ -355,7 +355,7 @@ $(function() {
 	    }
 
 	    var div_main = '<div class="torrent-title">' + mainTitle;
-	    var div_desc = '<div class="torrent-title">' + desc;
+	    var div_desc = '<div class="torrent-title">';
 
 	    var mainTitleDecorators = '<ul class="prs">';
 
@@ -384,11 +384,12 @@ $(function() {
 		    hexpire += 'pr-limit" title="' + expire.raw + '">' + expire.canonical;
 		}
 		else {
-		    hexpire += 'pr-eternal">' + lang.text_forever;
+		    hexpire += 'pr-eternal">' + lang.text_will_end_in + lang.text_forever;
 		}
 		hexpire += '</span>]</span></li></ul>';
 		desc += hexpire;
 	    }
+	    div_desc += desc;
 	    div_desc += '</div>';
 
 	    if (torrent.oday) {
