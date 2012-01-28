@@ -215,15 +215,19 @@ else{
 
 // bookmark.js
 function bookmark(torrentid) {
-    var result=ajax.gets('bookmark.php?torrentid='+torrentid);
-    bmicon(result,torrentid);
+    $.getJSON('bookmark.php', {torrentid : torrentid}, function(result) {
+	var status = result.status;
+	bmicon(status, torrentid);
+    });
 }
 
 function bmicon(status,torrentid) {
-    if (status=="added")
+    if (status=="added") {
 	document.getElementById("bookmark"+torrentid).innerHTML="<img class=\"bookmark\" src=\"pic/trans.gif\" alt=\"Bookmarked\" />";
-    else if (status=="deleted")
+    }
+    else if (status=="deleted") {
 	document.getElementById("bookmark"+torrentid).innerHTML="<img class=\"delbookmark\" src=\"pic/trans.gif\" src=\"pic/trans.gif\" alt=\"Unbookmarked\" />";
+    }
 }
 
 // check.js
