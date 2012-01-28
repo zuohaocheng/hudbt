@@ -20,10 +20,7 @@ if ($order=='username')
 	$order .=' ASC';
 else $order .= ' DESC';
 stdhead($lang_uploaders['head_uploaders']);
-begin_main_frame();
-?>
-<div style="width: 940px">
-<?php
+
 $year2 = substr($datefounded, 0, 4);
 $yearfounded = ($year2 ? $year2 : 2007);
 $yearnow=date("Y");
@@ -117,9 +114,5 @@ else{
 </div>
 <?php
 }
-?>
-</div>
-<?php
-end_main_frame();
 stdfoot();
 ?>

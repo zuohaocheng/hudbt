@@ -628,6 +628,21 @@ A.Peasant_Name:visited{color: #708090}
     font-family: tahoma, arial, helvetica, sans-serif;
 }
 
+.minor-list.properties li:before {
+    content: "[";
+    color: black;
+}
+
+.minor-list.properties li:after {
+    content: "]";
+    color: black;
+}
+
+.minor-list.properties li {
+    color: red;
+    font-size: 80%;
+}
+
 .minor-list ul {
     display:inline;
     margin: 0px;

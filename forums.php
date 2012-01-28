@@ -506,6 +506,7 @@ elseif ($action == "viewtopic") {
 		$subject = highlight($highlight,$orgsubject);
 	}
 	$sticky = $arr['sticky'] == "yes";
+	$selected = ($arr['selected'] == "yes");
 	$hlcolor = $arr['hlcolor'];
 	$views = $arr['views'];
 	$forumid = $arr["forumid"];
@@ -566,7 +567,19 @@ elseif ($action == "viewtopic") {
 	stdhead($lang_forums['head_view_topic']." \"".$orgsubject."\"");
 	begin_main_frame("",true);
 
-	print("<h1 align=\"center\"><a class=\"faqlink\" href=\"forums.php\">".$SITENAME."&nbsp;".$lang_forums['text_forums']."</a>--><a class=\"faqlink\" href=\"".htmlspecialchars("?action=viewforum&forumid=".$forumid)."\">".$forumname."</a><b>--></b><span id=\"top\">".$subject.($locked ? "&nbsp;&nbsp;<b>[<font class=\"striking\">".$lang_forums['text_locked']."</font>]</b>" : "")."</span></h1>\n");
+	print("<h1 id=\"page-title\"><a class=\"faqlink\" href=\"forums.php\">".$SITENAME."&nbsp;".$lang_forums['text_forums']."</a> --> <a class=\"faqlink\" href=\"".htmlspecialchars("?action=viewforum&forumid=".$forumid)."\">".$forumname."</a> --> <span id=\"top\">".$subject."</span>");
+	echo ' <span class="minor-list properties horizon-compact"><ul>';
+	if ($locked) {
+	  echo '<li>' . $lang_forums['text_locked'] . '</li>';
+	}
+	if ($sticky) {
+	  echo '<li>' . $lang_forums['title_sticky'] . '</li>';
+	}
+	if ($selected) {
+	  echo '<li>' . $lang_forums['title_selected'] . '</li>';
+	}
+	echo '</ul></span>';
+	echo '</h1>';
 	end_main_frame();
 
 	//------ Print table
@@ -625,12 +638,22 @@ elseif ($action == "viewtopic") {
 	//------ Mod options
 
 	if ($maymodify) {
+	  function generateForm($action) {
+	    
+	  }
+	  
 		print('<div id="forum-toolbox" class="minor-list"><ul>');
 		print("<li><form method=\"post\" action=\"?action=setsticky\">\n");
 		print("<input type=\"hidden\" name=\"topicid\" value=\"".$topicid."\" />\n");
 		print("<input type=\"hidden\" name=\"returnto\" value=\"".htmlspecialchars($_SERVER[REQUEST_URI])."\" />\n");
-		print("<input type=\"hidden\" name=\"sticky\" value=\"".($sticky ? 'no' : 'yes')."\" /><input type=\"submit\" class=\"medium\" value=\"".($sticky ? $lang_forums['submit_unsticky'] : $lang_forums['submit_sticky'])."\" /></form></li>\n");
-
+		print("<input type=\"hidden\" name=\"value\" value=\"".($sticky ? 'no' : 'yes')."\" /><input type=\"submit\" class=\"medium\" value=\"".($sticky ? $lang_forums['submit_unsticky'] : $lang_forums['submit_sticky'])."\" /></form></li>\n");
+		
+		echo '<li><form method="POST" action="?action=setselected">';
+		print("<input type=\"hidden\" name=\"topicid\" value=\"".$topicid."\" />\n");
+		print("<input type=\"hidden\" name=\"returnto\" value=\"".htmlspecialchars($_SERVER[REQUEST_URI])."\" />\n");
+		print("<input type=\"hidden\" name=\"value\" value=\"".($selected ? 'no' : 'yes')."\" /><input type=\"submit\" class=\"medium\" value=\"".($selected ? $lang_forums['submit_unselected'] : $lang_forums['submit_selected'])."\" /></form></li>\n");
+		echo '</form></li>';
+		
 		print("<li><form method=\"post\" action=\"?action=setlocked\">\n");
 		print("<input type=\"hidden\" name=\"topicid\" value=\"".$topicid."\" />\n");
 		print("<input type=\"hidden\" name=\"returnto\" value=\"".htmlspecialchars($_SERVER[REQUEST_URI])."\" />\n");
@@ -903,17 +926,31 @@ elseif ($action == 'hltopic') {
 
 //-------- Action: Set sticky on/off
 
-elseif ($action == "setsticky") {
-	$topicid = 0 + $_POST["topicid"];
-	$ismod = is_forum_moderator($topicid,'topic');
-	if (!topicid || (get_user_class() < $postmanage_class && !$ismod))
-		permissiondenied();
+elseif ($action == "setsticky" || $action == 'setselected') {
+  if ($action == 'setsticky') {
+    $key = 'sticky';
+  }
+  elseif ($action == 'setselected') {
+    $key = 'selected';
+  }
+  else {
+    die;
+  }
 
-	$sticky = sqlesc($_POST["sticky"]);
-	sql_query("UPDATE topics SET sticky=$sticky WHERE id=$topicid") or sqlerr(__FILE__, __LINE__);
+  $topicid = 0 + $_REQUEST["topicid"];
+  $ismod = is_forum_moderator($topicid,'topic');
+  if (!$topicid || (get_user_class() < $postmanage_class && !$ismod))
+    permissiondenied();
 
-	header("Location: $_POST[returnto]");
-	die;
+  $value = $_REQUEST["value"];
+  if ($value != 'yes' && $value != 'no') {
+    die;
+  }
+  $value = sqlesc($value);
+  sql_query("UPDATE topics SET $key=$value WHERE id=$topicid") or sqlerr(__FILE__, __LINE__);
+
+  header("Location: $_REQUEST[returnto]");
+  die;
 }
 
 //-------- Action: View forum
@@ -938,10 +975,16 @@ elseif ($action == "viewforum") {
 		$wherea = " AND subject LIKE '%$search%'";
 		$addparam .= "&search=".rawurlencode($search);
 	}
-	else{
+	else {
 		$wherea = "";
 		$addparam = "";
 	}
+	$filter = $_REQUEST['filter'];
+	if ($filter == 'selected') {
+	  $wherea .= " AND selected = 'yes'";
+	  $addparam .= '&filter=selected';
+	}
+	
 	$num = get_row_count("topics","WHERE forumid=".sqlesc($forumid).$wherea);
 
 	list($pagertop, $pagerbottom, $limit) = pager($topicsperpage, $num, "?"."action=viewforum&forumid=".$forumid.$addparam."&");
@@ -981,9 +1024,18 @@ elseif ($action == "viewforum") {
 	$topicsres = sql_query("SELECT * FROM topics WHERE forumid=".sqlesc($forumid).$wherea." ORDER BY sticky DESC,".$orderby." ".$limit) or sqlerr(__FILE__, __LINE__);
 	$numtopics = mysql_num_rows($topicsres);
 	stdhead($lang_forums['head_forum']." ".$forumname);
-	begin_main_frame("",true);
-	print("<h1 align=\"center\"><a class=\"faqlink\" href=\"forums.php\">".$SITENAME."&nbsp;".$lang_forums['text_forums'] ."</a>--><a class=\"faqlink\" href=\"".htmlspecialchars("forums.php?action=viewforum&forumid=".$forumid)."\">".$forumname."</a></h1>\n");
-	end_main_frame();
+	print("<h1 id=\"page-title\"><a class=\"faqlink\" href=\"forums.php\">".$SITENAME."&nbsp;".$lang_forums['text_forums'] ."</a> --> <a class=\"faqlink\" href=\"".htmlspecialchars("forums.php?action=viewforum&forumid=".$forumid)."\">".$forumname."</a></h1>\n");
+
+	echo '<div class="minor-list list-seperator minor-nav"><ul>';
+	echo '<li>' . '<form action="?" method="GET"><input type="hidden" name="action" value="viewforum" /><input type="hidden" name="forumid" value="'.$forumid.'" /><input type="search" placeholder="' . $lang_forums['text_search'] . '" value="' . $_GET["search"] . '" name="search" /><input type="submit" class="btn" value="' . $lang_forums['text_go'] . '" /></form>' . '</li>';
+	if ($filter == 'selected') {
+	  echo '<li class="selected">' . $lang_forums['show_selected'] . '</li>';
+	}
+	else {
+	  echo '<li>' . '<a href="' . htmlspecialchars('?action=viewforum&filter=selected&forumid=' . $forumid) . '">' . $lang_forums['show_selected'] . '</a></li>';
+	}
+	echo '</ul></div>';
+	
 	print("<br />");
 	$maypost = get_user_class() >= $row["minclasswrite"] && get_user_class() >= $row["minclasscreate"] && $CURUSER["forumpost"] == 'yes';
 
@@ -1000,27 +1052,52 @@ elseif ($action == "viewforum") {
 	print("</div></div>\n");
 	if ($numtopics > 0)
 	{
-		print("<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\" style=\"width:95%\">");
+		print("<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\" style=\"width:95%\"><thead>");
 
-		print("<tr><td class=\"colhead\" align=\"center\" width=\"99%\">".$lang_forums['col_topic']."</td><td class=\"colhead\" align=\"center\"><a href=\"".htmlspecialchars("?action=viewforum&forumid=".$forumid.$addparam."&sort=".($_GET["sort"] == 'firstpostdesc' ? "firstpostasc" : "firstpostdesc"))."\" title=\"".($_GET["sort"] == 'firstpostdesc' ?  $lang_forums['title_order_topic_asc'] : $lang_forums['title_order_topic_desc'])."\">".$lang_forums['col_author']."</a></td><td class=\"colhead\" align=\"center\">".$lang_forums['col_replies']."/".$lang_forums['col_views']."</td><td class=\"colhead\" align=\"center\"><a href=\"".htmlspecialchars("?action=viewforum&forumid=".$forumid.$addparam."&sort=".($_GET["sort"] == 'lastpostasc' ? "lastpostdesc" : "lastpostasc"))."\" title=\"".($_GET["sort"] == 'lastpostasc' ? $lang_forums['title_order_post_desc'] : $lang_forums['title_order_post_asc'])."\">".$lang_forums['col_last_post']."</a></td>\n");
+		print("<tr><th style=\"width:1%;\"></th><th style=\"width:99%\">".$lang_forums['col_topic']."</th>");
+		if ($_REQUEST["sort"] == 'firstpostdesc') {
+		  $sort = 'firstpostasc';
+		  $title =  $lang_forums['title_order_topic_asc'];
+		  $class = 'headerSort headerSortUp';
+		}
+		else {
+		  $sort = 'firstpostdesc';
+		  $title = $lang_forums['title_order_topic_desc'];
+		  $class = 'headerSort';
+		}
+		if ($_REQUEST["sort"] == 'firstpostasc') {
+		  $class = 'headerSort headerSortDown';
+		}
+		echo "<th class=\"$class\" title=\"$title\"><a href=\"".htmlspecialchars("?action=viewforum&forumid=".$forumid.$addparam."&sort=$sort") . "\">".$lang_forums['col_author']."</a></th>";
 
-		print("</tr>\n");
+		echo "<th>".$lang_forums['col_replies']."/".$lang_forums['col_views']."</th>";
+				
+		if ($_REQUEST["sort"] == 'lastpostdesc') {
+		  $sort = 'lastpostasc';
+		  $title =  $lang_forums['title_order_post_asc'];
+		  $class = 'headerSort headerSortUp';
+		}
+		else {
+		  $sort = 'lastpostdesc';
+		  $title = $lang_forums['title_order_post_desc'];
+		  $class = 'headerSort';
+		}
+		if ($_REQUEST["sort"] == 'lastpostasc') {
+		  $class = 'headerSort headerSortDown';
+		}
+		echo "<th class=\"$class\" title=\"$title\"><a href=\"".htmlspecialchars("?action=viewforum&forumid=".$forumid.$addparam."&sort=$sort")."\">".$lang_forums['col_last_post']."</a></th>\n";
+
+		print("</tr></thead><tbody>\n");
 		$counter = 0;
 
-		while ($topicarr = mysql_fetch_assoc($topicsres))
-		{
+		while ($topicarr = mysql_fetch_assoc($topicsres)) {
 			$topicid = $topicarr["id"];
-
 			$topic_userid = $topicarr["userid"];
-
 			$topic_views = $topicarr["views"];
-
 			$views = number_format($topic_views);
-
 			$locked = $topicarr["locked"] == "yes";
-
 			$sticky = $topicarr["sticky"] == "yes";
-
+			$selected = $topicarr["selected"] == "yes";
 			$hlcolor = $topicarr["hlcolor"];
 
 			//---- Get reply count
@@ -1080,7 +1157,17 @@ elseif ($action == "viewforum") {
 			$fpuserid = 0 + $arr["userid"];
 			$fpauthor = get_username($arr["userid"]);
 
-			$subject = ($sticky ? "<img class=\"sticky\" src=\"pic/trans.gif\" alt=\"Sticky\" title=\"".$lang_forums['title_sticky']."\" />&nbsp;&nbsp;" : "") . "<a href=\"".htmlspecialchars("?action=viewtopic&forumid=".$forumid."&topicid=".$topicid)."\" ".$onmouseover.">" .highlight_topic(highlight($search,htmlspecialchars($topicarr["subject"])), $hlcolor) . "</a>".$topicpages;
+			$subject = '';
+			if ($sticky) {
+			  $subject .= "<img class=\"sticky\" src=\"pic/trans.gif\" alt=\"Sticky\" title=\"".$lang_forums['title_sticky']."\" /> ";
+			}
+			$subject .= "<a href=\"".htmlspecialchars("?action=viewtopic&forumid=".$forumid."&topicid=".$topicid)."\" ".$onmouseover.">" .highlight_topic(highlight($search,htmlspecialchars($topicarr["subject"])), $hlcolor) . "</a>";
+			$subject .= ' <span class="minor-list horizon-compact properties"><ul>';
+			if ($selected) {
+			  $subject .= '<li>' . $lang_forums['title_selected'] . '</li>';
+			}
+			$subject .= '</ul></span>';
+			$subject .= $topicpages;
 			$lastpostread = get_last_read_post_id($topicid);
 
 			if ($lastpostread >= $lppostid)
@@ -1098,10 +1185,9 @@ elseif ($action == "viewforum") {
 			else
 				$topictime = "<font color=\"gray\" class=\"small\">".$topictime."</font>";
 
-			print("<tr><td class=\"rowfollow\" style=\"text-align:left;\"><table border=\"0\" cellspacing=\"0\" cellpadding=\"0\"><tr>" .
-			"<td class=\"embedded\" style='padding-right: 10px'>".$img .
-			"</td><td class=\"embedded\" style=\"text-align:left;\">\n" .
-			$subject."</td></tr></table></td><td class=\"rowfollow\" align=\"center\">".get_username($fpuserid)."<br />".$topictime."</td><td class=\"rowfollow\" align=\"center\">".$replies." / <font color=\"gray\">".$views."</font></td>\n" .
+			print("<tr>" . "<td style=\"padding:0;\">".$img .
+			"</td><td style=\"text-align:left;\">\n" .
+			$subject."</td><td class=\"rowfollow\" align=\"center\">".get_username($fpuserid)."<br />".$topictime."</td><td class=\"rowfollow\" align=\"center\">".$replies." / <font color=\"gray\">".$views."</font></td>\n" .
 			"<td class=\"rowfollow nowrap\">".$lpadded."<br />".$lpusername."</td>\n");
 
 			print("</tr>\n");
@@ -1109,23 +1195,7 @@ elseif ($action == "viewforum") {
 
 		} // while
 
-		print("<tr><td align=\"left\">\n");
-		print("<form method=\"get\" action=\"forums.php\"><b>".$lang_forums['text_fast_search']."</b><input type=\"hidden\" name=\"action\" value=\"viewforum\" /><input type=\"hidden\" name=\"forumid\" value=\"".$forumid."\" /><input type=\"text\" style=\"width: 180px\" name=\"search\" />&nbsp;<input type=\"submit\" value=\"".$lang_forums['text_go']."\" /></form>");
-		print("</td>");
-?>
-<td align="left" colspan="3">
-<span id="order" onclick="dropmenu(this);"><span style="cursor: pointer;"><b><?php echo $lang_forums['text_order']?></b></span>
-<span id="orderlist" class="dropmenu" style="display: none"><ul>
-<li><a href="?action=viewforum&amp;forumid=<?php echo $forumid.$addparam?>&amp;sort=firstpostdesc"><?php echo $lang_forums['text_topic_desc']?></a></li>
-<li><a href="?action=viewforum&amp;forumid=<?php echo $forumid.$addparam?>&amp;sort=firstpostasc"><?php echo $lang_forums['text_topic_asc']?></a></li>
-<li><a href="?action=viewforum&amp;forumid=<?php echo $forumid.$addparam?>&amp;sort=lastpostdesc"><?php echo $lang_forums['text_post_desc']?></a></li>
-<li><a href="?action=viewforum&amp;forumid=<?php echo $forumid.$addparam?>&amp;sort=lastpostasc"><?php echo $lang_forums['text_post_asc']?></a></li>
-</ul>
-</span>
-</span>
-</td>
-<?php
-		print("</tr></table>");
+		print("</tbody></table>");
 		print($pagerbottom);
 		if ($enabletooltip_tweak == 'yes' && $CURUSER['showlastpost'] != 'no')
 			create_tooltip_container($lastpost_tooltip, 400);
