@@ -486,7 +486,7 @@ ul.menu li
     margin-left: 0px;
     margin-right: 0px;
 }
-ul.menu li a
+ul.menu li a, ul.menu li span
 {
     border-right: #778 1px solid;
     padding-right: 7px;
@@ -526,7 +526,7 @@ ul.menu li a:active
 {
     color: #2d2b2b;
 }
-ul.menu li.selected a
+ul.menu li.selected a, ul.menu li.selected span
 {
     background-image: url(./shadeactive.gif);
     background-color: #ffffff;
@@ -726,11 +726,58 @@ A.Peasant_Name:visited{color: #708090}
     padding: 0;
 }
 
+input.invalid, .invalid input[type="text"] {
+    background-color: red;
+}
+
+input.invalid-ref, .invalid-ref input[type="text"], .invalid-ref a {
+    background-color: yellow;
+}
+
+dl.table { 
+    width:940px;
+    margin:0 auto;
+    border:1px black solid;
+}
+
+dl dt {  
+    float:left; 
+    font-weight:bold;  
+    margin-right:10px; 
+    padding:5px;  
+    width:100px; 
+    text-align:right;
+    clear: both;
+    /* background:#9af; */
+    /* border-radius:2px; */
+    /* box-shadow:2px 2px 5px silver; */
+}
+
+dl dd {
+    margin:0;
+    padding:5px 0 5px 120px;
+    border-top:1px silver dashed;
+    min-height: 1.1em;
+}
+
+dl dd.no-dt {
+    margin-left: 120px;
+    padding-left: 0;
+}
+
+dl dd.first-child{
+    border-top:none;
+}
+
 #searchbox-right li {
     margin: 1.5em 0;
 }
 
 .selected {
+    color: gray;
+}
+
+.disabled {
     color: gray;
 }
 

@@ -37,6 +37,9 @@ function success($action) {
     $row = mysql_fetch_array(sql_query("SELECT seedbonus, title, uploaded, invites FROM users WHERE id=".sqlesc($CURUSER['id']))) or sqlerr(__FILE__, __LINE__);
     echo php_json_encode(array('success' => true, 'title' => '成功', 'text' => bonusTextFromAction($action, $row['title']), 'bonus' => number_format($row['seedbonus'], 1), 'uploaded' => mksize($row['uploaded']), 'invites' => $row['invites']));
   }
+
+  $s = smarty();
+  $s->clearCache('stdhead.tpl', $CURUSER['id']);
   die();
 }
 

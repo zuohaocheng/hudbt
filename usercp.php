@@ -43,11 +43,11 @@ function getimageheight ($imagewidth, $imageheight)
 	return $imageheight;
 }
 function form($name) {
-	return print("<form method=post action=usercp.php><input type=hidden name=action value=".htmlspecialchars($name)."><input type=hidden name=type value=save>");
+	return print('<form method="post" action="usercp.php"><input type="hidden" name="action" value="'.htmlspecialchars($name).'"><input type="hidden" name="type" value="save">');
 }
 function submit() {
 	global $lang_usercp;
-	print("<tr><td class=\"rowhead\" valign=\"top\" align=\"right\">".$lang_usercp['row_save_settings']."</td><td class=\"rowfollow\" valign=\"top\" align=left><input type=submit value=\"".$lang_usercp['submit_save_settings']."\"></td></tr>"."</form>");
+	print("<dt>".$lang_usercp['row_save_settings'].'</dt><dd><input type="submit" value="'.$lang_usercp['submit_save_settings'].'"></dd></form>');
 }
 function format_tz($a)
 {
@@ -69,6 +69,21 @@ function goback ($where = "-1") {
 	$goback = "<a class=faqlink HREF=\"javascript:history.go(".htmlspecialchars($where).")\">".htmlspecialchars($text)."</a>";
 	return $goback;
 }
+
+function dl_item($title, $desc, $noesc = false) {
+  static $first = true;
+  if (!$noesc) {
+    $desc = htmlspecialchars($desc);
+    //$a = str_replace("\n", "<br />\n", $a);
+  }
+  echo '<dt>' . $title . '</dt><dd';
+  if ($first) {
+    $first = false;
+    echo ' class="first-child"';
+  }
+  echo '>' . $desc .  '</dd>';
+}
+
 $action = isset($_POST['action']) ? htmlspecialchars($_POST['action']) : (isset($_GET['action']) ? htmlspecialchars($_GET['action']) : '');
 $type = isset($_POST['type']) ? htmlspecialchars($_POST['type']) : (isset($_GET['type']) ? htmlspecialchars($_GET['type']) : '');
 
@@ -165,41 +180,41 @@ if ($action){
 			}
 
 			usercpmenu ("personal");
-			print ("<table border=0 cellspacing=0 cellpadding=5 width=940>");
 			if ($type == 'saved')
 				print("<tr><td colspan=2 class=\"heading\" valign=\"top\" align=\"center\"><font color=red>".$lang_usercp['text_saved']."</font></td></tr>\n");
 
+			echo '<dl class="table">';
 			form ("personal");
-			tr_small($lang_usercp['row_account_parked'],
+			dl_item($lang_usercp['row_account_parked'],
 			"<input type=checkbox name=parked" . ($CURUSER["parked"] == "yes" ? " checked" : "") . " value=yes>".$lang_usercp['checkbox_pack_my_account']."<br /><font class=small size=1>".$lang_usercp['text_account_pack_note']."</font>"
 			,1);
 			//Modified by bluemonster 20111107
-			//tr_small($lang_usercp['row_pms'],$lang_usercp['text_accept_pms']."<input type=radio name=acceptpms" . ($CURUSER["acceptpms"] == "yes" ? " checked" : "") . " value=yes>".$lang_usercp['radio_all_except_blocks']."<input type=radio name=acceptpms" .  ($CURUSER["acceptpms"] == "friends" ? " checked" : "") . " value=friends>".$lang_usercp['radio_friends_only']."<input type=radio name=acceptpms" .  ($CURUSER["acceptpms"] == "no" ? " checked" : "") . " value=no>".$lang_usercp['radio_staff_only']."<br /><input type=checkbox name=deletepms" . ($CURUSER["deletepms"] == "yes" ? " checked" : "") . "> ".$lang_usercp['checkbox_delete_pms']."<br /><input type=checkbox name=savepms" . ($CURUSER["savepms"] == "yes" ? " checked" : "") . "> ".$lang_usercp['checkbox_save_pms']."<br /><input type=checkbox name=commentpm" . ($CURUSER["commentpm"] == "yes" ? " checked" : "") . " value=yes> ".$lang_usercp['checkbox_pm_on_comments'],1);
-			tr_small($lang_usercp['row_pms'],$lang_usercp['text_accept_pms']."<input type=radio name=acceptpms" . ($CURUSER["acceptpms"] == "yes" ? " checked" : "") . " value=yes>".$lang_usercp['radio_all_except_blocks']."<input type=radio name=acceptpms" .  ($CURUSER["acceptpms"] == "friends" ? " checked" : "") . " value=friends>".$lang_usercp['radio_friends_only']."<input type=radio name=acceptpms" .  ($CURUSER["acceptpms"] == "no" ? " checked" : "") . " value=no>".$lang_usercp['radio_staff_only']."<br /><input type=checkbox name=deletepms" . ($CURUSER["deletepms"] == "yes" ? " checked" : "") . "> ".$lang_usercp['checkbox_delete_pms']."<br /><input type=checkbox name=savepms" . ($CURUSER["savepms"] == "yes" ? " checked" : "") . "> ".$lang_usercp['checkbox_save_pms']."<br /><input type=checkbox name=commentpm" . ($CURUSER["commentpm"] == "yes" ? " checked" : "") . " value=yes>".$lang_usercp['checkbox_pm_on_comments']."<br /><input type=checkbox name=accepttdpms".($CURUSER["accepttdpms"] == "yes" ? " checked" : "").">".$lang_usercp['checkbox_accepttdpms'],1);
+			//dl_item($lang_usercp['row_pms'],$lang_usercp['text_accept_pms']."<input type=radio name=acceptpms" . ($CURUSER["acceptpms"] == "yes" ? " checked" : "") . " value=yes>".$lang_usercp['radio_all_except_blocks']."<input type=radio name=acceptpms" .  ($CURUSER["acceptpms"] == "friends" ? " checked" : "") . " value=friends>".$lang_usercp['radio_friends_only']."<input type=radio name=acceptpms" .  ($CURUSER["acceptpms"] == "no" ? " checked" : "") . " value=no>".$lang_usercp['radio_staff_only']."<br /><input type=checkbox name=deletepms" . ($CURUSER["deletepms"] == "yes" ? " checked" : "") . "> ".$lang_usercp['checkbox_delete_pms']."<br /><input type=checkbox name=savepms" . ($CURUSER["savepms"] == "yes" ? " checked" : "") . "> ".$lang_usercp['checkbox_save_pms']."<br /><input type=checkbox name=commentpm" . ($CURUSER["commentpm"] == "yes" ? " checked" : "") . " value=yes> ".$lang_usercp['checkbox_pm_on_comments'],1);
+			dl_item($lang_usercp['row_pms'],$lang_usercp['text_accept_pms']."<input type=radio name=acceptpms" . ($CURUSER["acceptpms"] == "yes" ? " checked" : "") . " value=yes>".$lang_usercp['radio_all_except_blocks']."<input type=radio name=acceptpms" .  ($CURUSER["acceptpms"] == "friends" ? " checked" : "") . " value=friends>".$lang_usercp['radio_friends_only']."<input type=radio name=acceptpms" .  ($CURUSER["acceptpms"] == "no" ? " checked" : "") . " value=no>".$lang_usercp['radio_staff_only']."<br /><input type=checkbox name=deletepms" . ($CURUSER["deletepms"] == "yes" ? " checked" : "") . "> ".$lang_usercp['checkbox_delete_pms']."<br /><input type=checkbox name=savepms" . ($CURUSER["savepms"] == "yes" ? " checked" : "") . "> ".$lang_usercp['checkbox_save_pms']."<br /><input type=checkbox name=commentpm" . ($CURUSER["commentpm"] == "yes" ? " checked" : "") . " value=yes>".$lang_usercp['checkbox_pm_on_comments']."<br /><input type=checkbox name=accepttdpms".($CURUSER["accepttdpms"] == "yes" ? " checked" : "").">".$lang_usercp['checkbox_accepttdpms'],1);
 			
-			tr_small($lang_usercp['row_gender'],
+			dl_item($lang_usercp['row_gender'],
 			"<input type=radio name=gender" . ($CURUSER["gender"] == "N/A" ? " checked" : "") . " value=N/A>".$lang_usercp['radio_not_available']."
 <input type=radio name=gender" . ($CURUSER["gender"] == "Male" ? " checked" : "") . " value=Male>".$lang_usercp['radio_male']."<input type=radio name=gender" .  ($CURUSER["gender"] == "Female" ? " checked" : "") . " value=Female>".$lang_usercp['radio_female'],1);
-			tr_small($lang_usercp['row_country'], "<select name=country>\n$countries\n</select>",1);
+			dl_item($lang_usercp['row_country'], "<select name=country>\n$countries\n</select>",1);
 		//School select
 if ($showschool == 'yes'){
 $schools = "<option value=35>---- ".$lang_usercp['select_none_selected']." ----</option>n";
 $sc_r = sql_query("SELECT id,name FROM schools ORDER BY name") or die;
 while ($sc_a = mysql_fetch_array($sc_r))
 $schools .= "<option value=$sc_a[id]" . ($sc_a['id'] == $CURUSER['school'] ? " selected" : "") . ">$sc_a[name]</option>n";
-tr($lang_usercp['row_school'], "<select name=school>$schools</select>", 1);
+dl_item($lang_usercp['row_school'], "<select name=school>$schools</select>", 1);
 }
-			tr_small($lang_usercp['row_network_bandwidth'], "<b>".$lang_usercp['text_downstream_rate']. "</b>: <select name=download>".$downloadspeed."</select>&nbsp;&nbsp;<b>".$lang_usercp['text_upstream_rate']."</b>: <select name=upload>".$uploadspeed."</select>&nbsp;&nbsp;<b>".$lang_usercp['text_isp']."</b>: <select name=isp>".$isplist."</select>",1);
-			tr_small($lang_usercp['row_avatar_url'], "<img src=".($CURUSER["avatar"] ? "'$CURUSER[avatar]'" : "'" . get_protocol_prefix() . $BASEURL . "/pic/default_avatar.png'")." name='avatarimg'><br />
+			dl_item($lang_usercp['row_network_bandwidth'], "<b>".$lang_usercp['text_downstream_rate']. "</b>: <select name=download>".$downloadspeed."</select>&nbsp;&nbsp;<b>".$lang_usercp['text_upstream_rate']."</b>: <select name=upload>".$uploadspeed."</select>&nbsp;&nbsp;<b>".$lang_usercp['text_isp']."</b>: <select name=isp>".$isplist."</select>",1);
+			dl_item($lang_usercp['row_avatar_url'], "<img src=".($CURUSER["avatar"] ? "'$CURUSER[avatar]'" : "'" . get_protocol_prefix() . $BASEURL . "/pic/default_avatar.png'")." name='avatarimg'><br />
   <select name=savatar OnChange=\"document.forms[0].avatarimg.src=this.value;this.form.avatar.value=this.value;\">
   <option value='$CURUSER[avatar]'>".$lang_usercp['select_choose_avatar']."</option>
   <option value='" . get_protocol_prefix() . $BASEURL . "/pic/default_avatar.png'>".$lang_usercp['select_nothing']."</option>
   $text
   </select><input type=text name=avatar style=\"width: 400px\" value=\"" . htmlspecialchars($CURUSER["avatar"]) .
   "\"><br />\n".$lang_usercp['text_avatar_note'].($enablebitbucket_main == 'yes' ? $lang_usercp['text_bitbucket_note'] : ""),1);
-  tr($lang_usercp['row_info'], "<textarea name=\"info\" style=\"width:700px\" rows=\"10\" >" . htmlspecialchars($CURUSER["info"]) . "</textarea><br />".$lang_usercp['text_info_note'], 1);
+  dl_item($lang_usercp['row_info'], "<textarea name=\"info\" style=\"width:700px\" rows=\"10\" >" . htmlspecialchars($CURUSER["info"]) . "</textarea><br />".$lang_usercp['text_info_note'], 1);
   submit();
-  print("</table>");
+  print("</dl>");
   stdfoot();
   die;
   break;
@@ -404,12 +419,13 @@ if ($showprocessing) $processings = searchbox_item_list("processings");
 if ($showteam) $teams = searchbox_item_list("teams");
 if ($showaudiocodec) $audiocodecs = searchbox_item_list("audiocodecs");
 }
-			print ("<table border=0 cellspacing=0 cellpadding=5 width=940>");
+
+echo '<dl class="table">';
 			form ("tracker");
 			if ($type == 'saved')
 				print("<tr><td colspan=2 class=\"heading\" valign=\"top\" align=\"center\"><font color=red>".$lang_usercp['text_saved']."</font></td></tr>\n");
 			if ($emailnotify_smtp=='yes' && $smtptype != 'none')
-				tr_small($lang_usercp['row_email_notification'], "<input type=checkbox name=pmnotif" . (strpos($CURUSER['notifs'], "[pm]") !== false ? " checked" : "") . " value=yes> ".$lang_usercp['checkbox_notification_received_pm']."<br />\n<input type=checkbox name=emailnotif" . (strpos($CURUSER['notifs'], "[email]") !== false ? " checked" : "") . " value=\"yes\" /> ".$lang_usercp['checkbox_notification_default_categories'], 1);
+				dl_item($lang_usercp['row_email_notification'], "<input type=checkbox name=pmnotif" . (strpos($CURUSER['notifs'], "[pm]") !== false ? " checked" : "") . " value=yes> ".$lang_usercp['checkbox_notification_received_pm']."<br />\n<input type=checkbox name=emailnotif" . (strpos($CURUSER['notifs'], "[email]") !== false ? " checked" : "") . " value=\"yes\" /> ".$lang_usercp['checkbox_notification_default_categories'], 1);
 
 			$categories = "<table>".($allowspecial ? "<tr><td class=embedded align=left><font class=big>".$lang_usercp['text_at_browse_page']."</font></td></tr></table><table>" : "")."<tr><td class=embedded align=left><b>".($brenablecatrow == true ? $brcatrow[0] : $lang_usercp['text_category'])."</b></td></tr><tr>";
 			$i = 0;
@@ -543,7 +559,7 @@ if ($showaudiocodec) $audiocodecs = searchbox_item_list("audiocodecs");
 
 			$categories .= "<tr><td class=bottom><b>".$lang_usercp['text_show_dead_active']."</b><br /><select name=\"incldead\"><option value=\"0\" ".(strpos($CURUSER['notifs'], "[incldead=0]") !== false ? " selected" : "").">".$lang_usercp['select_including_dead']."</option><option value=\"1\" ".(strpos($CURUSER['notifs'], "[incldead=1]") !== false ||  strpos($CURUSER['notifs'], "incldead") == false ? " selected" : "").">".$lang_usercp['select_active']."</option><option value=\"2\" ".(strpos($CURUSER['notifs'], "[incldead=2]") !== false  ? " selected" : "").">".$lang_usercp['select_dead']."</option></select></td><td class=bottom align=left><b>".$lang_usercp['text_show_special_torrents']."</b><br /><select name=\"spstate\"><option value=\"0\" ".($special_state == 0 ? " selected" : "").">".$lang_usercp['select_all']."</option>".promotion_selection($special_state)."</select></td><td class=bottom><b>".$lang_usercp['text_show_bookmarked']."</b><br /><select name=\"inclbookmarked\"><option value=\"0\" ".(strpos($CURUSER['notifs'], "[inclbookmarked=0]") !== false ? " selected" : "").">".$lang_usercp['select_all']."</option><option value=\"1\" ".(strpos($CURUSER['notifs'], "[inclbookmarked=1]") !== false ? " selected" : "")." >".$lang_usercp['select_bookmarked']."</option><option value=\"2\" ".(strpos($CURUSER['notifs'], "[inclbookmarked=2]") !== false ? " selected" : "").">".$lang_usercp['select_bookmarked_exclude']."</option></select></td></tr>";
 			$categories .= "</table>";
-			tr_small($lang_usercp['row_browse_default_categories'],$categories,1);
+			dl_item($lang_usercp['row_browse_default_categories'],$categories,1);
 			$ss_r = sql_query("SELECT * FROM stylesheets") or die;
 			$ss_sa = array();
 			while ($ss_a = mysql_fetch_array($ss_r))
@@ -564,9 +580,9 @@ if ($showaudiocodec) $audiocodecs = searchbox_item_list("audiocodecs");
 				if ($caticon['id'] == $CURUSER['caticon']) $sl = " selected"; else $sl = "";
 				$categoryicons .= "<option value=".$caticon['id'].$sl.">".$caticon['name']."</option>\n";
 			}
-			tr_small($lang_usercp['row_stylesheet'], "<select id=\"stylesheet\" name=\"stylesheet\">\n$stylesheets\n</select>&nbsp;&nbsp;<font class=small>".$lang_usercp['text_stylesheet_note']."<a href=\"aboutnexus.php#stylesheet\" ><b>".$lang_usercp['text_stylesheet_link']."</b></a></font>.",1);
-			tr_small($lang_usercp['row_category_icons'], "<select id==\"caticon\" name=\"caticon\">".$categoryicons."</select>",1);
-			tr_small($lang_usercp['row_font_size'], "<select name=fontsize><option value=small ".($CURUSER['fontsize'] == 'small' ? " selected" : "").">".$lang_usercp['select_small']."</option><option value=medium ".($CURUSER['fontsize'] == 'medium' ? " selected" : "").">".$lang_usercp['select_medium']."</option><option value=large ".($CURUSER['fontsize'] == 'large' ? " selected" : "").">".$lang_usercp['select_large']."</option></select>",1);
+			dl_item($lang_usercp['row_stylesheet'], "<select id=\"stylesheet\" name=\"stylesheet\">\n$stylesheets\n</select>&nbsp;&nbsp;<font class=small>".$lang_usercp['text_stylesheet_note']."<a href=\"aboutnexus.php#stylesheet\" ><b>".$lang_usercp['text_stylesheet_link']."</b></a></font>.",1);
+			dl_item($lang_usercp['row_category_icons'], "<select id==\"caticon\" name=\"caticon\">".$categoryicons."</select>",1);
+			dl_item($lang_usercp['row_font_size'], "<select name=fontsize><option value=small ".($CURUSER['fontsize'] == 'small' ? " selected" : "").">".$lang_usercp['select_small']."</option><option value=medium ".($CURUSER['fontsize'] == 'medium' ? " selected" : "").">".$lang_usercp['select_medium']."</option><option value=large ".($CURUSER['fontsize'] == 'large' ? " selected" : "").">".$lang_usercp['select_large']."</option></select>",1);
 
 
 			$s = "<select name=\"sitelanguage\">\n";
@@ -580,24 +596,24 @@ if ($showaudiocodec) $audiocodecs = searchbox_item_list("audiocodecs");
 			}
 			$s .= "\n</select>&nbsp;&nbsp;<font class=small>".$lang_usercp['text_translation_note']."<a href=\"aboutnexus.php#translation\"><b>".$lang_usercp['text_translation_link']."</b></a></font>.</td></tr>";
 
-			tr_small($lang_usercp['row_site_language'], $s,1);
+			dl_item($lang_usercp['row_site_language'], $s,1);
 
 			if($showmovies['hot'] == "yes" || $showmovies['classic'] == "yes")
-			tr_small($lang_usercp['row_recommended_movies'], ($showmovies['hot'] == "yes" ? "<input type=checkbox name=show_hot" . ($CURUSER["showhot"] == "yes" ? " checked" : "") . " value=yes>".$lang_usercp['checkbox_show_hot']. "&nbsp;" : "") . ($showmovies['classic'] == "yes" ? "<input type=checkbox name=show_classic" . ($CURUSER["showclassic"] == "yes" ? " checked" : "") . " value=yes>".$lang_usercp['checkbox_show_classic']."&nbsp;" : ""),1);
-			tr_small($lang_usercp['row_pm_boxes'], $lang_usercp['text_show']."<input type=text name=pmnum size=5 value=".$CURUSER['pmnum']." >".$lang_usercp['text_pms_per_page'], 1);
+			dl_item($lang_usercp['row_recommended_movies'], ($showmovies['hot'] == "yes" ? "<input type=checkbox name=show_hot" . ($CURUSER["showhot"] == "yes" ? " checked" : "") . " value=yes>".$lang_usercp['checkbox_show_hot']. "&nbsp;" : "") . ($showmovies['classic'] == "yes" ? "<input type=checkbox name=show_classic" . ($CURUSER["showclassic"] == "yes" ? " checked" : "") . " value=yes>".$lang_usercp['checkbox_show_classic']."&nbsp;" : ""),1);
+			dl_item($lang_usercp['row_pm_boxes'], $lang_usercp['text_show']."<input type=text name=pmnum size=5 value=".$CURUSER['pmnum']." >".$lang_usercp['text_pms_per_page'], 1);
 if ($showshoutbox_main == "yes") //system side setting for shoutbox
-			tr_small($lang_usercp['row_shoutbox'], $lang_usercp['text_show_last']."<input type=text name=sbnum size=5 value=".$CURUSER['sbnum']." >".$lang_usercp['text_messages_at_shoutbox']."<br />".$lang_usercp['text_refresh_shoutbox_every']."<input type=text name=sbrefresh size=5 value=".$CURUSER['sbrefresh']." >".$lang_usercp['text_seconds'].($showhelpbox_main == 'yes' ? "<br /><input type=checkbox name=hidehb".($CURUSER["hidehb"] == "yes" ? " checked" : "") ." value=yes>".$lang_usercp['text_hide_helpbox_messages'] : ""), 1);
+			dl_item($lang_usercp['row_shoutbox'], $lang_usercp['text_show_last']."<input type=text name=sbnum size=5 value=".$CURUSER['sbnum']." >".$lang_usercp['text_messages_at_shoutbox']."<br />".$lang_usercp['text_refresh_shoutbox_every']."<input type=text name=sbrefresh size=5 value=".$CURUSER['sbrefresh']." >".$lang_usercp['text_seconds'].($showhelpbox_main == 'yes' ? "<br /><input type=checkbox name=hidehb".($CURUSER["hidehb"] == "yes" ? " checked" : "") ." value=yes>".$lang_usercp['text_hide_helpbox_messages'] : ""), 1);
 if ($showfunbox_main == 'yes') //siteside setting for funbox
-tr_small($lang_usercp['row_funbox'],"<input type=checkbox name=showfb".($CURUSER["showfb"] == "yes" ? " checked" : "") ." value=yes>".$lang_usercp['text_show_funbox'] , 1);
+dl_item($lang_usercp['row_funbox'],"<input type=checkbox name=showfb".($CURUSER["showfb"] == "yes" ? " checked" : "") ." value=yes>".$lang_usercp['text_show_funbox'] , 1);
 
-			tr_small($lang_usercp['row_torrent_detail'], "<input type=checkbox name=showdescription".($CURUSER["showdescription"] == "yes" ? " checked" : "") ." value=yes>".$lang_usercp['text_show_description']."<br />".($enablenfo_main == 'yes' && get_user_class() >= UC_POWER_USER ? "<input type=checkbox name=shownfo".($CURUSER["shownfo"] == "yes" ? " checked" : "") ." value=yes>".$lang_usercp['text_show_nfo']."<br />" : "").($showextinfo['imdb'] == 'yes' ? "<input type=checkbox name=showimdb".($CURUSER["showimdb"] == "yes" ? " checked" : "") ." value=yes>".$lang_usercp['text_show_imdb_info'] : ""),1);
-			tr_small($lang_usercp['row_discuss'],"<input type=checkbox name=showcomment".($CURUSER["showcomment"] == "yes" ? " checked" : "") ." value=yes>".$lang_usercp['text_show_comments'], 1);
+			dl_item($lang_usercp['row_torrent_detail'], "<input type=checkbox name=showdescription".($CURUSER["showdescription"] == "yes" ? " checked" : "") ." value=yes>".$lang_usercp['text_show_description']."<br />".($enablenfo_main == 'yes' && get_user_class() >= UC_POWER_USER ? "<input type=checkbox name=shownfo".($CURUSER["shownfo"] == "yes" ? " checked" : "") ." value=yes>".$lang_usercp['text_show_nfo']."<br />" : "").($showextinfo['imdb'] == 'yes' ? "<input type=checkbox name=showimdb".($CURUSER["showimdb"] == "yes" ? " checked" : "") ." value=yes>".$lang_usercp['text_show_imdb_info'] : ""),1);
+			dl_item($lang_usercp['row_discuss'],"<input type=checkbox name=showcomment".($CURUSER["showcomment"] == "yes" ? " checked" : "") ." value=yes>".$lang_usercp['text_show_comments'], 1);
 			if ($enablead_advertisement == 'yes'){
-				tr_small($lang_usercp['row_show_advertisements'],"<input type=\"checkbox\" name=\"showad\"".($CURUSER["noad"] == "yes" ? "" : " checked=\"checked\"") .($showaddisabled ? " disabled=\"disabled\"" : ""). " value=\"yes\" />".$lang_usercp['text_show_advertisement_note'].($enablenoad_advertisement == 'yes' ? "<br />".get_user_class_name($noad_advertisement,false,true,true).$lang_usercp['text_can_turn_off_advertisement'] : "").($enablebonusnoad_advertisement == 'yes' ? "<br />".get_user_class_name($bonusnoad_advertisement,false,true,true).$lang_usercp['text_buy_no_advertisement']."<a href=\"mybonus.php\"><b>".$lang_usercp['text_bonus_center']."</b></a>" : ""), 1);
+				dl_item($lang_usercp['row_show_advertisements'],"<input type=\"checkbox\" name=\"showad\"".($CURUSER["noad"] == "yes" ? "" : " checked=\"checked\"") .($showaddisabled ? " disabled=\"disabled\"" : ""). " value=\"yes\" />".$lang_usercp['text_show_advertisement_note'].($enablenoad_advertisement == 'yes' ? "<br />".get_user_class_name($noad_advertisement,false,true,true).$lang_usercp['text_can_turn_off_advertisement'] : "").($enablebonusnoad_advertisement == 'yes' ? "<br />".get_user_class_name($bonusnoad_advertisement,false,true,true).$lang_usercp['text_buy_no_advertisement']."<a href=\"mybonus.php\"><b>".$lang_usercp['text_bonus_center']."</b></a>" : ""), 1);
 			}
-			tr_small($lang_usercp['row_time_type'], "<input type=radio name=timetype ".($CURUSER['timetype'] == 'timeadded' ? " checked" : "")." value=timeadded>".$lang_usercp['text_time_added']."&nbsp;&nbsp;<input type=radio name=timetype ".($CURUSER['timetype'] == 'timealive' ? " checked" : "")." value=timealive>".$lang_usercp['text_time_elapsed']."<br />", 1);
+			dl_item($lang_usercp['row_time_type'], "<input type=radio name=timetype ".($CURUSER['timetype'] == 'timeadded' ? " checked" : "")." value=timeadded>".$lang_usercp['text_time_added']."&nbsp;&nbsp;<input type=radio name=timetype ".($CURUSER['timetype'] == 'timealive' ? " checked" : "")." value=timealive>".$lang_usercp['text_time_elapsed']."<br />", 1);
 			//Setting for browse page
-			tr_small($lang_usercp['row_browse_page'], $lang_usercp['text_browse_setting_warning']."
+			dl_item($lang_usercp['row_browse_page'], $lang_usercp['text_browse_setting_warning']."
 		<br /><b>".$lang_usercp['row_torrent_page'].": </b><br />".$lang_usercp['text_show']."<input type=text size=5 name=torrentsperpage value=".$CURUSER['torrentsperpage']."> ".$lang_usercp['text_torrents_per_page'].$lang_usercp['text_zero_equals_default']."<br />".
 		($showtooltipsetting ? "<b>".$lang_usercp['text_tooltip_type']."</b>: <br />".($showextinfo['imdb'] == 'yes' ? "<input type=radio name=tooltip ".($CURUSER['tooltip'] == 'minorimdb' ? " checked" : "")." value=minorimdb>".$lang_usercp['text_minor_imdb_info']."<br /><input type=radio name=tooltip ".($CURUSER['tooltip'] == 'medianimdb' ? " checked" : "")." value=medianimdb>".$lang_usercp['text_median_imdb_info']. "<br />" : "")."<input type=radio name=tooltip ".($CURUSER['tooltip'] == 'off' ? " checked" : "")." value=off>".$lang_usercp['text_off']."<br />" : "").
 		"<b>".$lang_usercp['text_append_words_to_torrents'].": </b><br /><input type=checkbox name=appendsticky ".($CURUSER['appendsticky'] == 'yes' ? " checked" : "")." value=yes>".$lang_usercp['text_append_sticky']."<br /><input type=checkbox name=appendnew ".($CURUSER['appendnew'] == 'yes' ? " checked" : "")." value=yes>".$lang_usercp['text_append_new']."<br />".$lang_usercp['text_torrents_on_promotion']."<input type=radio name=appendpromotion ".($CURUSER['appendpromotion'] == 'highlight' ? " checked" : "")." value='highlight'>".$lang_usercp['text_highlight']."<input type=radio name=appendpromotion ".($CURUSER['appendpromotion'] == 'word' ? " checked" : "")." value='word'>".$lang_usercp['text_append_words']."<input type=radio name=appendpromotion ".($CURUSER['appendpromotion'] == 'icon' ? " checked" : "")." value='icon'>".$lang_usercp['text_append_icon']."<input type=radio name=appendpromotion ".($CURUSER['appendpromotion'] == 'off' ? " checked" : "")." value='off'>".$lang_usercp['text_no_mark']."<br /><input type=checkbox name=appendpicked ".($CURUSER['appendpicked'] == 'yes' ? " checked" : "")." value=yes>".$lang_usercp['text_append_picked']."<br />
@@ -606,7 +622,7 @@ tr_small($lang_usercp['row_funbox'],"<input type=checkbox name=showfb".($CURUSER
 		<b>".$lang_usercp['text_comments_reviews'].": </b><br /><input type=checkbox name=showcomnum ".($CURUSER['showcomnum'] == 'yes' ? " checked" : "")." value=yes>".$lang_usercp['text_show_comment_number'].($showtooltipsetting ? "<select name=\"showlastcom\" style=\"width: 70px;\"><option value=\"yes\" ".($CURUSER['showlastcom'] != 'no' ? " selected" : "").">".$lang_usercp['select_with']."</option><option value=\"no\" ".($CURUSER['showlastcom'] == 'no' ? " selected" : "").">".$lang_usercp['select_without']."</option></select>".$lang_usercp['text_last_comment_on_tooltip'] : ""), 1);
 
 			  submit();
-echo '</table>';
+echo '</dl>';
 			stdfoot();
 			die;
 			break;
@@ -644,21 +660,22 @@ echo '</table>';
 				bark('Guest 用户不能进行个人设置');
 			}
 			usercpmenu ("forum");
-			print ("<table border=0 cellspacing=0 cellpadding=5 width=940>");
+
+			echo '<dl class="table">';
 			form ("forum");
 			if ($type == 'saved')
 			print("<tr><td colspan=2 class=\"heading\" valign=\"top\" align=\"center\"><font color=red>".$lang_usercp['text_saved']."</font></td></tr>\n");
 
-			tr_small($lang_usercp['row_topics_per_page'], "<input type=text size=10 name=topicsperpage value=$CURUSER[topicsperpage]>".$lang_usercp['text_zero_equals_default'],1);
-			tr_small($lang_usercp['row_posts_per_page'], "<input type=text size=10 name=postsperpage value=$CURUSER[postsperpage]> ".$lang_usercp['text_zero_equals_default'],1);
-			tr_small($lang_usercp['row_view_avatars'], "<input type=checkbox name=avatars" . ($CURUSER["avatars"] == "yes" ? " checked" : "") . ">".$lang_usercp['checkbox_low_bandwidth_note'],1);
-			tr_small($lang_usercp['row_view_signatures'], "<input type=checkbox name=signatures" . ($CURUSER["signatures"] == "yes" ? " checked" : "") . ">".$lang_usercp['checkbox_low_bandwidth_note'],1);
+			dl_item($lang_usercp['row_topics_per_page'], "<input type=text size=10 name=topicsperpage value=$CURUSER[topicsperpage]>".$lang_usercp['text_zero_equals_default'],1);
+			dl_item($lang_usercp['row_posts_per_page'], "<input type=text size=10 name=postsperpage value=$CURUSER[postsperpage]> ".$lang_usercp['text_zero_equals_default'],1);
+			dl_item($lang_usercp['row_view_avatars'], "<input type=checkbox name=avatars" . ($CURUSER["avatars"] == "yes" ? " checked" : "") . ">".$lang_usercp['checkbox_low_bandwidth_note'],1);
+			dl_item($lang_usercp['row_view_signatures'], "<input type=checkbox name=signatures" . ($CURUSER["signatures"] == "yes" ? " checked" : "") . ">".$lang_usercp['checkbox_low_bandwidth_note'],1);
 			if ($showtooltipsetting)
-				tr($lang_usercp['row_tooltip_last_post'], "<input type=checkbox name=ttlastpost" . ($CURUSER["showlastpost"] == "yes" ? " checked" : "") . ">".$lang_usercp['checkbox_last_post_note'],1);
-			tr_small($lang_usercp['row_click_on_topic'], "<input type=radio name=clicktopic" . ($CURUSER["clicktopic"] == "firstpage" ? " checked" : "") . " value=\"firstpage\">".$lang_usercp['text_go_to_first_page']."<input type=radio name=clicktopic" . ($CURUSER["clicktopic"] == "lastpage" ? " checked" : "") . " value=\"lastpage\">".$lang_usercp['text_go_to_last_page'],1);
-			tr_small($lang_usercp['row_forum_signature'], "<textarea name=signature style=\"width:700px\" rows=10>" . $CURUSER[signature] . "</textarea><br />".$lang_usercp['text_signature_note'],1);
+				dl_item($lang_usercp['row_tooltip_last_post'], "<input type=checkbox name=ttlastpost" . ($CURUSER["showlastpost"] == "yes" ? " checked" : "") . ">".$lang_usercp['checkbox_last_post_note'],1);
+			dl_item($lang_usercp['row_click_on_topic'], "<input type=radio name=clicktopic" . ($CURUSER["clicktopic"] == "firstpage" ? " checked" : "") . " value=\"firstpage\">".$lang_usercp['text_go_to_first_page']."<input type=radio name=clicktopic" . ($CURUSER["clicktopic"] == "lastpage" ? " checked" : "") . " value=\"lastpage\">".$lang_usercp['text_go_to_last_page'],1);
+			dl_item($lang_usercp['row_forum_signature'], "<textarea name=signature style=\"width:700px\" rows=10>" . $CURUSER[signature] . "</textarea><br />".$lang_usercp['text_signature_note'],1);
 			submit();
-			print("</table>");
+			print("</dl>");
 			stdfoot();
 			die;
 			break;
@@ -802,9 +819,10 @@ EOD;
 				bark('Guest 用户不能进行个人设置');
 			}
 			usercpmenu ("security");
-			print ("<table border=0 cellspacing=0 cellpadding=5 width=940>");
+
+			echo '<dl class="table">';
 			if ($type == 'save') {
-				print("<form method=post action=usercp.php><input type=hidden name=action value=security><input type=hidden name=type value=confirm>");
+				print('<form method="post" action="usercp.php"><input type="hidden" name="action" value="security"><input type="hidden" name="type" value="confirm">');
 				$resetpasskey = $_POST["resetpasskey"];
 				$email = mysql_real_escape_string( htmlspecialchars( trim($_POST["email"]) ));
 				$chpassword = $_POST["chpassword"];
@@ -818,19 +836,19 @@ EOD;
 				print("<input type=\"hidden\" name=\"privacy\" value=\"$privacy\">");
 				Print("<tr><td class=\"heading\" valign=\"top\" align=\"right\" width=1%>".$lang_usercp['row_security_check']."</td><td valign=\"top\" align=left><input type=password name=oldpassword style=\"width: 200px\"><br /><font class=small>".$lang_usercp['text_security_check_note']."</font></td></tr>\n");
 				submit();
-				print("</table>");
+				print("</dl>");
 				stdfoot();
 				die;
 			}
 			if ($type == 'saved')
 				print("<tr><td colspan=2 class=\"heading\" valign=\"top\" align=\"center\"><font color=red>".$lang_usercp['text_saved'].($_GET["mail"] == "1" ? $lang_usercp['std_confirmation_email_sent'] : "")." ".($_GET["passkey"] == "1" ? $lang_usercp['std_passkey_reset'] : "")." ".($_GET["password"] == "1" ? $lang_usercp['std_password_changed'] : "")." ".($_GET["privacy"] == "1" ? $lang_usercp['std_privacy_level_updated'] : "")."</font></td></tr>\n");
 			form ("security");
-			tr_small($lang_usercp['row_reset_passkey'],"<input type=checkbox name=resetpasskey value=1 />".$lang_usercp['checkbox_reset_my_passkey']."<br /><font class=small>".$lang_usercp['text_reset_passkey_note']."</font>", 1);
+			dl_item($lang_usercp['row_reset_passkey'],"<input type=checkbox name=resetpasskey value=1 />".$lang_usercp['checkbox_reset_my_passkey']."<br /><font class=small>".$lang_usercp['text_reset_passkey_note']."</font>", 1);
 			if ($disableemailchange != 'no' && $smtptype != 'none') //system-wide setting
-				tr_small($lang_usercp['row_email_address'], "<input type=\"text\" name=\"email\" style=\"width: 200px\" value=\"" . htmlspecialchars($CURUSER["email"]) . "\" /> <br /><font class=small>".$lang_usercp['text_email_address_note']."</font>", 1);
-			tr_small($lang_usercp['row_change_password'], "<input type=\"password\" name=\"chpassword\" style=\"width: 200px\" />", 1);
-			tr_small($lang_usercp['row_type_password_again'], "<input type=\"password\" name=\"passagain\" style=\"width: 200px\" />", 1);
-			tr_small($lang_usercp['row_privacy_level'],  priv("normal", $lang_usercp['radio_normal']) . " " . priv("low", $lang_usercp['radio_low']) . " " . priv("strong", $lang_usercp['radio_strong']), 1);
+				dl_item($lang_usercp['row_email_address'], "<input type=\"text\" name=\"email\" style=\"width: 200px\" value=\"" . htmlspecialchars($CURUSER["email"]) . "\" /> <br /><font class=small>".$lang_usercp['text_email_address_note']."</font>", 1);
+			dl_item($lang_usercp['row_change_password'], "<input type=\"password\" name=\"chpassword\" style=\"width: 200px\" />", 1);
+			dl_item($lang_usercp['row_type_password_again'], "<input type=\"password\" name=\"passagain\" style=\"width: 200px\" />", 1);
+			dl_item($lang_usercp['row_privacy_level'],  priv("normal", $lang_usercp['radio_normal']) . " " . priv("low", $lang_usercp['radio_low']) . " " . priv("strong", $lang_usercp['radio_strong']), 1);
 			submit();
 			print("</table>");
 			stdfoot();
@@ -884,38 +902,38 @@ if ($forumposts)
 	}
 	$percentages = round($forumposts*100/$postcount, 3)."%";
 }
-?>
-<table border="0" cellspacing="0" cellpadding="5" width=940>
-<?php
-tr_small($lang_usercp['row_join_date'], $joindate, 1);
-tr_small($lang_usercp['row_email_address'], $CURUSER['email'], 1);
+
+echo '<dl class="table">';
+
+dl_item($lang_usercp['row_join_date'], $joindate, 1);
+dl_item($lang_usercp['row_email_address'], $CURUSER['email'], 1);
 if ($enablelocation_tweak == 'yes'){
 	list($loc_pub, $loc_mod) = get_ip_location($CURUSER["ip"]);
-	tr_small($lang_usercp['row_ip_location'], $CURUSER["ip"]." <span title='" . $loc_mod . "'>[" . $loc_pub . "]</span>", 1);
+	dl_item($lang_usercp['row_ip_location'], $CURUSER["ip"]." <span title='" . $loc_mod . "'>[" . $loc_pub . "]</span>", 1);
 }
 else{
-	tr_small($lang_usercp['row_ip_location'], $CURUSER["ip"], 1);
+	dl_item($lang_usercp['row_ip_location'], $CURUSER["ip"], 1);
 }
 if ($CURUSER["avatar"])
-	tr_small($lang_usercp['row_avatar'], "<img src=\"" . $CURUSER["avatar"] . "\" border=0>", 1);
-tr_small($lang_usercp['row_passkey'], $CURUSER["passkey"], 1);
+	dl_item($lang_usercp['row_avatar'], "<img src=\"" . $CURUSER["avatar"] . "\" border=0>", 1);
+dl_item($lang_usercp['row_passkey'], $CURUSER["passkey"], 1);
 if ($prolinkpoint_bonus)
 {
 	$prolinkclick=get_row_count("prolinkclicks", "WHERE userid=".$CURUSER['id']);
-	tr_small($lang_usercp['row_promotion_link'], $prolinkclick. " [<a href=\"promotionlink.php\">".$lang_usercp['text_read_more']."</a>]", 1);
-	//tr_small($lang_usercp['row_promotion_link'], $prolinkclick. " [<a href=\"promotionlink.php?updatekey=1\">".$lang_usercp['text_update_promotion_link']."</a>] [<a href=\"promotionlink.php\">".$lang_usercp['text_read_more']."</a>]", 1);
+	dl_item($lang_usercp['row_promotion_link'], $prolinkclick. " [<a href=\"promotionlink.php\">".$lang_usercp['text_read_more']."</a>]", 1);
+	//dl_item($lang_usercp['row_promotion_link'], $prolinkclick. " [<a href=\"promotionlink.php?updatekey=1\">".$lang_usercp['text_update_promotion_link']."</a>] [<a href=\"promotionlink.php\">".$lang_usercp['text_read_more']."</a>]", 1);
 }
-tr_small($lang_usercp['row_invitations'],$CURUSER[invites]." [<a href=\"invite.php?id=".$CURUSER[id]."\" title=\"".$lang_usercp['link_send_invitation']."\">".$lang_usercp['text_send']."</a>]",1);
-tr_small($lang_usercp['row_karma_points'], $CURUSER['seedbonus']." [<a href=\"mybonus.php\" title=\"".$lang_usercp['link_use_karma_points']."\">".$lang_usercp['text_use']."</a>]", 1);
-tr_small($lang_usercp['row_written_comments'], $commentcount." [<a href=\"userhistory.php?action=viewcomments&id=".$CURUSER[id]."\" title=\"".$lang_usercp['link_view_comments']."\">".$lang_usercp['text_view']."</a>]", 1);
-tr_small($lang_usercp['row_quoted_comments'], $quotedcommentcount." [<a href=\"userhistory.php?action=viewquotedcomments&id=".$CURUSER[id]."\" title=\"".$lang_usercp['link_view_comments']."\">".$lang_usercp['text_view']."</a>]", 1);
+dl_item($lang_usercp['row_invitations'],$CURUSER[invites]." [<a href=\"invite.php?id=".$CURUSER[id]."\" title=\"".$lang_usercp['link_send_invitation']."\">".$lang_usercp['text_send']."</a>]",1);
+dl_item($lang_usercp['row_karma_points'], $CURUSER['seedbonus']." [<a href=\"mybonus.php\" title=\"".$lang_usercp['link_use_karma_points']."\">".$lang_usercp['text_use']."</a>]", 1);
+dl_item($lang_usercp['row_written_comments'], $commentcount." [<a href=\"userhistory.php?action=viewcomments&id=".$CURUSER[id]."\" title=\"".$lang_usercp['link_view_comments']."\">".$lang_usercp['text_view']."</a>]", 1);
+dl_item($lang_usercp['row_quoted_comments'], $quotedcommentcount." [<a href=\"userhistory.php?action=viewquotedcomments&id=".$CURUSER[id]."\" title=\"".$lang_usercp['link_view_comments']."\">".$lang_usercp['text_view']."</a>]", 1);
 if ($forumposts) {
-  tr($lang_usercp['row_forum_posts'], $forumposts." [<a href=\"userhistory.php?action=viewposts&id=".$CURUSER[id]."\" title=\"".$lang_usercp['link_view_posts']."\">".$lang_usercp['text_view']."</a>] (".$dayposts.$lang_usercp['text_posts_per_day']."; ".$percentages.$lang_usercp['text_of_total_posts'].")", 1);
-  tr($lang_usercp['row_quoted_posts'], $quotedforumposts." [<a href=\"userhistory.php?action=viewquotedposts&id=".$CURUSER[id]."\" title=\"".$lang_usercp['link_view_posts']."\">".$lang_usercp['text_view']."</a>]", 1);
+  dl_item($lang_usercp['row_forum_posts'], $forumposts." [<a href=\"userhistory.php?action=viewposts&id=".$CURUSER[id]."\" title=\"".$lang_usercp['link_view_posts']."\">".$lang_usercp['text_view']."</a>] (".$dayposts.$lang_usercp['text_posts_per_day']."; ".$percentages.$lang_usercp['text_of_total_posts'].")", 1);
+  dl_item($lang_usercp['row_quoted_posts'], $quotedforumposts." [<a href=\"userhistory.php?action=viewquotedposts&id=".$CURUSER[id]."\" title=\"".$lang_usercp['link_view_posts']."\">".$lang_usercp['text_view']."</a>]", 1);
 }
 ?>
-</table>
-<table border="0" cellspacing="0" cellpadding="5" width=940>
+</dl>
+<table border="0" cellspacing="0" cellpadding="5" width="940">
 <?php
 print("<td align=center class=tabletitle><b>".$lang_usercp['text_recently_read_topics']."</b></td>");
 ?>

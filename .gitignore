@@ -1,0 +1,8 @@
+*.sql
+/cache
+/attachments
+/config/allconfig.php
+/templates_c
+test*.php
+*.orig
+/imdb/cache

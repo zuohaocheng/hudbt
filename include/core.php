@@ -1,14 +1,16 @@
 <?php
 if(!defined('IN_TRACKER'))
   die('Hacking attempt!');
-error_reporting(E_ERROR | E_PARSE);
+#error_reporting(E_ERROR | E_PARSE);
 ini_set('display_errors', 1);
-include_once($rootpath . 'classes/class_cache.php'); //Require the caching class
-$Cache = NEW CACHE(); //Load the caching class
+require_once($rootpath . 'classes/class_cache.php'); //Require the caching class
+$Cache = NEW NPCache(); //Load the caching class
 $Cache->setLanguageFolderArray(get_langfolder_list());
 define('TIMENOW', time());
 $USERUPDATESET = array();
 $query_name=array();
+
+$NEXUSPHP = true;
 
 define ("UC_PEASANT", 0);
 define ("UC_USER", 1);
@@ -23,7 +25,7 @@ define ("UC_NEXUS_MASTER", 9);
 define ("UC_VIP", 10);
 define ("UC_RETIREE",11);
 define ("UC_UPLOADER",12);
-//define ("UC_FORUM_MODERATOR", 12);
+define ("UC_FORUM_MODERATOR", UC_UPLOADER); # An alias for uploaders
 define ("UC_MODERATOR",13);
 define ("UC_ADMINISTRATOR",14);
 define ("UC_SYSOP",15);

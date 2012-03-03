@@ -180,9 +180,10 @@ function load_constant() {
     global $lang_functions;
     global $promotion_text;
     global $torrentmanage_class;
+    global $BASEURL, $CAKEURL;
 
     $const = 'hb.constant = ';
-    $const .= php_json_encode(array('torrentmanage_class' => $torrentmanage_class, 'cat_class' => get_category_row(), 'lang' => $lang_functions, 'pr' => $promotion_text));
+    $const .= php_json_encode(['torrentmanage_class' => $torrentmanage_class, 'cat_class' => get_category_row(), 'lang' => $lang_functions, 'pr' => $promotion_text, 'url' =>['base' => $BASEURL, 'cake' => $CAKEURL]]);
     $const .= ';';
     $Cache->cache_value('js_hb_constant', $const, 2592000);
   }

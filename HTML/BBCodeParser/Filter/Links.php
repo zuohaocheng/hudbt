@@ -54,7 +54,7 @@ class HTML_BBCodeParser_Filter_Links extends HTML_BBCodeParser_Filter
      */
     var $_definedTags = array(
         'url' => array(
-            'htmlopen'  => 'a',
+		       'htmlopencallback'  => array('HTML_BBCodeParser_Filter_Links', 'aCallback'),
             'htmlclose' => 'a',
             'allowed'   => 'none^img,color,font,size,b,i,u,s',
             'attributes'=> array('url' => 'href=%2$s%1$s%2$s')
@@ -214,5 +214,15 @@ class HTML_BBCodeParser_Filter_Links extends HTML_BBCodeParser_Filter
         //Else remove url tag
         return $matches[6];
     }
+
+    static function aCallback() {
+      $options = PEAR::getStaticProperty('HTML_BBCodeParser','_options');
+      $target = $options['aTarget'];
+      if ($target) {
+	return 'a target="' . $target . '"';
+      }
+      return 'a';
+    }
+
 }
 ?>

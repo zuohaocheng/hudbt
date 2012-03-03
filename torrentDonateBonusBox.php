@@ -5,9 +5,8 @@
  */
 
 ?>
-<tr>
-	<td rowspan=2 id="donating">捐赠魔力值<br /><a href='bonusDonations.php' class="sublink">[查看我的捐赠历史]</a></td>
-	<td id="to_donate">
+	<dt id="donating" class="nowrap">捐赠魔力值<br /><a href='bonusDonations.php' class="sublink">[查看捐赠历史]</a></dt>
+	<dd id="to_donate">
 <?php
 $torrent_id = (int) $_GET['id'];
 if($CURUSER['id'] == $row['owner']) {
@@ -29,9 +28,8 @@ if($CURUSER['id'] == $row['owner']) {
 	}
 }
 ?>
-	</td>
-</tr>
-<tr><td id="donater_list">
+	</dd>
+<dd class="no-dt" id="donater_list">
 <?php 
 $torrent_id = (int) $_GET['id'];
 $sqlDonateList = 'SELECT donater, donater_id, amount, message, action_date FROM donate_bonus WHERE object_id='.$torrent_id.' AND `type`="torrent"';
@@ -75,41 +73,4 @@ if($doanterCount) {
 }
 ?>
 
-</td></tr>
-<script type="text/javascript">
-$('#to_donate a').click(function(e) {
-    e.preventDefault();
-
-    var torrent_id = <?php echo intval($_GET['id']);?>;
-    var bonus      = <?php echo $CURUSER['seedbonus']; ?>;
-    var to_donate = $(this).html();
-    if(bonus < to_donate) {
-	alert('你的魔力值不足，谢谢你的好心，继续努力吧~');
-    } else if(confirm('确认向种子发布者捐赠 ' + to_donate +' 魔力值吗？')) {
-	var url = 'donateBonus.php';
-	var data = {amount: to_donate, torrent_id : torrent_id, type: 'torrent'};
-	$.getJSON(url, data, function(data) {
-	    if(data.status == 9) {
-		var newDonate = '<div class="donate'+ data.amount +' donate" id="donated_successfully" title="' + data.message + '\n[' + data.amount + ' 魔力值] ' + data.date + '">' + data.donater + '</div>';
-		$('#donater_list').append(newDonate);
-
-		$('#to_donate').html("你已经于 " + data.date + " 对种子发布者进行过魔力值捐赠，谢谢你！");
-	    } else if(data.status == 1) {
-		alert('谢谢你，但是你的魔力值不足，继续努力吧。');
-	    } else if(data.status == 2) {
-		alert('你要捐赠种子不存在。');
-	    } else if(data.status == 3) {
-		alert('你要捐赠的用户不存在。');
-	    } else if(data.status == 4) {
-		alert('只允许以下几个数量的捐赠数：64, 128, 256, 512, 1024。');
-	    } else if(data.status == 5) {
-		alert('不能给自己捐赠的哦！');
-	    } else if(data.status == 6) {
-		alert('你已经捐赠过了，谢谢！');
-	    } else {
-		alert('貌似系统出问题了，呼管理员！');
-	    }
-	});
-    }
-});
-</script>
+</dd>

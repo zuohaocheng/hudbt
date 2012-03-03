@@ -53,14 +53,15 @@ function oldReadConfig ($configname) {
 }
 
 
-if (file_exists('config/allconfig.php')) {
-	require('config/allconfig.php');
+if (file_exists($rootpath . 'config/allconfig.php')) {
+	require($rootpath . 'config/allconfig.php');
 } else {
 	ReadConfig();
 }
 
 $SITENAME = $BASIC['SITENAME'];
 $BASEURL = $BASIC['BASEURL'];
+$CAKEURL = $BASIC['BASEURL'] . '/' . $BASIC['CAKEDIR'];
 $announce_urls = array();
 $announce_urls[] = $BASIC['announce_url'];
 $mysql_host = $BASIC['mysql_host'];

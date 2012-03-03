@@ -34,7 +34,7 @@ if ($inv["invites"] != 1){
 }
 
 if ($type == 'new'){
-	if ($CURUSER[invites] <= 0) {
+	if ($CURUSER['invites'] <= 0) {
 		stdmsg($lang_invite['std_sorry'],$lang_invite['std_no_invites_left'].
 		"<a class=altlink href=invite.php?id=$CURUSER[id]>".$lang_invite['here_to_go_back'],false);
 		print("</td></tr></table>");
@@ -115,7 +115,14 @@ if ($type == 'new'){
 		print("<tr><td colspan=7 align=right><input type=submit style='height: 20px' value=".$lang_invite['submit_confirm_users']."></td></tr>");
 		}
 		print("</form>");
-		print("<tr><td colspan=7 align=center><form method=post action=invite.php?id=".htmlspecialchars($id)."&type=new><input type=submit ".($CURUSER[invites] <= 0 ? "disabled " : "")." value='".$lang_invite['sumbit_invite_someone']."'></form></td></tr>");
+		print("<tr><td colspan=7 align=center>");
+		if ($CURUSER['invites'] <= 0) {
+		  echo '<span class="disabled">' . $lang_invite['text_unable_to_invite'] . '</span>';
+		}
+		else {
+		  echo '<a class="index" href="' . htmlspecialchars('invite.php?id=' . $id . '&type=new') . '">' . $lang_invite['sumbit_invite_someone'] . '</a>';
+		}
+		echo '</td></tr>';
 	}
 	print("</table>");
 

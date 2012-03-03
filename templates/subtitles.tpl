@@ -1,0 +1,102 @@
+<h2 id="page-title" class="transparentbg">{$lang['text_upload_subtitles']}</h2>
+<h3 class="page-titles">{$lang['text_uploaded_size']} {mksize($size)}</h3>
+<h3 class="page-titles">{$lang['text_rules']}</h3>
+<div>
+  <ol>
+    {foreach $lang['text_rule'] as $hint}
+    <li>{$hint}</li>
+    {/foreach}
+  </ol>
+</div>
+{if $detail_torrent_id}
+<h3 class="page-titles">{$lang['text_uploading_subtitles_for_torrent']} <strong>{$torrent_name}</strong></h3>
+{/if}
+
+<form enctype="multipart/form-data" method="post" action="?">
+  <input type="hidden" name="action" value="upload">
+    <table class="main" border="1" cellspacing="0" cellpadding="5">
+      <thead>
+	<tr><th colspan="2">{$lang['text_red_star_required']}</th></tr>
+      </thead>
+      <tbody>
+	<tr><td class="rowhead">{$lang['row_file']}<span class="required-field">*</span></td><td class="rowfollow" align="left"><input type="file" name="file">
+	{if $maxsubsize_main > 0}
+	<br />({$lang['text_maximum_file_size']} {mksize($maxsubsize_main)})
+	{/if}
+      </td></tr>
+      {if !$detail_torrent_id}
+      <tr><td class="rowhead">{$lang['row_torrent_id']}<span class="required-field">*</span></td><td align="left"><input type="text" name="torrent_id" style="width:300px"><br />{$lang['text_torrent_id_note']}</td></tr>
+      {else}
+      <tr><td class="rowhead">{$lang['row_torrent_id']}<span class="required-field">*</span></td><td align="left"><input type="text" name="torrent_id" value="{$detail_torrent_id}" style="width:300px"><br />{$lang['text_torrent_id_note']}</td></tr>
+      {/if}
+      <tr><td class="rowhead">{$lang['row_title']}</td><td colspan="3" align="left"><input type="text" name="title" style="width:300px"><br />{$lang['text_title_note']}</td></tr>
+      <tr><td class="rowhead">{$lang['row_language']}<span class="required-field">*</span></td><td align="left">
+      <select name="sel_lang">
+	<option value="0">{$lang['select_choose_one']}</option>
+	{html_options values=$lang_ids output=$lang_names}
+      </select>
+      {if (get_user_class() >= $beanonymous_class)}
+      <tr><td class="rowhead">{$lang['row_show_uploader']}</td><td><label><input type="checkbox" name="uplver" value="yes" />{$lang['hide_uploader_note']}</label></td></tr>
+      {/if}
+      <tr><td class="toolbox" colspan="2" align="center"><input type="submit" class="btn" value="{$lang['submit_upload_file']}" /> <input type="reset" class="btn" value="{$lang['submit_reset']}" /></td></tr>
+    </tbody>
+  </table>
+</form>
+
+<div id="search-subtitles">
+  <form method="get" action="?">
+    <input type="search" style="width:200px" name="search" />
+    <select name="lang_id">
+      <option value="0">{$lang['select_all_languages']}</option>
+      {html_options values=$lang_ids output=$lang_names}
+    </select>
+    <input type="submit" class="btn" value="{$lang['submit_search']}" />
+  </form>
+  {a_to_z_index($letter)}
+</div>
+
+{if count($rows)}
+{$pagertop}
+<table style="width:940px" border="1" cellspacing="0" cellpadding="5">
+  <thead>
+    <tr>
+      <th>{$lang['col_lang']}</th>
+      <th style="width:100%;text-align:center;">{$lang['col_title']}</th>
+      <th><img class="time" src="pic/trans.gif" alt="time" title="{$lang['title_date_added']}" /></th>
+      <th><img class="size" src="pic/trans.gif" alt="size" title="{$lang['title_size']}" /></th>
+      <th>{$lang['col_hits']}</th>
+      <th>{$lang['col_upped_by']}</th>
+      <th>{$lang['col_report']}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {foreach $rows as $arr}
+    <tr>
+      <td align="center" valign="middle"><img border="0" src="pic/flag/{$arr["flagpic"]}" alt="{$arr["lang_name"]}" title="{$arr["lang_name"]}"/></td>
+      <td align="left"><a href="downloadsubs.php?torrentid={$arr['torrent_id']}&subid={$arr['id']}"><strong>{htmlspecialchars($arr["title"])}</strong></a>
+      {if $arr['candelete']}
+      <a href="?delete={$arr[id]}"><span class="small">{$lang['text_delete']}</span></a>
+      {/if}
+    </td>
+    <td class="nowrap" align="center">{gettime($arr["added"],false,false)}</td>
+    <td align="center">{mksize_loose($arr['size'])}</td>
+    <td align="center">{number_format($arr['hits'])}</td>
+    <td align="center">
+      {if $arr["anonymous"] == 'yes'}
+      {$lang['text_anonymous']}
+      {if get_user_class() >= $viewanonymous_class}
+      <br />{get_username($arr['uppedby'],false,true,true,false,true)}
+      {/if}
+      {else}
+      {get_username($arr['uppedby'])}
+      {/if}
+    </td>
+    <td align="center"><a href="report.php?subtitle={$arr[id]}"><img class="f_report" src="pic/trans.gif" alt="Report" title="{$lang['title_report_subtitle']}" /></a></td>
+  </tr>
+  {/foreach}
+</tbody>
+</table>
+{$pagerbottom}
+{else}
+{stdmsg($lang['text_sorry'],$lang['text_nothing_here'])}
+{/if}

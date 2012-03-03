@@ -1,7 +1,7 @@
 <?php
 //Caching class (Based on file From ProjectGazelle)
 
-class CACHE extends Memcache{
+class NPCache extends Memcache{
 	var $isEnabled;
 	var $clearCache = 0;
 	var $language = 'en';
@@ -22,6 +22,9 @@ class CACHE extends Memcache{
 		} else {
 			$this->isEnabled = 0;
 		}
+
+		$this->keyHits['read'] = array();
+		$this->keyHits['write'] = array();
 	}
 	
 	function getIsEnabled() {
@@ -165,7 +168,13 @@ class CACHE extends Memcache{
 	function cache_value($Key, $Value, $Duration = 3600){
 		$this->set($Key,$Value, 0, $Duration);
 		$this->cacheWriteTimes++;
-		$this->keyHits['write'][$Key] = !$this->keyHits['write'][$Key] ? 1 : $this->keyHits['write'][$Key]+1;
+		
+		if (array_key_exists($Key, $this->keyHits['write'])) {
+		  $this->keyHits['write'][$Key] += 1;
+		}
+		else {
+		  $this->keyHits['write'][$Key] = 1;
+		}
 	}
 
 	//---------- Getting functions ----------//
@@ -231,7 +240,12 @@ class CACHE extends Memcache{
 
 		$Return = $this->get($Key);
 		$this->cacheReadTimes++;
-		$this->keyHits['read'][$Key] = !$this->keyHits['read'][$Key] ? 1 : $this->keyHits['read'][$Key]+1;
+		if (array_key_exists($Key, $this->keyHits['read'])) {
+		  $this->keyHits['read'][$Key] += 1;
+		}
+		else {
+		  $this->keyHits['read'][$Key] = 1;
+		}
 		return $Return;
 	}
 

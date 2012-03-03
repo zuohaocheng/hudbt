@@ -9,6 +9,7 @@ $lang_invite = array
 	'here_to_go_back' => "这里</a>返回。",
 	'text_invite_code_sent' => "邀请代码已发送！<br />",
 	'text_invite_someone' => "邀请其他人加入",
+	'text_unable_to_invite' => '你无法邀请他人',
 	'text_s' => "",
 	'text_invitation' => "个剩余邀请",
 	'text_left' => "",

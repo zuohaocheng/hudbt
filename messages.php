@@ -81,7 +81,7 @@ if ($mailbox != PM_SENTBOX)
 		$perpage = ($CURUSER['pmnum'] ? $CURUSER['pmnum'] : 20);
 
 		list($pagertop, $pagerbottom, $limit) = pager($perpage, $count, "?action=viewmailbox".($mailbox ? "&box=".$mailbox : "").($place ? "&place=".$place : "").($keyword ? "&keyword=".rawurlencode($keyword) : "").($unread ? "&unread=".$unread : "")."&");
-$res = sql_query('SELECT * FROM messages WHERE receiver=' . sqlesc($CURUSER['id']) . ' AND location=' . sqlesc($mailbox) .$wherea. ' ORDER BY id DESC '.$limit) or
+$res = sql_query('SELECT * FROM messages WHERE receiver=' . sqlesc($CURUSER['id']) . ' AND location=' . sqlesc($mailbox) .$wherea. ' ORDER BY unread ASC, id DESC '.$limit) or
 
 sqlerr(__FILE__,__LINE__);
 }
@@ -94,7 +94,7 @@ else
 		$perpage = ($CURUSER['pmnum'] ? $CURUSER['pmnum'] : 20);
 
 		list($pagertop, $pagerbottom, $limit) = pager($perpage, $count, "?action=viewmailbox".($mailbox ? "&box=".$mailbox : "").($place ? "&place=".$place : "").($keyword ? "&keyword=".rawurlencode($keyword) : "").($unread ? "&unread=".$unread : "")."&");
-$res = sql_query('SELECT * FROM messages WHERE sender=' . sqlesc($CURUSER['id']) . ' AND saved=\'yes\''.$wherea.' ORDER BY id DESC '.$limit) or sqlerr(__FILE__,__LINE__);
+$res = sql_query('SELECT * FROM messages WHERE sender=' . sqlesc($CURUSER['id']) . ' AND saved=\'yes\''.$wherea.' ORDER BY unread ASC, id DESC '.$limit) or sqlerr(__FILE__,__LINE__);
 }
 
 $content = '';
@@ -120,18 +120,18 @@ if ($format == 'html') {
 <div style="text-align:center;width:750px;padding:0.8em 0;" class="table td"><?php echo insertJumpTo($mailbox);?></div>
 
 <?php
+    if ($messages) {
   $content .= $pagertop;
   $content .= '
 <form action="messages.php" method="post">
-<input type="hidden" name="action" value="moveordel">
-<table border="0" cellpadding="4" cellspacing="0" style="width:750px;"><thead><tr>
+<input type="hidden" name="action" value="moveordel" />';
+$content .= '<table border="0" cellpadding="4" cellspacing="0" style="width:750px;"><thead><tr>
 <th style="text-align:center;width:1%">' . $lang_messages['col_status'] .'</th>';
   $content .= '<th style="text-align:left;">' . $lang_messages['col_subject'] . '</th>';
   $content .= '<th style="text-align:left;width:35%">' . $sender_receiver . '</th>';
   $content .= '<th style="text-align:center;width:1%;"><img class="time" src="pic/trans.gif" alt="time" title="' . $lang_messages['col_date'] . '" /></th>';
 $content .= '<th style="text-align:center;width:1%;">' . $lang_messages['col_act'] .'</th></tr></thead><tbody>';
 
-if ($messages) {
   foreach ($messages as $row) {
       // Get Sender Username
     if ($row['sender'] != 0) {
@@ -184,7 +184,7 @@ if ($messages) {
 <li><a href="messages.php?action=editmailboxes">' .  $lang_messages['text_mailbox_manager']  . '</a></li></ul></div></td></tr></table>';
 }
 else {
-  $content .= ("<div>".$lang_messages['text_no_messages']."</div>\n");
+  $content .= ('<div id="stderr" style="margin-top: 1em; font-size: 120%;">'.$lang_messages['text_no_messages']."</div>\n");
 }
 
   echo $content;
