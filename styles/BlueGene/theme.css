@@ -1418,6 +1418,11 @@ input.a:hover {
     cursor:pointer;
 }
 
+#funbox-content {
+    max-height: 360px;
+    overflow-y: scroll;
+}
+
 #nav-reg-signup {
     margin: 0 auto;
     padding: 0.8em;

@@ -192,7 +192,8 @@ if ($showfunbox_main == "yes" && (!isset($CURUSER) || $CURUSER['showfb'] == "yes
       print("</h2>");
 
       print('<div id="funbox" class="table td text main">');
-      print("<iframe src=\"fun.php?action=view\" width='100%' height='360' frameborder='0' name='funbox' marginwidth='0' marginheight='0'></iframe>\n");
+      require_once(get_langfile_path('fun.php'));
+      current_fun();
 
       if ($CURUSER) {
 	echo '<span id="funvote">';

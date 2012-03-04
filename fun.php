@@ -3,14 +3,13 @@ require_once("include/bittorrent.php");
 dbconn();
 require_once(get_langfile_path());
 require_once(get_langfile_path("",true));
-$action=$_GET["action"];
+
+$action=$_REQUEST["action"];
 if (!$action) {
-  $action = (string) $_POST['action'];
-  if (!$action)
-    $action = 'view';
+  $action = 'view';
 }
 if ($action == 'delete') {
-  $id = 0+$_GET["id"];
+  $id = 0 + $_REQUEST["id"];
   int_check($id,true);
   $res = sql_query("SELECT userid FROM fun WHERE id=$id") or sqlerr(__FILE__,__LINE__);
   $arr = mysql_fetch_array($res);
@@ -18,8 +17,8 @@ if ($action == 'delete') {
     stderr($lang_fun['std_error'], $lang_fun['std_invalid_id']);
   if (get_user_class() < $funmanage_class)
     permissiondenied();
-  $sure = 0+$_REQUEST["sure"];
-  $returnto = $_GET["returnto"] ? htmlspecialchars($_GET["returnto"]) : 'fun.php';
+  $sure = 0 + $_REQUEST["sure"];
+  $returnto = $_REQUEST["returnto"] ? htmlspecialchars($_REQUEST["returnto"]) : 'fun.php';
   if (!$sure || $_SERVER['REQUEST_METHOD'] != 'POST') {
     stderr($lang_fun['std_delete_fun'], "<form action=\"?action=delete&id=$id&returnto=$returnto\" method=\"POST\">" . '<input type="hidden" name="sure" value="1" />' . $lang_fun['text_please_click'] . $lang_fun['text_here_if_sure'] . '</form>',false);
   }
@@ -80,46 +79,19 @@ if ($action == 'add') {
 
 if ($action == 'view') {
 ?>
-<html><head>
-  <title><?php echo $lang_fun['head_fun']; ?></title>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<html>
+  <head>
+    <title><?php echo $lang_fun['head_fun']; ?></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <?php echo get_load_uri('css'); ?>
-    </head>
-    <body class="inframe"><div class="table">
+  </head>
+  <body class="inframe">
+    <div class="table">
+      <?php current_fun(); ?>
+    </div>
+  </body>
+</html>
 <?php
-  print(get_style_addicode());
-  if (!$row = $Cache->get_value('current_fun_content')) {
-    $result = sql_query("SELECT fun.*, IF(ADDTIME(added, '1 0:0:0') < NOW(),true,false) AS neednew FROM fun WHERE status != 'banned' AND status != 'dull' ORDER BY added DESC LIMIT 1") or sqlerr(__FILE__,__LINE__);
-    $row = mysql_fetch_array($result);
-    $Cache->cache_value('current_fun_content', $row, 1043);
-  }
-  if ($row){
-    $title = $row['title'];
-    $username = get_username($row["userid"],false,true,true,true,false,false,"",false);
-    if ($CURUSER['timetype'] != 'timealive') {
-      $time = $lang_fun['text_on'].$row['added'];
-    }
-    else $time = $lang_fun['text_blank'].gettime($row['added'],true,false);
-    $Cache->new_page('current_fun', 874, true);
-    if (!$Cache->get_page()){
-      $Cache->add_row();
-      $Cache->add_part();
-      print('<div class="page-titles"><h3>'.$title.'</h3><h4>'.$lang_fun['text_posted_by']);
-      $Cache->end_part();
-      $Cache->add_part();
-      print('</h4></div><div>');
-      print(format_comment($row['body'], true, true, true)."</div>");
-      $Cache->end_part();
-      $Cache->end_row();
-      $Cache->cache_page();
-    }
-    while($Cache->next_row()){
-      echo $Cache->next_part();
-      print($username.$time);
-      echo $Cache->next_part();
-    }
-  }
-  echo '</div></body></html>';
 }
   
 if ($action == 'edit') {

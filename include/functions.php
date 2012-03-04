@@ -4270,3 +4270,38 @@ function votes($poll, $uservote = 255) {
   return $out;
 }
 
+function current_fun() {
+  global $Cache, $CURUSER, $lang_fun, $BASEURL;
+  print(get_style_addicode());
+  if (!$row = $Cache->get_value('current_fun_content')) {
+    $result = sql_query("SELECT fun.*, IF(ADDTIME(added, '1 0:0:0') < NOW(),true,false) AS neednew FROM fun WHERE status != 'banned' AND status != 'dull' ORDER BY added DESC LIMIT 1") or sqlerr(__FILE__,__LINE__);
+    $row = mysql_fetch_array($result);
+    $Cache->cache_value('current_fun_content', $row, 1043);
+  }
+  if ($row){
+    $title = $row['title'];
+    $username = get_username($row["userid"],false,true,true,true,false,false,"",false);
+    if ($CURUSER['timetype'] != 'timealive') {
+      $time = $lang_fun['text_on'].$row['added'];
+    }
+    else $time = $lang_fun['text_blank'].gettime($row['added'],true,false);
+    $Cache->new_page('current_fun', 874, true);
+    if (!$Cache->get_page()){
+      $Cache->add_row();
+      $Cache->add_part();
+      print('<div class="page-titles"><h3><a href="//' . $BASEURL . '/log.php?action=funbox">'.$title.'</h3><h4>'.$lang_fun['text_posted_by']);
+      $Cache->end_part();
+      $Cache->add_part();
+      print('</h4></div><div id="funbox-content">');
+      print(format_comment($row['body'], true, true, true)."</div>");
+      $Cache->end_part();
+      $Cache->end_row();
+      $Cache->cache_page();
+    }
+    while($Cache->next_row()){
+      echo $Cache->next_part();
+      print($username.$time);
+      echo $Cache->next_part();
+    }
+  }
+}
