@@ -33,23 +33,23 @@ function emu_getallheaders() {
 	return $headers;
 }
 
-function block_browser()
-{
-	$agent = $_SERVER["HTTP_USER_AGENT"];
-	if (preg_match("/^Mozilla/", $agent) || preg_match("/^Opera/", $agent) || preg_match("/^Links/", $agent) || preg_match("/^Lynx/", $agent) )
-		err("Browser access blocked!");
-// check headers
-	if (function_exists('getallheaders')){ //getallheaders() is only supported when PHP is installed as an Apache module
-		$headers = getallheaders();
-	//else
-	//	$headers = emu_getallheaders();
+function block_browser() {
+  $agent = $_SERVER["HTTP_USER_AGENT"];
+  if (preg_match("/^Mozilla/", $agent) || preg_match("/^Opera/", $agent) || preg_match("/^Links/", $agent) || preg_match("/^Lynx/", $agent) ) {
+    err("Browser access blocked!");
+  }
+  // check headers
+  if (function_exists('getallheaders')) { //getallheaders() is only supported when PHP is installed as an Apache module
+    $headers = getallheaders();
+    //else
+    //	$headers = emu_getallheaders();
 
-	if($_SERVER["HTTPS"] != "on")
-	{
-		if (isset($headers["Cookie"]) || isset($headers["Accept-Language"]) || isset($headers["Accept-Charset"]))
-			err("Anti-Cheater: You cannot use this agent");
-	}
-	}
+    if(!array_key_exists('HTTPS', $_SERVER) || $_SERVER["HTTPS"] != "on") {
+      if (isset($headers["Cookie"]) || isset($headers["Accept-Language"]) || isset($headers["Accept-Charset"])) {
+	err("Anti-Cheater: You cannot use this agent");
+      }
+    }
+  }
 }
 
 function benc_resp($d)
@@ -61,7 +61,7 @@ function benc_resp_raw($x) {
 	header("Content-Type: text/plain; charset=utf-8");
 	header("Pragma: no-cache");
 
-	if ($_SERVER["HTTP_ACCEPT_ENCODING"] == "gzip") {
+	if (array_key_exists("HTTP_ACCEPT_ENCODING", $_SERVER) && $_SERVER["HTTP_ACCEPT_ENCODING"] == "gzip") {
 		header("Content-Encoding: gzip");
 		echo gzencode($x, 9, FORCE_GZIP);
 	} 
@@ -167,175 +167,162 @@ function ipv4_to_compact($ip, $port)
 	return $compact;
 }
 
-function check_client($peer_id, $agent, $agent_familyid)
-{
-	global $BASEURL, $Cache;
+function check_client($peer_id, $agent) {
+  global $BASEURL, $Cache;
+  $agent_familyid = '';
 
-	if (!$clients = $Cache->get_value('allowed_client_list')){
-		$clients = array();
-		$res = mysql_query("SELECT * FROM agent_allowed_family ORDER BY hits DESC") or err("check err");
-		while ($row = mysql_fetch_array($res))
-			$clients[] = $row;
-		$Cache->cache_value('allowed_client_list', $clients, 86400);
-	}
-	foreach ($clients as $row_allowed_ua)
-	{
-		$allowed_flag_peer_id = false;
-		$allowed_flag_agent = false;
-		$version_low_peer_id = false;
-		$version_low_agent = false;
+  if (!$clients = $Cache->get_value('allowed_client_list')) {
+    $clients = array();
+    $res = mysql_query("SELECT * FROM agent_allowed_family ORDER BY hits DESC") or err("check err");
+    while ($row = mysql_fetch_array($res)) {
+      $clients[] = $row;
+    }
+    $Cache->cache_value('allowed_client_list', $clients, 86400);
+  }
+  foreach ($clients as $row_allowed_ua) {
+    $allowed_flag_peer_id = false;
+    $allowed_flag_agent = false;
+    $version_low_peer_id = false;
+    $version_low_agent = false;
 
-		if($row_allowed_ua['peer_id_pattern'] != '')
-		{
-			if(!preg_match($row_allowed_ua['peer_id_pattern'], $row_allowed_ua['peer_id_start'], $match_bench))
-			err("regular expression err for: " . $row_allowed_ua['peer_id_start'] . ", please ask sysop to fix this");
+    if($row_allowed_ua['peer_id_pattern'] != '') {
+      if(!preg_match($row_allowed_ua['peer_id_pattern'], $row_allowed_ua['peer_id_start'], $match_bench))
+	err("regular expression err for: " . $row_allowed_ua['peer_id_start'] . ", please ask sysop to fix this");
 
-			if(preg_match($row_allowed_ua['peer_id_pattern'], $peer_id, $match_target))
-			{
-				if($row_allowed_ua['peer_id_match_num'] != 0)
-				{
-					for($i = 0 ; $i < $row_allowed_ua['peer_id_match_num']; $i++)
-					{
-						if($row_allowed_ua['peer_id_matchtype'] == 'dec')
-						{
-							$match_target[$i+1] = 0 + $match_target[$i+1];
-							$match_bench[$i+1] = 0 + $match_bench[$i+1];
-						}
-						else if($row_allowed_ua['peer_id_matchtype'] == 'hex')
-						{
-							$match_target[$i+1] = hexdec($match_target[$i+1]);
-							$match_bench[$i+1] = hexdec($match_bench[$i+1]);
-						}
+      if(preg_match($row_allowed_ua['peer_id_pattern'], $peer_id, $match_target)) {
+	if($row_allowed_ua['peer_id_match_num'] != 0) {
+	  for($i = 0 ; $i < $row_allowed_ua['peer_id_match_num']; $i++) {
+	    if($row_allowed_ua['peer_id_matchtype'] == 'dec') {
+	      $match_target[$i+1] = 0 + $match_target[$i+1];
+	      $match_bench[$i+1] = 0 + $match_bench[$i+1];
+	    }
+	    else if($row_allowed_ua['peer_id_matchtype'] == 'hex') {
+	      $match_target[$i+1] = hexdec($match_target[$i+1]);
+	      $match_bench[$i+1] = hexdec($match_bench[$i+1]);
+	    }
 
-						if ($match_target[$i+1] > $match_bench[$i+1])
-						{
-							$allowed_flag_peer_id = true;
-							break;
-						}
-						else if($match_target[$i+1] < $match_bench[$i+1])
-						{
-							$allowed_flag_peer_id = false;
-							$version_low_peer_id = true;
-							$low_version = "Your " . $row_allowed_ua['family'] . " 's version is too low, please update it after " . $row_allowed_ua['start_name'];
-							break;
-						}
-						else if($match_target[$i+1] == $match_bench[$i+1])//equal
-						{
-							if($i+1 == $row_allowed_ua['peer_id_match_num'])		//last
-							{
-								$allowed_flag_peer_id = true;
-							}
-						}
-					}
-				}
-				else // no need to compare version
-				$allowed_flag_peer_id = true;
-			}
-		}
-		else	// not need to match pattern
+	    if ($match_target[$i+1] > $match_bench[$i+1]) {
+	      $allowed_flag_peer_id = true;
+	      break;
+	    }
+	    else if($match_target[$i+1] < $match_bench[$i+1]) {
+	      $allowed_flag_peer_id = false;
+	      $version_low_peer_id = true;
+	      $low_version = "Your " . $row_allowed_ua['family'] . " 's version is too low, please update it after " . $row_allowed_ua['start_name'];
+	      break;
+	    }
+	    else if($match_target[$i+1] == $match_bench[$i+1]) { //equal
+	      if($i+1 == $row_allowed_ua['peer_id_match_num']) { //last
 		$allowed_flag_peer_id = true;
+	      }
+	    }
+	  }
+	}
+	else { // no need to compare version
+	  $allowed_flag_peer_id = true;
+	}
+      }
+    }
+    else { // not need to match pattern
+      $allowed_flag_peer_id = true;
+    }
 
-		if($row_allowed_ua['agent_pattern'] != '')
-		{
-			if(!preg_match($row_allowed_ua['agent_pattern'], $row_allowed_ua['agent_start'], $match_bench))
-			err("regular expression err for: " . $row_allowed_ua['agent_start'] . ", please ask sysop to fix this");
+    if($row_allowed_ua['agent_pattern'] != '') {
+      if(!preg_match($row_allowed_ua['agent_pattern'], $row_allowed_ua['agent_start'], $match_bench)) {
+	err("regular expression err for: " . $row_allowed_ua['agent_start'] . ", please ask sysop to fix this");
+      }
 
-			if(preg_match($row_allowed_ua['agent_pattern'], $agent, $match_target))
-			{
-				if( $row_allowed_ua['agent_match_num'] != 0)
-				{
-					for($i = 0 ; $i < $row_allowed_ua['agent_match_num']; $i++)
-					{
-						if($row_allowed_ua['agent_matchtype'] == 'dec')
-						{
-							$match_target[$i+1] = 0 + $match_target[$i+1];
-							$match_bench[$i+1] = 0 + $match_bench[$i+1];
-						}
-						else if($row_allowed_ua['agent_matchtype'] == 'hex')
-						{
-							$match_target[$i+1] = hexdec($match_target[$i+1]);
-							$match_bench[$i+1] = hexdec($match_bench[$i+1]);
-						}
+      if(preg_match($row_allowed_ua['agent_pattern'], $agent, $match_target)) {
+	if( $row_allowed_ua['agent_match_num'] != 0) {
+	  for($i = 0 ; $i < $row_allowed_ua['agent_match_num']; $i++) {
+	    if($row_allowed_ua['agent_matchtype'] == 'dec') {
+	      $match_target[$i+1] = 0 + $match_target[$i+1];
+	      $match_bench[$i+1] = 0 + $match_bench[$i+1];
+	    }
+	    else if($row_allowed_ua['agent_matchtype'] == 'hex') {
+	      $match_target[$i+1] = hexdec($match_target[$i+1]);
+	      $match_bench[$i+1] = hexdec($match_bench[$i+1]);
+	    }
 
-						if ($match_target[$i+1] > $match_bench[$i+1])
-						{
-							$allowed_flag_agent = true;
-							break;
-						}
-						else if($match_target[$i+1] < $match_bench[$i+1])
-						{
-							$allowed_flag_agent = false;
-							$version_low_agent = true;
-							$low_version = "Your " . $row_allowed_ua['family'] . " 's version is too low, please update it after " . $row_allowed_ua['start_name'];
-							break;
-						}
-						else //equal
-						{
-							if($i+1 == $row_allowed_ua['agent_match_num'])		//last
-							$allowed_flag_agent = true;
-						}
-					}
-				}
-				else // no need to compare version
-				$allowed_flag_agent = true;
-			}
-		}
-		else
+	    if ($match_target[$i+1] > $match_bench[$i+1]) {
+	      $allowed_flag_agent = true;
+	      break;
+	    }
+	    else if($match_target[$i+1] < $match_bench[$i+1]) {
+	      $allowed_flag_agent = false;
+	      $version_low_agent = true;
+	      $low_version = "Your " . $row_allowed_ua['family'] . " 's version is too low, please update it after " . $row_allowed_ua['start_name'];
+	      break;
+	    }
+	    else { //equal
+	      if($i+1 == $row_allowed_ua['agent_match_num']) {		//last
 		$allowed_flag_agent = true;
-
-		if($allowed_flag_peer_id && $allowed_flag_agent)
-		{
-			$exception = $row_allowed_ua['exception'];
-			$family_id = $row_allowed_ua['id'];
-			$allow_https = $row_allowed_ua['allowhttps'];
-			break;
-		}
-		elseif(($allowed_flag_peer_id || $allowed_flag_agent) || ($version_low_peer_id || $version_low_agent))	//client spoofing possible
-		;//add anti-cheat code here
+	      }
+	    }
+	  }
 	}
-
-	if($allowed_flag_peer_id && $allowed_flag_agent)
-	{
-		if($exception = 'yes')
-		{
-			if (!$clients_exp = $Cache->get_value('allowed_client_exception_family_'.$family_id.'_list')){
-				$clients_exp = array();
-				$res = mysql_query("SELECT * FROM agent_allowed_exception WHERE family_id = $family_id") or err("check err");
-				while ($row = mysql_fetch_array($res))
-					$clients_exp[] = $row;
-				$Cache->cache_value('allowed_client_exception_family_'.$family_id.'_list', $clients_exp, 86400);
-			}
-			if($clients_exp)
-			{
-				foreach ($clients_exp as $row_allowed_ua_exp)
-				{
-					if($row_allowed_ua_exp['agent'] == $agent && preg_match("/^" . $row_allowed_ua_exp['peer_id'] . "/", $peer_id))
-					return "Client " . $row_allowed_ua_exp['name'] . " is banned due to: " . $row_allowed_ua_exp['comment'] . ".";
-				}
-			}
-			$agent_familyid = $row_allowed_ua['id'];
-		}
-		else
-		{
-			$agent_familyid = $row_allowed_ua['id'];
-		}
-
-		if($_SERVER["HTTPS"] == "on")
-		{
-			if($allow_https == 'yes')
-			return 0;
-			else
-			return "This client does not support https well, Please goto $BASEURL/faq.php#id29 for a list of proper clients";
-		}
-		else
-		return 0;	// no exception found, so allowed or just allowed
+	else { // no need to compare version
+	  $allowed_flag_agent = true;
 	}
-	else
-	{
-		if($version_low_peer_id && $version_low_agent)
-		return $low_version;
-		else
-		return "Banned Client, Please goto $BASEURL/faq.php#id29 for a list of acceptable clients";
+      }
+    }
+    else {
+      $allowed_flag_agent = true;
+    }
+
+    if($allowed_flag_peer_id && $allowed_flag_agent) {
+      $exception = $row_allowed_ua['exception'];
+      $family_id = $row_allowed_ua['id'];
+      $allow_https = $row_allowed_ua['allowhttps'];
+      break;
+    }
+    /* elseif(($allowed_flag_peer_id || $allowed_flag_agent) || ($version_low_peer_id || $version_low_agent)) { //client spoofing possible */
+    /* ;//add anti-cheat code here */
+    /* } */
+  }
+
+  if($allowed_flag_peer_id && $allowed_flag_agent) {
+    if($exception = 'yes') {
+      if (!$clients_exp = $Cache->get_value('allowed_client_exception_family_'.$family_id.'_list')) {
+	$clients_exp = array();
+	$res = mysql_query("SELECT * FROM agent_allowed_exception WHERE family_id = $family_id") or err("check err");
+	while ($row = mysql_fetch_array($res)) {
+	  $clients_exp[] = $row;
 	}
+	$Cache->cache_value('allowed_client_exception_family_'.$family_id.'_list', $clients_exp, 86400);
+      }
+      if($clients_exp) {
+	foreach ($clients_exp as $row_allowed_ua_exp) {
+	  if($row_allowed_ua_exp['agent'] == $agent && preg_match("/^" . $row_allowed_ua_exp['peer_id'] . "/", $peer_id)) {
+	    return ["Client " . $row_allowed_ua_exp['name'] . " is banned due to: " . $row_allowed_ua_exp['comment'] . "."];
+	  }
+	}
+      }
+      $agent_familyid = $row_allowed_ua['id'];
+    }
+    else {
+      $agent_familyid = $row_allowed_ua['id'];
+    }
+
+    if(array_key_exists('HTTPS', $_SERVER) && $_SERVER["HTTPS"] == "on") {
+      if($allow_https == 'yes') {
+	return [0, $agent_familyid];
+      }
+      else {
+	return ["This client does not support https well, Please goto $BASEURL/faq.php#id29 for a list of proper clients"];
+      }
+    }
+    else {
+      return [0, $agent_familyid];	// no exception found, so allowed or just allowed
+    }
+  }
+  else {
+    if($version_low_peer_id && $version_low_agent) {
+      return [$low_version, $agent_familyid];
+    }
+    else {
+      return ["Banned Client, Please goto $BASEURL/faq.php#id29 for a list of acceptable clients"];
+    }
+  }
 }
-?>
+

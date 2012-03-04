@@ -71,7 +71,7 @@ if (!$az) err("Invalid passkey! Re-download the .torrent from $BASEURL");
 $userid = 0+$az['id'];
 
 //3. CHECK IF CLIENT IS ALLOWED
-$clicheck_res = check_client($peer_id,$agent,&$client_familyid);
+list($clicheck_res, $client_familyid) = check_client($peer_id,$agent);
 if($clicheck_res){
   if ($az['showclienterror'] == 'no')
     {
@@ -276,8 +276,10 @@ else { // continue an existing session
 $dt = sqlesc(date("Y-m-d H:i:s"));
 $updateset = array();
 // set non-type event
-if (!isset($event))
+if (!isset($event)) {
   $event = "";
+}
+
 if (isset($self) && $event == "stopped") {
   sql_query("DELETE FROM peers WHERE $selfwhere") or err("D Err");
   if (mysql_affected_rows()) {
@@ -291,6 +293,10 @@ elseif(isset($self)) {
     $finished = ", finishedat = ".TIMENOW;
     $finished_snatched = ", completedat = ".$dt . ", finished  = 'yes'";
     $updateset[] = "times_completed = times_completed + 1";
+  }
+  else {
+    $finished = '';
+    $finished_snatched = '';
   }
 
   sql_query("UPDATE peers SET ip = ".sqlesc($ip).", port = $port, uploaded = $uploaded, downloaded = $downloaded, to_go = $left, prev_action = last_action, last_action = $dt, seeder = '$seeder', agent = ".sqlesc($agent)." $finished WHERE $selfwhere") or err("PL Err 1");

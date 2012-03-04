@@ -70,20 +70,6 @@ function goback ($where = "-1") {
 	return $goback;
 }
 
-function dl_item($title, $desc, $noesc = false) {
-  static $first = true;
-  if (!$noesc) {
-    $desc = htmlspecialchars($desc);
-    //$a = str_replace("\n", "<br />\n", $a);
-  }
-  echo '<dt>' . $title . '</dt><dd';
-  if ($first) {
-    $first = false;
-    echo ' class="first-child"';
-  }
-  echo '>' . $desc .  '</dd>';
-}
-
 $action = isset($_POST['action']) ? htmlspecialchars($_POST['action']) : (isset($_GET['action']) ? htmlspecialchars($_GET['action']) : '');
 $type = isset($_POST['type']) ? htmlspecialchars($_POST['type']) : (isset($_GET['type']) ? htmlspecialchars($_GET['type']) : '');
 

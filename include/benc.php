@@ -58,25 +58,30 @@ function bdec($s) {
     $pl = strlen($l) + 1;
     $v = substr($s, $pl, $l);
     $ss = substr($s, 0, $pl + $l);
-    if (strlen($v) != $l)
+    if (strlen($v) != $l) {
       return;
+    }
     return array('type' => "string", 'value' => $v, 'strlen' => strlen($ss), 'string' => $ss);
   }
-  if (preg_match('/^i(\d+)e/', $s, $m)) {
+  if (preg_match('/^i([-0-9]+)e/', $s, $m)) {
     $v = $m[1];
     $ss = "i" . $v . "e";
-    if ($v === "-0")
+    if ($v === "-0") {
       return;
-    if ($v[0] == "0" && strlen($v) != 1)
+    }
+    if ($v[0] == "0" && strlen($v) != 1) {
       return;
+    }
     return array('type' => "integer", 'value' => $v, 'strlen' => strlen($ss), 'string' => $ss);
   }
 
   switch ($s[0]) {
-  case "l":
+  case "l": {
     return bdec_list($s);
-  case "d":
+  }
+  case "d": {
     return bdec_dict($s);
+  }
   default:
     return;
   }
@@ -106,28 +111,37 @@ function bdec_list($s) {
 }
 
 function bdec_dict($s) {
-  if ($s[0] != "d")
+  if ($s[0] != "d") {
     return;
+  }
   $sl = strlen($s);
   $i = 1;
   $v = array();
   $ss = "d";
   for (;;) {
-    if ($i >= $sl)
+    if ($i >= $sl) {
       return;
-    if ($s[$i] == "e")
+    }
+    if ($s[$i] == "e") {
       break;
+    }
+    
     $ret = bdec(substr($s, $i));
-    if (!isset($ret) || !is_array($ret) || $ret["type"] != "string")
+    if (!isset($ret) || !is_array($ret) || $ret["type"] != "string") {
       return;
+    }
     $k = $ret["value"];
     $i += $ret["strlen"];
     $ss .= $ret["string"];
-    if ($i >= $sl)
+    if ($i >= $sl) {
       return;
+    }
     $ret = bdec(substr($s, $i));
-    if (!isset($ret) || !is_array($ret))
+    if (!isset($ret) || !is_array($ret)) {
+      echo substr($s, $i);
       return;
+    }
+
     $v[$k] = $ret;
     $i += $ret["strlen"];
     $ss .= $ret["string"];

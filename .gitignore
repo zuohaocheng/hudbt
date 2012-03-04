@@ -3,6 +3,8 @@
 /attachments
 /config/allconfig.php
 /templates_c
-test*.php
+/torrents
+/test-*.php
+/test.php
 *.orig
 /imdb/cache
