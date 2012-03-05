@@ -7,7 +7,7 @@ $lang_cleanup_target = array
 	'msg_your_ratio_warning_removed' => "Your warning of low ratio have been removed and auto-promoted to [b]User[/b]. We highly recommend you to keep a your ratio up to not be warned again.\n",
 	'msg_promoted_to' => "Promoted to ",
 	'msg_now_you_are' => "Congratulations, you have been auto-promoted to [b]",
-	'msg_see_faq' => "[/b]. :)\nPlease see the [b][url=faq.php#idid22]FAQ[/url][/b] for what you can do now.\n",
+	'msg_see_faq' => "[/b]. :)\nPlease see the [b][url=faq.php#id22]FAQ[/url][/b] for what you can do now.\n",
 	'msg_demoted_to' => "Demoted to ",
 	'msg_demoted_from' => "You have been auto-demoted from [b]",
 	'msg_to' => "[/b] to [b]",

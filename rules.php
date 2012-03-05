@@ -11,9 +11,7 @@ $Cache->add_whole_row();
 //make_folder("cache/" , get_langfolder_cookie());
 //cache_check ('rules');
 begin_main_frame();
-if ($CURUSER)
-$lang_id = $CURUSER['lang'];
-else
+
 $lang_id = get_guest_lang_id();
 $is_rulelang = get_single_value("language","rule_lang","WHERE id = ".sqlesc($lang_id));
 if (!$is_rulelang){

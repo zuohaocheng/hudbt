@@ -1,5 +1,4 @@
 <?php
-define("VERSION", "BAN EMAIL");
 require "include/bittorrent.php";
 dbconn();
 loggedinorreturn();

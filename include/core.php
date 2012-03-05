@@ -1,8 +1,8 @@
 <?php
 if(!defined('IN_TRACKER'))
   die('Hacking attempt!');
-#error_reporting(E_ERROR | E_PARSE);
-ini_set('display_errors', 1);
+error_reporting(E_ERROR | E_PARSE);
+ini_set('display_errors', 0);
 require_once($rootpath . 'classes/class_cache.php'); //Require the caching class
 $Cache = NEW NPCache(); //Load the caching class
 $Cache->setLanguageFolderArray(get_langfolder_list());

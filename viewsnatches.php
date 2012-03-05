@@ -44,7 +44,7 @@ if ($count){
 		$downrate = $arr["leechtime"] > 0 ? mksize($arr["downloaded"] / $arr["leechtime"]) : mksize(0);
 		//end
 
-		$highlight = $CURUSER["id"] == $arr["id"] ? " bgcolor=#00A527" : "";
+		$highlight = $CURUSER["id"] == $arr["userid"] ? " bgcolor=#00A527" : "";
 		$userrow = get_user_row($arr['userid']);
 		if ($userrow['privacy'] == 'strong'){
 			$username = $lang_viewsnatches['text_anonymous'];

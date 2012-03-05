@@ -117,15 +117,8 @@ function sql_query($query)
 }
 
 function sqlesc($value) {
-	// Stripslashes
-	if (get_magic_quotes_gpc()) {
-		$value = stripslashes($value);
-	}
-	// Quote if not a number or a numeric string
-	if (!is_numeric($value)) {
-		$value = "'" . mysql_real_escape_string($value) . "'";
-	}
-	return $value;
+  $value = "'" . mysql_real_escape_string($value) . "'";
+  return $value;
 }
 
 function hash_pad($hash) {

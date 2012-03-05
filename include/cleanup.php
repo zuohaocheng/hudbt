@@ -2,7 +2,6 @@
 # IMPORTANT: Do not edit below unless you know what you are doing!
 if(!defined('IN_TRACKER'))
 die('Hacking attempt!');
-require_once($rootpath . '/lang/_target/lang_cleanup.php');
 
 function printProgress($msg) {
 	echo $msg.'...done<br />';
@@ -18,6 +17,9 @@ function docleanup($forceAll = 0, $printProgress = false) {
 	global $neverdelete_account, $neverdeletepacked_account, $deletepacked_account, $deleteunpacked_account, $deletenotransfer_account, $deletenotransfertwo_account, $deletepeasant_account, $psdlone_account, $psratioone_account, $psdltwo_account, $psratiotwo_account, $psdlthree_account, $psratiothree_account, $psdlfour_account, $psratiofour_account, $psdlfive_account, $psratiofive_account, $putime_account, $pudl_account, $puprratio_account, $puderatio_account, $eutime_account, $eudl_account, $euprratio_account, $euderatio_account, $cutime_account, $cudl_account, $cuprratio_account, $cuderatio_account, $iutime_account, $iudl_account, $iuprratio_account, $iuderatio_account, $vutime_account, $vudl_account, $vuprratio_account, $vuderatio_account, $exutime_account, $exudl_account, $exuprratio_account, $exuderatio_account, $uutime_account, $uudl_account, $uuprratio_account, $uuderatio_account, $nmtime_account, $nmdl_account, $nmprratio_account, $nmderatio_account, $getInvitesByPromotion_class;
 	global $enablenoad_advertisement, $noad_advertisement;
 	global $Cache;
+	global $rootpath;
+
+	require_once($rootpath . get_langfile_path('', true));
 
 	set_time_limit(0);
 	ignore_user_abort(1);

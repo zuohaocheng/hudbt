@@ -1284,8 +1284,6 @@ function autoclean() {
 }
 
 function unesc($x) {
-  if (get_magic_quotes_gpc())
-    return stripslashes($x);
   return $x;
 }
 
@@ -3238,9 +3236,6 @@ function GetVar ($name) {
   } else {
     if ( !isset($_REQUEST[$name]) )
     return false;
-    if ( get_magic_quotes_gpc() ) {
-      $_REQUEST[$name] = ssr($_REQUEST[$name]);
-    }
     $GLOBALS[$name] = $_REQUEST[$name];
     return $GLOBALS[$name];
   }
