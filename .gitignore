@@ -7,4 +7,5 @@
 /test-*.php
 /test.php
 *.orig
+*.rej
 /imdb/cache

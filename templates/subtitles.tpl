@@ -13,34 +13,44 @@
 {/if}
 
 <form enctype="multipart/form-data" method="post" action="?">
-  <input type="hidden" name="action" value="upload">
-    <table class="main" border="1" cellspacing="0" cellpadding="5">
-      <thead>
-	<tr><th colspan="2">{$lang['text_red_star_required']}</th></tr>
-      </thead>
-      <tbody>
-	<tr><td class="rowhead">{$lang['row_file']}<span class="required-field">*</span></td><td class="rowfollow" align="left"><input type="file" name="file">
-	{if $maxsubsize_main > 0}
-	<br />({$lang['text_maximum_file_size']} {mksize($maxsubsize_main)})
-	{/if}
-      </td></tr>
-      {if !$detail_torrent_id}
-      <tr><td class="rowhead">{$lang['row_torrent_id']}<span class="required-field">*</span></td><td align="left"><input type="text" name="torrent_id" style="width:300px"><br />{$lang['text_torrent_id_note']}</td></tr>
-      {else}
-      <tr><td class="rowhead">{$lang['row_torrent_id']}<span class="required-field">*</span></td><td align="left"><input type="text" name="torrent_id" value="{$detail_torrent_id}" style="width:300px"><br />{$lang['text_torrent_id_note']}</td></tr>
+  <input type="hidden" name="action" value="upload" />
+  <div class="edit-hint">{$lang['text_red_star_required']}</div>
+  <dl class="table" style="width:550px;">
+    <dt><span class="required">{$lang['row_file']}</span></dt>
+    <dd class="first-child">
+      <input type="file" name="file" />
+      {if $maxsubsize_main > 0}
+      <br />
+      ({$lang['text_maximum_file_size']} {mksize($maxsubsize_main)})
       {/if}
-      <tr><td class="rowhead">{$lang['row_title']}</td><td colspan="3" align="left"><input type="text" name="title" style="width:300px"><br />{$lang['text_title_note']}</td></tr>
-      <tr><td class="rowhead">{$lang['row_language']}<span class="required-field">*</span></td><td align="left">
+    </dd>
+    <dt><span class="required">{$lang['row_torrent_id']}</span></dt>
+    <dd>
+      {if !$detail_torrent_id}
+      <input type="text" name="torrent_id" style="width:300px"><br />{$lang['text_torrent_id_note']}
+      {else}
+      <input type="text" name="torrent_id" value="{$detail_torrent_id}" style="width:300px" /><br />{$lang['text_torrent_id_note']}
+      {/if}
+    </dd>
+    <dt>{$lang['row_title']}</dt>
+    <dd><input type="text" name="title" style="width:300px" /><br />{$lang['text_title_note']}</dd>
+    <dt><span class="required">{$lang['row_language']}</span></dt>
+    <dd>
       <select name="sel_lang">
 	<option value="0">{$lang['select_choose_one']}</option>
 	{html_options values=$lang_ids output=$lang_names}
       </select>
-      {if (get_user_class() >= $beanonymous_class)}
-      <tr><td class="rowhead">{$lang['row_show_uploader']}</td><td><label><input type="checkbox" name="uplver" value="yes" />{$lang['hide_uploader_note']}</label></td></tr>
-      {/if}
-      <tr><td class="toolbox" colspan="2" align="center"><input type="submit" class="btn" value="{$lang['submit_upload_file']}" /> <input type="reset" class="btn" value="{$lang['submit_reset']}" /></td></tr>
-    </tbody>
-  </table>
+    </dd>
+    {if (get_user_class() >= $beanonymous_class)}
+    <dt>{$lang['row_show_uploader']}</dt>
+    <dd>
+      <label><input type="checkbox" name="uplver" value="yes" />{$lang['hide_uploader_note']}</label>
+    </dd>
+    {/if}
+    <dd class="toolbox"><input type="submit" class="btn" value="{$lang['submit_upload_file']}" /> <input type="reset" class="btn" value="{$lang['submit_reset']}" />
+  </dd>
+  </dl>
+
 </form>
 
 <div id="search-subtitles">

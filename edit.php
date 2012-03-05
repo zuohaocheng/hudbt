@@ -47,21 +47,23 @@ else {
 	print("<input type=\"hidden\" name=\"id\" value=\"$id\" />");
 	if (isset($_GET["returnto"]))
 	print("<input type=\"hidden\" name=\"returnto\" value=\"" . htmlspecialchars($_GET["returnto"]) . "\" />");
-	print('<table style="margin:0 auto;width:95%;" border="1" cellspacing="0" cellpadding="5">');
-	print("<tr><td class='colhead' colspan='2' align='center'>".htmlspecialchars($row["name"])."</td></tr>");
-	tr($lang_edit['row_torrent_name']."<font color=\"red\">*</font>", "<input type=\"text\" style=\"width: 650px;\" name=\"name\" value=\"" . htmlspecialchars($row["name"]) . "\" />", 1);
-	if ($smalldescription_main == 'yes')
-		tr($lang_edit['row_small_description'], "<input type=\"text\" style=\"width: 650px;\" name=\"small_descr\" value=\"" . htmlspecialchars($row["small_descr"]) . "\" />", 1);
+	print('<h1 id="page-title">'.htmlspecialchars($row["name"])."</h1>");
+	echo '<dl class="table">';
+	dl_item('<span class="required">' . $lang_edit['row_torrent_name']."</span>", "<input type=\"text\" style=\"width: 650px;\" name=\"name\" value=\"" . htmlspecialchars($row["name"]) . "\" />", 1);
+	if ($smalldescription_main == 'yes') {
+	  dl_item($lang_edit['row_small_description'], "<input type=\"text\" style=\"width: 650px;\" name=\"small_descr\" value=\"" . htmlspecialchars($row["small_descr"]) . "\" />", 1);
+	}
 
-	get_external_tr($row["url"]);
+	get_external_tr($row["url"], true);
 
-	if ($enablenfo_main=='yes')
-		tr($lang_edit['row_nfo_file'], "<font class=\"medium\"><input type=\"radio\" name=\"nfoaction\" value=\"keep\" checked=\"checked\" />".$lang_edit['radio_keep_current'].
+	if ($enablenfo_main=='yes') {
+	  dl_item($lang_edit['row_nfo_file'], "<font class=\"medium\"><input type=\"radio\" name=\"nfoaction\" value=\"keep\" checked=\"checked\" />".$lang_edit['radio_keep_current'].
 	"<input type=\"radio\" name=\"nfoaction\" value=\"remove\" />".$lang_edit['radio_remove'].
 	"<input id=\"nfoupdate\" type=\"radio\" name=\"nfoaction\" value=\"update\" />".$lang_edit['radio_update']."</font><br /><input type=\"file\" name=\"nfo\" onchange=\"document.getElementById('nfoupdate').checked=true\" />", 1);
-	print("<tr><td class=\"rowhead\">".$lang_edit['row_description']."<font color=\"red\">*</font></td><td class=\"rowfollow\">");
+	}
+	print('<dt><span class="required">'.$lang_edit['row_description']."</span></dt><dd>");
 	textbbcode("edittorrent","descr",($row["descr"]), false);
-	print("</td></tr>");
+	print("</dd>");
 	$s = "<select name=\"type\" id=\"oricat\">";
 
 	$cats = genrelist($sectionmode);
@@ -85,7 +87,7 @@ else {
 		$s2 .= "</select>\n";
 		$movecheckbox = "<input type=\"checkbox\" id=movecheck name=\"movecheck\" value=\"1\" onclick=\"disableother2('oricat','newcat')\" />";
 	}
-	tr($lang_edit['row_type']."<font color=\"red\">*</font>", $s.($allowmove ? "&nbsp;&nbsp;".$movecheckbox.$movenote.$s2 : ""), 1);
+	dl_item('<span class="required">' . $lang_edit['row_type']."</span>", $s.($allowmove ? "&nbsp;&nbsp;".$movecheckbox.$movenote.$s2 : ""), 1);
 	if ($showsource || $showmedium || $showcodec || $showaudiocodec || $showstandard || $showprocessing){
 		if ($showsource){
 			$source_select = torrent_selection($lang_edit['text_source'],"source_sel","sources",$row["source"]);
@@ -117,7 +119,7 @@ else {
 		}
 		else $processing_select = "";
 
-		tr($lang_edit['row_quality'], $source_select . $medium_select . $codec_select . $audiocodec_select. $standard_select . $processing_select, 1);
+		dl_item($lang_edit['row_quality'], $source_select . $medium_select . $codec_select . $audiocodec_select. $standard_select . $processing_select, 1);
 	}
 
 	if ($showteam){
@@ -126,9 +128,9 @@ else {
 		}
 		else $showteam = "";
 
-		tr($lang_edit['row_content'],$team_select,1);
+		dl_item($lang_edit['row_content'],$team_select,1);
 	}
-	tr($lang_edit['row_check'], "<input type=\"checkbox\" name=\"visible\"" . ($row["visible"] == "yes" ? " checked=\"checked\"" : "" ) . " value=\"1\" /> ".$lang_edit['checkbox_visible']."&nbsp;&nbsp;&nbsp;".(get_user_class() >= $beanonymous_class || get_user_class() >= $torrentmanage_class ? "<input type=\"checkbox\" name=\"anonymous\"" . ($row["anonymous"] == "yes" ? " checked=\"checked\"" : "" ) . " value=\"1\" />".$lang_edit['checkbox_anonymous_note']."&nbsp;&nbsp;&nbsp;" : "").(get_user_class() >= $torrentmanage_class ? "<input type=\"checkbox\" name=\"banned\"" . (($row["banned"] == "yes") ? " checked=\"checked\"" : "" ) . " value=\"yes\" /> ".$lang_edit['checkbox_banned'] : ""), 1);
+	dl_item($lang_edit['row_check'], "<input type=\"checkbox\" name=\"visible\"" . ($row["visible"] == "yes" ? " checked=\"checked\"" : "" ) . " value=\"1\" /> ".$lang_edit['checkbox_visible']."&nbsp;&nbsp;&nbsp;".(get_user_class() >= $beanonymous_class || get_user_class() >= $torrentmanage_class ? "<input type=\"checkbox\" name=\"anonymous\"" . ($row["anonymous"] == "yes" ? " checked=\"checked\"" : "" ) . " value=\"1\" />".$lang_edit['checkbox_anonymous_note']."&nbsp;&nbsp;&nbsp;" : "").(get_user_class() >= $torrentmanage_class ? "<input type=\"checkbox\" name=\"banned\"" . (($row["banned"] == "yes") ? " checked=\"checked\"" : "" ) . " value=\"yes\" /> ".$lang_edit['checkbox_banned'] : ""), 1);
 	if (get_user_class()>= $torrentsticky_class || (get_user_class() >= $torrentmanage_class && $CURUSER["picker"] == 'yes')){
 		$pickcontent = "";
 	
@@ -209,8 +211,7 @@ EOT;
 			*/
 			}
 		}
-		if(get_user_class()>=$torrentmanage_class && $CURUSER["picker"] == 'yes')
-		{
+		if (get_user_class()>=$torrentmanage_class && $CURUSER["picker"] == 'yes') {
 			$pickcontent .= "<b>".$lang_edit['row_recommended_movie'].":&nbsp;</b>"."<select name=\"sel_recmovie\" style=\"width: 100px;\">" .
 			"<option" . (($row["picktype"] == "normal") ? " selected=\"selected\"" : "" ) . " value=\"0\">".$lang_edit['select_normal']."</option>" .
 			"<option" . (($row["picktype"] == "hot") ? " selected=\"selected\"" : "" ) . " value=\"1\">".$lang_edit['select_hot']."</option>" .
@@ -218,11 +219,11 @@ EOT;
 			"<option" . (($row["picktype"] == "recommended") ? " selected=\"selected\"" : "" ) . " value=\"3\">".$lang_edit['select_recommended']."</option>" .
 			"</select>";
 		}
-		tr($lang_edit['row_pick'], $pickcontent, 1);
+		dl_item($lang_edit['row_pick'], $pickcontent, 1);
 	}
 
-	print("<tr><td class=\"toolbox\" colspan=\"2\" align=\"center\"><input id=\"qr\" type=\"submit\" value=\"".$lang_edit['submit_edit_it']."\" /> <input type=\"reset\" value=\"".$lang_edit['submit_revert_changes']."\" /></td></tr>\n");
-	print("</table>\n");
+	print("<dd class=\"toolbox\"><input id=\"qr\" type=\"submit\" value=\"".$lang_edit['submit_edit_it']."\" /> <input type=\"reset\" value=\"".$lang_edit['submit_revert_changes']."\" /></dd>\n");
+	print("</dl>\n");
 	print("</form>\n");
 	print("<br /><br />");
 	print("<form method=\"post\" action=\"delete.php\">\n");
