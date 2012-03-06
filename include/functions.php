@@ -58,7 +58,8 @@ function get_load_uri($type, $script_name ="", $absolute = true) {
     $addition .= '&debug=1';
   }
   else {
-    $addition .= '&rev=20120303';
+    include('include/loadRevision.php');
+    $addition .= '&rev=' . $loadRevision;
   }
 
   $pagename = 'load.php';
@@ -1582,11 +1583,24 @@ function get_css_uri($file = "", $theme = -1) {
   $cssRow = get_css_row($theme);
 
   $ss_uri = $cssRow['uri'];
-  if (!$ss_uri)
+  if (!$ss_uri) {
     $ss_uri = get_single_value("stylesheets","uri","WHERE id=".sqlesc($defcss));
-  if ($file == "")
+  }
+  if ($file == "") {
     return $ss_uri;
-  else return $ss_uri.$file;
+  }
+  else {
+    return $ss_uri.$file;
+  }
+}
+
+function jqui_css_name($theme = -1) {
+  $cssRow = get_css_row($theme);
+  $ss_uri = $cssRow['jqui'];
+  if (!$ss_uri) {
+    $ss_uri = get_single_value("stylesheets","jqui","WHERE id=".sqlesc($defcss));
+  }
+  return $ss_uri;
 }
 
 function get_font_type() {
@@ -1677,11 +1691,14 @@ function no_login_navbar() {
   return navbar_item('login.php', $lang_functions['text_login'], ($file == 'login.php')) . navbar_item('signup.php', $lang_functions['text_signup'], ($file == 'signup.php'));
 }
 
-function msgalert($url, $text, $bgcolor = '') {
+function msgalert($url, $text, $bgcolor = '', $id='') {
   global $BASEURL;
   $out = ('<li');
   if ($bgcolor != '') {
     $out .= ' style="background-color:' . $bgcolor . ';"';
+  }
+  if ($id != '') {
+    $out .= ' id="' . $id . '"';
   }
   $out .= '><a href="//' . $BASEURL . '/' . $url . '">' . $text . '</a></li>';
   return $out;
@@ -1877,7 +1894,8 @@ function stdhead($title = "", $msgalert = true, $script = "", $place = "") {
       $text = $lang_functions['text_you_have'].$unread.$lang_functions['text_new_message'] . add_s($unread) . $lang_functions['text_click_here_to_read'];
       $alerts[] = array('href' => "messages.php",
 			'text' => $text,
-			'color' => "red");
+			'color' => "red",
+			'id' => 'alert-message');
     }
 
     $settings_script_name = $_SERVER["SCRIPT_FILENAME"];
@@ -1977,7 +1995,6 @@ function stdfoot() {
 		   'analyticscode_tweak' => $analyticscode_tweak,
 		   'cnzz' => $cnzz
 		   ));
-  
   $s->display('stdfoot.tpl');
   if (isset($_SESSION)) {
     unset($_SESSION['queries']);

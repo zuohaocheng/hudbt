@@ -139,8 +139,8 @@ function load_files_cache($name, $type, $debug, $purge) {
 
   if ($type == 'js') {
     //Mind the sequence of loading
-    $out .= load_files(array('jquery-1.7.1.min', 'jquery-ui-1.8.16.custom.min', 'jquery.tablesorter'), $type, $debug, $purge, false, false);
-    $out .= load_files(array('ajaxbasic', 'common', 'domLib', 'domTT', 'domTT_drag', 'fadomatic'), $type, $debug, $purge);
+    $out .= load_files(array('jquery-1.7.1.min', 'jquery-ui-1.8.18.custom.min', 'jquery.tablesorter'), $type, $debug, $purge, false, false);
+    $out .= load_files(array('ajaxbasic', 'common', 'domLib', 'domTT', 'domTT_drag', 'fadomatic', 'pm'), $type, $debug, $purge);
 
     $out .= load_files(dependence($name), $type, $debug, $purge);
     $out .= load_files(array($name), $type, $debug, $purge);
@@ -150,7 +150,7 @@ function load_files_cache($name, $type, $debug, $purge) {
   elseif ($type == 'css') {
     global $font, $theme, $caticon;
     $css_uri = get_css_uri('', $theme);
-    $files = array(get_font_css_uri($font), 'styles/sprites.css', get_forum_pic_folder().'/forumsprites.css', $css_uri."theme.css", $css_uri."DomTT.css", 'pic/' . get_cat_folder(401, $caticon) . "sprite.css", 'styles/jqui/ui-lightness/jquery-ui-1.8.16.custom.css', 'styles/jquery.tablesorter/jquery.tablesorter.css');
+    $files = array(get_font_css_uri($font), 'styles/sprites.css', get_forum_pic_folder().'/forumsprites.css', $css_uri."theme.css", $css_uri."DomTT.css", 'pic/' . get_cat_folder(401, $caticon) . "sprite.css", 'styles/jqui/' . jqui_css_name($theme) . '/jquery-ui-1.8.18.custom.css', 'styles/jquery.tablesorter/jquery.tablesorter.css');
     $out .= load_files($files, $type, $debug, $purge, true);
 
     if ($CURUSER){

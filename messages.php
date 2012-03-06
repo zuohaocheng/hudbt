@@ -64,8 +64,9 @@ else {
 				case "both": $wherea=" AND (msg LIKE '%$keyword%' or subject LIKE '%$keyword%') "; break;
 				default: $wherea=" AND (msg LIKE '%$keyword%' or subject LIKE '%$keyword%') "; break;
 				}
-		else
-		$wherea="";
+		else {
+		  $wherea="";
+		}
 		$unread=$_GET["unread"];
 		if ($unread)
 			switch ($unread){
@@ -206,6 +207,7 @@ elseif ($format == 'json') {
   function msg_json_pre($message) {
     $message['receiver'] = get_user_prop_msg($message['receiver']);
     $message['sender'] = get_user_prop_msg($message['sender']);
+    $message['msg'] = format_comment($message['msg']);
     return $message;
   }
   echo php_json_encode(array_map('msg_json_pre',$messages));

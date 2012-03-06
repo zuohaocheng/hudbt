@@ -105,7 +105,7 @@
       {if $alerts}
       <div id="alert" class="minor-list"><ul>
 	{section name=idx loop=$alerts}
-	{msgalert($alerts[idx]['href'], $alerts[idx]['text'], $alerts[idx]['color'])}
+	{msgalert($alerts[idx]['href'], $alerts[idx]['text'], $alerts[idx]['color'], $alerts[idx]['id'])}
 	{/section}
       </ul></div>
       {/if}

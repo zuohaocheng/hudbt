@@ -100,11 +100,28 @@ p.sub
 }
 td, th, .td
 {
-    border-right: #000000 1px solid;
-    border-top: #000000 1px solid;
-    border-left: #000000 1px solid;
-    border-bottom: #000000 1px solid
+    border: #000000 1px solid;
 }
+
+table.no-vertical-line>thead>tr:first-child>th {
+    border-top: #000000 1px solid;
+}
+
+table.no-vertical-line td, table.no-vertical-line th {
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    border-top: silver 1px dashed;
+}
+
+table.no-vertical-line>tbody>tr:first-child>td {
+    border-top: none;
+}
+
+table.no-vertical-line {
+    border-bottom: #000000 1px solid;
+}
+
 td.embedded
 {
     border-right: medium none;
@@ -774,6 +791,11 @@ dl dd.first-child{
 
 .disabled {
     color: gray;
+}
+
+.alert-message-body {
+    max-height:4em;
+    overflow-y:hidden;
 }
 
 #torrents h2, #torrents h3 {
