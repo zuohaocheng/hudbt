@@ -3,7 +3,7 @@
 if(!defined('IN_TRACKER'))
 die('Hacking attempt!');
 
-$CONFIGURATIONS = array('ACCOUNT', 'ADVERTISEMENT', 'ATTACHMENT', 'AUTHORITY', 'BASIC', 'BONUS', 'CODE', 'MAIN', 'SECURITY', 'SMTP', 'TORRENT', 'TWEAK');
+$CONFIGURATIONS = array('ACCOUNT', 'ADVERTISEMENT', 'ATTACHMENT', 'AUTHORITY', 'BASIC', 'BONUS', 'CODE', 'MAIN', 'SECURITY', 'SMTP', 'TORRENT', 'TWEAK', 'SNS');
 function ReadConfig ($configname = NULL) {
 	global $CONFIGURATIONS;
 	if ($configname) {
@@ -383,6 +383,8 @@ $thirtypercentleechbecome_torrent = $TORRENT['thirtypercentleechbecome'];
 $normalbecome_torrent = $TORRENT['normalbecome'];
 $uploaderdouble_torrent = $TORRENT['uploaderdouble'];
 $deldeadtorrent_torrent = $TORRENT['deldeadtorrent'];
+
+$sns = $SNS;
 
 $promotion_text = array(array('name' => 'normal', 'lang' => 'text_normal'), array('name' => 'free', 'lang' => 'text_free'), array('name'=>'twoup', 'lang'=>'text_two_times_up'), array('name' => 'twoupfree', 'lang'=> 'text_free_two_times_up'), array('name' => 'halfdown', 'lang' => 'text_half_down'), array('name' => 'twouphalfdown','lang' => 'text_half_down_two_up'), array('name' => 'thirtypercent', 'lang' => 'text_thirty_percent_down'));
 $expire_limits = array(NULL, 0, $expirefree_torrent, $expiretwoup_torrent, $expiretwoupfree_torrent, $expirehalfleech_torrent, $expiretwouphalfleech_torrent, $expirethirtypercentleech_torrent);

@@ -39,11 +39,18 @@ else {
 }
 ?>
 <form method="post" action="takelogin.php">
-<h2><a href="https://sp-pt.hust.edu.cn:444/Shibboleth.sso/DS?target=http://sp-pt.hust.edu.cn:81">联盟用户在此登录</a></h2>
-<h3>（本校用户可使用南六楼网络中心申请的锐捷账号通过联盟认证登录）</h3>
-<div class="hints"><ul><li><?php echo $lang_login['p_need_cookies_enables']?></li>
+<h2 class="page-titles"><a href="https://sp-pt.hust.edu.cn:444/Shibboleth.sso/DS?target=http://sp-pt.hust.edu.cn:81">联盟用户在此登录</a></h2>
+<h3 class="page-titles">（本校用户可使用南六楼网络中心申请的锐捷账号通过联盟认证登录）</h3>
+<div class="hints center"><ul><li><?php echo $lang_login['p_need_cookies_enables']?></li>
 <li>[<b><?php echo $maxloginattempts;?></b>] <?php echo $lang_login['p_fail_ban']?></li>
 <li><?php echo $lang_login['p_you_have']?> <b><?php echo remaining ();?></b> <?php echo $lang_login['p_remaining_tries']?></li></ul></div>
+<?php
+echo '<div id="sns" class="minor-list text center"><ul>';
+foreach ($sns as $s) {
+  echo '<li><a href="' . $s['url'] . '">' . $s['text'] . '</a></li>';
+}
+echo '</ul></div>';
+?>
 <table border="0" cellpadding="5" style="margin:0 auto;">
 <tr><td class="rowhead"><?php echo $lang_login['rowhead_username']?></td><td class="rowfollow" align="left"><input type="text" name="username" style="width: 180px; border: 1px solid gray" /></td></tr>
 <tr><td class="rowhead"><?php echo $lang_login['rowhead_password']?></td><td class="rowfollow" align="left"><input type="password" name="password" style="width: 180px; border: 1px solid gray"/></td></tr>
@@ -76,7 +83,7 @@ if (isset($returnto))
 
 ?>
 </form>
-<div class="hints"><ul>
+<div class="hints center"><ul>
 <li><?php echo $lang_login['p_no_account_signup']?></li>
 <?php
 if ($smtptype != 'none'){
@@ -88,7 +95,7 @@ if ($smtptype != 'none'){
 ?>
 </ul></div>
 <?php
-if ($showhelpbox_main != 'no'){?>
+if ($showhelpbox_main != 'no') {?>
 <table width="700" class="main" border="0" cellspacing="0" cellpadding="0"><tr><td class="embedded">
 <h2><?php echo $lang_login['text_helpbox'] ?><font class="small"> - <?php echo $lang_login['text_helpbox_note'] ?><font id= "waittime" color="red"></font></h2>
 <?php
@@ -100,4 +107,6 @@ print("<div id=sbword style=\"display: none\">".$lang_login['sumbit_shout']."</d
 print(smile_row("shbox","shbox_text"));
 print("</td></tr></table></form></td></tr></table>");
 }
+
+
 stdfoot();

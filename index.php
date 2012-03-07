@@ -331,6 +331,22 @@ if ($CURUSER && $showpolls_main == "yes")
     }
   }
 // ------------- end: polls ------------------//
+// ------------- start: sns ------------------//
+$Cache->new_page('sns', 3000, true);
+if (!$Cache->get_page()) {
+  $Cache->add_whole_row();
+
+  echo '<div id="sns"><h2 class="page-titles">' . $lang_index['text_sns'] . '</h2><div class="minor-list text table td center"><ul>';
+  foreach ($sns as $s) {
+    echo '<li><a href="' . $s['url'] . '">' . $s['text'] . '</a></li>';
+  }
+  echo '</ul></div></div>';
+  $Cache->end_whole_row();
+  $Cache->cache_page();
+}
+echo $Cache->next_row();
+
+// ------------- end: sns ------------------//
 // ------------- start: stats ------------------//
 if ($showstats_main == "yes")
   {

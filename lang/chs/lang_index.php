@@ -99,6 +99,7 @@ $lang_index = array
 	'row_active_browsing_users' => "当前访问用户数",
 	'row_tracker_active_users' => "当前Tracker用户数",
 	'text_detail' => "详情",
+	'text_sns' => '社交网站',
 );
 
 ?>
