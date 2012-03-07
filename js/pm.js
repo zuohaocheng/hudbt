@@ -3,7 +3,7 @@ $(function() {
     var base = hb.constant.url.base;
     var title = $('title');
     var origTitle = title.text();
-    var checkInt = 10;
+    var checkInt = 120;
     var alertMsg = $('#alert-message');
     var timerMouse;
     var dialogOpen = false;

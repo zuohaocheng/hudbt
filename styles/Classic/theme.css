@@ -1011,6 +1011,12 @@ input.text {
     margin-bottom: 2em;
 }
 
+#bonuses li {
+    -moz-column-break-inside:avoid;
+    -webkit-column-break-inside:avoid;
+    column-break-inside:avoid;
+}
+
 .bonus-sub-group:first-child {
     border-right: dashed 1px silver;
 }
