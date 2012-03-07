@@ -766,8 +766,12 @@ A.Peasant_Name:visited{color: #708090}
     padding: 0;
 }
 
-input.invalid, .invalid input[type="text"] {
+input.invalid, dt.invalid, .invalid input[type="text"] {
     background-color: red;
+}
+
+dt.invalid {
+    border-radius: 3px;
 }
 
 input.invalid-ref, .invalid-ref input[type="text"], .invalid-ref a {

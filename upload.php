@@ -46,7 +46,7 @@ stdhead($lang_upload['head_upload']);
   </ul></div>
   <dl class="table">
     <?php
-	dl_item('<span class="required">' . $lang_upload['row_torrent_file']."</span>", "<input type=\"file\" class=\"file\" id=\"torrent\" name=\"file\" onchange=\"getname()\" />\n", 1);
+	dl_item($lang_upload['row_torrent_file'], "<input type=\"file\" class=\"file\" id=\"torrent\" name=\"file\" />\n", 1, 'required');
 	if ($altname_main == 'yes'){
 	  dl_item($lang_upload['row_torrent_name'], "<b>".$lang_upload['text_english_title']."</b>&nbsp;<input type=\"text\" style=\"width: 250px;\" name=\"name\" />&nbsp;&nbsp;&nbsp;
 	  <b>".$lang_upload['text_chinese_title']."</b>&nbsp;<input type=\"text\" style=\"width: 250px\" name=\"cnname\"><br /><font class=\"medium\">".$lang_upload['text_titles_note']."</font>", 1);
@@ -59,7 +59,7 @@ stdhead($lang_upload['head_upload']);
 	get_external_tr('', true);
 	if ($enablenfo_main=='yes')
 	  dl_item($lang_upload['row_nfo_file'], "<input type=\"file\" class=\"file\" name=\"nfo\" /><br /><font class=\"medium\">".$lang_upload['text_only_viewed_by'].get_user_class_name($viewnfo_class,false,true,true).$lang_upload['text_or_above']."</font>", 1);
-	print('<dt><span class="required">' . $lang_upload['row_description'] . '</span></dt><dd>');
+	print('<dt class="required">' . $lang_upload['row_description'] . '</dt><dd>');
 	textbbcode("upload","descr","",false);
 	print("</dd>\n");
 
@@ -81,7 +81,7 @@ stdhead($lang_upload['head_upload']);
 	  $s2 .= "</select>\n";
 	}
 	else $s2 = "";
-	dl_item('<span class="required">' . $lang_upload['row_type']."</span>", ($allowtwosec ? $lang_upload['text_to_browse_section'] : "").$s.($allowtwosec ? $lang_upload['text_to_special_section'] : "").$s2.($allowtwosec ? $lang_upload['text_type_note'] : ""),1);
+dl_item($lang_upload['row_type'], ($allowtwosec ? $lang_upload['text_to_browse_section'] : "").$s.($allowtwosec ? $lang_upload['text_to_special_section'] : "").$s2.($allowtwosec ? $lang_upload['text_type_note'] : ""), 1, 'required');
 
 	if ($showsource || $showmedium || $showcodec || $showaudiocodec || $showstandard || $showprocessing){
 	  if ($showsource){
@@ -135,9 +135,12 @@ stdhead($lang_upload['head_upload']);
 	  $offer .= "</select>";
 	  $dt = $lang_upload['row_your_offer'];
 	  if (!$uploadfreely && !$allowspecial) {
-	    $dt = '<span class="required">' . $dt . '</span>';
+	    $class = 'required';
 	  }
-	  dl_item($dt, $offer.$lang_upload['text_please_select_offer'] , 1);
+	  else {
+	    $class = '';
+	  }
+	  dl_item($dt, $offer.$lang_upload['text_please_select_offer'] , 1, $class);
 	}
 	//===end
 

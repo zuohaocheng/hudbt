@@ -293,7 +293,7 @@ $(function() {
 
     var selections = function(name, header, opts) {
 	var sel = $('<select></select>', {
-	    'class' : "med codebuttons",
+	    'class' : "med codebuttons no-validate",
 	    name : name
 	});
 	sel.append('<option value="0">' + header + '</option>');

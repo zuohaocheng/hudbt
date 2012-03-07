@@ -1424,13 +1424,17 @@ function tr_small($x,$y,$noesc=0,$relation='') {
   print("<tr".( $relation ? " relation = \"$relation\"" : "")."><td width=\"1%\" class=\"rowhead nowrap\" valign=\"top\" align=\"right\">".$x."</td><td width=\"99%\" class=\"rowfollow\" valign=\"top\" align=\"left\">".$a."</td></tr>\n");
 }
 
-function dl_item($title, $desc, $noesc = false) {
+function dl_item($title, $desc, $noesc = false, $class = '') {
   static $first = true;
   if (!$noesc) {
     $desc = htmlspecialchars($desc);
     //$a = str_replace("\n", "<br />\n", $a);
   }
-  echo '<dt>' . $title . '</dt><dd';
+  echo '<dt';
+  if ($class) {
+    echo ' class="' . $class . '"';
+  }
+  echo '>' . $title . '</dt><dd';
   if ($first) {
     $first = false;
     echo ' class="first-child"';
