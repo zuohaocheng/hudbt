@@ -81,7 +81,10 @@ stdhead($lang_upload['head_upload']);
 	  $s2 .= "</select>\n";
 	}
 	else $s2 = "";
-dl_item($lang_upload['row_type'], ($allowtwosec ? $lang_upload['text_to_browse_section'] : "").$s.($allowtwosec ? $lang_upload['text_to_special_section'] : "").$s2.($allowtwosec ? $lang_upload['text_type_note'] : ""), 1, 'required');
+	dl_item($lang_upload['row_type'], ($allowtwosec ? $lang_upload['text_to_browse_section'] : "").$s.($allowtwosec ? $lang_upload['text_to_special_section'] : "").$s2.($allowtwosec ? $lang_upload['text_type_note'] : ""), 1, 'required');
+
+	echo '<dt>分类</dt>';
+	echo '<dd class="minor-list" id="tcategories"><ul></ul></dd>';
 
 	if ($showsource || $showmedium || $showcodec || $showaudiocodec || $showstandard || $showprocessing){
 	  if ($showsource){

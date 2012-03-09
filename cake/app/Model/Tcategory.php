@@ -39,6 +39,16 @@ class Tcategory extends AppModel {
  *
  * @var array
  */
+	public $hasMany = array(
+		'RedirectFrom' => array(
+			'className' => 'Tcategory',
+			'foreignKey' => 'redirect_to_id',
+			'conditions' => '',
+			'fields' => '',
+			'order' => ''
+		)
+	);
+	
 	public $belongsTo = array(
 		'RedirectTo' => array(
 			'className' => 'Tcategory',
@@ -87,4 +97,23 @@ class Tcategory extends AppModel {
 		)
 	);
 
+	public function afterFind($results, $primary) {
+	  if (!$primary) {
+	    return $results;
+	  }
+	  for ($i = 0; $i < count($results); $i += 1) {
+	    if (!array_key_exists('Tcategory', $results[$i])) {
+	      continue;
+	    }
+
+	    if ($results[$i]['RedirectTo']['id']) {
+	      $results[$i]['Tcategory']['showName'] = $results[$i]['RedirectTo']['name'];
+	    }
+	    else {
+	      $results[$i]['Tcategory']['showName'] = $results[$i]['Tcategory']['name'];
+	    }
+	  }
+	  return $results;
+	}
+#				 'showName' => 'CASE WHEN Tcategory.redirect_to_id != 0 then RedirectTo.name ELSE Tcategory.name END'
 }

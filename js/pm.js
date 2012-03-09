@@ -48,15 +48,17 @@ $(function() {
 				}).join('') + '</tbody></table>';
 
 				dialogOpen = true;
-				$('<div></div>', {
+				var dialog = $('<div></div>', {
 				    title : '站内信',
 				    html : text
-				}).dialog({
+				});
+				dialog.dialog({
 				    autoOpen : true,
 				    position : 'right',
 				    width : '500px',
 				    'close' : function() {
 					dialogOpen = false;
+					dialog.remove();
 				    }
 				}).find('table').tablesorter();
 			    }, mouseoverTime * 1000);

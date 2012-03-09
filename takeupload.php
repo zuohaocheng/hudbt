@@ -8,9 +8,22 @@ require_once(get_langfile_path());
 require(get_langfile_path("",true));
 loggedinorreturn();
 
+if ($_REQUEST['format'] == 'json') {
+  $format = 'json';
+}
+else {
+  $format = 'html';
+}
+
 function bark($msg) {
 	global $lang_takeupload;
-	genbark($msg, $lang_takeupload['std_upload_failed']);
+	global $format;
+	if ($format == 'json') {
+	  echo json_encode(['success' => false, 'message' => $msg]);
+	}
+	else {
+	  genbark($msg, $lang_takeupload['std_upload_failed']);
+	}
 	die;
 }
 
@@ -365,8 +378,7 @@ foreach ($filelist as $file) {
 
 //move_uploaded_file($tmpname, "$torrent_dir/$id.torrent");
 $fp = fopen("$torrent_dir/$id.torrent", "w");
-if ($fp)
-{
+if ($fp) {
 	@fwrite($fp, benc($dict), strlen(benc($dict)));
 	fclose($fp);
 }
@@ -375,12 +387,28 @@ if ($fp)
 KPS("+",$uploadtorrent_bonus,$CURUSER["id"]);
 //===end
 
+//Tcategory
+include('./cake/app/webroot/index.php');
+include('./cake/app/Model/Torrent.php');
+
+$Torrent = new Torrent;
+$Torrent->id = $id;
+if ($Torrent->exists()) {
+  $data = $_REQUEST['data'];
+  $d = ['Torrent' => ['id' => $id],
+	'Tcategory' => ['Tcategory' => $data['Tcategory']['Tcategory']]];
+  if (!$Torrent->save($d)) {
+    bark('Cannot save tcategories');
+  }
+}
+
+//End of tcategory
+
 
 write_log("Torrent $id ($torrent) was uploaded by $anon");
 
 //===notify people who voted on offer thanks CoLdFuSiOn :)
-if ($is_offer)
-{
+if ($is_offer) {
 	$res = sql_query("SELECT `userid` FROM `offervotes` WHERE `userid` != " . $CURUSER["id"] . " AND `offerid` = ". sqlesc($offerid)." AND `vote` = 'yeah'") or sqlerr(__FILE__, __LINE__);
 
 	while($row = mysql_fetch_assoc($res)) 
@@ -406,8 +434,7 @@ if ($is_offer)
 //=== end notify people who voted on offer
 
 /* Email notifs */
-if ($emailnotify_smtp=='yes' && $smtptype != 'none')
-{
+if ($emailnotify_smtp=='yes' && $smtptype != 'none') {
 $cat = get_single_value("categories","name","WHERE id=".sqlesc($catid));
 $res = sql_query("SELECT id, email, lang FROM users WHERE enabled='yes' AND parked='no' AND status='confirmed' AND notifs LIKE '%[cat$catid]%' AND notifs LIKE '%[email]%' ORDER BY lang ASC") or sqlerr(__FILE__, __LINE__);
 
@@ -450,14 +477,19 @@ $body_arr[$langfolder_array[$i]] = str_replace("<br />","<br />",nl2br($body_arr
 	$i++;
 }
 
-while($arr = mysql_fetch_array($res))
-{
-		$current_lang = $arr["lang"];
-		$to = $arr["email"];
+while($arr = mysql_fetch_array($res)) {
+  $current_lang = $arr["lang"];
+  $to = $arr["email"];
 
-		sent_mail($to,$SITENAME,$SITEEMAIL,change_email_encode(validlang($current_lang),$lang_takeupload_target[validlang($current_lang)]['mail_title'].$torrent),change_email_encode(validlang($current_lang),$body_arr[validlang($current_lang)]),"torrent upload",false,false,'',get_email_encode(validlang($current_lang)), "eYou");
+  sent_mail($to,$SITENAME,$SITEEMAIL,change_email_encode(validlang($current_lang),$lang_takeupload_target[validlang($current_lang)]['mail_title'].$torrent),change_email_encode(validlang($current_lang),$body_arr[validlang($current_lang)]),"torrent upload",false,false,'',get_email_encode(validlang($current_lang)), "eYou");
 }
 }
 
-header("Location: " . get_protocol_prefix() . "$BASEURL/details.php?id=".htmlspecialchars($id)."&uploaded=1");
+$location = "//$BASEURL/details.php?id=".htmlspecialchars($id)."&uploaded=1";
+if ($format == 'json') {
+  echo json_ecnode(['success' => true, 'uri' => $location]);
+}
+else {
+  header("Location: $location");
+}
 ?>

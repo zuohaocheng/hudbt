@@ -73,10 +73,14 @@ class TorrentsController extends AppController {
 			throw new NotFoundException(__('Invalid torrent'));
 		}
 		if ($this->request->is('post') || $this->request->is('put')) {
-			if ($this->Torrent->save($this->request->data)) {
+		  $data = $this->request->data;
+		  $d = ['Torrent' => ['id' => $data['Torrent']['id']],
+			'Tcategory' => ['Tcategory' => $data['Tcategory']['Tcategory']]];
+			if ($this->Torrent->save($d)) {
 			  $tcategories = [];
 			  foreach ($this->Torrent->read(null, $id)['Tcategory'] as $tc) {
-			    $tcategories[] = ['id' => $tc['id'], 'name' => $tc['name']];
+			    $tc = $this->Torrent->Tcategory->read(null, $tc['id'])['Tcategory'];
+			    $tcategories[] = ['id' => $tc['id'], 'name' => $tc['name'], 'showName' => $tc['showName'], 'hidden' => $tc['hidden']];
 			  }
 			  
 			  $result = ['success' => true, 'messgae' => __('The torrent has been saved'), 'tcategories' =>$tcategories];
@@ -84,7 +88,7 @@ class TorrentsController extends AppController {
 #			  $this->redirect(array('action' => 'index'));
 			} else {
 				$this->Session->setFlash(__('The torrent could not be saved. Please, try again.'));
-				$result = ['success' => false, __('The torrent could not be saved. Please, try again.')];
+				$result = ['success' => false, 'message' => __('The torrent could not be saved. Please, try again.')];
 			}
 		} else {
 			$this->request->data = $this->Torrent->read(null, $id);

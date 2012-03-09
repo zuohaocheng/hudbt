@@ -21,21 +21,21 @@ class Torrent extends AppModel {
  *
  * @var array
  */
-	public $hasMany = array(
-		'Sub' => array(
-			'className' => 'Sub',
-			'foreignKey' => 'torrent_id',
-			'dependent' => false,
-			'conditions' => '',
-			'fields' => '',
-			'order' => '',
-			'limit' => '',
-			'offset' => '',
-			'exclusive' => '',
-			'finderQuery' => '',
-			'counterQuery' => ''
-		)
-	);
+	/* public $hasMany = array( */
+	/* 	'Sub' => array( */
+	/* 		'className' => 'Sub', */
+	/* 		'foreignKey' => 'torrent_id', */
+	/* 		'dependent' => false, */
+	/* 		'conditions' => '', */
+	/* 		'fields' => '', */
+	/* 		'order' => '', */
+	/* 		'limit' => '', */
+	/* 		'offset' => '', */
+	/* 		'exclusive' => '', */
+	/* 		'finderQuery' => '', */
+	/* 		'counterQuery' => '' */
+	/* 	) */
+	/* ); */
 
 
 /**
@@ -60,5 +60,4 @@ class Torrent extends AppModel {
 			'insertQuery' => ''
 		)
 	);
-
 }

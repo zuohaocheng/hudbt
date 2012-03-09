@@ -134,7 +134,7 @@ $(function() {
 			    var resultId = result[0].Tcategory.id;
 			    form.find(':input[type="hidden"]').each(function() {
 				if (resultId == this.value && this !== in_id[0]) {
-				    $(this).parent().parent().addClass('invalid-ref');
+				    $(this).parent().addClass('invalid-ref');
 				    validation = false;
 				}
 			    });
@@ -160,7 +160,9 @@ $(function() {
 		else {
 		    $inputs.removeClass('invalid');
 		    in_id.attr('value', '');
-		    $inputs.remove();
+		    if (form.find('ul li:last')[0] !== $inputs[0]) {
+			$inputs.remove();
+		    }
 		}
 	    });
 	});
@@ -175,6 +177,7 @@ $(function() {
 	    li.find('.tcategory-edit').fadeIn();
 
 	    form.find(':submit').fadeIn();
+	    $('#hidden-tcategories').slideDown();
 	});
 
 	return inputs;
@@ -214,9 +217,24 @@ $(function() {
 		    if (result.success) {
 			form.find(':submit').hide();
 			form.find('#add-tcategory').show();
-			tcategory(form.find('ul').html($.map(result.tcategories, function(tcategory) {
-			    return generateLi(tcategory);
-			}).join('')).find('.tcategory'));
+			var shows ='';
+			var hiddens = '';
+			$.each(result.tcategories, function() {
+			    var o = generateLi(this);
+			    if (this.hidden) {
+				hiddens += o;
+			    }
+			    else {
+				shows += o;
+			    }
+			});
+			
+			if (hiddens !== '') {
+			    shows += '<div style="display: none" id="hidden-tcategories">隐藏分类: ' + hiddens + '</div>';
+			    addShowHiddens();
+			}
+
+			tcategory(form.find('ul').html(shows).find('.tcategory'));
 		    }
 		    else {
 			var dialog = $('<div></div>', {
@@ -275,14 +293,41 @@ $(function() {
 	}).click(removeTcategory))));
 	lastTcategory();
     };
-    form.find('#add-tcategory').click(function(e) {
+
+    var addShowHiddens = (function() {
+	var added = false;
+	return function() {
+	    if (added) {
+		return;
+	    }
+
+	    added = true;
+	    $('#tcategories-title').append('<br />').append($('<a></a>', {
+		href : '#',
+		text : '[显示隐藏分类]',
+		'class' : 'sublink'
+	    }).click(function(e) {
+		e.preventDefault();
+		$('#hidden-tcategories').slideToggle();
+	    }));
+	}
+    })();
+
+    var clickAdd = function(e) {
 	addTcategory(e);
 	$(this).hide();
 	form.find(':submit').fadeIn();
-    });
-
+	$('#hidden-tcategories').slideDown();
+    };
+    form.find('#add-tcategory').click(clickAdd);
+    if (form.find('.tcategory').length === 0) {
+	clickAdd();
+    }
+    else if ($('#hidden-tcategories').length !== 0) {
+	addShowHiddens();
+    }
 
     var generateLi = function(tcategory) {
-	return '<li class="tcategory"><span class="tcategory-show"><a href="//' + hb.constant.url.cake + '/tcategories/view/' + tcategory.id + '">' + tcategory.name + '</a><a href="#" class="edit-tcategory">±</a></span><span class="tcategory-edit" style="display: none;"><input type="text" placeholder="Tcategory" value="' + tcategory.name + '" /><input type="hidden" name="data[Tcategory][Tcategory][]" value="'  + tcategory.id + '"/ ><a href="#" class="remove-tcategory">-</a></span></li>'
+	return '<li class="tcategory"><span class="tcategory-show"><a href="//' + hb.constant.url.cake + '/tcategories/view/' + tcategory.id + '">' + tcategory.showName + '</a><a href="#" class="edit-tcategory">±</a></span><span class="tcategory-edit" style="display: none;"><input type="text" placeholder="Tcategory" value="' + tcategory.showName + '" /><input type="hidden" name="data[Tcategory][Tcategory][]" value="'  + tcategory.id + '"/ ><a href="#" class="remove-tcategory">-</a></span></li>'
     };
 });

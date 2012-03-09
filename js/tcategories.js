@@ -132,7 +132,7 @@ $(function() {
 	else {
 	    validating = true;
 	    $.getJSON("/cake/tcategories/search/exact:true/" + categoryName.val(), function(result) {
-		act(result.length === 0)
+		act(result.length === 0 || (hb.tcategory && result[0].Tcategory.id === hb.tcategory.id));
 		validating = false;
 	    });
 	}

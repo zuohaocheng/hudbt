@@ -543,21 +543,37 @@ else {
     define('DONATE_BONUS', true);
     include('./torrentDonateBonusBox.php');
 
-    echo '<dt><a href="//' . $CAKEURL . '/tcategories/">Tcategories</a></dt>';
+    echo '<dt id="tcategories-title"><a href="//' . $CAKEURL . '/tcategories/">分类</a></dt>';
     echo '<dd>';
     include('./cake/app/webroot/index.php');
     include('./cake/app/Model/Torrent.php');
+    include('./cake/app/Model/Tcategory.php');
     $Torrent = new Torrent;
     $Torrent->id = $id;
     if ($Torrent->exists()) {
       $torrent = $Torrent->read(null, $id);
       $tcategories = $torrent['Tcategory'];
       echo '<form action="//' . $CAKEURL . '/torrents/edit/' . $id . '.json?%2Fcake%2Ftorrents%2Fedit%2F' . $id . '=" method="post" accept-charset="utf-8" id="tcategories">';
-      echo '<div class="minor-list"><ul>';
       echo '<input type="hidden" name="_method" value="PUT">';
       echo '<input type="hidden" name="data[Torrent][id]" value="' . $id . '" id="TorrentId">';
+      echo '<div class="minor-list"><ul>';
+      $Tcategory = new Tcategory;
+
+      $showCategories = '';
+      $hiddenCategories = '';
       foreach ($tcategories as $tcategory) {
-	echo '<li class="tcategory"><span class="tcategory-show"><a href="//' . $CAKEURL . '/tcategories/view/' . $tcategory['id'] . '">' . $tcategory['name'] . '</a><a href="#" class="edit-tcategory">±</a></span><span class="tcategory-edit" style="display: none;"><input type="text" placeholder="Tcategory" value="' . $tcategory['name'] . '" /><input type="hidden" name="data[Tcategory][Tcategory][]" value="'. $tcategory['id'] . '"/ ><a href="#" class="remove-tcategory">-</a></span></li>';
+	$tcategory = $Tcategory->read(null, $tcategory['id'])['Tcategory'];
+	$o = '<li class="tcategory"><span class="tcategory-show"><a href="//' . $CAKEURL . '/tcategories/view/' . $tcategory['id'] . '">' . $tcategory['showName'] . '</a><a href="#" class="edit-tcategory">±</a></span><span class="tcategory-edit" style="display: none;"><input type="text" placeholder="Tcategory" value="' . $tcategory['showName'] . '" /><input type="hidden" name="data[Tcategory][Tcategory][]" value="'. $tcategory['id'] . '"/ ><a href="#" class="remove-tcategory">-</a></span></li>';
+	if ($tcategory['hidden']) {
+	  $hiddenCategories .= $o;
+	}
+	else {
+	  $showCategories .= $o;
+	}
+      }
+      echo $showCategories;
+      if ($hiddenCategories) {
+	echo '<div style="display: none" id="hidden-tcategories">', '隐藏分类: ', $hiddenCategories, '</div>';
       }
       echo '</ul>';
       echo '<a href="#" id="add-tcategory">+</a>';

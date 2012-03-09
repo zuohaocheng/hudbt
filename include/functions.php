@@ -113,6 +113,37 @@ function get_single_value($table, $field, $suffix = "") {
   }
 }
 
+function checkPrivilege($item) {
+  static $privilegeConfig = ['Tcategory' => ['lock' => UC_UPLOADER,
+					     'delete' => UC_VIP,
+					     ],
+			     ];
+  if (is_array($item)) {
+    $config = $privilegeConfig;
+    for($i = 0; $i < count($item) - 1; $i += 1) {
+      $key = $item[$i];
+      if (array_key_exists($key, $config)) {
+	$config = $config[$key];
+      }
+      else {
+	$config = null;
+	break;
+      }
+    }
+
+    $last_key = array_pop($item);
+    if ($config && array_key_exists($last_key, $config)) {
+      return (get_user_class() >= $config[$last_key]);
+    }
+  }
+  elseif (is_string($item)) {
+    if (array_key_exists($item, $privilegeConfig)) {
+      return (get_user_class() >= $privilegeConfig[$item]);
+    }
+  }
+  throw 'Invalid input';
+}
+
 function stdmsg($heading, $text, $htmlstrip = false) {
   if ($htmlstrip) {
     $heading = htmlspecialchars(trim($heading));
@@ -1453,7 +1484,9 @@ function twotd($x,$y,$nosec=0) {
 }
 
 function validfilename($name) {
-  return preg_match('/^[^\0-\x1f:\\\\\/?*\xff#<>|]+$/si', $name);
+  return preg_match('/^[^\0-\x1f:\\\\\/?*#<>|]+$/si', $name);
+# Because of unknown reason  
+#  return preg_match('/^[^\0-\x1f:\\\\\/?*\xff#<>|]+$/si', $name); 
 }
 
 function validemail($email) {

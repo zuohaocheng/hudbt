@@ -27,7 +27,10 @@ class TcategoriesController extends AppController {
  */
 	public function index() {
 		$this->Tcategory->recursive = 0;
-		$this->set('tcategories', $this->paginate());
+		$this->set(['tcategories' => $this->paginate(),
+			    'canLock' => checkPrivilege(['Tcategory', 'lock']),
+			    'canDelete' => checkPrivilege(['Tcategory', 'delete']),
+			    ]);
 	}
 
 
@@ -42,6 +45,12 @@ class TcategoriesController extends AppController {
 		$this->Tcategory->id = $id;
 		if (!$this->Tcategory->exists()) {
 			throw new NotFoundException(__('Invalid tcategory'));
+		}
+
+		$tcategory = $this->Tcategory->read(null, $id);
+
+		if(!array_key_exists('noredirect', $this->request->params['named']) && $tcategory['Tcategory']['redirect_to_id']) {
+		  $this->redirect(array('action' => 'view', $tcategory['Tcategory']['redirect_to_id']));
 		}
 
 		$this->paginate = ['Torrent' => ['joins' => [ 
@@ -65,9 +74,11 @@ class TcategoriesController extends AppController {
 
 		$torrents = $this->paginate('Torrent');
 
-		$tcategory = $this->Tcategory->read(null, $id);
 		$this->set(['tcategory' => $tcategory,
-			    'torrents' => $torrents]);
+			    'torrents' => $torrents,
+			    'canEdit' => !$tcategory['Tcategory']['locked'] || checkPrivilege(['Tcategory', 'lock']),
+			    'canDelete' => checkPrivilege(['Tcategory', 'delete']),
+			    ]);
 		$this->set('_serialize', 'tcategory');
 	}
 
@@ -103,21 +114,36 @@ class TcategoriesController extends AppController {
 		if (!$this->Tcategory->exists()) {
 			throw new NotFoundException(__('Invalid tcategory'));
 		}
-		if ($this->request->is('post') || $this->request->is('put')) {
-			if ($this->Tcategory->save($this->request->data)) {
+
+		$tcategory = $this->Tcategory->read(null, $id);
+		$canLock = checkPrivilege(['Tcategory', 'lock']);
+		$canEdit = !$tcategory['Tcategory']['locked'] || $canLock;
+		if (!$canEdit) {
+		  $this->redirect(array('action' => 'view', $id));
+		}
+		elseif ($this->request->is('post') || $this->request->is('put')) {
+		  $data = $this->request->data;
+		  if (!$canLock) {
+		    unset($data['Tcategory']['locked']);
+		  }
+
+			if ($this->Tcategory->save($data)) {
 				$this->Session->setFlash(__('The tcategory has been saved'));
 				$this->redirect(array('action' => 'index'));
 			} else {
 				$this->Session->setFlash(__('The tcategory could not be saved. Please, try again.'));
 			}
-		} else {
-			$this->request->data = $this->Tcategory->read(null, $id);
 		}
+		else {
+		  $this->request->data = $tcategory;
+		}
+		
 		$redirectTos = $this->Tcategory->RedirectTo->find('list');
 		$parents = $this->Tcategory->Parent->find('list');
 		$torrents = $this->Tcategory->Torrent->find('list');
 		$tcategory = $this->request->data;
-		$this->set(compact('redirectTos', 'parents', 'torrents', 'tcategory'));
+		$canDelete = checkPrivilege(['Tcategory', 'delete']);
+		$this->set(compact('redirectTos', 'parents', 'torrents', 'tcategory', 'canLock', 'canDelete'));
 	}
 
 /**
@@ -127,6 +153,10 @@ class TcategoriesController extends AppController {
  * @return void
  */
 	public function delete($id = null) {
+	  if (!checkPrivilege(['Tcategory', 'delete'])) {
+	    $this->redirect(array('action' => 'view', $id));
+	  }
+	  
 		if (!$this->request->is('post')) {
 			throw new MethodNotAllowedException();
 		}
@@ -161,7 +191,10 @@ class TcategoriesController extends AppController {
 	    $this->paginate = array('conditions' => array('Tcategory.name LIKE' => '%' . $text . '%'));
 	  }
 	  $tcategories = $this->paginate('Tcategory');
-	  $this->set(compact('tcategories'));
+	  $this->set(['tcategories' => $tcategories,
+		      'canLock' => checkPrivilege(['Tcategory', 'lock']),
+		      'canDelete' => checkPrivilege(['Tcategory', 'delete']),
+		      ]);
 	  $this->set('_serialize', 'tcategories');
 	}
 }
