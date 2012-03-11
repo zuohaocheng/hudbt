@@ -525,7 +525,11 @@ elseif ($action == "viewtopic") {
 	sql_query("UPDATE topics SET views = views + 1 WHERE id=$topicid") or sqlerr(__FILE__, __LINE__);
 
 	//------ Get post count
-	$postcount = get_row_count("posts",$where);
+	$r = sql_query("SELECT COUNT(*) AS count, MAX(id) AS maxid FROM posts $where") or sqlerr(__FILE__, __LINE__);
+	$a = mysql_fetch_assoc($r) or die(mysql_error());
+	$postcount = $a['count'];
+	$maxid = $a['maxid'];
+
 	if (!$authorid)
 		$Cache->cache_value('topic_'.$topicid.'_post_count', $postcount, 3600);
 
@@ -605,6 +609,19 @@ elseif ($action == "viewtopic") {
 	}
 
 	echo '<div class="forum-posts"><ol>';
+
+	if ($authorid) {
+	  $query = "SELECT shows.id AS shows_id FROM posts AS ref LEFT JOIN (SELECT id FROM posts $where ORDER BY id $limit) AS shows ON ref.id=shows.id WHERE ref.topicid=$topicid AND ref.id <= $maxid;";
+	  $r = sql_query($query) or sqlerr(__FILE__, __LINE__);
+	  $i = 0;
+	  $floorsDict = [];
+	  while ($arr = mysql_fetch_assoc($r)) {
+	    if ($arr['shows_id']) {
+	      $floorsDict[$arr['shows_id']] = $i;
+	    }
+	    $i += 1;
+	  }
+	}
 	
 	while ($arr = mysql_fetch_assoc($res)) {
 	  if ($pn>=1) {
@@ -631,7 +648,13 @@ elseif ($action == "viewtopic") {
 	  }
 
 	  $arr['topicid'] = $topicid;
-	  single_post($arr, $maypost, $maymodify, $locked, $highlight, ($pn == $pc), ($pn + $offset));
+	  if ($authorid) {
+	    $floor = $floorsDict[$arr['id']] + 1;
+	  }
+	  else {
+	    $floor = $pn + $offset;
+	  }
+	  single_post($arr, $maypost, $maymodify, $locked, $highlight, ($pn == $pc), $floor);
 	}
 	echo '</ol></div>';
 

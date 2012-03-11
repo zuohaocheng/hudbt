@@ -2414,8 +2414,16 @@ function post_author_toolbox($arr2) {
 
 function post_format_author_info($id, $stat = false) {
   global $CURUSER;
+  static $users = [];
   //---- Get poster details
-
+  if (!array_key_exists($id, $users)) {
+    $users[$id] = true;
+    $first = true;
+  }
+  else {
+    $first = false;
+  }
+  
   $arr2 = get_user_row($id);
 
   $avatar = ($CURUSER["avatars"] == "yes" ? htmlspecialchars($arr2["avatar"]) : "");
@@ -2423,14 +2431,35 @@ function post_format_author_info($id, $stat = false) {
   if (!$avatar) {
     $avatar = "pic/default_avatar.png";
   }
-  $signature = $arr2["signature"];
-
-  $out = '<div class="forum-author-info">';
-  $out .= '<div class="post-avatar">' . return_avatar_image($avatar) . '</div>';
-  if ($stat) {
-    $out .= '<div class="user-stats minor-list-vertical"><ul><li>' . user_class_image($arr2['class']) . '</li>' . post_author_stats($id, $arr2) . '</ul></div>';
+  
+  if ($first) {
+    $signature = $arr2["signature"];
   }
-  $out .= '<div class="forum-user-toolbox minor-list horizon-compact compact"><ul>' . post_author_toolbox($arr2) . '</ul></div>';
+  else {
+    $signature = '';
+  }
+
+  $href_id = 'user-info-' . $id;
+  $out = '<div class="forum-author-info"';
+  if ($first) {
+    $out .= ' id="' . $href_id . '"';
+  }
+  $out .= '>';
+  $out .= '<div class="post-avatar">';
+  if (!$first) {
+    $out .= '<a href="#' . $href_id . '">';
+  }
+  $out .= return_avatar_image($avatar);
+  if (!$first) {
+    $out .= '</a>';
+  }
+  $out .= '</div>';
+  if ($first) {
+    if ($stat) {
+      $out .= '<div class="user-stats minor-list-vertical"><ul><li>' . user_class_image($arr2['class']) . '</li>' . post_author_stats($id, $arr2) . '</ul></div>';
+    }
+    $out .= '<div class="forum-user-toolbox minor-list horizon-compact compact"><ul>' . post_author_toolbox($arr2) . '</ul></div>';
+  }
   $out .= '</div>';
   return array($out, $signature);
 }
