@@ -524,7 +524,7 @@ else {
 
     tr($lang_details['row_health'], $health, 1);*/
     $startseed = '';
-    if (get_user_class() >= UC_VIP) {
+    if (checkPrivilege(['Torrent', 'startseed'])) {
       if ($row['startseed'] == 'yes') {
 	$startseed = '<li>' . $lang_details['text_startseed'] . '</li>';
       }

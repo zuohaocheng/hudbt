@@ -32,7 +32,7 @@ if ($allsec != 1 || $enablespecial != 'yes'){ //do not print searchbox if showin
 	    if ($i && $i % $catsperrow == 0){
 	      print("</tr><tr>");
 	    }
-	    print("<td align=\"left\" class=\"bottom\" style=\"padding-bottom: 4px; padding-left: ".$catpadding."px;\"><input type=\"checkbox\" id=\"".$cbname.$list[id]."\" name=\"".$cbname.$list[id]."\"" . (in_array($list[id],$wherelistina) ? " checked=\"checked\"" : "") . " value=\"1\" />".($showimg ? return_category_image($list[id], "?") : "<a title=\"" .$list[name] . "\" href=\"?".$cbname."=".$list[id]."\">".$list[name]."</a>")."</td>\n");
+	    print("<td align=\"left\" class=\"bottom\" style=\"padding-bottom: 4px; padding-left: ".$catpadding."px;\"><input type=\"checkbox\" id=\"".$cbname.$list['id']."\" name=\"".$cbname.$list['id']."\"" . (in_array($list['id'],$wherelistina) ? " checked=\"checked\"" : "") . " value=\"1\" />".($showimg ? return_category_image($list['id'], "?") : "<a title=\"" .$list['name'] . "\" href=\"?".$cbname."=".$list['id']."\">".$list['name']."</a>")."</td>\n");
 	    $i++;
 	  }
 	  $checker = "<input id=\"".$btname."\" value='" .  $lang_torrents['input_check_all'] . "' class=\"btn medium\" type=\"button\" onclick=\"javascript:SetChecked('".$cbname."','".$btname."','". $lang_torrents['input_check_all'] ."','" . $lang_torrents['input_uncheck_all'] . "',-1,10)\" />";
@@ -83,6 +83,7 @@ if ($allsec != 1 || $enablespecial != 'yes'){ //do not print searchbox if showin
 		    <option value="0"><?php echo $lang_torrents['select_and'] ?></option>
 		    <option value="1"<?php echo $_GET["search_mode"] == 1 ? " selected=\"selected\"" : "" ?>><?php echo $lang_torrents['select_or'] ?></option>
 		    <option value="2"<?php echo $_GET["search_mode"] == 2 ? " selected=\"selected\"" : "" ?>><?php echo $lang_torrents['select_exact'] ?></option>
+		    <option value="3"<?php echo $_GET["search_mode"] == 3 ? " selected=\"selected\"" : "" ?>><?php echo $lang_torrents['select_complete'] ?></option>
 		  </select>
 		  <?php echo $lang_torrents['text_mode'] ?>
 		</li>
@@ -92,6 +93,9 @@ if ($allsec != 1 || $enablespecial != 'yes'){ //do not print searchbox if showin
 		      <option value="0"><?php echo $lang_torrents['select_including_dead'] ?></option>
 		      <option value="1"<?php print($include_dead == 1 ? " selected=\"selected\"" : ""); ?>><?php echo $lang_torrents['select_active'] ?> </option>
 		      <option value="2"<?php print($include_dead == 2 ? " selected=\"selected\"" : ""); ?>><?php echo $lang_torrents['select_dead'] ?></option>
+		      <?php if (checkPrivilege(['Torrent', 'startseed'])): ?>
+		      <option value="3"<?php print($include_dead == 3 ? " selected=\"selected\"" : ""); ?>><?php echo $lang_torrents['select_no_startseed'] ?></option>
+		      <?php endif; ?>
 		    </select>
 		    </li>
 <li>

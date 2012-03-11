@@ -280,6 +280,7 @@ $lang_functions = array
 	'text_short_min' => "分",
 	'submit_edit' => "编辑",
 	'text_banned_client_warning' => "你最近一次使用的BT客户端是被禁止的！点击这里。",
+	'text_no_startseed' => '你发布的%d个种子尚未开始做种，不要忘记了~',
 	'text_please_improve_ratio_within' => "请在",
 	'text_or_you_will_be_banned' =>"内改善你的分享率，否则你的账号将被禁用！点击这里。",
 	'text_size' => "大小",

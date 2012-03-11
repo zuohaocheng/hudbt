@@ -102,6 +102,7 @@
       </div>
       {/if}
 
+      {nocache}
       {if $alerts}
       <div id="alert" class="minor-list"><ul>
 	{section name=idx loop=$alerts}
@@ -109,5 +110,6 @@
 	{/section}
       </ul></div>
       {/if}
+      {/nocache}
       {/if}
       <div id="outer">

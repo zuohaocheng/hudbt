@@ -2,6 +2,7 @@
 require_once("include/bittorrent.php");
 dbconn(true);
 require_once(get_langfile_path("torrents.php"));
+
 loggedinorreturn();
 parked();
 if ($showextinfo['imdb'] == 'yes')
@@ -58,18 +59,15 @@ if ($_GET['sort'] && $_GET['type']) {
 
   switch($_GET['type']) {
   case 'asc': $ascdesc = "ASC"; $linkascdesc = "asc"; break;
-  case 'desc': $ascdesc = "DESC"; $linkascdesc = "desc"; break;
   default: $ascdesc = "DESC"; $linkascdesc = "desc"; break;
   }
 
-  if($column == "owner")
-    {
-      $orderby = "ORDER BY pos_state DESC, torrents.anonymous, users.username " . $ascdesc;
-    }
-  else
-    {
-      $orderby = "ORDER BY pos_state DESC, torrents." . $column . " " . $ascdesc;
-    }
+  if($column == "owner") {
+    $orderby = "ORDER BY pos_state DESC, torrents.anonymous, users.username " . $ascdesc;
+  }
+  else {
+    $orderby = "ORDER BY pos_state DESC, torrents." . $column . " " . $ascdesc;
+  }
 
   $pagerlink = "sort=" . intval($_GET['sort']) . "&type=" . $linkascdesc . "&";
 
@@ -163,11 +161,10 @@ elseif ($CURUSER['notifs']){
 }
 else $include_dead = 1;
 
-if (!in_array($include_dead,array(0,1,2)))
-  {
-    $include_dead = 0;
-    write_log("User " . $CURUSER["username"] . "," . $CURUSER["ip"] . " is hacking incldead field in" . $_SERVER['SCRIPT_NAME'], 'mod');
-  }
+if (!in_array($include_dead,array(0,1,2,3))) {
+  $include_dead = 0;
+  write_log("User " . $CURUSER["username"] . "," . $CURUSER["ip"] . " is hacking incldead field in" . $_SERVER['SCRIPT_NAME'], 'mod');
+}
 if ($include_dead == 0) { //all(active,dead)
   $addparam .= "incldead=0&";
 }
@@ -180,6 +177,11 @@ elseif ($include_dead == 2) {		//dead
   $addparam .= "incldead=2&";
   $wherea[] = "visible = 'no'";
 }
+elseif ($include_dead == 3) {		//no startseed
+  $addparam .= "incldead=3&";
+  $wherea[] = "startseed = 'no'";
+}
+
 // ----------------- end include dead ---------------------//
 if ($_GET)
   $special_state = 0 + $_GET["spstate"];
@@ -346,7 +348,7 @@ if (!$all) {
     $all = true;
 
     foreach ($cats as $cat) {
-      $all &= $cat[id];
+      $all &= $cat['id'];
       $mystring = $CURUSER['notifs'];
       $findme  = '[cat'.$cat['id'].']';
       $search = strpos($mystring, $findme);
@@ -356,7 +358,7 @@ if (!$all) {
 	$catcheck = true;
 
       if ($catcheck) {
-	$wherecatina[] = $cat[id];
+	$wherecatina[] = $cat['id'];
 	$addparam .= "cat$cat[id]=1&";
       }
     }
@@ -364,7 +366,7 @@ if (!$all) {
       if ($showsource)
 	foreach ($sources as $source)
 	  {
-	    $all &= $source[id];
+	    $all &= $source['id'];
 	    $mystring = $CURUSER['notifs'];
 	    $findme  = '[sou'.$source['id'].']';
 	    $search = strpos($mystring, $findme);
@@ -375,14 +377,14 @@ if (!$all) {
 
 	    if ($sourcecheck)
 	      {
-		$wheresourceina[] = $source[id];
+		$wheresourceina[] = $source['id'];
 		$addparam .= "source$source[id]=1&";
 	      }
 	  }
       if ($showmedium)
 	foreach ($media as $medium)
 	  {
-	    $all &= $medium[id];
+	    $all &= $medium['id'];
 	    $mystring = $CURUSER['notifs'];
 	    $findme  = '[med'.$medium['id'].']';
 	    $search = strpos($mystring, $findme);
@@ -393,14 +395,14 @@ if (!$all) {
 
 	    if ($mediumcheck)
 	      {
-		$wheremediumina[] = $medium[id];
+		$wheremediumina[] = $medium['id'];
 		$addparam .= "medium$medium[id]=1&";
 	      }
 	  }
       if ($showcodec)
 	foreach ($codecs as $codec)
 	  {
-	    $all &= $codec[id];
+	    $all &= $codec['id'];
 	    $mystring = $CURUSER['notifs'];
 	    $findme  = '[cod'.$codec['id'].']';
 	    $search = strpos($mystring, $findme);
@@ -411,14 +413,14 @@ if (!$all) {
 
 	    if ($codeccheck)
 	      {
-		$wherecodecina[] = $codec[id];
+		$wherecodecina[] = $codec['id'];
 		$addparam .= "codec$codec[id]=1&";
 	      }
 	  }
       if ($showstandard)
 	foreach ($standards as $standard)
 	  {
-	    $all &= $standard[id];
+	    $all &= $standard['id'];
 	    $mystring = $CURUSER['notifs'];
 	    $findme  = '[sta'.$standard['id'].']';
 	    $search = strpos($mystring, $findme);
@@ -429,14 +431,14 @@ if (!$all) {
 
 	    if ($standardcheck)
 	      {
-		$wherestandardina[] = $standard[id];
+		$wherestandardina[] = $standard['id'];
 		$addparam .= "standard$standard[id]=1&";
 	      }
 	  }
       if ($showprocessing)
 	foreach ($processings as $processing)
 	  {
-	    $all &= $processing[id];
+	    $all &= $processing['id'];
 	    $mystring = $CURUSER['notifs'];
 	    $findme  = '[pro'.$processing['id'].']';
 	    $search = strpos($mystring, $findme);
@@ -447,14 +449,14 @@ if (!$all) {
 
 	    if ($processingcheck)
 	      {
-		$whereprocessingina[] = $processing[id];
+		$whereprocessingina[] = $processing['id'];
 		$addparam .= "processing$processing[id]=1&";
 	      }
 	  }
       if ($showteam)
 	foreach ($teams as $team)
 	  {
-	    $all &= $team[id];
+	    $all &= $team['id'];
 	    $mystring = $CURUSER['notifs'];
 	    $findme  = '[tea'.$team['id'].']';
 	    $search = strpos($mystring, $findme);
@@ -465,14 +467,14 @@ if (!$all) {
 
 	    if ($teamcheck)
 	      {
-		$whereteamina[] = $team[id];
+		$whereteamina[] = $team['id'];
 		$addparam .= "team$team[id]=1&";
 	      }
 	  }
       if ($showaudiocodec)
 	foreach ($audiocodecs as $audiocodec)
 	  {
-	    $all &= $audiocodec[id];
+	    $all &= $audiocodec['id'];
 	    $mystring = $CURUSER['notifs'];
 	    $findme  = '[aud'.$audiocodec['id'].']';
 	    $search = strpos($mystring, $findme);
@@ -483,7 +485,7 @@ if (!$all) {
 
 	    if ($audiocodeccheck)
 	      {
-		$whereaudiocodecina[] = $audiocodec[id];
+		$whereaudiocodecina[] = $audiocodec['id'];
 		$addparam .= "audiocodec$audiocodec[id]=1&";
 	      }
 	  }
@@ -718,7 +720,7 @@ if (isset($searchstr))
       $notnewword="notnewword=1&";
     }
     $search_mode = 0 + $_GET["search_mode"];
-    if (!in_array($search_mode,array(0,1,2)))
+    if (!in_array($search_mode,array(0,1,2,3)))
       {
 	$search_mode = 0;
 	write_log("User " . $CURUSER["username"] . "," . $CURUSER["ip"] . " is hacking search_mode field in" . $_SERVER['SCRIPT_NAME'], 'mod');
@@ -755,11 +757,10 @@ if (isset($searchstr))
 	  $like_expression_array[] = " LIKE '%" . $searchstr. "%'";
 	  break;
 	}
-	/*case 3 :	// parsed
-	  {
-	  $like_expression_array[] = $searchstr;
-	  break;
-	  }*/
+      case 3 : {	// complete
+	$like_expression_array[] = " LIKE '" . $searchstr. "'";
+	break;
+      }
       }
     $ANDOR = ($search_mode == 0 ? " AND " : " OR ");	// only affects mode 0 and mode 1
 
@@ -918,10 +919,7 @@ else
 
 
 
-if ($_GET['format'] == 'xml') {
-  include('include/torrents_xml.php');
-}
-else if ($_GET['format'] == 'json') {
+if ($_REQUEST['format'] == 'json') {
   include('include/torrents_json.php');
 }
 else {

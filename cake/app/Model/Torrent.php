@@ -37,6 +37,16 @@ class Torrent extends AppModel {
 	/* 	) */
 	/* ); */
 
+	public $belongsTo = array(
+		'RedirectTo' => array(
+			'className' => 'User',
+			'foreignKey' => 'owner',
+			'conditions' => '',
+			'fields' => '',
+			'order' => ''
+		)
+	);
+
 
 /**
  * hasAndBelongsToMany associations

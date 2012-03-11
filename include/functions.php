@@ -117,6 +117,8 @@ function checkPrivilege($item) {
   static $privilegeConfig = ['Tcategory' => ['lock' => UC_UPLOADER,
 					     'delete' => UC_VIP,
 					     ],
+			     'Torrent' => ['startseed' => UC_VIP,
+					   ]
 			     ];
   if (is_array($item)) {
     $config = $privilegeConfig;
@@ -1927,6 +1929,19 @@ function stdhead($title = "", $msgalert = true, $script = "", $place = "") {
 			'text' => $text,
 			'color' => "black");
     }
+
+    $cahce_key = 'user_' . $CURUSER['id'] . '_startseed_count';
+    $no_startseed_count = $Cache->get_value($cache_key);
+    if ($no_startseed_count === false) {
+      $no_startseed_count = get_row_count('torrents', 'WHERE owner = ' . $CURUSER['id'] . ' AND startseed = "no"');
+      $Cache->cache_value($cache_key, $no_startseed_count, 300);
+    }
+    if ($no_startseed_count) {
+      $alerts[] = ['href' => 'torrents.php?search_area=3&search_mode=3&incldead=3&search=' . $CURUSER['username'],
+    		   'text' => sprintf($lang_functions['text_no_startseed'], $no_startseed_count),
+    		   'color' => 'black'];
+    }
+    
     if ($unread) {
       $text = $lang_functions['text_you_have'].$unread.$lang_functions['text_new_message'] . add_s($unread) . $lang_functions['text_click_here_to_read'];
       $alerts[] = array('href' => "messages.php",
