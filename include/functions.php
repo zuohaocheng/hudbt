@@ -2346,7 +2346,7 @@ function pager($rpp, $count, $href, $opts = array(), $pagename = "page") {
     for ($i = 0; $i < $pages; $i++) {
       if (($i >= $startdotspace && $i <= $curdotend) || ($i >= $curdotstart && $i < $dotend)) {
         if (!$dotted)
-        $pagerarr[] = "...";
+        $pagerarr[] = '<a href="#" class="pager-more">...</a>';
         $dotted = 1;
         continue;
       }
@@ -4049,11 +4049,9 @@ function get_forum_moderators($forumid, $plaintext = true)
   $moderators = rtrim(trim($moderators), ",");
   return $moderators;
 }
-function key_shortcut($page=1,$pages=1)
-{
-  $currentpage = "var currentpage=".$page.";";
-  $maxpage = "var maxpage=".$pages.";";
-  $key_shortcut_block = "\n<script type=\"text/javascript\">\n//<![CDATA[\n".$maxpage."\n".$currentpage."\n//]]>\n</script>\n";
+function key_shortcut($page=1,$pages=1) {
+  $key_shortcut_block = '<script type="text/javascript">hb.config.pager=(' . json_encode(['current' => 0 + $page, 'max' => $pages]) . ');</script>';
+  
   return $key_shortcut_block;
 }
 function promotion_selection($selected = 0, $hide = 0)

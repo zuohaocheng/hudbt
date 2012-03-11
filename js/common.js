@@ -167,51 +167,6 @@ function ctrlenter(event,formname,submitname){
 	}
     }
 }
-function gotothepage(page){
-    var url=window.location.href;
-    var end=url.lastIndexOf("page");
-    url = url.replace(/#[0-9]+/g,"");
-    if (end == -1){
-	if (url.lastIndexOf("?") == -1)
-	    window.location.href=url+"?page="+page;
-	else
-	    window.location.href=url+"&page="+page;
-    }
-    else{
-	url = url.replace(/page=.+/g,"");
-	window.location.href=url+"page="+page;
-    }
-}
-function changepage(event){
-    var gotopage;
-    var keynum;
-    var altkey;
-    if (navigator.userAgent.toLowerCase().indexOf('presto') != -1)
-	altkey = event.shiftKey;
-    else altkey = event.altKey;
-    if (event.keyCode){
-	keynum = event.keyCode;
-    }
-    else if (event.which){
-	keynum = event.which;
-    }
-    if(altkey && keynum==33){
-	if(currentpage<=0) return;
-	gotopage=currentpage-1;
-	gotothepage(gotopage);
-    }
-    else if (altkey && keynum == 34){
-	if(currentpage>=maxpage) return;
-	gotopage=currentpage+1;
-	gotothepage(gotopage);
-    }
-}
-if(window.document.addEventListener){
-    window.addEventListener("keydown",changepage,false);
-}
-else{
-    window.attachEvent("onkeydown",changepage,false);
-}
 
 // bookmark.js
 function bookmark(torrentid) {

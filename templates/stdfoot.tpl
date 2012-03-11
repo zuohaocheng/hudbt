@@ -33,7 +33,9 @@
 	{/if}
 	{/nocache}
 	<div style="display: none;" id="lightbox" class="lightbox"></div><div style="display: none;" id="curtain" class="curtain"></div>
+	{nocache}
 	{$key_shortcut}
+	{/nocache}
       </div>
       {$analyticscode_tweak}
       {$cnzz}

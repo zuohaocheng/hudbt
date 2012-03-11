@@ -140,7 +140,7 @@ function load_files_cache($name, $type, $debug, $purge) {
   if ($type == 'js') {
     //Mind the sequence of loading
     $out .= load_files(array('jquery-1.7.1.min', 'jquery-ui-1.8.18.custom.min', 'jquery.tablesorter'), $type, $debug, $purge, false, false);
-    $out .= load_files(array('ajaxbasic', 'common', 'domLib', 'domTT', 'domTT_drag', 'fadomatic', 'pm'), $type, $debug, $purge);
+    $out .= load_files(array('ajaxbasic', 'common', 'domLib', 'domTT', 'domTT_drag', 'fadomatic', 'pm', 'pager'), $type, $debug, $purge);
 
     $out .= load_files(dependence($name), $type, $debug, $purge);
     $out .= load_files(array($name), $type, $debug, $purge);
