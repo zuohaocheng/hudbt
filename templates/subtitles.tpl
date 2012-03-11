@@ -67,11 +67,12 @@
 
 {if count($rows)}
 {$pagertop}
-<table style="width:940px" border="1" cellspacing="0" cellpadding="5">
-  <thead>
+<table style="width:100%;" cellspacing="0" cellpadding="5" class="no-vertical-line">
+  <thead class="center">
     <tr>
       <th>{$lang['col_lang']}</th>
-      <th style="width:100%;text-align:center;">{$lang['col_title']}</th>
+      <th>{$lang['col_title']}</th>
+      <th>{$lang['col_torrent']}</th>
       <th><img class="time" src="pic/trans.gif" alt="time" title="{$lang['title_date_added']}" /></th>
       <th><img class="size" src="pic/trans.gif" alt="size" title="{$lang['title_size']}" /></th>
       <th>{$lang['col_hits']}</th>
@@ -82,16 +83,17 @@
   <tbody>
     {foreach $rows as $arr}
     <tr>
-      <td align="center" valign="middle"><img border="0" src="pic/flag/{$arr["flagpic"]}" alt="{$arr["lang_name"]}" title="{$arr["lang_name"]}"/></td>
-      <td align="left"><a href="downloadsubs.php?torrentid={$arr['torrent_id']}&subid={$arr['id']}"><strong>{htmlspecialchars($arr["title"])}</strong></a>
+      <td style="text-align:center;" valign="middle"><img border="0" src="pic/flag/{$arr["flagpic"]}" alt="{$arr["lang_name"]}" title="{$arr["lang_name"]}"/></td>
+      <td><a href="downloadsubs.php?torrentid={$arr['torrent_id']}&amp;subid={$arr['id']}" title="{htmlspecialchars($arr["title"])}" class="index subtitle-name">{htmlspecialchars($arr["title"])}</a>
       {if $arr['candelete']}
-      <a href="?delete={$arr[id]}"><span class="small">{$lang['text_delete']}</span></a>
+      <a href="?delete={$arr['id']}"><span class="small">{$lang['text_delete']}</span></a>
       {/if}
-    </td>
-    <td class="nowrap" align="center">{gettime($arr["added"],false,false)}</td>
-    <td align="center">{mksize_loose($arr['size'])}</td>
-    <td align="center">{number_format($arr['hits'])}</td>
-    <td align="center">
+      </td>
+    <td><a href="details.php?id={$arr['torrent_id']}" title="{$arr['torrent_name']}" class="subtitle-name">{htmlspecialchars($arr['torrent_name'])}</a></td>
+    <td style="text-align:center;">{gettime($arr["added"],false,false)}</td>
+    <td style="text-align:center;">{mksize_loose($arr['size'])}</td>
+    <td style="text-align:center;">{number_format($arr['hits'])}</td>
+    <td style="text-align:center;">
       {if $arr["anonymous"] == 'yes'}
       {$lang['text_anonymous']}
       {if get_user_class() >= $viewanonymous_class}
@@ -101,7 +103,7 @@
       {get_username($arr['uppedby'])}
       {/if}
     </td>
-    <td align="center"><a href="report.php?subtitle={$arr[id]}"><img class="f_report" src="pic/trans.gif" alt="Report" title="{$lang['title_report_subtitle']}" /></a></td>
+    <td style="text-align:center;"><a href="report.php?subtitle={$arr['id']}"><img class="f_report" src="pic/trans.gif" alt="Report" title="{$lang['title_report_subtitle']}" /></a></td>
   </tr>
   {/foreach}
 </tbody>

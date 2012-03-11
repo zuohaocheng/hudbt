@@ -85,13 +85,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $_REQUEST["action"] == "upload") {
     exit;
   }
   else {
-    $torrent_id = $_POST["torrent_id"];
-    if(!is_numeric($_POST["torrent_id"]) || !isInteger($_POST["torrent_id"])) {
-      echo($lang_subtitles['std_invalid_torrent_id']);
-      exit;
-    }
+    $torrent_id = 0 + $_POST["torrent_id"];
 
-    $r = sql_query("SELECT * from torrents where id = ". sqlesc($torrent_id)) or sqlerr(__FILE__, __LINE__);
+    $r = sql_query("SELECT owwner FROM torrents WHERE id = ". sqlesc($torrent_id)) or sqlerr(__FILE__, __LINE__);
     if(!mysql_num_rows($r)) {
       echo($lang_subtitles['std_invalid_torrent_id']);
       exit;
@@ -242,7 +238,7 @@ if (get_user_class() >= UC_PEASANT) {
     list($pagertop, $pagerbottom, $limit) = pager($perpage, $num, "subtitles.php?".$q."&");
 
     $i = 0;
-    $res = sql_query("SELECT subs.*, language.flagpic, language.lang_name FROM subs LEFT JOIN language ON subs.lang_id=language.id $query ORDER BY id DESC $limit") or sqlerr();
+    $res = sql_query("SELECT subs.*, torrents.name AS torrent_name, language.flagpic, language.lang_name FROM subs LEFT JOIN torrents ON subs.torrent_id = torrents.id LEFT JOIN language ON subs.lang_id=language.id $query ORDER BY id DESC $limit") or sqlerr();
 
     $mod = get_user_class() >= $submanage_class;
     $pu = get_user_class() >= $delownsub_class;

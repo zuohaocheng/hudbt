@@ -895,6 +895,15 @@ ul.prs li {
     color: blue;
 }
 
+.subtitle-name {
+    display: inline-block;
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    zoom: 1;
+}
+
 #expand-pr {
     margin-left: 1.5em;
     margin-bottom: 0.5em;

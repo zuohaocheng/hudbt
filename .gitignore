@@ -4,6 +4,7 @@
 /config/allconfig.php
 /templates_c
 /torrents
+/subs
 /test-*.php
 /test.php
 *.orig
