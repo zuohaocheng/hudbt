@@ -574,7 +574,7 @@ elseif ($type == 3)
 {
 	if ($limit == 10 || $subtype == "us")
 	{
-		$r = sql_query("SELECT name, flagpic, COUNT(users.country) as num FROM countries LEFT JOIN users ON users.country = countries.id GROUP BY name ORDER BY num DESC LIMIT $limit") or sqlerr();
+		$r = sql_query("SELECT * FROM (SELECT name, flagpic, COUNT(users.country) as num FROM countries LEFT JOIN users ON users.country = countries.id GROUP BY name ORDER BY num DESC LIMIT $limit) AS origin WHERE num > 0") or sqlerr();
 		countriestable($r, $lang_topten['text_top']."$limit ".$lang_topten['text_countries_users']. ($limit == 10 ? " <font class=\"small\"> - [<a class=\"altlink\" href=\"topten.php?type=$type&amp;lim=25&amp;subtype=us\">Top 25</a>]</font>" : ""),$lang_topten['col_users']);
 	}
 
