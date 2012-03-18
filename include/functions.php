@@ -700,14 +700,6 @@ function EmailAllowed($newEmail) {
 	else {                // User@host
 	  if(strtolower($email) == $newEmail)
 	    return true;
-=======
-    function KPS($type = "+", $point = "1.0", $id = "") {
-      global $bonus_tweak;
-      if ($point != 0){
-	$point = sqlesc($point);
-	if ($bonus_tweak == "enable" || $bonus_tweak == "disablesave"){
-	  sql_query("UPDATE LOW_PRIORITY users SET seedbonus = seedbonus$type$point WHERE id = ".sqlesc($id)) or sqlerr(__FILE__, __LINE__);
->>>>>>> brucewolf-20120313
 	}
       }
     }

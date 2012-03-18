@@ -865,9 +865,6 @@ else
     $sql = "SELECT COUNT(*), categories.mode FROM torrents LEFT JOIN categories ON category = categories.id " . ($search_area == 3 || $column == "owner" ? "LEFT JOIN users ON torrents.owner = users.id " : "") . $where." GROUP BY categories.mode";
   }
 
-
-include_once($rootpath . 'classes/class_cache.php'); //Require the caching class
-$Cache = NEW CACHE(); //Load the caching class
 if(true) {
 	$timer_1_start = microtime(true);
 	
