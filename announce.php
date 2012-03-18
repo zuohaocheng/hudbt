@@ -75,7 +75,7 @@ $clicheck_res = check_client($peer_id,$agent,&$client_familyid);
 if($clicheck_res){
   if ($az['showclienterror'] == 'no')
     {
-      sql_query("UPDATE users SET showclienterror = 'yes' WHERE id = ".sqlesc($userid));
+      sql_query("UPDATE LOW_PRIORITY users SET showclienterror = 'yes' WHERE id = ".sqlesc($userid));
       $Cache->delete_value('user_passkey_'.$passkey.'_content');
     }
   err($clicheck_res);
@@ -282,12 +282,12 @@ if (isset($self) && $event == "stopped") {
   sql_query("DELETE FROM peers WHERE $selfwhere") or err("D Err");
   if (mysql_affected_rows()) {
     $updateset[] = ($self["seeder"] == "yes" ? "seeders = seeders - 1" : "leechers = leechers - 1");
-    sql_query("UPDATE snatched SET uploaded = uploaded + $trueupthis, downloaded = downloaded + $truedownthis, to_go = $left, $announcetime, last_action = ".$dt." WHERE torrentid = $torrentid AND userid = $userid") or err("SL Err 1");
+    sql_query("UPDATE LOW_PRIORITY snatched SET uploaded = uploaded + $trueupthis, downloaded = downloaded + $truedownthis, to_go = $left, $announcetime, last_action = ".$dt." WHERE torrentid = $torrentid AND userid = $userid") or err("SL Err 1");
   }
 }
 elseif(isset($self)) {
   if ($event == "completed") {
-    //sql_query("UPDATE snatched SET  finished  = 'yes', completedat = $dt WHERE torrentid = $torrentid AND userid = $userid");
+    //sql_query("UPDATE LOW_PRIORITY snatched SET  finished  = 'yes', completedat = $dt WHERE torrentid = $torrentid AND userid = $userid");
     $finished = ", finishedat = ".TIMENOW;
     $finished_snatched = ", completedat = ".$dt . ", finished  = 'yes'";
     $updateset[] = "times_completed = times_completed + 1";
@@ -298,7 +298,7 @@ elseif(isset($self)) {
   if (mysql_affected_rows()) {
     if ($seeder <> $self["seeder"])
       $updateset[] = ($seeder == "yes" ? "seeders = seeders + 1, leechers = leechers - 1" : "seeders = seeders - 1, leechers = leechers + 1");
-    sql_query("UPDATE snatched SET uploaded = uploaded + $trueupthis, downloaded = downloaded + $truedownthis, to_go = $left, $announcetime, last_action = ".$dt." $finished_snatched WHERE torrentid = $torrentid AND userid = $userid") or err("SL Err 2");
+    sql_query("UPDATE LOW_PRIORITY snatched SET uploaded = uploaded + $trueupthis, downloaded = downloaded + $truedownthis, to_go = $left, $announcetime, last_action = ".$dt." $finished_snatched WHERE torrentid = $torrentid AND userid = $userid") or err("SL Err 2");
   }
 }
 else {
@@ -326,7 +326,7 @@ else {
     if (!$check['0'])
       sql_query("INSERT INTO snatched (torrentid, userid, ip, port, uploaded, downloaded, to_go, startdat, last_action) VALUES ($torrentid, $userid, ".sqlesc($ip).", $port, $uploaded, $downloaded, $left, $dt, $dt)") or err("SL Err 4");
     else
-      sql_query("UPDATE snatched SET to_go = $left, last_action = ".$dt ." WHERE torrentid = $torrentid AND userid = $userid") or err("SL Err 3.1");
+      sql_query("UPDATE LOW_PRIORITY snatched SET to_go = $left, last_action = ".$dt ." WHERE torrentid = $torrentid AND userid = $userid") or err("SL Err 3.1");
   }
 }
 
@@ -336,7 +336,7 @@ if (count($updateset)) { // Update only when there is change in peer counts
   if ($seeder == 'yes') {
     $updateset[] = "startseed = 'yes'";
   }
-  sql_query("UPDATE torrents SET " . join(",", $updateset) . " WHERE id = $torrentid");
+  sql_query("UPDATE LOW_PRIORITY torrents SET " . join(",", $updateset) . " WHERE id = $torrentid");
 }
 
 if($client_familyid != 0 && $client_familyid != $az['clientselect']) {
@@ -344,7 +344,7 @@ if($client_familyid != 0 && $client_familyid != $az['clientselect']) {
 }
 
 if(count($USERUPDATESET) && $userid) {
-  sql_query("UPDATE users SET " . join(",", $USERUPDATESET) . " WHERE id = ".$userid);
+  sql_query("UPDATE LOW_PRIORITY users SET " . join(",", $USERUPDATESET) . " WHERE id = ".$userid);
 }
 benc_resp_raw($resp);
 ?>

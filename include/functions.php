@@ -41,7 +41,7 @@ function get_load_uri($type, $script_name ="", $debug=false) {
     $addition .= '&debug=1';
   }
   else {
-    $addition .= '&rev=20120106';
+	$addition .= '&rev=20120306';
   }
   
   if ($type == 'js') {
@@ -601,7 +601,7 @@ function textbbcode($form,$text,$content="",$hastitle=false, $col_num = 130) {
 	  exit(0);
 	}
 	else {
-	  sql_query("UPDATE users SET lang=" . get_langid_from_langcookie() . " WHERE id = ". $CURUSER['id']);
+	  sql_query("UPDATE LOW_PRIORITY users SET lang=" . get_langid_from_langcookie() . " WHERE id = ". $CURUSER['id']);
 	  stderr ($lang_functions['std_permission_denied'], $lang_functions['std_already_logged_in']);
 	}  
       }
@@ -612,7 +612,7 @@ function textbbcode($form,$text,$content="",$hastitle=false, $col_num = 130) {
       if ($point != 0){
 	$point = sqlesc($point);
 	if ($bonus_tweak == "enable" || $bonus_tweak == "disablesave"){
-	  sql_query("UPDATE users SET seedbonus = seedbonus$type$point WHERE id = ".sqlesc($id)) or sqlerr(__FILE__, __LINE__);
+	  sql_query("UPDATE LOW_PRIORITY users SET seedbonus = seedbonus$type$point WHERE id = ".sqlesc($id)) or sqlerr(__FILE__, __LINE__);
 	}
       }
       else return;
@@ -1176,13 +1176,13 @@ function textbbcode($form,$text,$content="",$hastitle=false, $col_num = 130) {
       global $mysql_host, $mysql_user, $mysql_pass, $mysql_db;
       global $useCronTriggerCleanUp;
 
-      if (!mysql_connect($mysql_host, $mysql_user, $mysql_pass)) {
+      if (!mysql_pconnect($mysql_host, $mysql_user, $mysql_pass)) {
 	switch (mysql_errno()) {
 	case 1040:
 	case 2002:
 	  die("<html><head><meta http-equiv=refresh content=\"10 $_SERVER[REQUEST_URI]\"><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body><table border=0 width=100% height=100%><tr><td><h3 align=center>".$lang_functions['std_server_load_very_high']."</h3></td></tr></table></body></html>");
 	default:
-	  die("[" . mysql_errno() . "] dbconn: mysql_connect: " . mysql_error());
+	  die("[" . mysql_errno() . "] dbconn: mysql_pconnect: " . mysql_error());
 	}
       }
       mysql_query("SET NAMES UTF8");
@@ -1289,7 +1289,7 @@ function textbbcode($form,$text,$content="",$hastitle=false, $col_num = 130) {
 	}
       if (!$row["passkey"]){
 	$passkey = md5($row['username'].date("Y-m-d H:i:s").$row['passhash']);
-	sql_query("UPDATE users SET passkey = ".sqlesc($passkey)." WHERE id=" . sqlesc($row["id"]));// or die(mysql_error());
+	sql_query("UPDATE LOW_PRIORITY users SET passkey = ".sqlesc($passkey)." WHERE id=" . sqlesc($row["id"]));// or die(mysql_error());
       }
 
       $oldip = $row['ip'];
@@ -2089,7 +2089,7 @@ function stdfoot() {
   print('<div style="margin-top: 10px; margin-bottom: 30px; text-align: center;
 ">');
   if ($CURUSER){
-    sql_query("UPDATE users SET " . join(",", $USERUPDATESET) . " WHERE id = ".$CURUSER['id']);
+    sql_query("UPDATE LOW_PRIORITY users SET " . join(",", $USERUPDATESET) . " WHERE id = ".$CURUSER['id']);
   }
   // Variables for End Time
   $tend = getmicrotime();
@@ -2179,7 +2179,7 @@ function logincookie($id, $passhash, $updatedb = 1, $expires = 0x7fffffff, $secu
 
 
   if ($updatedb)
-  sql_query("UPDATE users SET last_login = NOW(), lang=" . sqlesc(get_langid_from_langcookie()) . " WHERE id = ".sqlesc($id));
+  sql_query("UPDATE LOW_PRIORITY users SET last_login = NOW(), lang=" . sqlesc(get_langid_from_langcookie()) . " WHERE id = ".sqlesc($id));
 }
 
 function set_langfolder_cookie($folder, $expires = 0x7fffffff)
@@ -2809,7 +2809,7 @@ function writecomment($userid, $comment) {
   $modcomment = date("d-m-Y") . " - " . $comment . "" . ($arr[modcomment] != "" ? "\n\n" : "") . "$arr[modcomment]";
   $modcom = sqlesc($modcomment);
 
-  return sql_query("UPDATE users SET modcomment = $modcom WHERE id = '$userid'") or sqlerr(__FILE__, __LINE__);
+  return sql_query("UPDATE LOW_PRIORITY users SET modcomment = $modcom WHERE id = '$userid'") or sqlerr(__FILE__, __LINE__);
 }
 
 function return_torrent_bookmark_array($userid)
@@ -2852,7 +2852,7 @@ function get_torrent_bookmark_state($userid, $torrentid, $text = false)
   return $act;
 }
 
-function torrenttable($res, $variant = "torrent", $swap_headings = false, $onlyhead=false) {
+function torrenttable($rows, $variant = "torrent", $swap_headings = false, $onlyhead=false) {
   global $Cache;
   global $lang_functions;
   global $CURUSER, $waitsystem;
@@ -2961,7 +2961,7 @@ $counter = 0;
 if ($smalldescription_main == 'no' || $CURUSER['showsmalldescr'] == 'no')
   $displaysmalldescr = false;
 else $displaysmalldescr = true;
-while ($row = mysql_fetch_assoc($res))
+foreach($rows as $row)
 {
   if($row['banned'] == 'no' 
      || ($row['banned'] == 'yes' 

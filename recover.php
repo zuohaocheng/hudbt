@@ -42,7 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 
 	$sec = mksecret();
 
-	sql_query("UPDATE users SET editsecret=" . sqlesc($sec) . " WHERE id=" . sqlesc($arr["id"])) or sqlerr(__FILE__, __LINE__);
+	sql_query("UPDATE LOW_PRIORITY users SET editsecret=" . sqlesc($sec) . " WHERE id=" . sqlesc($arr["id"])) or sqlerr(__FILE__, __LINE__);
 	if (!mysql_affected_rows())
 	stderr($lang_recover['std_error'], $lang_recover['std_database_error']);
 
@@ -89,7 +89,7 @@ elseif($_SERVER["REQUEST_METHOD"] == "GET" && $take_recover && isset($_GET["id"]
 
 	$newpasshash = md5($sec . $newpassword . $sec);
 
-	sql_query("UPDATE users SET secret=" . sqlesc($sec) . ", editsecret='', passhash=" . sqlesc($newpasshash) . " WHERE id=" . sqlesc($id)." AND editsecret=" . sqlesc($arr["editsecret"])) or sqlerr(__FILE__, __LINE__);
+	sql_query("UPDATE LOW_PRIORITY users SET secret=" . sqlesc($sec) . ", editsecret='', passhash=" . sqlesc($newpasshash) . " WHERE id=" . sqlesc($id)." AND editsecret=" . sqlesc($arr["editsecret"])) or sqlerr(__FILE__, __LINE__);
 
 	if (!mysql_affected_rows())
 	stderr($lang_recover['std_error'], $lang_recover['std_unable_updating_user_data']);

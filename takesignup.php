@@ -209,7 +209,7 @@ sql_query("DELETE FROM invites WHERE hash = '".mysql_real_escape_string($code)."
 $dt = sqlesc(date("Y-m-d H:i:s"));
 $subject = sqlesc($lang_takesignup_target[get_user_lang($inviter)]['msg_invited_user_has_registered']);
 $msg = sqlesc($lang_takesignup_target[get_user_lang($inviter)]['msg_user_you_invited'].$usern.$lang_takesignup_target[get_user_lang($inviter)]['msg_has_registered']);
-//sql_query("UPDATE users SET uploaded = uploaded + 10737418240 WHERE id = $inviter"); //add 10GB to invitor's uploading credit
+//sql_query("UPDATE LOW_PRIORITY users SET uploaded = uploaded + 10737418240 WHERE id = $inviter"); //add 10GB to invitor's uploading credit
 sql_query("INSERT INTO messages (sender, receiver, subject, added, msg) VALUES(0, $inviter, $subject, $dt, $msg)") or sqlerr(__FILE__, __LINE__);
 $Cache->delete_value('user_'.$inviter.'_unread_message_count');
 $Cache->delete_value('user_'.$inviter.'_inbox_count');

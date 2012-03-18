@@ -24,7 +24,7 @@ $confirm_sec = hash_pad($row["secret"]);
 if ($confirm_md5 != md5($confirm_sec))
 	httperr();
 
-sql_query("UPDATE users SET status='confirmed', editsecret='' WHERE id=".sqlesc($id)." AND status='pending'") or sqlerr(__FILE__, __LINE__);
+sql_query("UPDATE LOW_PRIORITY users SET status='confirmed', editsecret='' WHERE id=".sqlesc($id)." AND status='pending'") or sqlerr(__FILE__, __LINE__);
 
 if (!mysql_affected_rows())
 	httperr();

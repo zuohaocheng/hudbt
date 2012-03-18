@@ -29,7 +29,7 @@ elseif ($row['banned'] == 'yes' && get_user_class() < $seebanned_class && $CURUS
   permissiondenied();
 else {
   if ($_GET["hit"]) {
-    sql_query("UPDATE torrents SET views = views + 1 WHERE id = $id");
+    sql_query("UPDATE LOW_PRIORITY torrents SET views = views + 1 WHERE id = $id");
   }
 
   if (!isset($_GET["cmtpage"])) {

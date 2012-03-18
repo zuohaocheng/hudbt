@@ -94,7 +94,7 @@ if ($_SERVER["REQUEST_METHOD"] != "POST")
 	$msgid=mysql_insert_id();
 	$date=date("Y-m-d H:i:s");
 	// Update Last PM sent...
-	sql_query("UPDATE users SET last_pm = NOW() WHERE id = ".sqlesc($CURUSER['id'])) or sqlerr(__FILE__, __LINE__);
+	sql_query("UPDATE LOW_PRIORITY users SET last_pm = NOW() WHERE id = ".sqlesc($CURUSER['id'])) or sqlerr(__FILE__, __LINE__);
 
 	// Send notification email.
 if ($emailnotify_smtp=='yes' && $smtptype != 'none'){

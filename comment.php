@@ -99,7 +99,7 @@ if ($action == "add") {
 
 		$newid = mysql_insert_id();
 		if($type == "torrent") {
-		  sql_query("UPDATE torrents SET comments = comments + 1 WHERE id = $parent_id");
+		  sql_query("UPDATE LOW_PRIORITY torrents SET comments = comments + 1 WHERE id = $parent_id");
 		}
 		elseif($type == "offer") {
 		  sql_query("UPDATE offers SET comments = comments + 1 WHERE id = $parent_id");
@@ -138,7 +138,7 @@ if ($action == "add") {
 		KPS("+",$addcomment_bonus,$CURUSER["id"]);
 
 		// Update Last comment sent...
-		sql_query("UPDATE users SET last_comment = NOW() WHERE id = ".sqlesc($CURUSER['id'])) or sqlerr(__FILE__, __LINE__);
+		sql_query("UPDATE LOW_PRIORITY users SET last_comment = NOW() WHERE id = ".sqlesc($CURUSER['id'])) or sqlerr(__FILE__, __LINE__);
 
 		if($type == "torrent") {
 		  header("Refresh: 0; url=details.php?id=$parent_id#cid$newid");
@@ -299,7 +299,7 @@ elseif ($action == "delete")
 		if ($parent_id && mysql_affected_rows() > 0)
 		{
 			if($type == "torrent")
-			sql_query("UPDATE torrents SET comments = comments - 1 WHERE id = $parent_id") or sqlerr(__FILE__,__LINE__);
+			sql_query("UPDATE LOW_PRIORITY torrents SET comments = comments - 1 WHERE id = $parent_id") or sqlerr(__FILE__,__LINE__);
 			else if($type == "offer")
 			sql_query("UPDATE offers SET comments = comments - 1 WHERE id = $parent_id") or sqlerr(__FILE__,__LINE__);
 			else if($type == "request")

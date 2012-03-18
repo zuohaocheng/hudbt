@@ -29,7 +29,7 @@ $id = $arr['id'];
 $wantpassword=$newpassword;
 $secret = mksecret();
 $wantpasshash = md5($secret . $wantpassword . $secret);
-sql_query("UPDATE users SET passhash=".sqlesc($wantpasshash).", secret= ".sqlesc($secret)." where id=$id");
+sql_query("UPDATE LOW_PRIORITY users SET passhash=".sqlesc($wantpasshash).", secret= ".sqlesc($secret)." where id=$id");
 write_log("Password Reset For $username by $CURUSER[username]");
  if (mysql_affected_rows() != 1)
    stderr("Error", "Unable to RESET PASSWORD on this account.");

@@ -30,7 +30,7 @@ $subject = trim($_POST['subject']);
 $query = sql_query("SELECT id FROM users WHERE class IN (".implode(",", $updateset).")");
 
 $amount = sqlesc(getsize_int($amount,"G"));
-sql_query("UPDATE users SET uploaded=uploaded + $amount WHERE class IN (".implode(",", $updateset).")") or sqlerr(__FILE__, __LINE__);
+sql_query("UPDATE LOW_PRIORITY users SET uploaded=uploaded + $amount WHERE class IN (".implode(",", $updateset).")") or sqlerr(__FILE__, __LINE__);
 
 while($dat=mysql_fetch_assoc($query))
 {

@@ -97,7 +97,7 @@ if ($_GET["new_offer"]){
 	$arr = mysql_fetch_assoc($res);
 	if (!$arr['name']){
 		//===add karma //=== uncomment if you use the mod
-		//sql_query("UPDATE users SET seedbonus = seedbonus+10.0 WHERE id = $CURUSER[id]") or sqlerr(__FILE__, __LINE__);
+		//sql_query("UPDATE LOW_PRIORITY users SET seedbonus = seedbonus+10.0 WHERE id = $CURUSER[id]") or sqlerr(__FILE__, __LINE__);
 		//===end
 
 		$ret = sql_query("INSERT INTO offers (userid, name, descr, category, added) VALUES (" .
@@ -570,7 +570,7 @@ if ($_GET["del_offer"]){
 		sql_query("DELETE FROM comments WHERE offer=$offer");
 
 		//===add karma	//=== use this if you use the karma mod
-		//sql_query("UPDATE users SET seedbonus = seedbonus-10.0 WHERE id = $num[userid]") or sqlerr(__FILE__, __LINE__);
+		//sql_query("UPDATE LOW_PRIORITY users SET seedbonus = seedbonus-10.0 WHERE id = $num[userid]") or sqlerr(__FILE__, __LINE__);
 		//===end
 
 		if ($CURUSER["id"] != $num["userid"])
