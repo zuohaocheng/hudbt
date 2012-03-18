@@ -60,7 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 	$wantpasshash = md5($secret . $wantpassword . $secret);
 	$editsecret = ($verification == 'admin' ? '' : $secret);
 
-	sql_query("UPDATE users SET passhash=" .sqlesc($wantpasshash) . ",secret=" . sqlesc($secret) . ",editsecret=" . sqlesc($editsecret) . " WHERE id=" . sqlesc($arr["id"])) or sqlerr(__FILE__, __LINE__);
+	sql_query("UPDATE LOW_PRIORITY users SET passhash=" .sqlesc($wantpasshash) . ",secret=" . sqlesc($secret) . ",editsecret=" . sqlesc($editsecret) . " WHERE id=" . sqlesc($arr["id"])) or sqlerr(__FILE__, __LINE__);
 	
 	if (!mysql_affected_rows())
 	stderr($lang_confirm_resend['std_error'], $lang_confirm_resend['std_database_error']);

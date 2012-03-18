@@ -1,5 +1,6 @@
 <?php
-require_once("include/bittorrent.php");
+$timer_0_start = microtime(true); // debug
+require_once("include/bittorrent_.php");
 dbconn(true);
 require_once(get_langfile_path("torrents.php"));
 
@@ -854,7 +855,7 @@ if ($allsec == 1 || $enablespecial != 'yes')
     if ($where != "")
       $where = "WHERE $where ";
     else $where = "";
-    $sql = "SELECT COUNT(*) FROM torrents " . ($search_area == 3 || $column == "owner" ? "LEFT JOIN users ON torrents.owner = users.id " : "") . $where;
+    $sql = "SELECT COUNT(1) FROM torrents " . ($search_area == 3 || $column == "owner" ? "LEFT JOIN users ON torrents.owner = users.id " : "") . $where;
   }
 else
   {
@@ -865,11 +866,34 @@ else
   }
 
 
+include_once($rootpath . 'classes/class_cache.php'); //Require the caching class
+$Cache = NEW CACHE(); //Load the caching class
+if(true) {
+	$timer_1_start = microtime(true);
+	
+	$sql_key = MD5($sql);
+	$count = $Cache->get_value($sql_key);
+//	var_dump($sql_key, $count);
+	if(empty($count)) {
+		$timer_2_start = microtime(true);
+		$res = sql_query($sql) or die(mysql_error());
+		$count = 0;
+		while($row = mysql_fetch_array($res))
+		  $count += $row[0];
+	
+		$Cache->cache_value($sql_key, $count, 1800);
+		$timer_2_end = microtime(true);
+	}
+	$timer_1_end = microtime(true);
+	$time_delta1 = $timer_1_end - $timer_1_start;
+	$time_delta2 = $timer_2_end - $timer_2_start;
 
-$res = sql_query($sql) or die(mysql_error());
-$count = 0;
-while($row = mysql_fetch_array($res))
-  $count += $row[0];
+} else {
+	$res = sql_query('/* FILE: '.__FILE__.' LINE: '.__LINE__.'*/ '.$sql) or die(mysql_error());
+	$count = 0;
+	while($row = mysql_fetch_array($res))
+	  $count += $row[0];
+}
 
 if ($CURUSER["torrentsperpage"])
   $torrentsperpage = (int)$CURUSER["torrentsperpage"];
@@ -877,53 +901,80 @@ elseif ($torrentsperpage_main)
   $torrentsperpage = $torrentsperpage_main;
 else $torrentsperpage = 50;
 
+
+
+$timer_3_start = microtime(true); // debug
+// var_dump($count); die(); //
 if ($count)
-  {
-    if ($addparam != "")
-      {
-	if ($pagerlink != "")
+{
+	if ($addparam != "")
 	  {
-	    if ($addparam{strlen($addparam)-1} != ";")
-	      { // & = &amp;
-		$addparam = $addparam . "&" . $pagerlink;
-	      }
-	    else
-	      {
-		$addparam = $addparam . $pagerlink;
-	      }
+		if ($pagerlink != "")
+		  {
+			if ($addparam{strlen($addparam)-1} != ";")
+			  { // & = &amp;
+			$addparam = $addparam . "&" . $pagerlink;
+			  }
+			else
+			  {
+			$addparam = $addparam . $pagerlink;
+			  }
+		  }
 	  }
-      }
-    else
-      {
+	else
+	  {
 	//stderr("in else","");
 	$addparam = $pagerlink;
-      }
-    //stderr("addparam",$addparam);
-    //echo $addparam;
+	  }
+	//stderr("addparam",$addparam);
+	//echo $addparam;
 
-    list($pagertop, $pagerbottom, $limit, $next_page_href) = pager($torrentsperpage, $count, "?" . $addparam);
+	list($pagertop, $pagerbottom, $limit, $next_page_href) = pager($torrentsperpage, $count, "?" . $addparam);
 
-    if ($allsec == 1 || $enablespecial != 'yes'){
-      //Modified by bluemonster 20111026
-      $query = "SELECT torrents.id, torrents.sp_state, torrents.promotion_time_type, torrents.promotion_until, torrents.banned, torrents.picktype, torrents.pos_state, torrents.category, torrents.source, torrents.medium, torrents.codec, torrents.standard, torrents.processing, torrents.team, torrents.audiocodec, torrents.leechers, torrents.seeders, torrents.name, torrents.small_descr, torrents.times_completed, torrents.size, torrents.added, torrents.comments,torrents.anonymous,torrents.owner,torrents.url,torrents.cache_stamp,torrents.oday FROM torrents ".($search_area == 3 || $column == "owner" ? "LEFT JOIN users ON torrents.owner = users.id " : "")." $where $orderby $limit";
-    }
-    else{
-      //Modified by bluemonster 20111026
-      $query = "SELECT torrents.id, torrents.sp_state, torrents.promotion_time_type, torrents.promotion_until, torrents.banned, torrents.picktype, torrents.pos_state, torrents.category, torrents.source, torrents.medium, torrents.codec, torrents.standard, torrents.processing, torrents.team, torrents.audiocodec, torrents.leechers, torrents.seeders, torrents.name, torrents.small_descr, torrents.times_completed, torrents.size, torrents.added, torrents.comments,torrents.anonymous,torrents.owner,torrents.url,torrents.cache_stamp,torrents.oday FROM torrents ".($search_area == 3 || $column == "owner" ? "LEFT JOIN users ON torrents.owner = users.id " : "")." LEFT JOIN categories ON torrents.category=categories.id $where $orderby $limit";
-    }
-    $res = sql_query($query) or die(mysql_error());
-  }
+	if ($allsec == 1 || $enablespecial != 'yes'){
+	  //Modified by bluemonster 20111026
+	  $query = "SELECT torrents.id, torrents.sp_state, torrents.promotion_time_type, torrents.promotion_until, torrents.banned, torrents.picktype, torrents.pos_state, torrents.category, torrents.source, torrents.medium, torrents.codec, torrents.standard, torrents.processing, torrents.team, torrents.audiocodec, torrents.leechers, torrents.seeders, torrents.name, torrents.small_descr, torrents.times_completed, torrents.size, torrents.added, torrents.comments,torrents.anonymous,torrents.owner,torrents.url,torrents.cache_stamp,torrents.oday FROM torrents ".($search_area == 3 || $column == "owner" ? "LEFT JOIN users ON torrents.owner = users.id " : "")." $where $orderby $limit";
+	}
+	else{
+	  //Modified by bluemonster 20111026
+	  $query = "SELECT torrents.id, torrents.sp_state, torrents.promotion_time_type, torrents.promotion_until, torrents.banned, torrents.picktype, torrents.pos_state, torrents.category, torrents.source, torrents.medium, torrents.codec, torrents.standard, torrents.processing, torrents.team, torrents.audiocodec, torrents.leechers, torrents.seeders, torrents.name, torrents.small_descr, torrents.times_completed, torrents.size, torrents.added, torrents.comments,torrents.anonymous,torrents.owner,torrents.url,torrents.cache_stamp,torrents.oday FROM torrents ".($search_area == 3 || $column == "owner" ? "LEFT JOIN users ON torrents.owner = users.id " : "")." LEFT JOIN categories ON torrents.category=categories.id $where $orderby $limit";
+	}
+	
+	$query_key = MD5($query);
+	$rows = $Cache->get_value($query_key);
+//	var_dump($rows); //debug
+
+	if(empty($rows)) 
+	{
+		$res = sql_query('/* FILE: '.__FILE__.' LINE: '.__LINE__.'*/ '.$query) or die(mysql_error());
+
+		while ($row = mysql_fetch_assoc($res))
+		{
+			$rows[] = $row;
+		}
+		$Cache->cache_value($query_key, $rows, 600);
+//		var_dump($rows); //debug
+	}
+//	die();
+}
 else
-  unset($res);
+  unset($rows);
 
-
-
-
-if ($_REQUEST['format'] == 'json') {
+$timer_3_end = microtime(true); // debug
+$timer_4_start = microtime(true); // debug
+if ($_REQUEST['format'] == 'json') { 
   include('include/torrents_json.php');
 }
 else {
   include('include/torrents_html.php');
 }
+$timer_4_end = microtime(true); // debug
+$timer_0_end = microtime(true); // debug
+if($_GET['ttimer']) {
+	$ttimer = "[{$time_delta1}](1), [{$time_delta2}](2)";
+	$ttimer .= ',['.($timer_3_end - $timer_3_start).'](3)';
+	$ttimer .= ',['.($timer_4_end - $timer_4_start).'](4)';
+	$ttimer .= ',['.($timer_0_end - $timer_0_start).'](all)'; // debug
+	echo $ttimer;
+}
 
-?>

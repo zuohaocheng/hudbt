@@ -7,7 +7,7 @@ stderr("Error", "Access denied.");
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if ($_POST['doit'] == 'yes') {
     $amount = 0 + $_POST['amount'];
-    sql_query("UPDATE users SET seedbonus = seedbonus + " . $amount . " WHERE status='confirmed'");
+    sql_query("UPDATE LOW_PRIORITY users SET seedbonus = seedbonus + " . $amount . " WHERE status='confirmed'");
     stderr("Bonus", $amount . " bonus point is sent to everyone...");
     die;
   }
@@ -17,7 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	$username = sqlesc($_POST["username"]);
 	$seedbonus = sqlesc($_POST["seedbonus"]);
 
-	sql_query("UPDATE users SET seedbonus=seedbonus + $seedbonus WHERE username=$username") or sqlerr(__FILE__, __LINE__);
+	sql_query("UPDATE LOW_PRIORITY users SET seedbonus=seedbonus + $seedbonus WHERE username=$username") or sqlerr(__FILE__, __LINE__);
 	$res = sql_query("SELECT id FROM users WHERE username=$username");
 	$arr = mysql_fetch_row($res);
 	if (!$arr)

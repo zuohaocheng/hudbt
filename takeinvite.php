@@ -61,7 +61,7 @@ $successed = sent_mail($email,$SITENAME,$SITEEMAIL,change_email_encode(get_langf
 //this email is sent only when someone give out an invitation
 
 if($successed) {
-	sql_query("UPDATE users SET invites = invites - 1 WHERE invites > 0 AND id = ".mysql_real_escape_string($id)."") or sqlerr(__FILE__, __LINE__);
+	sql_query("UPDATE LOW_PRIORITY users SET invites = invites - 1 WHERE invites > 0 AND id = ".mysql_real_escape_string($id)."") or sqlerr(__FILE__, __LINE__);
 	if (mysql_affected_rows()) {
 	  sql_query("INSERT INTO invites (inviter, invitee, hash, time_invited) VALUES ('".mysql_real_escape_string($id)."', '".mysql_real_escape_string($email)."', '".mysql_real_escape_string($hash)."', " . sqlesc(date("Y-m-d H:i:s")) . ")");
 	}

@@ -63,7 +63,7 @@ if(!empty($CURUSER['username'])) {
 					$receiver = $receiverInfo['username'];
 					$dotanerBonusComment = date("Y-m-d") . " - {$amount} Points as donate to {$receiver} on {$objectType} {$objectId}.\n";
 
-					$sqlUpdateDonaterInfo = "UPDATE users SET seedbonus=seedbonus-{$amount}, bonuscomment=CONCAT('{$dotanerBonusComment}', bonuscomment) WHERE id=".$donaterId;
+					$sqlUpdateDonaterInfo = "UPDATE LOW_PRIORITY users SET seedbonus=seedbonus-{$amount}, bonuscomment=CONCAT('{$dotanerBonusComment}', bonuscomment) WHERE id=".$donaterId;
 					sql_query($sqlUpdateDonaterInfo);
 					// End update the user details of donater
 					
@@ -73,7 +73,7 @@ if(!empty($CURUSER['username'])) {
 						
 						$receiverBonusComment = date("Y-m-d") . " + {$amount_after_tax} Points (after tax) as donate from {$donater} on {$objectType} {$objectId}.\n";
 						
-						$sqlUpdateReceiverInfo = "UPDATE users SET seedbonus=seedbonus+{$amount_after_tax}, bonuscomment=CONCAT('{$receiverBonusComment}', bonuscomment) WHERE id={$receiverId}"; // Successful;
+						$sqlUpdateReceiverInfo = "UPDATE LOW_PRIORITY users SET seedbonus=seedbonus+{$amount_after_tax}, bonuscomment=CONCAT('{$receiverBonusComment}', bonuscomment) WHERE id={$receiverId}"; // Successful;
 						sql_query($sqlUpdateReceiverInfo);
 						
 						if(mysql_affected_rows()) {
@@ -146,7 +146,7 @@ MESSAGE;
 	$Cache->delete_value('user_'.$donaterId.'_unread_message_count');
 	$Cache->delete_value('user_'.$donaterId.'_inbox_count');
 
-	$sqlUpdatePMStatus = 'UPDATE users SET last_pm = NOW() WHERE id = '.$donaterId;
+	$sqlUpdatePMStatus = 'UPDATE LOW_PRIORITY users SET last_pm = NOW() WHERE id = '.$donaterId;
 	sql_query($sqlUpdatePMStatus); */
 	// End send PM to donater ||
 	
@@ -159,7 +159,7 @@ MESSAGE;
 	$Cache->delete_value('user_'.$receiverId.'_unread_message_count');
 	$Cache->delete_value('user_'.$receiverId.'_inbox_count');
 
-	$sqlUpdatePMStatus = 'UPDATE users SET last_pm = NOW() WHERE id = '.$receiverId;
+	$sqlUpdatePMStatus = 'UPDATE LOW_PRIORITY users SET last_pm = NOW() WHERE id = '.$receiverId;
 	sql_query($sqlUpdatePMStatus);
 	// End send PM to receiver ||
 	

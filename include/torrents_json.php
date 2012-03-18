@@ -110,7 +110,7 @@ function torrentInfoForRow($row) {
   return $info;
 }
 
-function torrenttable_api($res, $variant = "torrent", $swap_headings = false) {
+function torrenttable_api($rows, $variant = "torrent", $swap_headings = false) {
   global $Cache;
   global $CURUSER, $waitsystem;
   global $showextinfo;
@@ -161,8 +161,8 @@ function torrenttable_api($res, $variant = "torrent", $swap_headings = false) {
   else $displaysmalldescr = true;
 
   $torrents = array();
-  if ($res) {
-    while ($row = mysql_fetch_assoc($res))  {
+  if (!empty($rows)) {
+    foreach ($rows as $row)  {
       if($row['banned'] == 'no' || get_user_class() >= $seebanned_class || $CURUSER['id'] == $row['owner']) {
 	$torrents[] = torrentInfoForRow($row);
       }
@@ -175,7 +175,7 @@ function torrenttable_api($res, $variant = "torrent", $swap_headings = false) {
 
 header('Content-type: application/json');
 
-$out = array('torrents' => torrenttable_api($res, "torrents"));
+$out = array('torrents' => torrenttable_api($rows, "torrents"));
 if ($next_page_href != '') {
   $out['continue'] = $next_page_href;
 }

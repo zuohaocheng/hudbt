@@ -175,11 +175,11 @@ if ($count) {
   $swap_headings = $_GET["swaph"];
 
   if ($sectiontype == $browsecatmode)
-    torrenttable($res, "torrents", $swap_headings);
-  elseif ($sectiontype == $specialcatmode) 
-    torrenttable($res, "music", $swap_headings);
-  else 
-    torrenttable($res, "bookmarks", $swap_headings);
+    torrenttable($rows, "torrents", $swap_headings);
+//  elseif ($sectiontype == $specialcatmode) die('Error, Contact SYSOP');
+//    torrenttable($res, "music", $swap_headings);
+//  else die('') die('Error, Contact SYSOP');
+//    torrenttable($res, "bookmarks", $swap_headings);
 
   if ($next_page_href != '') {
     print($pagerbottom);

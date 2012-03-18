@@ -130,7 +130,7 @@ if ($action){
 
 				$updateset[] = "info = " . sqlesc($info);
 
-				$query = "UPDATE users SET " . implode(",", $updateset) . " WHERE id = ".sqlesc($CURUSER["id"]);
+				$query = "UPDATE LOW_PRIORITY users SET " . implode(",", $updateset) . " WHERE id = ".sqlesc($CURUSER["id"]);
 				$result = sql_query($query);
 				if (!$result)
 				sqlerr(__FILE__,__LINE__);
@@ -362,7 +362,7 @@ dl_item($lang_usercp['row_school'], "<select name=school>$schools</select>", 1);
 				else $showcomment = 'no';
 				$updateset[] = "showcomment = " . sqlesc($showcomment);
 
-				$query = "UPDATE users SET " . implode(",", $updateset) . " WHERE id =".sqlesc($CURUSER["id"]);
+				$query = "UPDATE LOW_PRIORITY users SET " . implode(",", $updateset) . " WHERE id =".sqlesc($CURUSER["id"]);
 				//stderr("",$query);
 				$result = sql_query($query) or sqlerr(__FILE__,__LINE__);
 				header("Location: usercp.php?action=tracker&type=saved");
@@ -634,7 +634,7 @@ echo '</dl>';
 				$updateset[] = "clicktopic = ".sqlesc($clicktopic);
 				$updateset[] = "signature = " . sqlesc($signature);
 
-				$query = "UPDATE users SET " . implode(",", $updateset) . " WHERE id =".sqlesc($CURUSER["id"]);
+				$query = "UPDATE LOW_PRIORITY users SET " . implode(",", $updateset) . " WHERE id =".sqlesc($CURUSER["id"]);
 				$result = sql_query($query);
 				if (!$result)
 				sqlerr(__FILE__,__LINE__);
@@ -783,7 +783,7 @@ EOD;
 				if ($CURUSER['privacy'] != $privacy) $privacyupdated = 1;
 
 				$user = $CURUSER["id"];
-				$query = sprintf("UPDATE users SET " . implode(",", $updateset) . " WHERE id ='%s'",
+				$query = sprintf("UPDATE LOW_PRIORITY users SET " . implode(",", $updateset) . " WHERE id ='%s'",
 				mysql_real_escape_string($user));
 				$result = sql_query($query);
 				if (!$result)

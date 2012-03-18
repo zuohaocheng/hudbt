@@ -247,10 +247,10 @@ if ($action == "edituser")
 			if (get_single_value("users","class","WHERE id = ".sqlesc($userid)) == UC_PEASANT){
 				$length = 30*86400; // warn users until 30 days
 				$until = sqlesc(date("Y-m-d H:i:s",(strtotime(date("Y-m-d H:i:s")) + $length)));
-				sql_query("UPDATE users SET enabled='yes', leechwarn='yes', leechwarnuntil=$until WHERE id = ".sqlesc($userid));
+				sql_query("UPDATE LOW_PRIORITY users SET enabled='yes', leechwarn='yes', leechwarnuntil=$until WHERE id = ".sqlesc($userid));
 			}
 			else{
-				sql_query("UPDATE users SET enabled='yes', leechwarn='no' WHERE id = ".sqlesc($userid)) or sqlerr(__FILE__, __LINE__);
+				sql_query("UPDATE LOW_PRIORITY users SET enabled='yes', leechwarn='no' WHERE id = ".sqlesc($userid)) or sqlerr(__FILE__, __LINE__);
 			}
 		} else {
 			$modcomment = date("Y-m-d") . " - Disabled by " . $CURUSER['username']. ".\n". $modcomment;		
@@ -332,7 +332,7 @@ if ($action == "edituser")
 	
 	$updateset[] = "modcomment = " . sqlesc($modcomment);
 	
-	sql_query("UPDATE users SET  " . implode(", ", $updateset) . " WHERE id=$userid") or sqlerr(__FILE__, __LINE__);
+	sql_query("UPDATE LOW_PRIORITY users SET  " . implode(", ", $updateset) . " WHERE id=$userid") or sqlerr(__FILE__, __LINE__);
 
 	$returnto = htmlspecialchars($_POST["returnto"]);
 	header("Location: " . get_protocol_prefix() . "$BASEURL/$returnto");

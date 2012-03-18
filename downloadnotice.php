@@ -13,7 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 	elseif ($type == 'firsttime')
 	{
 		if ($hidenotice){
-			sql_query("UPDATE users SET showdlnotice=0 WHERE id=".sqlesc($CURUSER['id']));
+			sql_query("UPDATE LOW_PRIORITY users SET showdlnotice=0 WHERE id=".sqlesc($CURUSER['id']));
 		}
 		header("Location: " . get_protocol_prefix() . "$BASEURL/download.php?id=".$torrentid."&letdown=1");
 		die;
@@ -21,7 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 	elseif ($type == 'client')
 	{
 		if ($hidenotice){
-			sql_query("UPDATE users SET showclienterror='no' WHERE id=".sqlesc($CURUSER['id']));
+			sql_query("UPDATE LOW_PRIORITY users SET showclienterror='no' WHERE id=".sqlesc($CURUSER['id']));
 		}
 		header("Location: " . get_protocol_prefix() . "$BASEURL/download.php?id=".$torrentid."&letdown=1");
 		die;

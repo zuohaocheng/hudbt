@@ -59,7 +59,7 @@ function catch_up()
 	$lastpostid=get_single_value("posts","id","ORDER BY id DESC");
 	if ($lastpostid){
 		$CURUSER['last_catchup'] = $lastpostid;
-		sql_query("UPDATE users SET last_catchup = ".sqlesc($lastpostid)." WHERE id=".sqlesc($CURUSER['id']));
+		sql_query("UPDATE LOW_PRIORITY users SET last_catchup = ".sqlesc($lastpostid)." WHERE id=".sqlesc($CURUSER['id']));
 	}
 }
 
@@ -458,7 +458,7 @@ elseif ($action == "post") {
 		{
 			sql_query("UPDATE topics SET lastpost=$postid WHERE id=".sqlesc($topicid)) or sqlerr(__FILE__, __LINE__);
 		}
-		sql_query("UPDATE users SET last_post=".sqlesc($date)." WHERE id=".sqlesc($CURUSER['id'])) or sqlerr(__FILE__, __LINE__);
+		sql_query("UPDATE LOW_PRIORITY users SET last_post=".sqlesc($date)." WHERE id=".sqlesc($CURUSER['id'])) or sqlerr(__FILE__, __LINE__);
 	}
 
 	//------ All done, redirect user to the post

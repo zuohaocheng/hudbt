@@ -23,7 +23,7 @@ stdhead("Stats");
 <?php
 begin_main_frame();
 
-$res = sql_query("SELECT COUNT(*) FROM torrents") or sqlerr(__FILE__, __LINE__);
+$res = sql_query("/*".__FILE__."*/SELECT COUNT(*) FROM torrents") or sqlerr(__FILE__, __LINE__);
 $n = mysql_fetch_row($res);
 $n_tor = $n[0];
 

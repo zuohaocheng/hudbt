@@ -700,6 +700,14 @@ function EmailAllowed($newEmail) {
 	else {                // User@host
 	  if(strtolower($email) == $newEmail)
 	    return true;
+=======
+    function KPS($type = "+", $point = "1.0", $id = "") {
+      global $bonus_tweak;
+      if ($point != 0){
+	$point = sqlesc($point);
+	if ($bonus_tweak == "enable" || $bonus_tweak == "disablesave"){
+	  sql_query("UPDATE LOW_PRIORITY users SET seedbonus = seedbonus$type$point WHERE id = ".sqlesc($id)) or sqlerr(__FILE__, __LINE__);
+>>>>>>> brucewolf-20120313
 	}
       }
     }
@@ -1168,13 +1176,13 @@ function dbconn($autoclean = false) {
   global $mysql_host, $mysql_user, $mysql_pass, $mysql_db;
   global $useCronTriggerCleanUp;
 
-  if (!mysql_connect($mysql_host, $mysql_user, $mysql_pass)) {
+  if (!mysql_pconnect($mysql_host, $mysql_user, $mysql_pass)) {
     switch (mysql_errno()) {
     case 1040:
     case 2002:
       die("<html><head><meta http-equiv=refresh content=\"10 $_SERVER[REQUEST_URI]\"><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body><table border=0 width=100% height=100%><tr><td><h3 align=center>".$lang_functions['std_server_load_very_high']."</h3></td></tr></table></body></html>");
     default:
-      die("[" . mysql_errno() . "] dbconn: mysql_connect: " . mysql_error());
+      die("[" . mysql_errno() . "] dbconn: mysql_pconnect: " . mysql_error());
     }
   }
   mysql_query("SET NAMES UTF8");
@@ -1659,6 +1667,7 @@ function get_font_css_uri($type = '') {
   return "styles/" . $type . 'font.css';
 }
 
+
 function get_style_addicode() {
   $cssRow = get_css_row();
   return $cssRow['addicode'];
@@ -2023,7 +2032,7 @@ function stdfoot() {
   global $SITENAME,$BASEURL,$Cache,$datefounded,$tstart,$icplicense_main,$add_key_shortcut,$query_name, $USERUPDATESET, $CURUSER, $enablesqldebug_tweak, $sqldebug_tweak, $Advertisement, $analyticscode_tweak, $VERSION, $icplicense, $cnzz;
 
   if ($CURUSER){
-    sql_query("UPDATE users SET " . join(",", $USERUPDATESET) . " WHERE id = ".$CURUSER['id']);
+    sql_query("UPDATE LOW_PRIORITY users SET " . join(",", $USERUPDATESET) . " WHERE id = ".$CURUSER['id']);
   }
   // Variables for End Time
   $tend = getmicrotime();
@@ -2098,7 +2107,7 @@ function logincookie($id, $passhash, $updatedb = 1, $expires = 0x7fffffff, $secu
 
 
   if ($updatedb)
-  sql_query("UPDATE users SET last_login = NOW(), lang=" . sqlesc(get_langid_from_langcookie()) . " WHERE id = ".sqlesc($id));
+  sql_query("UPDATE LOW_PRIORITY users SET last_login = NOW(), lang=" . sqlesc(get_langid_from_langcookie()) . " WHERE id = ".sqlesc($id));
 }
 
 function set_langfolder_cookie($folder, $expires = 0x7fffffff)
@@ -2764,7 +2773,7 @@ function writecomment($userid, $comment) {
   $modcomment = date("d-m-Y") . " - " . $comment . "" . ($arr[modcomment] != "" ? "\n\n" : "") . "$arr[modcomment]";
   $modcom = sqlesc($modcomment);
 
-  return sql_query("UPDATE users SET modcomment = $modcom WHERE id = '$userid'") or sqlerr(__FILE__, __LINE__);
+  return sql_query("UPDATE LOW_PRIORITY users SET modcomment = $modcom WHERE id = '$userid'") or sqlerr(__FILE__, __LINE__);
 }
 
 function return_torrent_bookmark_array($userid)
@@ -2815,10 +2824,14 @@ function torrentTableCake($torrents) {
   }
   $query = 'SELECT torrents.id, torrents.sp_state, torrents.promotion_time_type, torrents.promotion_until, torrents.banned, torrents.picktype, torrents.pos_state, torrents.category, torrents.source, torrents.medium, torrents.codec, torrents.standard, torrents.processing, torrents.team, torrents.audiocodec, torrents.leechers, torrents.seeders, torrents.name, torrents.small_descr, torrents.times_completed, torrents.size, torrents.added, torrents.comments,torrents.anonymous,torrents.owner,torrents.url,torrents.cache_stamp,torrents.oday FROM torrents WHERE id IN (' . implode(',', $ids) . ') ORDER BY pos_state DESC, torrents.id DESC';
   $res = sql_query($query) or die(mysql_error());
-  torrenttable($res);
+  $rows = [];
+  while ($row = mysql_fetch_assoc($res)) {
+    $rows[] = $row;
+  }
+  torrenttable($rows);
 }
 
-function torrenttable($res, $variant = "torrent", $swap_headings = false, $onlyhead=false) {
+function torrenttable($rows, $variant = "torrent", $swap_headings = false, $onlyhead=false) {
   global $Cache;
   global $lang_functions;
   global $CURUSER, $waitsystem;
@@ -2945,7 +2958,7 @@ $counter = 0;
 if ($smalldescription_main == 'no' || $CURUSER['showsmalldescr'] == 'no')
   $displaysmalldescr = false;
 else $displaysmalldescr = true;
-while ($row = mysql_fetch_assoc($res))
+foreach($rows as $row)
 {
   if($row['banned'] == 'no' 
      || ($row['banned'] == 'yes' 
@@ -4403,3 +4416,4 @@ function current_fun() {
     }
   }
 }
+

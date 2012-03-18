@@ -53,7 +53,7 @@ if ($iplog1 == "yes") {
 	sql_query("INSERT INTO iplog (ip, userid, access) VALUES (" . sqlesc($CURUSER['ip']) . ", " . $CURUSER['id'] . ", '" . $CURUSER['last_access'] . "')");
 }
 //User may choose to download torrent from RSS. So update his last_access and ip when downloading torrents.
-sql_query("UPDATE users SET last_access = ".sqlesc(date("Y-m-d H:i:s")).", ip = ".sqlesc($CURUSER['ip'])."  WHERE id = ".sqlesc($CURUSER['id']));
+sql_query("UPDATE LOW_PRIORITY users SET last_access = ".sqlesc(date("Y-m-d H:i:s")).", ip = ".sqlesc($CURUSER['ip'])."  WHERE id = ".sqlesc($CURUSER['id']));
 
 /*
 @ini_set('zlib.output_compression', 'Off');
@@ -92,13 +92,13 @@ if (!$row || !is_file($fn) || !is_readable($fn))
 	httperr();
 if ($row['banned'] == 'yes' && get_user_class() < $seebanned_class)
 	permissiondenied();
-sql_query("UPDATE torrents SET hits = hits + 1 WHERE id = ".sqlesc($id)) or sqlerr(__FILE__, __LINE__);
+sql_query("UPDATE LOW_PRIORITY torrents SET hits = hits + 1 WHERE id = ".sqlesc($id)) or sqlerr(__FILE__, __LINE__);
 
 require_once "include/benc.php";
 
 if (strlen($CURUSER['passkey']) != 32) {
 	$CURUSER['passkey'] = md5($CURUSER['username'].date("Y-m-d H:i:s").$CURUSER['passhash']);
-	sql_query("UPDATE users SET passkey=".sqlesc($CURUSER[passkey])." WHERE id=".sqlesc($CURUSER[id]));
+	sql_query("UPDATE LOW_PRIORITY users SET passkey=".sqlesc($CURUSER[passkey])." WHERE id=".sqlesc($CURUSER[id]));
 }
 
 $dict = bdec_file($fn, $max_torrent_size);
