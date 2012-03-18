@@ -5,14 +5,11 @@ loggedinorreturn();
 
 if (get_user_class() < UC_MODERATOR) stderr("Error", "Permission denied");
 
-if ($_SERVER["REQUEST_METHOD"] == "POST")
-	$ip = $_POST["ip"];
-else
-	$ip = $_GET["ip"];
-if ($ip)
-{
+$ip = $_REQUEST["ip"];
+
+if ($ip) {
 	$nip = ip2long($ip);
-	if ($nip == -1)
+	if ($nip === false)
 	  stderr("Error", "Bad IP.");
 	$res = sql_query("SELECT * FROM bans WHERE $nip >= first AND $nip <= last") or sqlerr(__FILE__, __LINE__);
 	if (mysql_num_rows($res) == 0)
