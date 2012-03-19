@@ -183,7 +183,7 @@ function sqlerr($file = '', $line = '', $stack = true) {
 function format_comment($text, $strip_html = true, $xssclean = false, $newtab = false, $imageresizer = true, $image_max_width = 0, $enableimage = true, $enableflash = true , $imagenum = -1, $image_max_height = 0, $adid = 0) {
   global $SITENAME, $BASEURL, $enableattach_attachment;
   require_once('HTML/BBCodeParser.php');
-  $filters = array('Extended', 'Basic', 'Email', 'Lists', 'Attachments', 'Smiles');
+  $filters = array('Extended', 'Basic', 'Email', 'Lists', 'Attachments', 'Refs', 'Smiles');
   if ($enableimage) {
     $filters[] = 'Images';
   }

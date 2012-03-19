@@ -39,7 +39,19 @@ class HTML_BBCodeParser_Filter_Lists extends HTML_BBCodeParser_Filter
     * @access   private
     * @var      array
     */
-    var $_definedTags = array(  'list'  => array(   'htmlopen'  => 'ol',
+    var $_definedTags = array(  'ol'  => array(   'htmlopen'  => 'ol',
+                                                    'htmlclose' => 'ol',
+                                                    'allowed'   => 'all',
+                                                    'child'     => 'none^li',
+                                                    'attributes'=> array('ol'  => 'style=%2$slist-style-type:%1$s;%2$s')
+                                                    ),
+                                'ul' => array(   'htmlopen'  => 'ul',
+                                                    'htmlclose' => 'ul',
+                                                    'allowed'   => 'all',
+                                                    'child'     => 'none^li',
+                                                    'attributes'=> array('ul'  => 'style=%2$slist-style-type:%1$s;%2$s')
+                                                    ),
+				'list'  => array(   'htmlopen'  => 'ol',
                                                     'htmlclose' => 'ol',
                                                     'allowed'   => 'all',
                                                     'child'     => 'none^li',
@@ -54,7 +66,7 @@ class HTML_BBCodeParser_Filter_Lists extends HTML_BBCodeParser_Filter
                                 'li'    => array(   'htmlopen'  => 'li',
                                                     'htmlclose' => 'li',
                                                     'allowed'   => 'all',
-                                                    'parent'    => 'none^ulist,list',
+                                                    'parent'    => 'none^ul,ol,ulist,list',
                                                     'attributes'=> array()
                                                     ),
 				'dl' => array(   'htmlopen'  => 'dl',
