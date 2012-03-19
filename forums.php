@@ -157,16 +157,6 @@ function get_last_read_post_id($topicid) {
 	else return 0;
 }
 
-function dequote($s) {
-#  $MAX_LEN = 40;
-  
-  $s = preg_replace('/\[quote(=[a-z0-9]+)?\].*\[\/quote\]/smi', '', $s);
-#  if (iconv_strlen($s, 'utf-8') > $MAX_LEN) {
-#    $s = iconv_substr($s, 0, $MAX_LEN, 'utf-8') . '...';
-#  }
-  return $s;
-}
-
 //-------- Inserts a compose frame
 function insert_compose_frame($id, $type = 'new')
 {
@@ -1355,7 +1345,7 @@ print("<h1 align=\"center\">".$SITENAME."&nbsp;".$lang_forums['text_forums']."</
 echo '<div class="minor-list list-seperator minor-nav"><ul><li>';
 #      <a href="?action=search">'.$lang_forums['text_search'] . '</a>';
 echo '<form action="?" method="GET"><input type="hidden" name="action" value="search" /><input type="search" placeholder="' . $lang_forums['text_search'] . '" name="keywords" /><input type="submit" class="btn" value="' . $lang_forums['text_go'] . '" /></form>';
- echo '</li><li><a href="?action=viewunread">' . $lang_forums['text_view_unread'] . '</a></li><li><a href="?catchup=1">'.$lang_forums['text_catch_up'].'</a></li><li><a href="userhistory.php?action=viewquotedposts">' . $lang_forums['text_quoted_posts'] . '</a>'.(get_user_class() >= $forummanage_class ? '</li><li><a href="forummanage.php">'.$lang_forums['text_forum_manager'].'</a>':'').'</li></ul></div>';
+ echo '</li><li><a href="?action=viewunread">' . $lang_forums['text_view_unread'] . '</a></li><li><a href="?catchup=1">'.$lang_forums['text_catch_up'].'</a></li><li><a href="userhistory.php?action=viewposts">' . $lang_forums['text_my_posts'] . '</a></li><li><a href="userhistory.php?action=viewquotedposts">' . $lang_forums['text_quoted_posts'] . '</a>'.(get_user_class() >= $forummanage_class ? '</li><li><a href="forummanage.php">'.$lang_forums['text_forum_manager'].'</a>':'').'</li></ul></div>';
 print("<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\" width=\"100%\">\n");
 
 if (!$overforums = $Cache->get_value('overforums_list')){
@@ -1473,7 +1463,5 @@ stdfoot();
 
 }
 
-
-?>
 
 
