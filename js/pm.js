@@ -10,7 +10,7 @@ $(function() {
     var mouseoverTime = 1;
 
     var checkMsg = function() {
-	$.getJSON('/messages.php?format=json&unread=yes', function(result) {
+	$.getJSON('//' + base + '/messages.php?format=json&unread=yes', function(result) {
 	    if (result.length !== 0) {
 		title.text('(' + result.length + ') ' + origTitle);
 		if (alertMsg.length === 0) {

@@ -1,4 +1,7 @@
 $(function() {
+    if (!hb.config.pager) {
+	return;
+    }
     function gotothepage(page){
 	var url=window.location.href;
 	var end=url.lastIndexOf("page");

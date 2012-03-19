@@ -1,6 +1,6 @@
 <?php
-$timer_0_start = microtime(true); // debug
-require_once("include/bittorrent_.php");
+#$timer_0_start = microtime(true); // debug
+require_once("include/bittorrent.php");
 dbconn(true);
 require_once(get_langfile_path("torrents.php"));
 
@@ -900,8 +900,7 @@ else $torrentsperpage = 50;
 
 
 
-$timer_3_start = microtime(true); // debug
-// var_dump($count); die(); //
+#$timer_3_start = microtime(true); // debug
 if ($count)
 {
 	if ($addparam != "")
@@ -939,39 +938,34 @@ if ($count)
 	
 	$query_key = MD5($query);
 	$rows = $Cache->get_value($query_key);
-//	var_dump($rows); //debug
 
-	if(empty($rows)) 
-	{
+	if(empty($rows)) {
 		$res = sql_query('/* FILE: '.__FILE__.' LINE: '.__LINE__.'*/ '.$query) or die(mysql_error());
 
-		while ($row = mysql_fetch_assoc($res))
-		{
+		while ($row = mysql_fetch_assoc($res)) {
 			$rows[] = $row;
 		}
-		$Cache->cache_value($query_key, $rows, 600);
-//		var_dump($rows); //debug
+		$Cache->cache_value($query_key, $rows, 30);
 	}
-//	die();
 }
 else
   unset($rows);
 
-$timer_3_end = microtime(true); // debug
-$timer_4_start = microtime(true); // debug
+#$timer_3_end = microtime(true); // debug
+#$timer_4_start = microtime(true); // debug
 if ($_REQUEST['format'] == 'json') { 
   include('include/torrents_json.php');
 }
 else {
   include('include/torrents_html.php');
 }
-$timer_4_end = microtime(true); // debug
-$timer_0_end = microtime(true); // debug
-if($_GET['ttimer']) {
-	$ttimer = "[{$time_delta1}](1), [{$time_delta2}](2)";
-	$ttimer .= ',['.($timer_3_end - $timer_3_start).'](3)';
-	$ttimer .= ',['.($timer_4_end - $timer_4_start).'](4)';
-	$ttimer .= ',['.($timer_0_end - $timer_0_start).'](all)'; // debug
-	echo $ttimer;
-}
+/* $timer_4_end = microtime(true); // debug */
+/* $timer_0_end = microtime(true); // debug */
+/* if($_GET['ttimer']) { */
+/* 	$ttimer = "[{$time_delta1}](1), [{$time_delta2}](2)"; */
+/* 	$ttimer .= ',['.($timer_3_end - $timer_3_start).'](3)'; */
+/* 	$ttimer .= ',['.($timer_4_end - $timer_4_start).'](4)'; */
+/* 	$ttimer .= ',['.($timer_0_end - $timer_0_start).'](all)'; // debug */
+/* 	echo $ttimer; */
+/* } */
 

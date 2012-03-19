@@ -2,6 +2,7 @@ $(function() {
     var redirect = $('#redirect');
     var chkRedirect = redirect.find(':checkbox');
     var categoryName = $('#TcategoryName');
+    var cake = '//' + hb.constant.url.cake + '/';
 
     chkRedirect.click(function() {
 	if (chkRedirect.attr('checked')) {
@@ -33,7 +34,7 @@ $(function() {
 			return;
 		    }
 
-		    lastXhr = $.getJSON( "/cake/tcategories/search/", request, function( data, status, xhr ) {
+		    lastXhr = $.getJSON( cake + "tcategories/search/", request, function( data, status, xhr ) {
 			data = $.map(data, function(item) {
 			    return item.Tcategory.name;
 			});
@@ -59,7 +60,7 @@ $(function() {
 		    }
 
 		    validating = true;
-		    $.getJSON("/cake/tcategories/search/" + catName, function(result) {
+		    $.getJSON(cake + "tcategories/search/" + catName, function(result) {
 			var validation = true;
 			if (result.length === 1) {
 			    if ($inputs.parent().attr('id') === 'redirect') {
@@ -131,7 +132,7 @@ $(function() {
 	}
 	else {
 	    validating = true;
-	    $.getJSON("/cake/tcategories/search/exact:true/" + categoryName.val(), function(result) {
+	    $.getJSON(cake + "tcategories/search/exact:true/" + categoryName.val(), function(result) {
 		act(result.length === 0 || (hb.tcategory && result[0].Tcategory.id === hb.tcategory.id));
 		validating = false;
 	    });
@@ -166,9 +167,9 @@ $(function() {
 		    $('#outer').html(result);
 		    var state = {
 			title : document.title,
-			url : '/cake/tcategories'
+			url : cake + 'tcategories'
 		    }
-		    window.history.pushState(state, document.title, '/cake/tcategories');
+		    window.history.pushState(state, document.title, cake + 'tcategories');
 		});
 	    }
 	};
