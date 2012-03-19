@@ -70,7 +70,7 @@ function get_load_uri($type, $script_name ="", $absolute = true) {
   }
   
   if ($type == 'js') {
-    return '<script type="text/javascript" src="' . $pagename . '?format=js&name=' . $name . $addition . '"></script>';
+    return '<script type="text/javascript" src="' . $pagename . '?format=js' . $addition . '"></script><script type="text/javascript" src="' . $pagename . '?format=js&name=' . $name . $addition . '"></script>';
   }
   elseif ($type == 'css') {
     $addition .= '&font=' . get_font_type();
@@ -116,11 +116,15 @@ function get_single_value($table, $field, $suffix = "") {
 }
 
 function checkPrivilege($item) {
-  static $privilegeConfig = ['Tcategory' => ['lock' => UC_UPLOADER,
+  global $torrentonpromotion_class, $torrentsticky_class;
+  $privilegeConfig = ['Tcategory' => ['lock' => UC_UPLOADER,
 					     'delete' => UC_VIP,
 					     ],
 			     'Torrent' => ['startseed' => UC_VIP,
-					   ]
+					   'pr' => $torrentonpromotion_class,
+					   'sticky' => $torrentsticky_class,
+					   'oday' => UC_VIP,
+					   ],
 			     ];
   if (is_array($item)) {
     $config = $privilegeConfig;
