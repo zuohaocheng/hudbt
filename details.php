@@ -144,6 +144,11 @@ else {
     }
 
     $actions .= "<li><a title=\"".$lang_details['title_report_torrent']."\" href=\"report.php?torrent=$id\"><img class=\"dt_report\" src=\"pic/trans.gif\" alt=\"report\" />&nbsp;<span class=\"small\">".$lang_details['text_report_torrent']."</span></a></li>";
+
+    if(get_user_class() >= $torrentsticky_class) {
+      $actions .= '<li><a href="#" id="set-pr">设定优惠</a></li>';
+    }
+
     $actions .= '</ul></div>';
 
     dl_item($lang_details['row_action'], $actions, true);

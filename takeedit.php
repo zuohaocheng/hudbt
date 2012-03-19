@@ -83,7 +83,9 @@ $updateset[] = "processing = " . sqlesc(0 + $_POST["processing_sel"]);
 $updateset[] = "team = " . sqlesc(0 + $_POST["team_sel"]);
 $updateset[] = "audiocodec = " . sqlesc(0 + $_POST["audiocodec_sel"]);
 //Added by bluemonster 20111026
-$updateset[] = "oday = '" . ($_POST["sel_oday"] ? "yes" : "no") . "'";
+if (checkPrivilege(['Torrent', 'oday'])) {
+  $updateset[] = "oday = '" . ($_POST["sel_oday"] ? "yes" : "no") . "'";
+}
 
 
 if (get_user_class() >= $torrentmanage_class) {
@@ -95,8 +97,7 @@ if (get_user_class() >= $torrentmanage_class) {
 		$updateset[] = "banned = 'no'";
 }
 $updateset[] = "visible = '" . ($_POST["visible"] ? "yes" : "no") . "'";
-if(get_user_class()>=$torrentonpromotion_class)
-{
+if (checkPrivilege(['Torrent', 'pr'])) {
 	if(!isset($_POST["sel_spstate"]) || $_POST["sel_spstate"] == 1)
 		$updateset[] = "sp_state = 1";
 	elseif((0 + $_POST["sel_spstate"]) == 2)
@@ -129,8 +130,7 @@ if(get_user_class()>=$torrentonpromotion_class)
 		}
 	}
 }
-if(get_user_class()>=$torrentsticky_class)
-{
+if (checkPrivilege(['Torrent', 'sticky'])) {
 	if((0 + $_POST["sel_posstate"]) == 0)
 		$updateset[] = "pos_state = 'normal'";
 	elseif((0 + $_POST["sel_posstate"]) == 1)

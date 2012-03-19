@@ -311,3 +311,88 @@ var argsFromUri = function(uri) {
     });
     return args;
 };
+
+var editPr = function() {
+    $pr_type = $('#sel_spstate');
+    if ($pr_type.length) {
+	$pr_time_type = $('#promotion_time_type').attr("disabled", "disabled");
+	$pr_time = $('#promotionuntil');
+	var validatePrTimeType = function() {
+	    if ($pr_type.val() === '1') {
+		$pr_time_type.attr("disabled", "disabled");
+	    }
+	    else {
+		$pr_time_type.removeAttr("disabled");
+	    }
+	    validatePrTime();
+	};
+
+	var validatePrTime = (function() {
+	    var expand_pr = $("#expand-pr");
+	    var expand_pr_inited = false;
+	    var timeBox = $pr_time;
+
+	    return function() {
+		if ($pr_time_type.val() !== '2') {
+		    $('#pr-expire').fadeOut();
+		    expand_pr.slideUp();
+		}
+		else {
+		    $('#pr-expire').fadeIn();
+		    if (!expand_pr_inited) {
+			expand_pr_inited = true;
+			expand_pr.html('<label><select id="time_select_day"><option value="0">0</option><option value="1" selected="selected">1</option><option value="2">2</option><option value="3">3</option><option value="5">5</option><option value="7">7</option><option value="10">10</option><option value="15">15</option><option value="20">20</option><option value="30">30</option><option value="40">40</option><option value="50">50</option><option value="60">60</option><option value="90">90</option><option value="180">180</option><option value="365">365</option></select>天</label><label><select id="time_select_hour"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="8">8</option><option value="10">10</option><option value="12">12</option><option value="15">15</option><option value="18">18</option><option value="20">20</option></select>小时</label><label><select id="time_select_minute"><option value="0">0</option><option value="5">5</option><option value="10">10</option><option value="15">15</option><option value="20">20</option><option value="25">25</option><option value="30">30</option><option value="45">45</option></select>分钟</label>');
+			expand_pr.append($('<input />', {
+			    type : 'button',
+			    value : '延长促销时间'
+			}).click(function() {
+			    var new_date = new Date();
+
+			    var day = $('#time_select_day').val();
+			    var hour = $('#time_select_hour').val();
+			    var minute = $('#time_select_minute').val();
+
+			    // 换算成毫秒
+			    var time_period = (day * 24 * 3600 + hour * 3600 + minute * 60) * 1000;
+			    var default_unixtime = str2date(timeBox.val());
+			    new_date.setTime(default_unixtime.valueOf() + time_period);
+
+			    timeBox.val(new_date.getFullYear() 
+					+ '-' + (new_date.getMonth() + 1) 
+					+ '-' + new_date.getDate() 
+					+ ' ' + new_date.getHours() 
+					+ ':' + new_date.getMinutes() 
+					+ ':' + new_date.getSeconds());
+
+			    return false;
+			}));
+		    }
+		    
+		    expand_pr.slideDown();
+		}
+	    };
+	})();
+
+	validatePrTimeType();
+
+	$pr_type.change(validatePrTimeType);
+	$pr_time_type.change(validatePrTime);
+
+	function str2date(string) {
+	    var default_date = new Date();
+	    
+	    date_part = string.split(' ')[0].split('-');
+	    time_part = string.split(' ')[1].split(':');
+	    
+	    default_date.setFullYear(date_part[0]);
+	    default_date.setMonth(date_part[1] - 1);
+	    default_date.setDate(date_part[2]);
+	    default_date.setHours(time_part[0]);
+	    default_date.setMinutes(time_part[1]);
+	    default_date.setSeconds(time_part[2]);
+	    
+	    return default_date;
+	}
+
+    }
+};

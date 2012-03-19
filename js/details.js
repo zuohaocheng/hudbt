@@ -55,8 +55,8 @@ $(function() {
     $('#to_donate a').click(function(e) {
 	e.preventDefault();
 	var torrent_id = hb.torrent.id;
-	var bonus      = hb.config.user.bonus;
-	var to_donate = $(this).html();
+	var bonus      = parseInt(hb.config.user.bonus);
+	var to_donate = parseInt($(this).html());
 	if(bonus < to_donate) {
 	    alert('你的魔力值不足，谢谢你的好心，继续努力吧~');
 	} else if(confirm('确认向种子发布者捐赠 ' + to_donate +' 魔力值吗？')) {
@@ -91,6 +91,7 @@ $(function() {
 // Tcategories
 $(function() {
     var form = $('#tcategories');
+    var cake = '//' + hb.constant.url.cake + '/';
 
     var validating = false;
     var tcategory = function(inputs) {
@@ -109,7 +110,7 @@ $(function() {
 			return;
 		    }
 
-		    lastXhr = $.getJSON( "/cake/tcategories/search/", request, function( data, status, xhr ) {
+		    lastXhr = $.getJSON(cake + "tcategories/search/", request, function( data, status, xhr ) {
 			data = $.map(data, function(item) {
 			    return item.Tcategory.name;
 			});
@@ -128,7 +129,7 @@ $(function() {
 		var catName = this.value;
 		if (catName !== '') {
 		    validating = true;
-		    $.getJSON("/cake/tcategories/search/" + catName, function(result) {
+		    $.getJSON(cake + "tcategories/search/" + catName, function(result) {
 			var validation = true;
 			if (result.length === 1) {
 			    var resultId = result[0].Tcategory.id;
@@ -328,6 +329,100 @@ $(function() {
     }
 
     var generateLi = function(tcategory) {
-	return '<li class="tcategory"><span class="tcategory-show"><a href="//' + hb.constant.url.cake + '/tcategories/view/' + tcategory.id + '">' + tcategory.showName + '</a><a href="#" class="edit-tcategory">±</a></span><span class="tcategory-edit" style="display: none;"><input type="text" placeholder="Tcategory" value="' + tcategory.showName + '" /><input type="hidden" name="data[Tcategory][Tcategory][]" value="'  + tcategory.id + '"/ ><a href="#" class="remove-tcategory">-</a></span></li>'
+	return '<li class="tcategory"><span class="tcategory-show"><a href="//' + cake + '/tcategories/view/' + tcategory.id + '">' + tcategory.showName + '</a><a href="#" class="edit-tcategory">±</a></span><span class="tcategory-edit" style="display: none;"><input type="text" placeholder="Tcategory" value="' + tcategory.showName + '" /><input type="hidden" name="data[Tcategory][Tcategory][]" value="'  + tcategory.id + '"/ ><a href="#" class="remove-tcategory">-</a></span></li>'
     };
+});
+
+$(function() {
+    var createOptions = function(options, defaultOpt, name) {
+	return $.map(options, function(v, k) {
+	    if (v.length === 0) {
+		return '';
+	    }
+
+	    var out = '<option value="' + k + '"';
+	    if (k === defaultOpt) {
+		out += ' selected="selected"';
+	    }
+	    out += '>' + v + '</option>';
+	    return out;
+	}).join('');
+    };
+
+    var prDict = ['', '普通', '免费', '2X', '2X免费', '50%', '2X 50%', '30%'];
+    var untilDict = ['使用全局设置', '永久', '直到'];
+    var posDict = {
+	normal : '普通',
+	sticky : '置顶'
+    }; 
+    var id = hb.torrent.id;
+
+     $('#set-pr').click(function(e) {
+	e.preventDefault();
+	var cake = hb.constant.url.cake;
+	$.getJSON('//' + cake + '/torrents/view/' + id + '.json', function(result) {
+	    var putTarget = '//' + cake + '/torrents/edit/' + id + '.json?%2Fcake%2Ftorrents%2Fedit%2F' + hb.torrent.id + '=';
+	    var torrent = result.Torrent;
+	    var time;
+	    if (torrent.promotion_time_type === '2') {
+		time = torrent.promotion_until;
+	    }
+	    else {
+		var new_date = new Date();
+		time = new_date.getFullYear() 
+		    + '-' + (new_date.getMonth() + 1) 
+		    + '-' + new_date.getDate() 
+		    + ' ' + new_date.getHours() 
+		    + ':' + new_date.getMinutes() 
+		    + ':' + new_date.getSeconds();
+	    }
+	    var html = '<div id="dialog-hint"></div><input type="hidden" name="_method" value="PUT" /><input type="hidden" name="data[Torrent][id]" value="' + id + '" id="TorrentId"><ul><li><label>促销种子<select id="sel_spstate" name="data[Torrent][sp_state]" style="width: 100px;">' + createOptions(prDict, parseInt(torrent.sp_state)) + '</select></label></li><li><select id="promotion_time_type" name="data[Torrent][promotion_time_type]" style="width: 100px;" disabled="disabled">' + createOptions(untilDict, parseInt(torrent.promotion_time_type)) + '</select></li><li><label id="pr-expire">截止日期<input type="text" name="data[Torrent][promotion_until]" id="promotionuntil" style="width: 120px;" value="' + time + '"></label></li><li id="expand-pr" style="display: none; "></li><li><label>种子位置<select name="data[Torrent][pos_state]" style="width: 100px;">' + createOptions(posDict, torrent.pos_state) +'</select></label></li>';
+	    html += '<li><label><input type="checkbox" id="sel_oday" name="sel_oday" value="oday"';
+	    if (torrent.oday === 'yes') {
+		html += ' checked="checked"';
+	    }
+	    html += '>0day资源</label></li></ul>';
+	    var form = $('<form></form>', {
+		html : html,
+		'class' : 'minor-list',
+		action : putTarget,
+		method : 'post'
+	    });
+	    var dialog = $('<div></div>', {
+		title : '设定优惠'
+	    }).append(form);
+
+	    form.submit(function(e) {
+		e.preventDefault();
+		onOK();
+	    });
+
+	    var onOK = function() {
+		$.post(putTarget, form.serialize(), function(result) {
+		    if (result.success) {
+			dialog.dialog('close');
+		    }
+		    else {
+			$('#dialog-hint').text(result.message);
+		    }
+		}, 'json');
+	    };
+
+	    dialog.dialog({
+		modal : true,
+		autoOpen : true,
+		width : '365px',
+		buttons : {
+		    OK : onOK,
+		    Cancel : function() {
+			dialog.dialog('close');
+		    }
+		},
+		'close' : function() {
+		    dialog.remove();
+		}
+	    });
+	    editPr();
+	});
+    });
 });

@@ -134,82 +134,35 @@ else {
 	if (get_user_class()>= $torrentsticky_class || (get_user_class() >= $torrentmanage_class && $CURUSER["picker"] == 'yes')) {
 		$pickcontent = "";
 	
-		if(get_user_class()>=$torrentsticky_class) {
-			$pickcontent .= "<b>".$lang_edit['row_special_torrent'].":&nbsp;</b>"."<select name=\"sel_spstate\" style=\"width: 100px;\">" .promotion_selection($row["sp_state"], 0). "</select>&nbsp;&nbsp;&nbsp;";
+		if (checkPrivilege(['Torrent', 'pr'])) {
+			$pickcontent .= "<b>".$lang_edit['row_special_torrent'].':&nbsp;</b><select id="sel_spstate" name="sel_spstate" style="width: 100px;">' .promotion_selection($row["sp_state"], 0). "</select>&nbsp;&nbsp;&nbsp;";
 			
 			// Added by BruceWolf. Code Supplied by LM@gdbt
-			$pickcontent .= ""."<select name=\"promotion_time_type\" style=\"width: 100px;\">" .
+			$pickcontent .= ""."<select id='promotion_time_type' name=\"promotion_time_type\" style=\"width: 100px;\">" .
 			                "<option" . (($row["promotion_time_type"] == "0") ? " selected=\"selected\"" : "" ) . " value=\"0\">".$lang_edit['select_use_global_setting']."</option>" .
 			                "<option" . (($row["promotion_time_type"] == "1") ? " selected=\"selected\"" : "" ) . " value=\"1\">".$lang_edit['select_forever']."</option>" .
 			                "<option" . (($row["promotion_time_type"] == "2") ? " selected=\"selected\"" : "" ) . " value=\"2\">".$lang_edit['select_until']."</option>" ."</select>&nbsp;&nbsp;&nbsp;";
-			$pickcontent .= "<b>截止日期:&nbsp;</b><input type=\"text\" name=\"promotionuntil\" id=\"promotionuntil\" style=\"width: 120px;\" value=\"". (($row["promotion_time_type"]!=2)? date("Y-m-d H:i:s") :$row["promotion_until"]) . "\" />".$lang_edit['text_promotion_until_note']. "<br />";
-			$pickcontent .=<<<EOT
-<div id="expand-pr"><span style="font-weight: bold;">延长促销时间</span><select id="time_select_day">
-	<option value="0">0</option>
-	<option value="1" selected="selected">1</option>
-	<option value="2">2</option>
-	<option value="3">3</option>
-	<option value="5">5</option>
-	<option value="7">7</option>
-	<option value="10">10</option>
-	<option value="15">15</option>
-	<option value="20">20</option>
-	<option value="30">30</option>
-	<option value="40">40</option>
-	<option value="50">50</option>
-	<option value="60">60</option>
-	<option value="90">90</option>
-	<option value="180">180</option>
-	<option value="365">365</option>
-</select>天<select id="time_select_hour">
-	<option value="0">0</option>
-	<option value="1">1</option>
-	<option value="2">2</option>
-	<option value="3">3</option>
-	<option value="4">4</option>
-	<option value="5">5</option>
-	<option value="6">6</option>
-	<option value="8">8</option>
-	<option value="10">10</option>
-	<option value="12">12</option>
-	<option value="15">15</option>
-	<option value="18">18</option>
-	<option value="20">20</option>
-</select>小时<select id="time_select_minute">
-	<option value="0">0</option>
-	<option value="5">5</option>
-	<option value="10">10</option>
-	<option value="15">15</option>
-	<option value="20">20</option>
-	<option value="25">25</option>
-	<option value="30">30</option>
-	<option value="45">45</option>
-</select>分钟
-<input type="button" value="延长" id="delay_promotion_time" />
-</div>
-EOT;
+			$pickcontent .= "<label id='pr-expire'><b>截止日期:&nbsp;</b><input type=\"text\" name=\"promotionuntil\" id=\"promotionuntil\" style=\"width: 120px;\" value=\"". (($row["promotion_time_type"]!=2)? date("Y-m-d H:i:s") :$row["promotion_until"]) . "\" />".$lang_edit['text_promotion_until_note']. "</label><br />";
+			$pickcontent .='<div id="expand-pr"></div>';
 			// End
-			
+		}
+		
+		if (checkPrivilege(['Torrent', 'sticky'])) {
 			$pickcontent .= "<b>".$lang_edit['row_torrent_position'].":&nbsp;</b>"."<select name=\"sel_posstate\" style=\"width: 100px;\">" .
 			"<option" . (($row["pos_state"] == "normal") ? " selected=\"selected\"" : "" ) . " value=\"0\">".$lang_edit['select_normal']."</option>" .
 			"<option" . (($row["pos_state"] == "sticky") ? " selected=\"selected\"" : "" ) . " value=\"1\">".$lang_edit['select_sticky']."</option>" .
 			"</select>&nbsp;&nbsp;&nbsp;";
-			//Added by bluemonster 20111025
-			if (get_user_class() >= $UC_UPLOADER)
-			{
-			if($row['oday']=='yes')	
-				$odaycheckbox = "<input type=\"checkbox\" id=sel_oday name=\"sel_oday\" checked=\"yes\" value=\"oday\"/>".$lang_edit['oday'];
-			elseif($row['oday']=='no')
-				$odaycheckbox = "<input type=\"checkbox\" id=sel_oday name=\"sel_oday\" value=\"oday\"/>".$lang_edit['oday'];
-			$pickcontent.=$odaycheckbox;
-			/*
-			$pickcontent .= "<b>".$lang_edit['oday'].":&nbsp;</b>"."<select name=\"sel_oday\" style=\"width: 100px;\">" .
-			"<option" . " selected=\"selected\"". " value=\"0\">".$lang_edit['select_not_oday']."</option>" .
-			"<option" . " value=\"1\">".$lang_edit['select_oday']."</option>" .
-			"</select>&nbsp;&nbsp;&nbsp;";
-			*/
-			}
 		}
+		
+		//Added by bluemonster 20111025
+		if (checkPrivilege(['Torrent', 'oday'])) {
+		  if($row['oday']=='yes')	
+		    $odaycheckbox = "<input type=\"checkbox\" id=sel_oday name=\"sel_oday\" checked=\"yes\" value=\"oday\"/>".$lang_edit['oday'];
+		  elseif($row['oday']=='no')
+		    $odaycheckbox = "<input type=\"checkbox\" id=sel_oday name=\"sel_oday\" value=\"oday\"/>".$lang_edit['oday'];
+		  $pickcontent.=$odaycheckbox;
+		}
+		
 		if (get_user_class()>=$torrentmanage_class && $CURUSER["picker"] == 'yes') {
 			$pickcontent .= "<b>".$lang_edit['row_recommended_movie'].":&nbsp;</b>"."<select name=\"sel_recmovie\" style=\"width: 100px;\">" .
 			"<option" . (($row["picktype"] == "normal") ? " selected=\"selected\"" : "" ) . " value=\"0\">".$lang_edit['select_normal']."</option>" .

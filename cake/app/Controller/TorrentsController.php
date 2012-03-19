@@ -34,13 +34,16 @@ class TorrentsController extends AppController {
  * @param string $id
  * @return void
  */
-/*	public function view($id = null) {
+	public function view($id = null) {
 		$this->Torrent->id = $id;
 		if (!$this->Torrent->exists()) {
 			throw new NotFoundException(__('Invalid torrent'));
 		}
-		$this->set('torrent', $this->Torrent->read(null, $id));
-		}*/
+		$torrent = $this->Torrent->read(['id', 'name', 'promotion_time_type', 'promotion_until', 'sp_state', 'pos_state', 'picktype', 'oday'], $id);
+#		echo h(json_encode($torrent));
+		$this->set('torrent', $torrent);
+		$this->set('_serialize', 'torrent');
+	}
 
 /**
  * add method
@@ -76,6 +79,16 @@ class TorrentsController extends AppController {
 		  $data = $this->request->data;
 		  $d = ['Torrent' => ['id' => $data['Torrent']['id']],
 			'Tcategory' => ['Tcategory' => $data['Tcategory']['Tcategory']]];
+		  if (checkPrivilege(['Torrent', 'oday'])) {
+		    $d['Torrent']['oday'] = ($data['Torrent']['oday'] === 'yes');
+		  }
+
+		  if (checkPrivilege(['Torrent', 'pr'])) {
+		    $d['Torrent']['sp_state'] = $data['Torrent']['sp_state'];
+		    $d['Torrent']['promotion_time_type'] = $data['Torrent']['promotion_time_type'];
+		    $d['Torrent']['promotion_until'] = $data['Torrent']['promotion_until'];
+		  }
+		  
 			if ($this->Torrent->save($d)) {
 			  $tcategories = [];
 			  foreach ($this->Torrent->read(null, $id)['Tcategory'] as $tc) {
