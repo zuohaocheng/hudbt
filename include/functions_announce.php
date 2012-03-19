@@ -3,14 +3,13 @@
 if(!defined('IN_TRACKER'))
 	die('Hacking attempt!');
 include_once($rootpath . 'include/globalfunctions.php');
-include_once($rootpath . 'include/config.php');
 
 function dbconn_announce() {
 	global $mysql_host, $mysql_user, $mysql_pass, $mysql_db;
 
-	if (!@mysql_connect($mysql_host, $mysql_user, $mysql_pass))
+	if (!@mysql_pconnect($mysql_host, $mysql_user, $mysql_pass))
 	{
-		die('dbconn: mysql_connect: ' . mysql_error());
+		die('dbconn: mysql_pconnect: ' . mysql_error());
 	}
 	mysql_query("SET NAMES UTF8");
 	mysql_query("SET collation_connection = 'utf8_general_ci'");

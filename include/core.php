@@ -1,9 +1,14 @@
 <?php
 if(!defined('IN_TRACKER'))
   die('Hacking attempt!');
-error_reporting(E_ERROR | E_PARSE);
+include_once($rootpath . 'include/config.php');
+error_reporting(E_ALL);
 ini_set('display_errors', 0);
+if (!$enable_memcached) {
+  require_once($rootpath . 'classes/class_filecache.php'); //Fake a memcache
+}
 require_once($rootpath . 'classes/class_cache.php'); //Require the caching class
+
 $Cache = NEW NPCache(); //Load the caching class
 $Cache->setLanguageFolderArray(get_langfolder_list());
 define('TIMENOW', time());
@@ -33,35 +38,7 @@ define ("UC_STAFFLEADER",16);
 ignore_user_abort(1);
 @set_time_limit(60);
 
-function strip_magic_quotes($arr)
-{
-	foreach ($arr as $k => $v)
-	{
-		if (is_array($v))
-		{
-			$arr[$k] = strip_magic_quotes($v);
-		} else {
-			$arr[$k] = stripslashes($v);
-		}
-	}
-	return $arr;
-}
-
-if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc())
-{
-	if (!empty($_GET)) {
-		$_GET = strip_magic_quotes($_GET);
-	}
-	if (!empty($_POST)) {
-		$_POST = strip_magic_quotes($_POST);
-	}
-	if (!empty($_COOKIE)) {
-		$_COOKIE = strip_magic_quotes($_COOKIE);
-	}
-}
-
-function get_langfolder_list()
-{
+function get_langfolder_list() {
 	//do not access db for speed up, or for flexibility
 	return array("en", "chs", "cht", "ko", "ja");
 }

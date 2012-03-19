@@ -16,7 +16,7 @@ class NPCache extends Memcache{
 	var $languageFolderArray = array();
 
 	function __construct($host = 'localhost', $port = 11211) {
-		$success = $this->connect($host, $port); // Connect to memcache
+		$success = $this->pconnect($host, $port); // Connect to memcache
 		if ($success) {
 			$this->isEnabled = 1;
 		} else {

@@ -3,7 +3,6 @@
 if(!defined('IN_TRACKER'))
   die('Hacking attempt!');
 include_once($rootpath . 'include/globalfunctions.php');
-include_once($rootpath . 'include/config.php');
 include_once($rootpath . 'classes/class_advertisement.php');
 require_once($rootpath . get_langfile_path("functions.php"));
 
@@ -12,7 +11,10 @@ function smarty($cachetime=300, $debug = false) {
   static $smarty;
   if (!$smarty) {
     $smarty = new Smarty;
-    $smarty->caching_type = 'memcache';
+    global $enable_memcached;
+    if ($enable_memcached) {
+      $smarty->caching_type = 'memcache';
+    }
     $smarty->setCaching(Smarty::CACHING_LIFETIME_SAVED);
   }
   $smarty->debugging = $debug;
@@ -1297,6 +1299,7 @@ function userlogin() {
 
 function autoclean() {
   global $autoclean_interval_one, $rootpath;
+  global $lang_cleanup_target;
   $now = TIMENOW;
 
   $res = sql_query("SELECT value_u FROM avps WHERE arg = 'lastcleantime'");
@@ -2263,7 +2266,8 @@ function delete_single_torrent($id, $row, $reasonstr='') {
   
   if ($row['anonymous'] == 'yes' && $CURUSER["id"] == $row["owner"]) {
     write_log("Torrent $id ($row[name]) was deleted by its anonymous uploader" . $reasonstr,'normal');
-  } else {
+  }
+  else {
     write_log("Torrent $id ($row[name]) was deleted by $CURUSER[username]" . $reasonstr,'normal');
   }
 
@@ -2565,7 +2569,7 @@ function post_body_toolbox($postid, $privilege, $type='', $pid = '') {
   list($canquote, $candelete, $canedit) = $privilege;
   $hrefs = post_body_toolbox_href($postid, $type, $pid);
 
-  $toolbox_post .= '<li><a href="' . $hrefs[3] . '"><img class="f_report" src="//' . $BASEURL . '/pic/trans.gif" alt="Report" title="'.$lang_functions['title_report_this_post'].'" /></a></li>';
+  $toolbox_post .= '<li><a href="' . $hrefs[3] . '"><img class="f_report" src="//' . $BASEURL . '/pic/trans.gif" alt="Report" title="'.$lang_functions['title_report_this_comment'].'" /></a></li>';
   
   if ($canquote) {
     $toolbox_post .= '<li><a href="'.htmlspecialchars($hrefs[0]).'"><img class="f_quote" src="//' . $BASEURL . '/pic/trans.gif" alt="Quote" title="'.$lang_functions['title_reply_with_quote'].'" /></a></li>';
@@ -2675,7 +2679,7 @@ function single_comment($row, $parent_id, $type, $floor = -1) {
     $edit = false;
   }
 
-  $post_f = ['type' => $type, 'posterid' => $row['user'], 'topicid' => $parent_id, 'postid' => $row['id'], 'added' => $row['added'], 'floor' => $floor, 'body' => $row['text'], 'highlight' => false, 'edit' => $edit];
+  $post_f = ['type' => $type, 'posterid' => $row['user'], 'topicid' => $parent_id, 'postid' => $row['id'], 'added' => $row['added'], 'floor' => $floor, 'body' => $row['text'], 'highlight' => false, 'edit' => $edit, 'postname' => null, 'authorid' => null];
   if (array_key_exists('postname', $row)) {
     $pots_f['postname'] = $row['postname'];
   }
@@ -2698,7 +2702,7 @@ function commenttable($rows, $type, $parent_id, $review = false, $offset=0) {
   foreach ($rows as $row) {
     if ($count>=1) {
       if ($Advertisement->enable_ad()) {
-	if ($commentad[$count-1])
+	if (array_key_exists($count-1, $commentad))
 	  echo '<div class="forum-ad table td" id="ad_comment_'.$count."\">".$commentad[$count-1]."</div>";
       }
     }
@@ -2708,6 +2712,16 @@ function commenttable($rows, $type, $parent_id, $review = false, $offset=0) {
     $count++;
   }
   echo '</ol></div>';
+}
+
+function dequote($s) {
+#  $MAX_LEN = 40;
+  
+  $s = preg_replace('/\[quote(=[a-z0-9]+)?\].*\[\/quote\]/smi', '', $s);
+#  if (iconv_strlen($s, 'utf-8') > $MAX_LEN) {
+#    $s = iconv_substr($s, 0, $MAX_LEN, 'utf-8') . '...';
+#  }
+  return $s;
 }
 
 function searchfield($s) {

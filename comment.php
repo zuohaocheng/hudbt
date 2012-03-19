@@ -193,7 +193,7 @@ if ($action == "add") {
 	if ($sub == "quote") {
 	  echo $quote_input;
 	}
-	begin_compose($title, ($sub == "quote" ? "quote" : "reply"), ($sub == "quote" ? htmlspecialchars("[quote=".htmlspecialchars($arr2["username"])."]".unesc($arr2["text"])."[/quote]") : ""), false);
+	begin_compose($title, ($sub == "quote" ? "quote" : "reply"), ($sub == "quote" ? htmlspecialchars("[quote=".htmlspecialchars($arr2["username"])."]".dequote(unesc($arr2["text"]))."[/quote]") : ""), false);
 	end_compose();
 	print("</form>");
 	end_main_frame();
