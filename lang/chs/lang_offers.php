@@ -107,7 +107,7 @@ $lang_offers = array
 	'text_nah' => "否",
 	'title_show_vote_details' => "显示投票详情",
 	'title_i_want_this' => "我要！",
-	'title_do_not_want_it' => "没兴趣",
+	'title_do_not_want_it' => "违规",
 	'row_action' => "行为",
 	'text_quick_comment' => "快速评论",
 	'submit_add_comment' => "添加",
@@ -128,15 +128,13 @@ $lang_offers = array
 	'text_new' => "新",
 	'std_cannot_vote_youself' => "你不能给自己提交的候选投票。",
 	'text_rules' => "规则：",
-	'text_rule_one_one' => "",
-	'text_rule_one_two' => "及以上等级的用户可直接发布种子，无需经过候选。",
-	'text_rule_one_three' => "或以上等级的用户可以添加候选。",
-	'text_rule_two_one' => "当候选的支持票比反对票多",
-	'text_rule_two_two' => "票时，候选被通过。",
-	'text_rule_three_one' => "如候选在添加",
-	'text_rule_three_two' => "小时后未被通过，它将被删除。",
-	'text_rule_four_one' => "如在候选通过后",
-	'text_rule_four_two' => "小时内用户没有发布种子，通过的候选将被删除。",
+	'text_rules_p' => array(
+			 '%s及以上等级的用户可直接发布种子，无需经过候选。%s或以上等级的用户可以添加候选。',
+			 '当候选的支持票比反对票多%d票时，候选被通过。',
+			 "如候选在添加%d小时后未被通过，它将被删除。",
+			 '如在候选通过后%d小时内用户没有发布种子，通过的候选将被删除。',
+			 '请不要随便投反对票，反对票是用在那些不适于发布在蝴蝶的资源(政治敏感问题或大尺度)或者违反了发布规则的资源(如劣质资源) ，无差别投反对票将给予警告处理。',
+			      ),
 );
 
-?>
+

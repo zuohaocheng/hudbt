@@ -700,12 +700,25 @@ print('<h1>' . $lang_offers['text_offers_section'] . '</h1>');
 print('<div class="table td" style="margin-bottom:2em;padding:10px;">');
 print("<h2>".$lang_offers['text_rules']."</h2>\n");
 print("<div align=\"left\"><ul>");
-print("<li>".$lang_offers['text_rule_one_one'].get_user_class_name($upload_class, false, true, true).$lang_offers['text_rule_one_two'].get_user_class_name($addoffer_class, false, true, true).$lang_offers['text_rule_one_three']."</li>\n");
-print("<li>".$lang_offers['text_rule_two_one']."<b>".$minoffervotes."</b>".$lang_offers['text_rule_two_two']."</li>\n");
-if ($offervotetimeout_main)
-	print("<li>".$lang_offers['text_rule_three_one']."<b>".($offervotetimeout_main / 3600)."</b>".$lang_offers['text_rule_three_two']."</li>\n");
-if ($offeruptimeout_main)
-	print("<li>".$lang_offers['text_rule_four_one']."<b>".($offeruptimeout_main / 3600)."</b>".$lang_offers['text_rule_four_two']."</li>\n");
+$rule_args = array(
+		   array(get_user_class_name($upload_class, false, true, true), get_user_class_name($addoffer_class, false, true, true)),
+		   array($minoffervotes),
+		   );
+
+
+if ($offervotetimeout_main) {
+  $rule_args[2] = array($offervotetimeout_main / 3600);
+}
+if ($offeruptimeout_main) {
+  $rule_args[3] = array($offeruptimeout_main / 3600);
+}
+$rule_args[] = array();
+
+foreach ($rule_args as $k => $v) {
+  array_unshift($v, $lang_offers['text_rules_p'][$k]);
+  echo '<li>', call_user_func_array('sprintf', $v), '</li>';
+}
+
 print("</ul></div>");
 if (get_user_class() >= $addoffer_class)
 print("<div align=\"center\" style=\"margin-bottom: 8px;\"><a href=\"?add_offer=1\">".
