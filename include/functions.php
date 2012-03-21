@@ -2249,24 +2249,35 @@ function delete_single_torrent($id, $row, $reasonstr='') {
   global $CURUSER;
   require_once(get_langfile_path("delete.php",true));
   $users_of_torrent_res=sql_query('SELECT snatched.userid, users.accepttdpms FROM snatched INNER JOIN users ON snatched.userid = users.id WHERE torrentid=' . sqlesc($id) . " AND finished='no'") or sqlerr(__FILE__, __LINE__);
+  if ($reasonstr) {
+    $reasonstr = ' (' . $reasonstr . ')';
+  }
   while ($users_of_torrent = mysql_fetch_array($users_of_torrent_res)) {
     if ($user_of_torrent['accepttdpms'] != "no") {
       $lang = get_user_lang($users_of_torrent["userid"]);
       $dt = sqlesc(date("Y-m-d H:i:s"));
       $subject = sqlesc($lang_delete_target[$lang]['msg_torrent_deleted']);
-      $msg = sqlesc($lang_delete_target[$lang]['msg_the_torrent_you_downloaded'].$row['name'].$lang_delete_target[$lang]['msg_was_deleted_by']."[url=userdetails.php?id=".$CURUSER['id']."]".$CURUSER['username']."[/url]".$lang_delete_target[$lang]['msg_blank']);
+      $msg = sqlesc($lang_delete_target[$lang]['msg_the_torrent_you_downloaded'].$row['name'].$lang_delete_target[$lang]['msg_was_deleted_by']."[url=userdetails.php?id=".$CURUSER['id']."]".$CURUSER['username']."[/url]".$lang_delete_target[$lang]['msg_reason_is'].$reasonstr);
       sql_query("INSERT INTO messages (sender, receiver, subject, added, msg) VALUES(0, $users_of_torrent[userid], $subject, $dt, $msg)") or sqlerr(__FILE__, __LINE__);
     }
   }
-  
+  //PM Current Seeders EXCEPT Owner
+  $users_of_torrent_res=sql_query('SELECT peers.userid, users.accepttdpms FROM peers INNER JOIN users ON peers.userid = users.id WHERE torrent=' . sqlesc($id) . " AND seeder='yes' AND userid !=".$row["owner"]) or sqlerr(__FILE__, __LINE__);
+  while ($users_of_torrent = mysql_fetch_array($users_of_torrent_res)) {
+    if ($user_of_torrent['accepttdpms'] != "no") {
+      $lang = get_user_lang($users_of_torrent["userid"]);
+      $dt = sqlesc(date("Y-m-d H:i:s"));
+      $subject = sqlesc($lang_delete_target[$lang]['msg_torrent_deleted']);
+      $msg = sqlesc($lang_delete_target[$lang]['msg_the_torrent_you_downloaded'].$row['name'].$lang_delete_target[$lang]['msg_was_deleted_by']."[url=userdetails.php?id=".$CURUSER['id']."]".$CURUSER['username']."[/url]".$lang_delete_target[$lang]['msg_reason_is'].$reasonstr);
+      sql_query("INSERT INTO messages (sender, receiver, subject, added, msg) VALUES(0, $users_of_torrent[userid], $subject, $dt, $msg)") or sqlerr(__FILE__, __LINE__);
+    }
+  }
   $interval_no_deduct_bonus_on_deletion = 30* 86400;
   $tadded = strtotime($row['added']);
 
   deletetorrent($id, ((TIMENOW - $tadded) > $interval_no_deduct_bonus_on_deletion));
 
-  if ($reasonstr) {
-    $reasonstr = ' (' . $reasonstr . ')';
-  }
+  
   
   if ($row['anonymous'] == 'yes' && $CURUSER["id"] == $row["owner"]) {
     write_log("Torrent $id ($row[name]) was deleted by its anonymous uploader" . $reasonstr,'normal');
@@ -2539,8 +2550,13 @@ function post_body_edited($edit) {
   global $lang_functions;
   $id = $edit['editor'];
   $date = $edit['date'];
+  $editnotseen = $edit['editnotseen'];
   $lastedittime = gettime($date,true,false);
-  return '<div class="post-edited">'.$lang_functions['text_last_edited_by'].get_username($id).$lang_functions['text_last_edit_at'].$lastedittime."</div>\n";
+  echo $editnotseen;
+  if(get_user_class()< 12 && $editnotseen == 1)//To see if editting can be seen or not
+  return '';
+	else
+	return '<div class="post-edited">'.$lang_functions['text_last_edited_by'].get_username($id).$lang_functions['text_last_edit_at'].$lastedittime."</div>\n";;
 }
 
 function post_body_toolbox_href($postid, $type, $pid) {
@@ -2662,7 +2678,7 @@ function single_post($arr, $maypost, $maymodify, $locked, $highlight = '', $last
     $edit = false;
   }
   else {
-    $edit = array('editor' => $editor, 'date' => $arr['editdate']);
+    $edit = array('editor' => $editor, 'date' => $arr['editdate'],'editnotseen' =>$arr['editnotseen']);
   }
   $posterid = $arr['userid'];
 
@@ -2677,7 +2693,7 @@ function single_comment($row, $parent_id, $type, $floor = -1) {
   $userRow = get_user_row($row['user']);
 
   if ($row["editedby"]) {
-    $edit = array('editor' => $row["editedby"], 'date' => $row['editdate']);
+    $edit = array('editor' => $row["editedby"], 'date' => $row['editdate'],'editnotseen' => $row['editnotseen']);
   }
   else {
     $edit = false;

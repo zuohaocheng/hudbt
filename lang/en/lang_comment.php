@@ -46,6 +46,7 @@ $lang_comment = array
 	'text_body' => "Body",
 	'text_compose' => "Compose",
 	'text_edit' => "Edit",
+	'text_editnotseen' => "Show no editting information",
 );
 
 ?>

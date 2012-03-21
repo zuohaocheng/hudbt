@@ -649,7 +649,7 @@ else {
 
 	list($pagertop, $pagerbottom, $limit,$next_page ,$offset) = pager(10, $count, "details.php?id=$id&cmtpage=1&", $pager_opts, "page");
 
-	$subres = sql_query("SELECT id, text, user, added, editedby, editdate FROM comments WHERE torrent = $id ORDER BY id $limit") or sqlerr(__FILE__, __LINE__);
+	$subres = sql_query("SELECT id, text, user, added, editedby, editdate,editnotseen FROM comments WHERE torrent = $id ORDER BY id $limit") or sqlerr(__FILE__, __LINE__);
 	$allrows = array();
 	while ($subrow = mysql_fetch_array($subres)) {
 	  $allrows[] = $subrow;

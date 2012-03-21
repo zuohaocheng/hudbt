@@ -198,6 +198,7 @@ $lang_forums = array
 	'text_topic_asc' => "發布時間升序",
 	'text_post_asc' => "最近回覆升序",
 	'text_post_desc' => "最近回覆降序",
+	'text_editnotseen'=>"隐藏帖子编辑信息",
 );
 
 ?>
