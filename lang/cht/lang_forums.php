@@ -198,6 +198,9 @@ $lang_forums = array
 	'text_topic_asc' => "發布時間升序",
 	'text_post_asc' => "最近回覆升序",
 	'text_post_desc' => "最近回覆降序",
+	'text_editnotseen'=>"無痕編輯",
+	'text_showori'=>"顯示編輯前的帖子",
+	'text_shownow'=>"顯示編輯後的帖子",
 );
 
 ?>

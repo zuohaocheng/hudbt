@@ -209,7 +209,7 @@ if ($_GET["off_details"]){
 	else {
 	  list($pagertop, $pagerbottom, $limit, $next_page ,$offset) = pager(10, $count, "offers.php?id=$id&off_details=1&", array('lastpagedefault' => 1));
 
-		$subres = sql_query("SELECT id, text, user, added, editedby, editdate FROM comments  WHERE offer = " . sqlesc($id) . " ORDER BY id $limit") or sqlerr(__FILE__, __LINE__);
+		$subres = sql_query("SELECT id, text, user, added, editedby, editnotseen,editdate FROM comments  WHERE offer = " . sqlesc($id) . " ORDER BY id $limit") or sqlerr(__FILE__, __LINE__);
 		$allrows = array();
 		while ($subrow = mysql_fetch_array($subres))
 		$allrows[] = $subrow;

@@ -83,7 +83,6 @@ if ($action == "add") {
 		  }
 		  $quoteduser = mysql_fetch_array($res);
 		}
-		
 		$values = array($CURUSER["id"], $parent_id, "'" . date("Y-m-d H:i:s") . "'", sqlesc($text), sqlesc($text), $quote);
 		if ($type == "torrent"){
 		  sql_query("INSERT INTO comments (user, torrent, added, text, ori_text, quote) VALUES (" . implode(',', $values) . ")");
@@ -228,8 +227,12 @@ elseif ($action == "edit")
 				stderr($lang_comment['std_error'], $lang_comment['std_comment_body_empty']);
 			$text = sqlesc($text);
 			$editdate = sqlesc(date("Y-m-d H:i:s"));
-
-			sql_query("UPDATE comments SET text=$text, editdate=$editdate, editedby=$CURUSER[id] WHERE id=".sqlesc($commentid)) or sqlerr(__FILE__, __LINE__);
+			$editnotseen = empty($_REQUEST['editnotseen'])?'0':$_REQUEST['editnotseen'];
+			$editnotseen = $editnotseen + 0;
+			if ((!checkprivilege(["Posts","editnotseen"])) && $editnotseen==1){
+				permissiondenied();
+			}
+			sql_query("UPDATE comments SET text=".$text.", editdate=".$editdate.", editedby=".$CURUSER[id].",editnotseen = ".$editnotseen." WHERE id=".sqlesc($commentid)) or sqlerr(__FILE__, __LINE__);
 			if($type == "torrent")
 				$Cache->delete_value('torrent_'.$arr['parent_id'].'_last_comment_content');
 			elseif ($type == "offer")
@@ -251,6 +254,13 @@ elseif ($action == "edit")
 		print("<form id=compose method=post name=\"compose\" action=\"comment.php?action=edit&cid=$commentid&type=$type\">\n");
 		print("<input type=\"hidden\" name=\"returnto\" value=\"" . htmlspecialchars($_SERVER["HTTP_REFERER"]) . "\" />\n");
 		begin_compose($title, "edit", htmlspecialchars(unesc($arr["text"])), false);
+		$res=sql_query("SELECT editnotseen,user FROM comments WHERE id = ".$commentid)or sqlerr(__FILE__, __LINE__);
+  	$arr = mysql_fetch_assoc($res) or stderr($lang_forums['std_forum_error'], $lang_forums['std_topic_not_found']);
+		$editnotseen=$arr['editnotseen'];
+		$owner =$arr['user'];
+  	if(CheckPrivilege(["Posts","editnotseen"]) && ($CURUSER['id']==$owner)){
+  		echo "<tr><td class='center' colspan='2'><label><input type=\"checkbox\" name=\"editnotseen\" value=\"1\"".($editnotseen?"checked=\"checked\"":"").">".$lang_comment[text_editnotseen]."</label></td></tr>";
+ 		}
 		end_compose();
 		print("</form>");
 		end_main_frame();

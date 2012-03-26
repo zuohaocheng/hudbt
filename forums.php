@@ -4,7 +4,6 @@ dbconn();
 require_once(get_langfile_path());
 loggedinorreturn();
 parked();
-
 if ($enableextforum == 'yes') //check whether internal forum is disabled
 	permissiondenied();
 
@@ -165,6 +164,7 @@ function insert_compose_frame($id, $type = 'new')
 	$hassubject = false;
 	$subject = "";
 	$body = "";
+	$edit = "";
 	print("<form id=\"compose\" method=\"post\" name=\"compose\" action=\"?action=post\">\n");
 	echo $addition;
 	switch ($type){
@@ -221,6 +221,17 @@ function insert_compose_frame($id, $type = 'new')
 	print("<input type=\"hidden\" name=\"id\" value=\"".$id."\" />");
 	print("<input type=\"hidden\" name=\"type\" value=\"".$type."\" />");
 	begin_compose($title, $type, $body, $hassubject, $subject);
+	if($type==edit){
+		$resedit=sql_query("SELECT editnotseen,userid FROM posts WHERE id = ".$id)or sqlerr(__FILE__, __LINE__);
+ 		$arredit = mysql_fetch_assoc($resedit) or stderr($lang_forums['std_forum_error'], $lang_forums['std_topic_not_found']);
+	  $editnotseen=$arredit['editnotseen'];
+	  $owner =$arredit['userid'];
+		if(checkprivilege(["Posts","editnotseen"]) && ($CURUSER['id']==$owner)){
+  		echo "<tr><td class=\"center\" colspan=\"2\"><label><input type=\"checkbox\" value=\"1\" name=\"editnotseen\"";
+			echo ($editnotseen?" checked=\"checked\"" : "" ).">".$lang_forums[text_editnotseen]."</label></td></tr>";
+ 		}	
+ 	}
+
 	end_compose();
 	print("</form>");
 }
@@ -293,13 +304,14 @@ elseif ($action == "editpost") {
 	$arr2 = mysql_fetch_assoc($res2);
 	$locked = ($arr2["locked"] == 'yes');
 
-	$ismod = is_forum_moderator($postid, 'post');
+	$ismod = is_forum_moderator($postid, 'post'
+);
 	if (($CURUSER["id"] != $arr["userid"] || $locked) && get_user_class() < $postmanage_class && !$ismod)
 		permissiondenied();
 
 	stdhead($lang_forums['text_edit_post']);
 	begin_main_frame();
-	insert_compose_frame($postid, 'edit');
+  insert_compose_frame($postid, 'edit');
 	end_main_frame();
 	stdfoot();
 	die;
@@ -399,8 +411,14 @@ elseif ($action == "post") {
 			$forum_last_replied_topic_row = $Cache->get_value('forum_'.$forumid.'_last_replied_topic_content');
 			if ($forum_last_replied_topic_row && $forum_last_replied_topic_row['id'] == $topicid)
 				$Cache->delete_value('forum_'.$forumid.'_last_replied_topic_content');
+		}		
+		$editnotseen = empty($_REQUEST['editnotseen'])?'0':$_REQUEST['editnotseen'];
+		$editnotseen = $editnotseen + 0;
+		if ((!checkprivilege(["Posts","editnotseen"]))&& $editnotseen==1){
+			permissiondenied();
+		permissiondenied();
 		}
-		sql_query("UPDATE posts SET body=".sqlesc($body).", editdate=".sqlesc($date).", editedby=".sqlesc($CURUSER[id])." WHERE id=".sqlesc($id)) or sqlerr(__FILE__, __LINE__);
+		sql_query("UPDATE posts SET body=".sqlesc($body).", editdate=".sqlesc($date).", editedby=".sqlesc($CURUSER[id]).",editnotseen = ".$editnotseen." WHERE id=".sqlesc($id)) or sqlerr(__FILE__, __LINE__);
 		$postid = $id;
 		$Cache->delete_value('post_'.$postid.'_content');
 	}
@@ -429,8 +447,8 @@ elseif ($action == "post") {
 			//add bonus
 			KPS("+",$makepost_bonus,$userid);
 			sql_query("UPDATE forums SET postcount=postcount+1 WHERE id=".sqlesc($forumid));
+//
 		}
-
 		$values = array($topicid, $userid, sqlesc($date), sqlesc($body), sqlesc($body), $quote);
 		sql_query("INSERT INTO posts (topicid, userid, added, body, ori_body, quote) VALUES (" . implode(',', $values) . ')') or sqlerr(__FILE__, __LINE__);
 		$postid = mysql_insert_id() or die($lang_forums['std_post_id_not_available']);
@@ -465,12 +483,11 @@ elseif ($action == "post") {
 //-------- Action: View topic
 
 elseif ($action == "viewtopic") {
-	$highlight = htmlspecialchars(trim($_GET["highlight"]));
-
-	$topicid = 0+$_GET["topicid"];
+	$highlight = htmlspecialchars(trim($_REQUEST["highlight"]));
+	$topicid = 0+$_REQUEST["topicid"];
 	int_check($topicid,true);
-	$page = $_GET["page"];
-	$authorid = 0+$_GET["authorid"];
+	$page = $_REQUEST["page"];
+	$authorid = 0+$_REQUEST["authorid"];
 	if ($authorid)
 	{
 		$where = "WHERE topicid=".sqlesc($topicid)." AND userid=".sqlesc($authorid);
@@ -648,6 +665,12 @@ SELECT id, rownum FROM (SELECT @x:=@x+1 AS rownum, id, userid FROM (SELECT @x:=0
 	  else {
 	    $floor = $pn + $offset;
 	  }
+	  $showori=($_REQUEST['showori_body']=='1'?"1":"0");
+		$showori=$showori+0;
+	  if($showori&&$maymodify){
+	  	$arr['body']=$arr['ori_body'];
+	  	$arr['editedby']="";
+	  }
 	  single_post($arr, $maypost, $maymodify, $locked, $highlight, ($pn == $pc), $floor);
 	}
 	echo '</ol></div>';
@@ -682,6 +705,15 @@ SELECT id, rownum FROM (SELECT @x:=@x+1 AS rownum, id, userid FROM (SELECT @x:=0
 		print("<input type=\"hidden\" name=\"forumid\" value=\"".$forumid."\" />\n");
 		print("<input type=\"submit\" class=\"medium\" value=\"".$lang_forums['submit_delete_topic']."\" /></form></li>\n");
 
+		print("<li><form method=\"get\" action=\"?\">\n");
+		print("<input type=\"hidden\" name=\"action\" value=\"viewtopic\" />\n");
+		print("<input type=\"hidden\" name=\"topicid\" value=\"".$topicid."\" />\n");
+		if($authorid){
+		print("<input type=\"hidden\" name=\"authorid\" value=\"".$authorid."\" />\n");}
+		if($page){
+		print("<input type=\"hidden\" name=\"page\" value=\"".$page."\" />\n");}//These ifs are just to make the url cleaner.Feel no guilty to delete them if you don't like them
+		print("<input type=\"hidden\" name=\"showori_body\" value=\"".($showori ? '0' : '1')."\" /><input type=\"submit\" class=\"medium\" value=\"".($showori ? $lang_forums[text_shownow] : $lang_forums['text_showori'])."\" /></form></li>\n");
+		
 		print("<li><form method=\"post\" action=\"".htmlspecialchars("?action=movetopic&topicid=".$topicid)."\">\n"."&nbsp;".$lang_forums['text_move_thread_to']."&nbsp;<select class=\"med\" name=\"forumid\">");
 		$forums = get_forum_row();
 		foreach ($forums as $arr){
@@ -923,7 +955,7 @@ elseif ($action == "setlocked") {
 	header("Location: $_POST[returnto]");
 	die;
 }
-
+//-------Action:Set highlight
 elseif ($action == 'hltopic') {
 	$topicid = 0 + $_GET["topicid"];
 	$ismod = is_forum_moderator($topicid,'topic');

@@ -198,6 +198,9 @@ $lang_forums = array
 	'text_topic_asc' => "Topic Time Ascendant",
 	'text_post_asc' => "Last Post Time Ascendant",
 	'text_post_desc' => "Last Post Time Descendant",
+	'text_editnotseen' => "Show no editting information",
+	'text_showori'=>"Show Original Posts",
+	'text_shownow'=>"Show Edited Posts",
 );
 
 ?>

@@ -45,6 +45,7 @@ $lang_comment = array
 	'text_body' => "正文",
 	'text_compose' => "撰写",
 	'text_edit' => "编辑",
+	'text_editnotseen'=>"无痕编辑",
 );
 
 ?>
