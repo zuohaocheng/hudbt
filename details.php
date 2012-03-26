@@ -660,8 +660,10 @@ else {
       }
   }
 
-  print ('<div id="forum-reply-post" class="table td"><h2><a class="index" href="'. htmlspecialchars("comment.php?action=add&pid=".$id."&type=torrent") .'">'.$lang_details['text_quick_comment']."</a></h2><form id=\"compose\" name=\"comment\" method=\"post\" action=\"".htmlspecialchars("comment.php?action=add&type=torrent")."\" onsubmit=\"return postvalid(this);\"><input type=\"hidden\" name=\"pid\" value=\"".$id."\" /><br />");
-  quickreply('comment', 'body', $lang_details['submit_add_comment']);
+  print ('<div id="forum-reply-post" class="table td"><h2><a class="index" href="'. htmlspecialchars("comment.php?action=add&pid=".$id."&type=torrent") .'">'.$lang_details['text_quick_comment']."</a></h2>");
+  echo $lang_details['comment_warning'];
+  echo "<form id=\"compose\" name=\"comment\" method=\"post\" action=\"".htmlspecialchars("comment.php?action=add&type=torrent")."\" onsubmit=\"return postvalid(this);\"><input type=\"hidden\" name=\"pid\" value=\"".$id."\" /><br />";
+  quickreply('comment', 'body', $lang_details['submit_add_comment'], $lang_details['hint_placeholder_reply']);
   print("</form></div>");
 }
 

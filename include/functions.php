@@ -3649,11 +3649,12 @@ $smallth
   }
 }
 
-function quickreply($formname, $taname,$submit){
-  print("<textarea name='".$taname."' cols=\"100\" rows=\"8\" style=\"width: 450px\" onkeydown=\"ctrlenter(event,'compose','qr')\"></textarea>");
+function quickreply($formname, $taname,$submit, $placeholder=""){
+  global $lang_functions;
+  echo '<textarea name="', $taname, '" cols="100" rows="8" style="width: 450px" onkeydown="' , "ctrlenter(event,'compose','qr')", '"', ($placeholder ? ' placeholder="' . $placeholder . '"' : ''), '></textarea>';
   print(smile_row($formname, $taname));
-  print("<br />");
-   print("<input type=\"submit\" id=\"qr\" class=\"btn\" value=\"".$submit."\" />");
+  echo '<br />';
+  echo '<input type="submit" id="qr" class="btn" value="', $submit, '" />';
 }
 
 function smile_row($formname, $taname){
@@ -3843,7 +3844,7 @@ function get_torrent_promotion_append($promotion = 1,$forcemode = "",$showtimele
     $ret = '[<span class="' . $prDict['name'] . '">' . $text . '</span>]';
   }
   else if ($mode == 'icon') {
-    $ret = '<img class="' . $prDict['name'] . '" alt="' . $text . '" src="//$BASEURL/pic/trans.gif" />';
+    $ret = '<img class="' . $prDict['name'] . '" alt="' . $text . '" src="//' . $BASEURL . '/pic/trans.gif" />';
   }
   return $ret;
 }
