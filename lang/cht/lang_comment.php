@@ -45,7 +45,7 @@ $lang_comment = array
 	'text_body' => "正文",
 	'text_compose' => "撰寫",
 	'text_edit' => "編輯",
-	'text_editnotseen'="隐藏帖子编辑信息",
+	'text_editnotseen'="無痕編輯",
 );
 
 ?>

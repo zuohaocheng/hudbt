@@ -117,14 +117,9 @@ function get_single_value($table, $field, $suffix = "") {
 
 function checkPrivilege($item) {
   global $torrentonpromotion_class, $torrentsticky_class;
-  $privilegeConfig = ['Tcategory' => ['lock' => UC_UPLOADER,
-					     'delete' => UC_VIP,
-					     ],
-			     'Torrent' => ['startseed' => UC_VIP,
-					   'pr' => $torrentonpromotion_class,
-					   'sticky' => $torrentsticky_class,
-					   'oday' => UC_VIP,
-					   ],
+  $privilegeConfig = ['Tcategory' => ['lock' => UC_UPLOADER,'delete' => UC_VIP,],
+			   						  'Torrent' => ['startseed' => UC_VIP, 'pr' => $torrentonpromotion_class,'sticky' => $torrentsticky_class,'oday' => UC_VIP,],
+					 						'Posts'=>['editnotseen'=>UC_MODERATOR,'seeeditnotseen'=>UC_UPLOADER,],
 			     ];
   if (is_array($item)) {
     $config = $privilegeConfig;
@@ -2552,8 +2547,7 @@ function post_body_edited($edit) {
   $date = $edit['date'];
   $editnotseen = $edit['editnotseen'];
   $lastedittime = gettime($date,true,false);
-  echo $editnotseen;
-  if(get_user_class()< 12 && $editnotseen == 1)//To see if editting can be seen or not
+  if((!Checkprivilege(["Posts","seeeditnotseen"])) && $editnotseen == 1)//To see if editting can be seen or not
   return '';
 	else
 	return '<div class="post-edited">'.$lang_functions['text_last_edited_by'].get_username($id).$lang_functions['text_last_edit_at'].$lastedittime."</div>\n";;
@@ -2598,7 +2592,7 @@ function post_body_toolbox($postid, $privilege, $type='', $pid = '') {
   if ($candelete) {
     $toolbox_post .= ('<li><a href="'.htmlspecialchars($hrefs[1]).'"><img class="f_delete" src="//' . $BASEURL . '/pic/trans.gif" alt="Delete" title="'.$lang_functions['title_delete_post'].'" /></a></li>');
   }
-
+  
   if ($canedit) {
     $toolbox_post .= ('<li><a href="' . htmlspecialchars($hrefs[2]).'"><img class="f_edit" src="//' . $BASEURL . '/pic/trans.gif" alt="Edit" title="' . $lang_functions['title_edit_post'].'" /></a></li>');
   }

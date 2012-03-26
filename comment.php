@@ -229,7 +229,7 @@ elseif ($action == "edit")
 			$editdate = sqlesc(date("Y-m-d H:i:s"));
 			$editnotseen = empty($_REQUEST['editnotseen'])?'0':$_REQUEST['editnotseen'];
 			$editnotseen = $editnotseen + 0;
-			if (get_user_class()<13 && $editnotseen==1){
+			if ((!checkprivilege(["Posts","editnotseen"])) && $editnotseen==1){
 				permissiondenied();
 			}
 			sql_query("UPDATE comments SET text=".$text.", editdate=".$editdate.", editedby=".$CURUSER[id].",editnotseen = ".$editnotseen." WHERE id=".sqlesc($commentid)) or sqlerr(__FILE__, __LINE__);
@@ -258,7 +258,7 @@ elseif ($action == "edit")
   	$arr = mysql_fetch_assoc($res) or stderr($lang_forums['std_forum_error'], $lang_forums['std_topic_not_found']);
 		$editnotseen=$arr['editnotseen'];
 		$owner =$arr['user'];
-  	if(get_user_class()>=13 && ($CURUSER['id']==$owner)){
+  	if(CheckPrivilege(["Posts","editnotseen"]) && ($CURUSER['id']==$owner)){
   		echo "<tr><td class='center' colspan='2'><label><input type=\"checkbox\" name=\"editnotseen\" value=\"1\"".($editnotseen?"checked=\"checked\"":"").">".$lang_comment[text_editnotseen]."</label></td></tr>";
  		}
 		end_compose();
