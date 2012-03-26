@@ -181,6 +181,16 @@ function sqlerr($file = '', $line = '', $stack = true) {
 }
 
 function format_comment($text, $strip_html = true, $xssclean = false, $newtab = false, $imageresizer = true, $image_max_width = 0, $enableimage = true, $enableflash = true , $imagenum = -1, $image_max_height = 0, $adid = 0) {
+  global $Cache;
+  $cache = ($image_max_width == 0 && $image_max_height == 0 && $newtab == false);
+  if ($cache) {
+    $key = 'bbcode-' . md5($text);
+    $html = $Cache->get_value($key);
+    if ($html) {
+      return $html;
+    }
+  }
+  
   global $SITENAME, $BASEURL, $enableattach_attachment;
   require_once('HTML/BBCodeParser.php');
   $filters = array('Extended', 'Basic', 'Email', 'Lists', 'Attachments', 'Refs', 'Smiles');
@@ -201,7 +211,11 @@ function format_comment($text, $strip_html = true, $xssclean = false, $newtab = 
     $opts['aTarget'] = '_blank';
   }
   $parser = new HTML_BBCodeParser($opts);
-  return '<div class="bbcode">' . $parser->qparse($text) . '</div>';
+  $out = '<div class="bbcode">' . $parser->qparse($text) . '</div>';
+  if ($cache) {
+    $Cache->cache_value($key, $out, 86400 * 7);
+  }
+  return $out;
 }
 
 function highlight($search,$subject,$hlstart='<b><font class="striking">',$hlend="</font></b>") {
