@@ -39,7 +39,7 @@ if ($_GET["add_offer"]){
 
 	print("<p>".$lang_offers['text_red_star_required']."</p>");
 
-	print("<div align=\"center\"><form id=\"compose\" action=\"?new_offer=1\" name=\"compose\" method=\"post\">".
+	print("<form id=\"compose\" action=\"?new_offer=1\" name=\"compose\" method=\"post\">".
 	"<table width=940 border=0 cellspacing=0 cellpadding=5><tr><td class=colhead align=center colspan=2>".$lang_offers['text_offers_open_to_all']."</td></tr>\n");
 
 	$s = "<select name=type>\n<option value=0>".$lang_offers['select_type_select']."</option>\n";
@@ -53,7 +53,7 @@ if ($_GET["add_offer"]){
 	"<input type=text name=picture style=\"width: 650px;\"><br />".$lang_offers['text_link_to_picture']."</td></tr>".
 	"<tr><td class=rowhead align=right valign=top><b>".$lang_offers['row_description']."<b><font color=red>*</font></td><td class=rowfollow align=left>\n");
 	textbbcode("compose","body",$body,false);
-	print("</td></tr><tr><td class=toolbox align=center colspan=2><input id=qr type=submit class=btn value=".$lang_offers['submit_add_offer']." ></td></tr></table></form><br />\n");
+	print("</td></tr><tr><td class=toolbox align=center colspan=2><input id=\"qr\" type=\"submit\" class=\"btn\" value=".$lang_offers['submit_add_offer']." ></td></tr></table></form>\n");
 	stdfoot();
 	die;
 }
@@ -851,4 +851,4 @@ create_tooltip_container($lastcom_tooltip, 400);
 end_main_frame();
 $USERUPDATESET[] = "last_offer = ".sqlesc(date("Y-m-d H:i:s"));
 stdfoot();
-?>
+

@@ -601,13 +601,17 @@ elseif ($action == "viewtopic") {
 	echo '<div class="forum-posts"><ol>';
 
 	if ($authorid) {
+	  /* can be replaced by
+SELECT id, rownum FROM (SELECT @x:=@x+1 AS rownum, id, userid FROM (SELECT @x:=0, id, userid FROM posts WHERE topicid=10153) AS data ORDER BY id) AS tmp WHERE tmp.userid=66551;
+	  */
 	  $query = "SELECT shows.id AS shows_id FROM posts AS ref LEFT JOIN (SELECT id FROM posts $where ORDER BY id $limit) AS shows ON ref.id=shows.id WHERE ref.topicid=$topicid AND ref.id <= $maxid;";
 	  $r = sql_query($query) or sqlerr(__FILE__, __LINE__);
 	  $i = 0;
 	  $floorsDict = [];
-	  while ($arr = mysql_fetch_assoc($r)) {
-	    if ($arr['shows_id']) {
-	      $floorsDict[$arr['shows_id']] = $i;
+	  while ($arr = mysql_fetch_row($r)) {
+	    $t = $arr[0];
+	    if ($t) {
+	      $floorsDict[$t] = $i;
 	    }
 	    $i += 1;
 	  }

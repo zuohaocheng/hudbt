@@ -801,7 +801,6 @@ dl dd {
 dl dd.no-dt {
     margin-left: 120px;
     padding-left: 0;
-    clear: both;
 }
 
 dl dd.first-child{
