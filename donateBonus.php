@@ -3,12 +3,13 @@ ob_start(); //Do not delete this line
 header('Content-type: application/json');
 require_once("include/bittorrent.php");
 dbconn();
-$amount = (int) $_GET['amount'];
+
+$amount = (int) $_REQUEST['amount'];
 $now    = date('Y-m-d H:i:s');
 
 $donater    = $CURUSER['username'];
 $donaterId  = $CURUSER['id'];
-$objectType = $_GET['type'];
+$objectType = $_REQUEST['type'];
 
 $status = 0;
 if(!empty($CURUSER['username'])) {
@@ -18,7 +19,7 @@ if(!empty($CURUSER['username'])) {
 		
 	} else if($objectType == 'torrent') {
 		
-		$objectId = (int) $_GET['torrent_id'];
+		$objectId = (int) $_REQUEST['torrent_id'];
 		
 		$result = sql_query('SELECT id, owner, name, anonymous FROM torrents WHERE id='.$objectId);
 		$torrentInfo = mysql_fetch_assoc($result);
@@ -35,7 +36,9 @@ if(!empty($CURUSER['username'])) {
 			$status = 4; // Involid amount of donate
 		} else if($receiverId == $donaterId) {
 			$status = 5; // Donate to someone self
-		}else {
+		} else if (strtoupper($_SERVER['REQUEST_METHOD']) != 'POST') {
+		  $status = 7;
+		} else {
 			
 			$sqlCheckDonate = 'SELECT donater_id FROM donate_bonus WHERE object_id='.$objectId.' AND donater_id='.$donaterId.' AND `type`="torrent"';
 			$result  = sql_query($sqlCheckDonate);
@@ -45,7 +48,7 @@ if(!empty($CURUSER['username'])) {
 				$status = 6; // Already donated
 			}  else {
 				$amount_after_tax = $amount - ($amount / 8); // Tax is required, 1/8
-				$message = sqlesc($_GET['message']);
+				$message = sqlesc($_REQUEST['message']);
 				
 				$sqlAddLog = 'INSERT INTO donate_bonus'
 				            .' (`donater_id`, `donater`, `receiver_id`, `type`, `object_id`, `amount`, `amount_after_tax`, `message`)'

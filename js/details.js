@@ -62,7 +62,7 @@ $(function() {
 	} else if(confirm('确认向种子发布者捐赠 ' + to_donate +' 魔力值吗？')) {
 	    var url = 'donateBonus.php';
 	    var data = {amount: to_donate, torrent_id : torrent_id, type: 'torrent'};
-	    $.getJSON(url, data, function(data) {
+	    $.post(url, data, function(data) {
 		if(data.status == 9) {
 		    var newDonate = '<div class="donate'+ data.amount +' donate" id="donated_successfully" title="' + data.message + '\n[' + data.amount + ' 魔力值] ' + data.date + '">' + data.donater + '</div>';
 		    $('#donater_list').append(newDonate);
@@ -83,7 +83,7 @@ $(function() {
 		} else {
 		    alert('貌似系统出问题了，呼管理员！');
 		}
-	    });
+	    }, 'json');
 	}
     });
 });
