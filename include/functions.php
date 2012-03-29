@@ -1355,41 +1355,41 @@ function getsize_int($amount, $unit = "G") {
 
 function mksize_compact($bytes) {
   if ($bytes < 1000 * 1024)
-    return number_format($bytes / 1024, 2) . "<br />KB";
+    return number_format($bytes / 1024, 2) . "<br />KiB";
   elseif ($bytes < 1000 * 1048576)
-    return number_format($bytes / 1048576, 2) . "<br />MB";
+    return number_format($bytes / 1048576, 2) . "<br />MiB";
   elseif ($bytes < 1000 * 1073741824)
-    return number_format($bytes / 1073741824, 2) . "<br />GB";
+    return number_format($bytes / 1073741824, 2) . "<br />GiB";
   elseif ($bytes < 1000 * 1099511627776)
-    return number_format($bytes / 1099511627776, 3) . "<br />TB";
+    return number_format($bytes / 1099511627776, 3) . "<br />TiB";
   else
-    return number_format($bytes / 1125899906842624, 3) . "<br />PB";
+    return number_format($bytes / 1125899906842624, 3) . "<br />PiB";
 }
 
 function mksize_loose($bytes) {
       if ($bytes < 1000 * 1024)
-	return number_format($bytes / 1024, 2) . "&nbsp;KB";
+	return number_format($bytes / 1024, 2) . "&nbsp;KiB";
       elseif ($bytes < 1000 * 1048576)
-	return number_format($bytes / 1048576, 2) . "&nbsp;MB";
+	return number_format($bytes / 1048576, 2) . "&nbsp;MiB";
       elseif ($bytes < 1000 * 1073741824)
-	return number_format($bytes / 1073741824, 2) . "&nbsp;GB";
+	return number_format($bytes / 1073741824, 2) . "&nbsp;GiB";
       elseif ($bytes < 1000 * 1099511627776)
-	return number_format($bytes / 1099511627776, 3) . "&nbsp;TB";
+	return number_format($bytes / 1099511627776, 3) . "&nbsp;TiB";
       else
-	return number_format($bytes / 1125899906842624, 3) . "&nbsp;PB";
+	return number_format($bytes / 1125899906842624, 3) . "&nbsp;PiB";
 }
 
 function mksize($bytes) {
   if ($bytes < 1000 * 1024)
-    return number_format($bytes / 1024, 2) . " KB";
+    return number_format($bytes / 1024, 2) . " KiB";
   elseif ($bytes < 1000 * 1048576)
-    return number_format($bytes / 1048576, 2) . " MB";
+    return number_format($bytes / 1048576, 2) . " MiB";
   elseif ($bytes < 1000 * 1073741824)
-    return number_format($bytes / 1073741824, 2) . " GB";
+    return number_format($bytes / 1073741824, 2) . " GiB";
   elseif ($bytes < 1000 * 1099511627776)
-    return number_format($bytes / 1099511627776, 3) . " TB";
+    return number_format($bytes / 1099511627776, 3) . " TiB";
   else
-    return number_format($bytes / 1125899906842624, 3) . " PB";
+    return number_format($bytes / 1125899906842624, 3) . " PiB";
 }
 
 
@@ -1398,15 +1398,15 @@ function mksizeint($bytes) {
   if ($bytes < 1000)
     return floor($bytes) . " B";
   elseif ($bytes < 1000 * 1024)
-    return floor($bytes / 1024) . " kB";
+    return floor($bytes / 1024) . " KiB";
   elseif ($bytes < 1000 * 1048576)
-    return floor($bytes / 1048576) . " MB";
+    return floor($bytes / 1048576) . " MiB";
   elseif ($bytes < 1000 * 1073741824)
-    return floor($bytes / 1073741824) . " GB";
+    return floor($bytes / 1073741824) . " GiB";
   elseif ($bytes < 1000 * 1099511627776)
-    return floor($bytes / 1099511627776) . " TB";
+    return floor($bytes / 1099511627776) . " TiB";
   else
-    return floor($bytes / 1125899906842624) . " PB";
+    return floor($bytes / 1125899906842624) . " PiB";
 }
 
 function deadtime() {
