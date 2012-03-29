@@ -46,27 +46,29 @@
       {nocache}
       {menu()}
       {/nocache}
-      <div id="info_block" class="table td">
-	<div><span class="medium">{$lang['text_the_time_is_now']}{$smarty.now|date_format:"%H:%M"}
-	<br />
+      <div id="header-info" class="table td">
+	<div id="header-icons" class="medium">{$lang['text_the_time_is_now']}{$smarty.now|date_format:"%H:%M"}
+	  <div class="minor-list horizon-compact"><ul>
 	{if get_user_class() >= $staffmem_class}
-	<a href="//{$BASEURL}/cheaterbox.php"><img class="cheaterbox" alt="cheaterbox" title="{$lang['title_cheaterbox']}" src="//{$BASEURL}/pic/trans.gif" /></a> {$totalcheaters}
-	<a href="//{$BASEURL}/reports.php"><img class="reportbox" alt="reportbox" title="{$lang['title_reportbox']}" src="//{$BASEURL}/pic/trans.gif" /></a> {$totalreports}
-	<a href="//{$BASEURL}/staffbox.php"><img class="staffbox" alt="staffbox" title="{$lang['title_staffbox']}" src="//{$BASEURL}/pic/trans.gif" /></a> {$totalsm}
+	<li><a href="//{$BASEURL}/cheaterbox.php"><img class="cheaterbox" alt="cheaterbox" title="{$lang['title_cheaterbox']}" src="//{$BASEURL}/pic/trans.gif" /> {$totalcheaters}</a></li>
+	<li><a href="//{$BASEURL}/reports.php"><img class="reportbox" alt="reportbox" title="{$lang['title_reportbox']}" src="//{$BASEURL}/pic/trans.gif" /> {$totalreports}</a></li>
+	<li><a href="//{$BASEURL}/staffbox.php"><img class="staffbox" alt="staffbox" title="{$lang['title_staffbox']}" src="//{$BASEURL}/pic/trans.gif" /> {$totalsm}</a></li>
 	{/if}
 
-	<a href="//{$BASEURL}/messages.php"><img class="{if $unread}inboxnew{else}inbox{/if}" src="//{$BASEURL}/pic/trans.gif" alt="inbox" title={if $unread}{$lang['title_inbox_new_messages']}{else}$lang['title_inbox_no_new_messages']}{/if} /></a>
+	<li><a href="//{$BASEURL}/messages.php"><img class="{if $unread}inboxnew{else}inbox{/if}" src="//{$BASEURL}/pic/trans.gif" alt="inbox" title={if $unread}{$lang['title_inbox_new_messages']}{else}$lang['title_inbox_no_new_messages']}{/if} />
 	{if $messages}{$messages}({$unread}{$lang['text_message_new']})
 	{else}
 	0
 	{/if}
+	</a></li>
 
-	<a href="//{$BASEURL}/messages.php?action=viewmailbox&amp;box=-1"><img class="sentbox" alt="sentbox" title="{$lang['title_sentbox']}" src="//{$BASEURL}/pic/trans.gif" /></a> {if $outmessages}{$outmessages}{else}0{/if}
-	<a href="//{$BASEURL}/friends.php"><img class="buddylist" alt="Buddylist" title="{$lang['title_buddylist']}" src="//{$BASEURL}/pic/trans.gif" /></a>
-	<a href="//{$BASEURL}/getrss.php"><img class="rss" alt="RSS" title="{$lang['title_get_rss']}" src="//{$BASEURL}/pic/trans.gif" /></a>
-	</span></div>
+	<li><a href="//{$BASEURL}/messages.php?action=viewmailbox&amp;box=-1"><img class="sentbox" alt="sentbox" title="{$lang['title_sentbox']}" src="//{$BASEURL}/pic/trans.gif" /> {if $outmessages}{$outmessages}{else}0{/if}</a></li>
+	<li><a href="//{$BASEURL}/friends.php"><img class="buddylist" alt="Buddylist" title="{$lang['title_buddylist']}" src="//{$BASEURL}/pic/trans.gif" /></a></li>
+	<li><a href="//{$BASEURL}/getrss.php"><img class="rss" alt="RSS" title="{$lang['title_get_rss']}" src="//{$BASEURL}/pic/trans.gif" /></a></li>
+	</ul></div>
+	</div>
 
-	<div>
+	<div id="header-userinfo">
 	  <div class="minor-list list-seperator compact">
 	    <ul>
 	      <li><span class="medium">{$lang['text_welcome_back']}, {get_username($id)}</li>

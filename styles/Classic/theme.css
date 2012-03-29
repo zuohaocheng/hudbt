@@ -1359,16 +1359,15 @@ input.text {
 	width: 42px;
 }
 .donate {
-	display: block;
-	float: left;
+	display: inline-block;
 	height: 22px;
 	margin: 6px;
 	padding: 0 6px;
 	line-height: 22px;
 	text-align: center;
 	border: 1px solid #AAA;
-
 	border-radius:3px;
+	zoom: 1;
 }
 
 .donate64 {background-color: #FFFF99;}
@@ -1499,18 +1498,18 @@ input.a:hover {
     margin-right: auto;
 }
 
-#info_block {
+#header-info {
     padding: 4px;
     margin:0 10px;
     position:relative;
     zoom:1;
 }
 
-#info_block>div {
+#header-userinfo {
     text-align:left;
 }
 
-#info_block>div:first-child {
+#header-icons {
     position:absolute;
     right:8px;
     text-align:right;
