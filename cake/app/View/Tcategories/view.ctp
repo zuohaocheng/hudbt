@@ -77,14 +77,14 @@
 <div class="related">
 	<h3><?php echo __('Related Torrents');?></h3>
 	<?php torrentTableCake($torrents);?>
-	<p>
+	<div class="center">
 	<?php
 	echo $this->Paginator->counter(array(
 	'format' => __('Page {:page} of {:pages}, showing {:current} records out of {:count} total, starting on record {:start}, ending on {:end}')
 	));
-	?>	</p>
+	?>	</div>
 
-	<div class="paging">
+	<div class="paging center">
 	<?php
 		echo $this->Paginator->prev('< ' . __('previous'), array(), null, array('class' => 'prev disabled'));
 		echo $this->Paginator->numbers(array('separator' => ''));

@@ -1947,7 +1947,7 @@ function stdhead($title = "", $msgalert = true, $script = "", $place = "") {
 			'color' => "black");
     }
 
-    $cahce_key = 'user_' . $CURUSER['id'] . '_startseed_count';
+    $cache_key = 'user_' . $CURUSER['id'] . '_startseed_count';
     $no_startseed_count = $Cache->get_value($cache_key);
     if ($no_startseed_count === false) {
       $no_startseed_count = get_row_count('torrents', 'WHERE owner = ' . $CURUSER['id'] . ' AND startseed = "no"');
@@ -2978,7 +2978,9 @@ if ($CURUSER['showcomnum'] != 'no') { ?>
 <th value="8"><a href="?<?php echo $oldlink?>sort=8&amp;type=<?php echo $link[8]?>"><img class="leechers" src="//<?php echo $BASEURL; ?>/pic/trans.gif" alt="leechers" title="<?php echo $lang_functions['title_number_of_leechers'] ?>" /></a></th>
 <th value="6"><a href="?<?php echo $oldlink?>sort=6&amp;type=<?php echo $link[6]?>"><img class="snatched" src="//<?php echo $BASEURL; ?>/pic/trans.gif" alt="snatched" title="<?php echo $lang_functions['title_number_of_snatched']?>" /></a></th>
 <th value="9"><a href="?<?php echo $oldlink?>sort=9&amp;type=<?php echo $link[9]?>"><?php echo $lang_functions['col_uploader']?></a></th>
-<th class="unsortable"><?php echo (get_user_class() >= $torrentmanage_class ? $lang_functions['col_action'] : '') ?></th>
+<?php if (get_user_class() >= $torrentmanage_class): ?>
+<th class="unsortable"><?php echo $lang_functions['col_action']; ?></th>
+<?php endif; ?>
 </tr>
 </thead>
 <tbody>

@@ -1,0 +1,205 @@
+# LANGUAGE translation of CakePHP Application
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2012-03-09 18:01+0800\n"
+"PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
+"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: Controller/TcategoriesController.php:47;115;165
+msgid "Invalid tcategory"
+msgstr "无效的类别"
+
+#: Controller/TcategoriesController.php:94;131
+msgid "The tcategory has been saved"
+msgstr "分类已保存"
+
+#: Controller/TcategoriesController.php:97;134
+msgid "The tcategory could not be saved. Please, try again."
+msgstr "分类无法保存，请重试"
+
+#: Controller/TcategoriesController.php:168
+msgid "Tcategory deleted"
+msgstr "分类已删除"
+
+#: Controller/TcategoriesController.php:171
+msgid "Tcategory was not deleted"
+msgstr "分类未删除"
+
+#: Controller/TorrentsController.php:73
+msgid "Invalid torrent"
+msgstr "无效的种子文件"
+
+#: Controller/TorrentsController.php:83;84
+msgid "The torrent has been saved"
+msgstr "种子已保存"
+
+#: Controller/TorrentsController.php:87;88
+msgid "The torrent could not be saved. Please, try again."
+msgstr "种子无法保存，请重试"
+
+#: Controller/TorrentsController.php:92
+msgid "GET method not allowed"
+msgstr "不允许GET方法"
+
+#: View/Tcategories/add.ctp:4
+msgid "Add Tcategory"
+msgstr "添加分类"
+
+#: View/Tcategories/edit.ctp:4
+#: View/Tcategories/view.ctp:65
+msgid "Edit Tcategory"
+msgstr "编辑分类"
+
+#: View/Tcategories/edits.ctp:9
+msgid "Redirect"
+msgstr "重定向"
+
+#: View/Tcategories/edits.ctp:10
+msgid "Redirect to"
+msgstr "指向"
+
+#: View/Tcategories/edits.ctp:13
+msgid "Parent"
+msgstr "父分类"
+
+#: View/Tcategories/edits.ctp:18;24
+msgid "New parent"
+msgstr ""
+
+#: View/Tcategories/edits.ctp:35
+msgid "Submit"
+msgstr "提交"
+
+#: View/Tcategories/edits.ctp:38
+#: View/Tcategories/view.ctp:62
+#: View/Tcategories/viewm.ctp:28
+msgid "Actions"
+msgstr "行为"
+
+#: View/Tcategories/edits.ctp:41
+#: View/Tcategories/viewm.ctp:45
+msgid "Delete"
+msgstr "删除"
+
+#: View/Tcategories/edits.ctp:41
+#: View/Tcategories/view.ctp:68
+#: View/Tcategories/viewm.ctp:45
+msgid "Are you sure you want to delete # %s?"
+msgstr "确认删除 # %s？"
+
+#: View/Tcategories/edits.ctp:43
+#: View/Tcategories/view.ctp:70
+#: View/Tcategories/viewm.ctp:14
+msgid "List Tcategories"
+msgstr "分类列表"
+
+#: View/Tcategories/edits.ctp:44
+#: View/Tcategories/view.ctp:71
+#: View/Tcategories/viewm.ctp:13
+msgid "New Tcategory"
+msgstr "新分类"
+
+#: View/Tcategories/edits.ctp:45
+#: View/Tcategories/view.ctp:72
+#: View/Tcategories/viewm.ctp:16
+msgid "List Torrents"
+msgstr "种子列表"
+
+#: View/Tcategories/edits.ctp:46
+#: View/Tcategories/view.ctp:73;97
+#: View/Tcategories/viewm.ctp:15
+msgid "New Torrent"
+msgstr "新种子"
+
+#: View/Tcategories/view.ctp:3
+msgid "Tcategory"
+msgstr "分类"
+
+#: View/Tcategories/view.ctp:5
+msgid "Id"
+msgstr "Id"
+
+#: View/Tcategories/view.ctp:10
+msgid "Name"
+msgstr "分类名"
+
+#: View/Tcategories/view.ctp:15
+msgid "Created"
+msgstr "创建于"
+
+#: View/Tcategories/view.ctp:20
+msgid "Hidden"
+msgstr "隐藏"
+
+#: View/Tcategories/view.ctp:25
+msgid "Locked"
+msgstr "锁定"
+
+#: View/Tcategories/view.ctp:31
+msgid "Redirect To"
+msgstr "重定向至"
+
+#: View/Tcategories/view.ctp:38
+msgid "Double redirects"
+msgstr "双重重定向"
+
+#: View/Tcategories/view.ctp:38
+msgid "Redirect From"
+msgstr "重定向自"
+
+#: View/Tcategories/view.ctp:49
+msgid "Parents"
+msgstr "父分类"
+
+#: View/Tcategories/view.ctp:68
+msgid "Delete Tcategory"
+msgstr "删除分类"
+
+#: View/Tcategories/view.ctp:78
+msgid "Related Torrents"
+msgstr "相关种子"
+
+#: View/Tcategories/view.ctp:83
+#: View/Tcategories/viewm.ctp:56
+msgid "Page {:page} of {:pages}, showing {:current} records out of {:count} total, starting on record {:start}, ending on {:end}"
+msgstr "{:start}-{:end}/{:count}"
+
+#: View/Tcategories/view.ctp:89
+#: View/Tcategories/viewm.ctp:62
+msgid "previous"
+msgstr "上一页"
+
+#: View/Tcategories/view.ctp:91
+#: View/Tcategories/viewm.ctp:64
+msgid "next"
+msgstr "下一页"
+
+#: View/Tcategories/viewm.ctp:3
+msgid "Tcategories"
+msgstr "分类"
+
+#: View/Tcategories/viewm.ctp:9
+msgid "Keywords"
+msgstr "关键字"
+
+#: View/Tcategories/viewm.ctp:10
+msgid "Search"
+msgstr "搜索"
+
+#: View/Tcategories/viewm.ctp:43
+msgid "Edit"
+msgstr "编辑"
+
+#: Model/Tcategory.php:validation for field name
+msgid "notempty"
+msgstr "非空"
+
