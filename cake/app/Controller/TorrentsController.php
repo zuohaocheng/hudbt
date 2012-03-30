@@ -77,18 +77,28 @@ class TorrentsController extends AppController {
 		}
 		if ($this->request->is('post') || $this->request->is('put')) {
 		  $data = $this->request->data;
-		  $d = ['Torrent' => ['id' => $data['Torrent']['id']],
-			'Tcategory' => ['Tcategory' => $data['Tcategory']['Tcategory']]];
+		  $d = ['Tcategory' => ['Tcategory' => $data['Tcategory']['Tcategory']]];
+
+		  $keys = ['id'];
+
 		  if (checkPrivilege(['Torrent', 'oday'])) {
-		    $d['Torrent']['oday'] = ($data['Torrent']['oday'] === 'yes');
+		    $keys[] = 'oday';
 		  }
 
 		  if (checkPrivilege(['Torrent', 'pr'])) {
-		    $d['Torrent']['sp_state'] = $data['Torrent']['sp_state'];
-		    $d['Torrent']['promotion_time_type'] = $data['Torrent']['promotion_time_type'];
-		    $d['Torrent']['promotion_until'] = $data['Torrent']['promotion_until'];
+		    array_push($keys, 'sp_state', 'promotion_time_type', 'promotion_until');
 		  }
-		  
+
+		  if (checkPrivilege(['Torrent', 'sticky'])) {
+		    $keys[] = 'pos_state';
+		  }
+
+		  foreach ($keys as $key) {
+		    if (isset($data['Torrent'][$key])) {
+		      $d['Torrent'][$key] = $data['Torrent'][$key];
+		    }
+		  }
+
 			if ($this->Torrent->save($d)) {
 			  $tcategories = [];
 			  foreach ($this->Torrent->read(null, $id)['Tcategory'] as $tc) {

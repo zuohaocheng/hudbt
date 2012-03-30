@@ -1,6 +1,7 @@
 *.sql
 /cache
 /attachments
+/bitbucket
 /config/allconfig.php
 /templates_c
 /torrents
@@ -11,3 +12,6 @@
 *.rej
 /imdb/cache
 /include/loadRevision.php
+.DS_Store
+._*
+*.bak

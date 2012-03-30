@@ -14,6 +14,30 @@ class Torrent extends AppModel {
  */
 	public $displayField = 'name';
 
+/**
+ * Validation rules
+ *
+ * @var array
+ */
+	public $validate = [
+			    'sp_state' => [
+					   'rule' => ['between', 1, 7],
+					   'message' => 'Invalid sp state.',
+					   ],
+			    'promotion_time_type' => [
+			    			      'rule' => ['range', -1, 3],
+			    			      ],
+			    /* 'promotion_until' => [ */
+			    /* 			  'rule' => ['datetime', '', '/[0-9]{4}(-[0-9]{1,2}){2} ([0-9]{1,2}:){2}[0-9]{1,2}/'], */
+			    /* 			  ], */
+			    'pos_state' => [
+			    	       'rule' => ['inList', ['normal', 'sticky']],
+						  ],
+			    'oday' => [
+			    	       'rule' => ['inList', ['yes', 'no']],
+			    	       ],
+			    ];
+
 	//The Associations below have been created with all possible keys, those that are not needed can be removed
 
 /**

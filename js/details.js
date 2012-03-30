@@ -377,7 +377,7 @@ $(function() {
 		    + ':' + new_date.getSeconds();
 	    }
 	    var html = '<div id="dialog-hint"></div><input type="hidden" name="_method" value="PUT" /><input type="hidden" name="data[Torrent][id]" value="' + id + '" id="TorrentId"><ul><li><label>促销种子<select id="sel_spstate" name="data[Torrent][sp_state]" style="width: 100px;">' + createOptions(prDict, parseInt(torrent.sp_state)) + '</select></label></li><li><select id="promotion_time_type" name="data[Torrent][promotion_time_type]" style="width: 100px;" disabled="disabled">' + createOptions(untilDict, parseInt(torrent.promotion_time_type)) + '</select></li><li><label id="pr-expire">截止日期<input type="text" name="data[Torrent][promotion_until]" id="promotionuntil" style="width: 120px;" value="' + time + '"></label></li><li id="expand-pr" style="display: none; "></li><li><label>种子位置<select name="data[Torrent][pos_state]" style="width: 100px;">' + createOptions(posDict, torrent.pos_state) +'</select></label></li>';
-	    html += '<li><label><input type="checkbox" id="sel_oday" name="sel_oday" value="oday"';
+	    html += '<li><input type="hidden" name="data[Torrent][oday]" value="no"><label><input type="checkbox" id="sel_oday" name="data[Torrent][oday]" value="yes"';
 	    if (torrent.oday === 'yes') {
 		html += ' checked="checked"';
 	    }
