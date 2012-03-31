@@ -67,6 +67,10 @@ $lang_edit = array
 	'text_team' => "Group",
 	'text_audio_codec' => "Audio Codec",
 	'row_content' => "Content",
+		'oday'=> "0day",
+	'select_oday'=> "Yes",
+	'select_not_oday'=> "No",
+	'text_storing'=> "Storing",
 );
 
 ?>

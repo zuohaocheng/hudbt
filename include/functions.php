@@ -118,7 +118,7 @@ function get_single_value($table, $field, $suffix = "") {
 function checkPrivilege($item) {
   global $torrentonpromotion_class, $torrentsticky_class;
   $privilegeConfig = ['Tcategory' => ['lock' => UC_UPLOADER,'delete' => UC_VIP,],
-			   						  'Torrent' => ['startseed' => UC_VIP, 'pr' => $torrentonpromotion_class,'sticky' => $torrentsticky_class,'oday' => UC_VIP,],
+			   						  'Torrent' => ['startseed' => UC_VIP, 'pr' => $torrentonpromotion_class,'sticky' => $torrentsticky_class,'oday' => UC_VIP,'setstoring'=>UC_MODERATOR],
 					 						'Posts'=>['editnotseen'=>UC_MODERATOR,'seeeditnotseen'=>UC_UPLOADER,],
 			     ];
   if (is_array($item)) {
@@ -3112,6 +3112,16 @@ foreach($rows as $row)
       }
       elseif (($CURUSER['appendpromotion'] == 'word' && $forcemode == "") || $forcemode == 'word'){
       $sp_torrent.= "<li>[<span class='oday' ".$onmouseover.">".$lang_functions['text_oday']."</span>]</li>";
+      }
+    }
+    
+    if($row['storing']==1)
+    {
+      if (($CURUSER['appendpromotion'] == 'icon' && $forcemode == "") || $forcemode == 'icon'){  
+      $sp_torrent.="<li><img src=\"pic/ico_storing.png\" border=0 alt=\"0day\" title=\"".$lang_functions['text_storing']."\" /></li>";
+      }
+      elseif (($CURUSER['appendpromotion'] == 'word' && $forcemode == "") || $forcemode == 'word'){
+      $sp_torrent.= "<li>[<span class='oday' ".$onmouseover.">".$lang_functions['text_storing']."</span>]</li>";
       }
     }
     }

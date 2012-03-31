@@ -1,6 +1,7 @@
 <?php
 require_once("include/bittorrent.php");
 dbconn();
+
 require_once(get_langfile_path("edit.php", false, 'chs'));
 loggedinorreturn();
 
@@ -162,7 +163,14 @@ else {
 		    $odaycheckbox = "<input type=\"checkbox\" id=sel_oday name=\"sel_oday\" value=\"oday\"/>".$lang_edit['oday'];
 		  $pickcontent.=$odaycheckbox;
 		}
-		
+		//Added by Eggsorer 20120328
+		if (checkPrivilege(['Torrent', 'setstoring'])) {
+		  if($row['storing']=='1')	
+		    $storingcheckbox = "<input type=\"checkbox\" id=sel_storing name=\"sel_storing\" checked=\"yes\" value=\"storing\"/>".$lang_edit['text_storing'];
+		  elseif($row['storing']=='0')
+		    $storingcheckbox = "<input type=\"checkbox\" id=sel_storing name=\"sel_storing\" value=\"oday\"/>".$lang_edit['text_storing'];
+		  $pickcontent.=$storingcheckbox;
+		}
 		if (get_user_class()>=$torrentmanage_class && $CURUSER["picker"] == 'yes') {
 			$pickcontent .= "<b>".$lang_edit['row_recommended_movie'].":&nbsp;</b>"."<select name=\"sel_recmovie\" style=\"width: 100px;\">" .
 			"<option" . (($row["picktype"] == "normal") ? " selected=\"selected\"" : "" ) . " value=\"0\">".$lang_edit['select_normal']."</option>" .
