@@ -58,6 +58,8 @@ $lang_torrents = array
 	'text_tv' => "電視:",
 	'text_music' => "音樂:",
 	'text_software' => "軟件:",
+	'text_hot' =>"熱門",
+	'text_storing' =>"保種中",
 );
 
 ?>

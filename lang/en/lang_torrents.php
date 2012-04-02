@@ -58,6 +58,8 @@ $lang_torrents = array
 	'text_tv' => "TV:",
 	'text_music' => "Music:",
 	'text_software' => "Software:",
+	'text_hot' =>"Hot",
+	'text_storing' =>"Storing",
 );
 
 ?>

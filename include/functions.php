@@ -118,7 +118,7 @@ function get_single_value($table, $field, $suffix = "") {
 function checkPrivilege($item) {
   global $torrentonpromotion_class, $torrentsticky_class;
   $privilegeConfig = ['Tcategory' => ['lock' => UC_UPLOADER,'delete' => UC_VIP,],
-			   						  'Torrent' => ['startseed' => UC_VIP, 'pr' => $torrentonpromotion_class,'sticky' => $torrentsticky_class,'oday' => UC_VIP,],
+			   						  'Torrent' => ['startseed' => UC_VIP, 'pr' => $torrentonpromotion_class,'sticky' => $torrentsticky_class,'oday' => UC_VIP,'setstoring'=>UC_MODERATOR],
 					 						'Posts'=>['editnotseen'=>UC_MODERATOR,'seeeditnotseen'=>UC_UPLOADER,],
 			     ];
   if (is_array($item)) {
@@ -2267,8 +2267,8 @@ function delete_single_torrent($id, $row, $reasonstr='') {
     if ($user_of_torrent['accepttdpms'] != "no") {
       $lang = get_user_lang($users_of_torrent["userid"]);
       $dt = sqlesc(date("Y-m-d H:i:s"));
-      $subject = sqlesc($lang_delete_target[$lang]['msg_torrent_deleted']);
-      $msg = sqlesc($lang_delete_target[$lang]['msg_the_torrent_you_downloaded'].$row['name'].$lang_delete_target[$lang]['msg_was_deleted_by']."[url=userdetails.php?id=".$CURUSER['id']."]".$CURUSER['username']."[/url]".$lang_delete_target[$lang]['msg_reason_is'].$reasonstr);
+      $subject = sqlesc($lang_delete_target[$lang]['msg_the_torrent_you_downloaded'].$lang_delete_target[$lang]['msg_was_deleted_by'].$lang_delete_target[$lang]['msg_blank']);
+      $msg = sqlesc($lang_delete_target[$lang]['msg_the_torrent_you_downloaded']."'".$row['name']."'".$lang_delete_target[$lang]['msg_was_deleted_by']."[url=userdetails.php?id=".$CURUSER['id']."]".$CURUSER['username']."[/url]".$lang_delete_target[$lang]['msg_reason_is'].$reasonstr);
       sql_query("INSERT INTO messages (sender, receiver, subject, added, msg) VALUES(0, $users_of_torrent[userid], $subject, $dt, $msg)") or sqlerr(__FILE__, __LINE__);
     }
   }
@@ -2278,8 +2278,8 @@ function delete_single_torrent($id, $row, $reasonstr='') {
     if ($user_of_torrent['accepttdpms'] != "no") {
       $lang = get_user_lang($users_of_torrent["userid"]);
       $dt = sqlesc(date("Y-m-d H:i:s"));
-      $subject = sqlesc($lang_delete_target[$lang]['msg_torrent_deleted']);
-      $msg = sqlesc($lang_delete_target[$lang]['msg_the_torrent_you_downloaded'].$row['name'].$lang_delete_target[$lang]['msg_was_deleted_by']."[url=userdetails.php?id=".$CURUSER['id']."]".$CURUSER['username']."[/url]".$lang_delete_target[$lang]['msg_reason_is'].$reasonstr);
+      $subject = sqlesc($lang_delete_target[$lang]['msg_the_torrent_you_downloaded'].$lang_delete_target[$lang]['msg_was_deleted_by'].$lang_delete_target[$lang]['msg_blank']);
+      $msg = sqlesc($lang_delete_target[$lang]['msg_the_torrent_you_downloaded']."'".$row['name'].$lang_delete_target[$lang]['msg_was_deleted_by']."'"."[url=userdetails.php?id=".$CURUSER['id']."]".$CURUSER['username']."[/url]".$lang_delete_target[$lang]['msg_reason_is'].$reasonstr);
       sql_query("INSERT INTO messages (sender, receiver, subject, added, msg) VALUES(0, $users_of_torrent[userid], $subject, $dt, $msg)") or sqlerr(__FILE__, __LINE__);
     }
   }
@@ -2301,8 +2301,8 @@ function delete_single_torrent($id, $row, $reasonstr='') {
   if ($CURUSER["id"] != $row["owner"]){
     $dt = sqlesc(date("Y-m-d H:i:s"));
     $lang = get_user_lang($row["owner"]);
-    $subject = sqlesc($lang_delete_target[$lang]['msg_torrent_deleted']);
-    $msg = sqlesc($lang_delete_target[$lang]['msg_the_torrent_you_uploaded'].$row['name'].$lang_delete_target[$lang]['msg_was_deleted_by']."[url=userdetails.php?id=".$CURUSER['id']."]".$CURUSER['username']."[/url]".$lang_delete_target[$lang]['msg_reason_is'].$reasonstr);
+    $subject = sqlesc($lang_delete_target[$lang]['msg_the_torrent_you_uploaded'].$lang_delete_target[$lang]['msg_was_deleted_by'].$lang_delete_target[$lang]['msg_blank']);
+    $msg = sqlesc($lang_delete_target[$lang]['msg_the_torrent_you_uploaded']."'".$row['name']."'".$lang_delete_target[$lang]['msg_was_deleted_by']."[url=userdetails.php?id=".$CURUSER['id']."]".$CURUSER['username']."[/url]".$lang_delete_target[$lang]['msg_reason_is'].$reasonstr);
     sql_query("INSERT INTO messages (sender, receiver, subject, added, msg) VALUES(0, $row[owner], $subject, $dt, $msg)") or sqlerr(__FILE__, __LINE__);
   }
 
@@ -3116,6 +3116,16 @@ foreach($rows as $row)
       }
       elseif (($CURUSER['appendpromotion'] == 'word' && $forcemode == "") || $forcemode == 'word'){
       $sp_torrent.= "<li>[<span class='oday' ".$onmouseover.">".$lang_functions['text_oday']."</span>]</li>";
+      }
+    }
+    
+    if($row['storing']==1)
+    {
+      if (($CURUSER['appendpromotion'] == 'icon' && $forcemode == "") || $forcemode == 'icon'){  
+      $sp_torrent.="<li><img src=\"pic/ico_storing.png\" border=0 alt=\"0day\" title=\"".$lang_functions['text_storing']."\" /></li>";
+      }
+      elseif (($CURUSER['appendpromotion'] == 'word' && $forcemode == "") || $forcemode == 'word'){
+      $sp_torrent.= "<li>[<span class='oday' ".$onmouseover.">".$lang_functions['text_storing']."</span>]</li>";
       }
     }
     }

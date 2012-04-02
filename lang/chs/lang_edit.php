@@ -70,6 +70,7 @@ $lang_edit = array
 	'oday'=> "0day资源",
 	'select_oday'=> "是",
 	'select_not_oday'=> "否",
+	'text_storing'=> "保种中",
 );
 
 ?>

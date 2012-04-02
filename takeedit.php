@@ -86,7 +86,9 @@ $updateset[] = "audiocodec = " . sqlesc(0 + $_POST["audiocodec_sel"]);
 if (checkPrivilege(['Torrent', 'oday'])) {
   $updateset[] = "oday = '" . ($_POST["sel_oday"] ? "yes" : "no") . "'";
 }
-
+if (checkPrivilege(['Torrent', 'setstoring'])) {
+  $updateset[] = "storing = '" . ($_POST["sel_storing"] ? "1" : "0") . "'";
+}
 
 if (get_user_class() >= $torrentmanage_class) {
 	if ($_POST["banned"]) {

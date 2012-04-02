@@ -396,6 +396,11 @@ $(function() {
 		var oday = '<li><img src="pic/ico_0day.gif" alt="' + lang.text_oday + '" title="' + lang.text_oday + '"/></li>';
 		mainTitleDecorators += oday;
 	    }
+	    
+	    if (torrent.storing) {
+		var storing = '<li><img src="pic/ico_storing.png" alt="' + lang.text_storing + '" title="' + lang.text_storing + '"/></li>';
+		mainTitleDecorators += storing;
+	    }
 
 	    if (torrent.banned) {
 		var banned = '<li><span>(<span class="striking">' + lang.text_banned + '</span>)</span></li>'

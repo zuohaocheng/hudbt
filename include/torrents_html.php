@@ -118,7 +118,8 @@ if ($allsec != 1 || $enablespecial != 'yes'){ //do not print searchbox if showin
 		  <input type="submit" class="btn" value="<?php echo $lang_torrents['submit_go'] ?>" />
 		</li>
 		  <li>
-		    <input type="checkbox" name="hot" value="1" <?php echo ($wherehot? 'checked="checked"':'') ?>/><a href="?hot=1">热门</a>
+		    <input type="checkbox" name="hot" value="1" <?php echo ($wherehot? 'checked="checked"':'') ?>/><a href="?hot=1"><?php echo $lang_torrents['text_hot'] ?></a>
+		    <input type="checkbox" name="storing" value="1" <?php echo ($wherestoring? 'checked="checked"':'') ?>/><a href="?storing=1"><?php echo $lang_torrents['text_storing'] ?></a>
 		  </li>
 </ul></div>
 

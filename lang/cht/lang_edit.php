@@ -67,6 +67,10 @@ $lang_edit = array
 	'text_team' => "製作組",
 	'text_audio_codec' => "音頻編碼",
 	'row_content' => "內容"
+	'oday'=> "0day資源",
+	'select_oday'=> "是",
+	'select_not_oday'=> "否",
+	'text_storing'=> "保種中",
 );
 
 ?>
