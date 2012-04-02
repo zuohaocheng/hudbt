@@ -1635,6 +1635,7 @@ function get_css_row($cssid = -1) {
   }
   
 function get_css_uri($file = "", $theme = -1) {
+  global $defcss;
   $cssRow = get_css_row($theme);
 
   $ss_uri = $cssRow['uri'];
@@ -1650,6 +1651,7 @@ function get_css_uri($file = "", $theme = -1) {
 }
 
 function jqui_css_name($theme = -1) {
+  global $defcss;
   $cssRow = get_css_row($theme);
   $ss_uri = $cssRow['jqui'];
   if (!$ss_uri) {

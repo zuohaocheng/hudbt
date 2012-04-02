@@ -166,8 +166,9 @@ if ($action){
 			}
 
 			usercpmenu ("personal");
-			if ($type == 'saved')
-				print("<tr><td colspan=2 class=\"heading\" valign=\"top\" align=\"center\"><font color=red>".$lang_usercp['text_saved']."</font></td></tr>\n");
+			if ($type == 'saved') {
+				print('<span class="red">'.$lang_usercp['text_saved']."</span>\n");
+			}
 
 			echo '<dl class="table">';
 			form ("personal");
@@ -406,10 +407,13 @@ if ($showteam) $teams = searchbox_item_list("teams");
 if ($showaudiocodec) $audiocodecs = searchbox_item_list("audiocodecs");
 }
 
+if ($type == 'saved') {
+  print('<span class="red">'.$lang_usercp['text_saved']."</span>\n");
+}
+
 echo '<dl class="table">';
-			form ("tracker");
-			if ($type == 'saved')
-				print("<tr><td colspan=2 class=\"heading\" valign=\"top\" align=\"center\"><font color=red>".$lang_usercp['text_saved']."</font></td></tr>\n");
+			form ("tracker");			
+
 			if ($emailnotify_smtp=='yes' && $smtptype != 'none')
 				dl_item($lang_usercp['row_email_notification'], "<input type=checkbox name=pmnotif" . (strpos($CURUSER['notifs'], "[pm]") !== false ? " checked" : "") . " value=yes> ".$lang_usercp['checkbox_notification_received_pm']."<br />\n<input type=checkbox name=emailnotif" . (strpos($CURUSER['notifs'], "[email]") !== false ? " checked" : "") . " value=\"yes\" /> ".$lang_usercp['checkbox_notification_default_categories'], 1);
 
@@ -647,10 +651,11 @@ echo '</dl>';
 			}
 			usercpmenu ("forum");
 
+			if ($type == 'saved') {
+			  print('<span class="red">'.$lang_usercp['text_saved']."</span>\n");
+			}
 			echo '<dl class="table">';
 			form ("forum");
-			if ($type == 'saved')
-			print("<tr><td colspan=2 class=\"heading\" valign=\"top\" align=\"center\"><font color=red>".$lang_usercp['text_saved']."</font></td></tr>\n");
 
 			dl_item($lang_usercp['row_topics_per_page'], "<input type=text size=10 name=topicsperpage value=$CURUSER[topicsperpage]>".$lang_usercp['text_zero_equals_default'],1);
 			dl_item($lang_usercp['row_posts_per_page'], "<input type=text size=10 name=postsperpage value=$CURUSER[postsperpage]> ".$lang_usercp['text_zero_equals_default'],1);
@@ -806,6 +811,9 @@ EOD;
 			}
 			usercpmenu ("security");
 
+			if ($type == 'saved') {
+			  print("<span class=\"red\">".$lang_usercp['text_saved'].($_GET["mail"] == "1" ? $lang_usercp['std_confirmation_email_sent'] : "")." ".($_GET["passkey"] == "1" ? $lang_usercp['std_passkey_reset'] : "")." ".($_GET["password"] == "1" ? $lang_usercp['std_password_changed'] : "")." ".($_GET["privacy"] == "1" ? $lang_usercp['std_privacy_level_updated'] : "")."</span>\n");
+			}
 			echo '<dl class="table">';
 			if ($type == 'save') {
 				print('<form method="post" action="usercp.php"><input type="hidden" name="action" value="security"><input type="hidden" name="type" value="confirm">');
@@ -820,14 +828,13 @@ EOD;
 				print("<input type=\"hidden\" name=\"chpassword\" value=\"$chpassword\">");
 				print("<input type=\"hidden\" name=\"passagain\" value=\"$passagain\">");
 				print("<input type=\"hidden\" name=\"privacy\" value=\"$privacy\">");
-				Print("<tr><td class=\"heading\" valign=\"top\" align=\"right\" width=1%>".$lang_usercp['row_security_check']."</td><td valign=\"top\" align=left><input type=password name=oldpassword style=\"width: 200px\"><br /><font class=small>".$lang_usercp['text_security_check_note']."</font></td></tr>\n");
+				print("<dt>".$lang_usercp['row_security_check']."</dt><dd class=\"first-child\"><input type=\"password\" name=\"oldpassword\" style=\"width: 200px\"><br /><span class=small>".$lang_usercp['text_security_check_note']."</span></dd>\n");
 				submit();
 				print("</dl>");
 				stdfoot();
 				die;
 			}
-			if ($type == 'saved')
-				print("<tr><td colspan=2 class=\"heading\" valign=\"top\" align=\"center\"><font color=red>".$lang_usercp['text_saved'].($_GET["mail"] == "1" ? $lang_usercp['std_confirmation_email_sent'] : "")." ".($_GET["passkey"] == "1" ? $lang_usercp['std_passkey_reset'] : "")." ".($_GET["password"] == "1" ? $lang_usercp['std_password_changed'] : "")." ".($_GET["privacy"] == "1" ? $lang_usercp['std_privacy_level_updated'] : "")."</font></td></tr>\n");
+
 			form ("security");
 			dl_item($lang_usercp['row_reset_passkey'],"<input type=checkbox name=resetpasskey value=1 />".$lang_usercp['checkbox_reset_my_passkey']."<br /><font class=small>".$lang_usercp['text_reset_passkey_note']."</font>", 1);
 			if ($disableemailchange != 'no' && $smtptype != 'none') //system-wide setting
