@@ -89,6 +89,7 @@ end_frame();
 //--------------------- film critics section ---------------------------//
 
 //--------------------- forum moderators section ---------------------------//
+/*
 unset($ppl);
 $res = sql_query("SELECT forummods.userid AS userid, users.last_access, users.country FROM forummods LEFT JOIN users ON forummods.userid = users.id GROUP BY userid ORDER BY forummods.forumid, forummods.userid") or sqlerr();
 while ($arr = mysql_fetch_assoc($res))
@@ -127,7 +128,7 @@ begin_frame($lang_staff['text_forum_moderators']."<font class=small> - [<a class
 </table>
 <?php
 end_frame();
-
+*/
 //--------------------- film critics section ---------------------------//
 
 //--------------------- general staff section ---------------------------//
@@ -171,7 +172,7 @@ end_frame();
 
 
 //--------------------- VIP section ---------------------------//
-
+/*
 unset($ppl);
 $res = sql_query("SELECT * FROM users WHERE class=".UC_VIP." AND status='confirmed' ORDER BY username") or sqlerr();
 while ($arr = mysql_fetch_assoc($res))
@@ -204,7 +205,7 @@ begin_frame($lang_staff['text_vip']);
 </table>
 <?php
 end_frame();
-
+*/
 //--------------------- VIP section ---------------------------//
 end_main_frame();
 	$Cache->end_whole_row();

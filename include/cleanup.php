@@ -19,7 +19,7 @@ function docleanup($forceAll = 0, $printProgress = false) {
 	global $Cache;
 	global $rootpath;
 
-	require_once($rootpath . get_langfile_path('', true));
+	require_once($rootpath . get_langfile_path('cleanup.php', true));
 
 	set_time_limit(0);
 	ignore_user_abort(1);

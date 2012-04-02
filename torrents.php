@@ -3,11 +3,27 @@
 require_once("include/bittorrent.php");
 dbconn(true);
 require_once(get_langfile_path("torrents.php"));
-
 loggedinorreturn();
 parked();
 if ($showextinfo['imdb'] == 'yes')
   require_once ("imdb/imdb.class.php");
+
+
+
+// -------------- 缓存配置 ------------
+// 种子总数的缓存开关，true 为使用缓存
+// 时效性要求不高，默认为 true
+$torrent_count_cache = true;
+// 种子总数缓存时间
+define('TORRENT_COUNT_CACHE_TIME', 1800);
+
+// 种子详细数据的缓存开关，true 为使用缓存
+// 负载高时使用 true，平时设为 false
+$torrents_list_cache = false;
+// 种子详情缓存时间
+define('TORRENT_DETAIL_CACHE_TIME', 600);
+// -------------- 缓存配置 ------------|| END
+
 //check searchbox
 $sectiontype = $browsecatmode;
 $showsubcat = get_searchbox_value($sectiontype, 'showsubcat');//whether show subcategory (i.e. sources, codecs) or not
@@ -60,15 +76,18 @@ if ($_GET['sort'] && $_GET['type']) {
 
   switch($_GET['type']) {
   case 'asc': $ascdesc = "ASC"; $linkascdesc = "asc"; break;
+  case 'desc': $ascdesc = "DESC"; $linkascdesc = "desc"; break;
   default: $ascdesc = "DESC"; $linkascdesc = "desc"; break;
   }
 
-  if($column == "owner") {
-    $orderby = "ORDER BY pos_state DESC, torrents.anonymous, users.username " . $ascdesc;
-  }
-  else {
-    $orderby = "ORDER BY pos_state DESC, torrents." . $column . " " . $ascdesc;
-  }
+  if($column == "owner")
+    {
+      $orderby = "ORDER BY pos_state DESC, torrents.anonymous, users.username " . $ascdesc;
+    }
+  else
+    {
+      $orderby = "ORDER BY pos_state DESC, torrents." . $column . " " . $ascdesc;
+    }
 
   $pagerlink = "sort=" . intval($_GET['sort']) . "&type=" . $linkascdesc . "&";
 
@@ -162,10 +181,11 @@ elseif ($CURUSER['notifs']){
 }
 else $include_dead = 1;
 
-if (!in_array($include_dead,array(0,1,2,3))) {
-  $include_dead = 0;
-  write_log("User " . $CURUSER["username"] . "," . $CURUSER["ip"] . " is hacking incldead field in" . $_SERVER['SCRIPT_NAME'], 'mod');
-}
+if (!in_array($include_dead,array(0,1,2)))
+  {
+    $include_dead = 0;
+    write_log("User " . $CURUSER["username"] . "," . $CURUSER["ip"] . " is hacking incldead field in" . $_SERVER['SCRIPT_NAME'], 'mod');
+  }
 if ($include_dead == 0) { //all(active,dead)
   $addparam .= "incldead=0&";
 }
@@ -178,11 +198,6 @@ elseif ($include_dead == 2) {		//dead
   $addparam .= "incldead=2&";
   $wherea[] = "visible = 'no'";
 }
-elseif ($include_dead == 3) {		//no startseed
-  $addparam .= "incldead=3&";
-  $wherea[] = "startseed = 'no'";
-}
-
 // ----------------- end include dead ---------------------//
 if ($_GET)
   $special_state = 0 + $_GET["spstate"];
@@ -308,11 +323,6 @@ if ($_GET['hot']) {
   $wherea[] = "picktype='hot'";
   $addparam .= 'hot=1&';
 }
-if ($_GET['storing']) {
-  $wherestroing = true;
-  $wherea[] = "storing=1";
-  $addparam .= 'storing=1&';
-}
 
 if ($_GET["indate"]) {
   $indate = 0 + $_GET["indate"];
@@ -354,7 +364,7 @@ if (!$all) {
     $all = true;
 
     foreach ($cats as $cat) {
-      $all &= $cat['id'];
+      $all &= $cat[id];
       $mystring = $CURUSER['notifs'];
       $findme  = '[cat'.$cat['id'].']';
       $search = strpos($mystring, $findme);
@@ -364,7 +374,7 @@ if (!$all) {
 	$catcheck = true;
 
       if ($catcheck) {
-	$wherecatina[] = $cat['id'];
+	$wherecatina[] = $cat[id];
 	$addparam .= "cat$cat[id]=1&";
       }
     }
@@ -372,7 +382,7 @@ if (!$all) {
       if ($showsource)
 	foreach ($sources as $source)
 	  {
-	    $all &= $source['id'];
+	    $all &= $source[id];
 	    $mystring = $CURUSER['notifs'];
 	    $findme  = '[sou'.$source['id'].']';
 	    $search = strpos($mystring, $findme);
@@ -383,14 +393,14 @@ if (!$all) {
 
 	    if ($sourcecheck)
 	      {
-		$wheresourceina[] = $source['id'];
+		$wheresourceina[] = $source[id];
 		$addparam .= "source$source[id]=1&";
 	      }
 	  }
       if ($showmedium)
 	foreach ($media as $medium)
 	  {
-	    $all &= $medium['id'];
+	    $all &= $medium[id];
 	    $mystring = $CURUSER['notifs'];
 	    $findme  = '[med'.$medium['id'].']';
 	    $search = strpos($mystring, $findme);
@@ -401,14 +411,14 @@ if (!$all) {
 
 	    if ($mediumcheck)
 	      {
-		$wheremediumina[] = $medium['id'];
+		$wheremediumina[] = $medium[id];
 		$addparam .= "medium$medium[id]=1&";
 	      }
 	  }
       if ($showcodec)
 	foreach ($codecs as $codec)
 	  {
-	    $all &= $codec['id'];
+	    $all &= $codec[id];
 	    $mystring = $CURUSER['notifs'];
 	    $findme  = '[cod'.$codec['id'].']';
 	    $search = strpos($mystring, $findme);
@@ -419,14 +429,14 @@ if (!$all) {
 
 	    if ($codeccheck)
 	      {
-		$wherecodecina[] = $codec['id'];
+		$wherecodecina[] = $codec[id];
 		$addparam .= "codec$codec[id]=1&";
 	      }
 	  }
       if ($showstandard)
 	foreach ($standards as $standard)
 	  {
-	    $all &= $standard['id'];
+	    $all &= $standard[id];
 	    $mystring = $CURUSER['notifs'];
 	    $findme  = '[sta'.$standard['id'].']';
 	    $search = strpos($mystring, $findme);
@@ -437,14 +447,14 @@ if (!$all) {
 
 	    if ($standardcheck)
 	      {
-		$wherestandardina[] = $standard['id'];
+		$wherestandardina[] = $standard[id];
 		$addparam .= "standard$standard[id]=1&";
 	      }
 	  }
       if ($showprocessing)
 	foreach ($processings as $processing)
 	  {
-	    $all &= $processing['id'];
+	    $all &= $processing[id];
 	    $mystring = $CURUSER['notifs'];
 	    $findme  = '[pro'.$processing['id'].']';
 	    $search = strpos($mystring, $findme);
@@ -455,14 +465,14 @@ if (!$all) {
 
 	    if ($processingcheck)
 	      {
-		$whereprocessingina[] = $processing['id'];
+		$whereprocessingina[] = $processing[id];
 		$addparam .= "processing$processing[id]=1&";
 	      }
 	  }
       if ($showteam)
 	foreach ($teams as $team)
 	  {
-	    $all &= $team['id'];
+	    $all &= $team[id];
 	    $mystring = $CURUSER['notifs'];
 	    $findme  = '[tea'.$team['id'].']';
 	    $search = strpos($mystring, $findme);
@@ -473,14 +483,14 @@ if (!$all) {
 
 	    if ($teamcheck)
 	      {
-		$whereteamina[] = $team['id'];
+		$whereteamina[] = $team[id];
 		$addparam .= "team$team[id]=1&";
 	      }
 	  }
       if ($showaudiocodec)
 	foreach ($audiocodecs as $audiocodec)
 	  {
-	    $all &= $audiocodec['id'];
+	    $all &= $audiocodec[id];
 	    $mystring = $CURUSER['notifs'];
 	    $findme  = '[aud'.$audiocodec['id'].']';
 	    $search = strpos($mystring, $findme);
@@ -491,7 +501,7 @@ if (!$all) {
 
 	    if ($audiocodeccheck)
 	      {
-		$whereaudiocodecina[] = $audiocodec['id'];
+		$whereaudiocodecina[] = $audiocodec[id];
 		$addparam .= "audiocodec$audiocodec[id]=1&";
 	      }
 	  }
@@ -726,7 +736,7 @@ if (isset($searchstr))
       $notnewword="notnewword=1&";
     }
     $search_mode = 0 + $_GET["search_mode"];
-    if (!in_array($search_mode,array(0,1,2,3)))
+    if (!in_array($search_mode,array(0,1,2)))
       {
 	$search_mode = 0;
 	write_log("User " . $CURUSER["username"] . "," . $CURUSER["ip"] . " is hacking search_mode field in" . $_SERVER['SCRIPT_NAME'], 'mod');
@@ -763,10 +773,11 @@ if (isset($searchstr))
 	  $like_expression_array[] = " LIKE '%" . $searchstr. "%'";
 	  break;
 	}
-      case 3 : {	// complete
-	$like_expression_array[] = " LIKE '" . $searchstr. "'";
-	break;
-      }
+	/*case 3 :	// parsed
+	  {
+	  $like_expression_array[] = $searchstr;
+	  break;
+	  }*/
       }
     $ANDOR = ($search_mode == 0 ? " AND " : " OR ");	// only affects mode 0 and mode 1
 
@@ -870,7 +881,7 @@ else
     $sql = "SELECT COUNT(*), categories.mode FROM torrents LEFT JOIN categories ON category = categories.id " . ($search_area == 3 || $column == "owner" ? "LEFT JOIN users ON torrents.owner = users.id " : "") . $where." GROUP BY categories.mode";
   }
 
-if(true) {
+if($torrent_count_cache) {
 	$timer_1_start = microtime(true);
 	
 	$sql_key = MD5($sql);
@@ -882,8 +893,8 @@ if(true) {
 		$count = 0;
 		while($row = mysql_fetch_array($res))
 		  $count += $row[0];
+		$Cache->cache_value($sql_key, $count, TORRENT_COUNT_CACHE_TIME);
 	
-		$Cache->cache_value($sql_key, $count, 1800);
 		$timer_2_end = microtime(true);
 	}
 	$timer_1_end = microtime(true);
@@ -905,7 +916,8 @@ else $torrentsperpage = 50;
 
 
 
-#$timer_3_start = microtime(true); // debug
+#timer_3_start = microtime(true); // debug
+// var_dump($count); die(); //
 if ($count)
 {
 	if ($addparam != "")
@@ -934,38 +946,50 @@ if ($count)
 
 	if ($allsec == 1 || $enablespecial != 'yes'){
 	  //Modified by bluemonster 20111026
-	  $query = "SELECT torrents.id, torrents.sp_state, torrents.promotion_time_type, torrents.promotion_until, torrents.banned, torrents.picktype, torrents.pos_state, torrents.category, torrents.source, torrents.medium, torrents.codec, torrents.standard, torrents.processing, torrents.team, torrents.audiocodec, torrents.leechers, torrents.seeders, torrents.name, torrents.small_descr, torrents.times_completed, torrents.size, torrents.added, torrents.comments,torrents.anonymous,torrents.owner,torrents.url,torrents.cache_stamp,torrents.oday,torrents.storing FROM torrents ".($search_area == 3 || $column == "owner" ? "LEFT JOIN users ON torrents.owner = users.id " : "")." $where $orderby $limit";
+	  $query = "SELECT torrents.id, torrents.sp_state, torrents.promotion_time_type, torrents.promotion_until, torrents.banned, torrents.picktype, torrents.pos_state, torrents.category, torrents.source, torrents.medium, torrents.codec, torrents.standard, torrents.processing, torrents.team, torrents.audiocodec, torrents.leechers, torrents.seeders, torrents.name, torrents.small_descr, torrents.times_completed, torrents.size, torrents.added, torrents.comments,torrents.anonymous,torrents.owner,torrents.url,torrents.cache_stamp,torrents.oday FROM torrents ".($search_area == 3 || $column == "owner" ? "LEFT JOIN users ON torrents.owner = users.id " : "")." $where $orderby $limit";
 	}
 	else{
 	  //Modified by bluemonster 20111026
-	  $query = "SELECT torrents.id, torrents.sp_state, torrents.promotion_time_type, torrents.promotion_until, torrents.banned, torrents.picktype, torrents.pos_state, torrents.category, torrents.source, torrents.medium, torrents.codec, torrents.standard, torrents.processing, torrents.team, torrents.audiocodec, torrents.leechers, torrents.seeders, torrents.name, torrents.small_descr, torrents.times_completed, torrents.size, torrents.added, torrents.comments,torrents.anonymous,torrents.owner,torrents.url,torrents.cache_stamp,torrents.oday,torrents.storing FROM torrents ".($search_area == 3 || $column == "owner" ? "LEFT JOIN users ON torrents.owner = users.id " : "")." LEFT JOIN categories ON torrents.category=categories.id $where $orderby $limit";
+	  $query = "SELECT torrents.id, torrents.sp_state, torrents.promotion_time_type, torrents.promotion_until, torrents.banned, torrents.picktype, torrents.pos_state, torrents.category, torrents.source, torrents.medium, torrents.codec, torrents.standard, torrents.processing, torrents.team, torrents.audiocodec, torrents.leechers, torrents.seeders, torrents.name, torrents.small_descr, torrents.times_completed, torrents.size, torrents.added, torrents.comments,torrents.anonymous,torrents.owner,torrents.url,torrents.cache_stamp,torrents.oday FROM torrents ".($search_area == 3 || $column == "owner" ? "LEFT JOIN users ON torrents.owner = users.id " : "")." LEFT JOIN categories ON torrents.category=categories.id $where $orderby $limit";
 	}
-	
-	$query_key = MD5($query);
-	$rows = $Cache->get_value($query_key);
 
-	if(empty($rows)) {
+	// 缓存开关放在文件最顶部 BruceWolf 2012.03.21
+	if($torrents_list_cache) { // 使用缓存
+		// 取缓存数据
+		$query_key = MD5($query);
+		$rows = $Cache->get_value($query_key);
+
+		// 缓存为空时从数据库获取数据
+		if(empty($rows)) {
+			$res = sql_query('/* FILE: '.__FILE__.' LINE: '.__LINE__.'*/ '.$query) or die(mysql_error());
+
+			while ($row = mysql_fetch_assoc($res)) {
+				$rows[] = $row;
+			}
+			$Cache->cache_value($query_key, $rows, TORRENT_DETAIL_CACHE_TIME);
+		}
+	} else { // 不使用缓存
 		$res = sql_query('/* FILE: '.__FILE__.' LINE: '.__LINE__.'*/ '.$query) or die(mysql_error());
-
 		while ($row = mysql_fetch_assoc($res)) {
 			$rows[] = $row;
 		}
-		$Cache->cache_value($query_key, $rows, 30);
 	}
 }
 else
   unset($rows);
 
 #$timer_3_end = microtime(true); // debug
+
+
 #$timer_4_start = microtime(true); // debug
-if ($_REQUEST['format'] == 'json') { 
+if ($_GET['format'] == 'json') {
   include('include/torrents_json.php');
 }
 else {
   include('include/torrents_html.php');
 }
-/* $timer_4_end = microtime(true); // debug */
-/* $timer_0_end = microtime(true); // debug */
+#$timer_4_end = microtime(true); // debug
+#$timer_0_end = microtime(true); // debug
 /* if($_GET['ttimer']) { */
 /* 	$ttimer = "[{$time_delta1}](1), [{$time_delta2}](2)"; */
 /* 	$ttimer .= ',['.($timer_3_end - $timer_3_start).'](3)'; */
