@@ -126,6 +126,7 @@ function hash_pad($hash) {
 }
 
 function hash_where($name, $hash) {
+  $hash = stripslashes($hash);
 	$shhash = preg_replace('/ *$/s', "", $hash);
 	return "($name = " . sqlesc($hash) . " OR $name = " . sqlesc($shhash) . ")";
 }

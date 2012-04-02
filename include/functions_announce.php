@@ -20,7 +20,7 @@ function dbconn_announce() {
 function hash_where_arr($name, $hash_arr) {
 	$new_hash_arr = Array();
 	foreach ($hash_arr as $hash) {
-		$new_hash_arr[] = sqlesc((urldecode($hash)));
+	  $new_hash_arr[] = sqlesc(stripslashes(urldecode($hash)));
 	}
 	return $name." IN ( ".implode(", ",$new_hash_arr)." )";
 }
