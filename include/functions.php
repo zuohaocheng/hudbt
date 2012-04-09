@@ -4,7 +4,7 @@ if(!defined('IN_TRACKER'))
   die('Hacking attempt!');
 include_once($rootpath . 'include/globalfunctions.php');
 include_once($rootpath . 'classes/class_advertisement.php');
-require_once($rootpath . get_langfile_path("functions.php"));
+include($rootpath . get_langfile_path("functions.php"));
 
 function smarty($cachetime=300, $debug = false) {
   require_once('lib/Smarty/Smarty.class.php');
@@ -42,6 +42,15 @@ function get_langfolder_cookie() {
   }
 }
 
+function get_langlist() {
+  $langs = [];
+  $res = sql_query('SELECT site_lang_folder FROM language WHERE site_lang=1;') or sqlerr(__FILE__, __LINE__);
+  while ($a = mysql_fetch_row($res)) {
+    $langs[] = $a[0];
+  }
+  return $langs;
+}
+
 function get_user_lang($user_id) {
   $lang_res = sql_query("SELECT site_lang_folder FROM language LEFT JOIN users ON language.id = users.lang WHERE language.site_lang=1 AND users.id= ". sqlesc($user_id) ." LIMIT 1") or sqlerr(__FILE__, __LINE__);
   $lang = mysql_fetch_assoc($lang_res);
@@ -58,10 +67,12 @@ function get_load_uri($type, $script_name ="", $absolute = true) {
   }
   if (array_key_exists('debug', $_GET) && $_GET['debug']) {
     $addition .= '&debug=1';
+    $debug = true;
   }
   else {
     include('include/loadRevision.php');
     $addition .= '&rev=' . $loadRevision;
+    $debug = false;
   }
 
   $pagename = 'load.php';
@@ -70,15 +81,43 @@ function get_load_uri($type, $script_name ="", $absolute = true) {
   }
   
   if ($type == 'js') {
-    return '<script type="text/javascript" src="' . $pagename . '?format=js' . $addition . '"></script><script type="text/javascript" src="' . $pagename . '?format=js&name=' . $name . $addition . '"></script>';
+    if ($debug) {
+      $hrefs = [$pagename . '?format=js'  . $addition];
+    }
+    else {
+      $lang = get_langfolder_cookie();
+      $hrefs = ['//' . $BASEURL . '/cache/js-common-' . $lang . '.js'];
+
+      $filename = preg_replace('/\.php$/i', '.js', $name);
+    }
+
+    if (file_exists('js/' . $filename)) {
+      $hrefs[] = $pagename . '?format=js&name=' . $name . $addition;
+    }
+    
+    return join(array_map(function($href) {
+	  return '<script type="text/javascript" src="' . $href . '"></script>';
+	}, $hrefs));
   }
   elseif ($type == 'css') {
-    $addition .= '&font=' . get_font_type();
-    $addition .= '&theme=' . get_css_id();
-    if ($CURUSER) {
-      $addition .= '&caticon=' . $CURUSER['caticon'];
+    if ($debug) {
+      $addition .= '&font=' . get_font_type();
+      $addition .= '&theme=' . get_css_id();
+      if ($CURUSER) {
+	$addition .= '&caticon=' . $CURUSER['caticon'];
+      }
+      $href= $pagename . '?format=css' . $addition;
     }
-    $href= $pagename . '?format=css' . $addition;
+    else {
+      if ($CURUSER) {
+	$cat = $CURUSER['caticon'];
+      }
+      else {
+	$cat = 1;
+      }
+      $lang = get_langfolder_cookie();
+      $href = '//' . $BASEURL . '/cache/css-' . $lang . '-cat' . $cat . '-' . get_font_type() . '-theme' . get_css_id() . '.css';
+    }
     return '<link rel="stylesheet" href="' . $href . '" type="text/css" media="screen" />';
   }
   return '';
@@ -94,7 +133,7 @@ function get_langfile_path($script_name ="", $target = false, $lang_folder = "")
 }
 
 function get_row_count($table, $suffix = "") {
-  $r = sql_query("SELECT COUNT(*) FROM $table $suffix") or sqlerr(__FILE__, __LINE__);
+  $r = sql_query("SELECT COUNT(1) FROM $table $suffix") or sqlerr(__FILE__, __LINE__);
   $a = mysql_fetch_row($r) or die(mysql_error());
   return $a[0];
 }
@@ -117,9 +156,10 @@ function get_single_value($table, $field, $suffix = "") {
 
 function checkPrivilege($item) {
   global $torrentonpromotion_class, $torrentsticky_class;
-  $privilegeConfig = ['Tcategory' => ['lock' => UC_UPLOADER,'delete' => UC_VIP,],
-			   						  'Torrent' => ['startseed' => UC_VIP, 'pr' => $torrentonpromotion_class,'sticky' => $torrentsticky_class,'oday' => UC_VIP,'setstoring'=>UC_MODERATOR],
-					 						'Posts'=>['editnotseen'=>UC_MODERATOR,'seeeditnotseen'=>UC_UPLOADER,],
+  $privilegeConfig = ['Maintenance'=>['staticResources' => UC_MODERATOR],
+		      'Tcategory' => ['lock' => UC_UPLOADER,'delete' => UC_VIP,],
+		      'Torrent' => ['startseed' => UC_VIP, 'pr' => $torrentonpromotion_class,'sticky' => $torrentsticky_class,'oday' => UC_VIP,'setstoring'=>UC_MODERATOR],
+		      'Posts'=>['editnotseen'=>UC_MODERATOR,'seeeditnotseen'=>UC_UPLOADER,],
 			     ];
   if (is_array($item)) {
     $config = $privilegeConfig;
@@ -199,7 +239,8 @@ function format_comment($text, $strip_html = true, $xssclean = false, $newtab = 
 
   $text = htmlspecialchars($text, ENT_HTML401 | ENT_NOQUOTES);
   /* $text = preg_replace("/ /", "&nbsp;", $text); */
-  $text = preg_replace("/\n/s", " <br />", $text);
+  $text = str_replace("\r", "", $text);
+  $text = str_replace("\n", " <br />", $text);
 
   $opts = array('filters' => $filters, 'imgMaxW' => $image_max_width, 'imgMaxH' => $image_max_height);
   if ($newtab) {
@@ -510,7 +551,7 @@ function begin_compose($title = "",$type="new", $body="", $hassubject=true, $sub
   if ($hassubject)
     print("<tr><td class=\"rowhead\">".$lang_functions['row_subject']."</td>" .
 	  "<td class=\"rowfollow\" align=\"left\"><input type=\"text\" style=\"width: 650px;\" name=\"subject\" maxlength=\"".$maxsubjectlength."\" value=\"".$subject."\" /></td></tr>\n");
-  print("<tr><td class=\"rowhead\" valign=\"top\">".$lang_functions['row_body']."</td><td class=\"rowfollow\" align=\"left\"><span style=\"display: none;\" id=\"previewouter\"></span><div id=\"editorouter\">");
+  print("<tr><td class=\"rowhead\" valign=\"top\">".$lang_functions['row_body']."</td><td class=\"rowfollow\" align=\"left\"><div style=\"display: none;\" id=\"previewouter\"></div><div id=\"editorouter\">");
   textbbcode("compose","body", $body, false);
   print("</div></td></tr>");
 }
@@ -1514,7 +1555,7 @@ function validemail($email) {
 function validlang($langid) {
   global $deflang;
   $langid = 0 + $langid;
-  $res = sql_query("SELECT * FROM language WHERE site_lang = 1 AND id = " . sqlesc($langid)) or sqlerr(__FILE__, __LINE__);
+  $res = sql_query("SELECT site_lang_folder FROM language WHERE site_lang = 1 AND id = " . sqlesc($langid)) or sqlerr(__FILE__, __LINE__);
   if(mysql_num_rows($res) == 1)
     {
       $arr = mysql_fetch_array($res)  or sqlerr(__FILE__, __LINE__);
@@ -1616,22 +1657,26 @@ function get_css_id() {
   return $cssid;
 }
 
+function get_css_rows() {
+  global $Cache;
+  static $rows;
+
+  if (!$rows && !$rows = $Cache->get_value('stylesheet_content')){
+    $rows = array();
+    $res = sql_query("SELECT * FROM stylesheets ORDER BY id ASC");
+    while($row = mysql_fetch_array($res)) {
+      $rows[$row['id']] = $row;
+    }
+    $Cache->cache_value('stylesheet_content', $rows, 95400);
+  }
+  return $rows;
+}
+
 function get_css_row($cssid = -1) {
-    global $Cache;
-    static $rows;
     if ($cssid == -1) {
       $cssid = get_css_id();
     }
-
-    if (!$rows && !$rows = $Cache->get_value('stylesheet_content')){
-      $rows = array();
-      $res = sql_query("SELECT * FROM stylesheets ORDER BY id ASC");
-      while($row = mysql_fetch_array($res)) {
-	$rows[$row['id']] = $row;
-      }
-      $Cache->cache_value('stylesheet_content', $rows, 95400);
-    }
-    return $rows[$cssid];
+    return get_css_rows()[$cssid];
   }
   
 function get_css_uri($file = "", $theme = -1) {
@@ -2137,7 +2182,7 @@ function get_protocol_prefix()
     return "http://";
   } else {
     if (!isset($_COOKIE["c_secure_ssl"])) {
-      return "http://";
+      return "//";
     } else {
       return base64_decode($_COOKIE["c_secure_ssl"]) == "yeah" ? "https://" : "http://";
     }
@@ -3118,7 +3163,7 @@ foreach($rows as $row)
       $sp_torrent.= "<li>[<span class='oday' ".$onmouseover.">".$lang_functions['text_oday']."</span>]</li>";
       }
     }
-    
+
     if($row['storing']==1)
     {
       if (($CURUSER['appendpromotion'] == 'icon' && $forcemode == "") || $forcemode == 'icon'){  
@@ -3480,7 +3525,6 @@ $tablehtml = array("&#x00c7;", "&#x00fc;", "&#x00e9;", "&#x00e2;", "&#x00e4;",
 "&#x00b1;", "&#x2265;", "&#x2264;", "&#x2320;", "&#x2321;", "&#x00f7;",
 "&#x2248;", "&#x00b0;", "&#x2219;", "&#x00b7;", "&#x221a;", "&#x207f;",
 "&#x00b2;", "&#x25a0;", "&#x00a0;");
-$s = htmlspecialchars($ibm_437);
 
 
 // 0-9, 11-12, 14-31, 127 (decimalt)
@@ -3501,10 +3545,10 @@ $s = str_replace($control,$controlpict,$s); */
 /*echo "[a\\x00-\\x1F]";
 //$s = preg_replace("/[ \\x00-\\x1F]/", " ", $s);
 $s = preg_replace("/[ \000-\037]/", " ", $s); */
-$s = str_replace($control," ",$s);
+$s = str_replace($control," ",$ibm_437);
 
-
-
+$s = str_replace("&", "&amp;", $s); 
+$s = str_replace("<", "&lt;", $s); 
 
 if ($swedishmagic){
 $s = str_replace("\345","\206",$s);
@@ -3736,18 +3780,18 @@ function gettime($time, $withago = true, $twoline = false, $forceago = false, $o
   return $newtime;
 }
 
-function get_forum_pic_folder(){
-  global $CURLANGDIR;
-  return "pic/forum_pic/".$CURLANGDIR;
+function get_forum_pic_folder_for($lang) {
+  return "pic/forum_pic/".$lang;
 }
 
-function get_category_icon_row($typeid)
-{
+function get_forum_pic_folder(){
+  global $CURLANGDIR;
+  return get_forum_pic_folder_for($CURLANGDIR);
+}
+
+function get_category_icon_rows() {
   global $Cache;
   static $rows;
-  if (!$typeid) {
-    $typeid=1;
-  }
   if (!$rows && !$rows = $Cache->get_value('category_icon_content')){
     $rows = array();
     $res = sql_query("SELECT * FROM caticons ORDER BY id ASC");
@@ -3756,7 +3800,15 @@ function get_category_icon_row($typeid)
     }
     $Cache->cache_value('category_icon_content', $rows, 156400);
   }
-  return $rows[$typeid];
+  return $rows;
+}
+
+function get_category_icon_row($typeid) {
+  if (!$typeid) {
+    $typeid=1;
+  }
+
+  return get_category_icon_rows()[$typeid];
 }
 function get_category_row($catid = NULL)
 {

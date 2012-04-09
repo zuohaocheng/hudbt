@@ -1,6 +1,5 @@
 <?php
-require_once('lib/jsminplus.php');
-require_once('lib/CSSMin.php');
+require_once("include/static_resources.php");
 require_once("include/bittorrent.php");
 dbconn(true);
 
@@ -107,18 +106,6 @@ function generate_key($name, $type, $multiple) {
   return $key;
 }
 
-function dependence($name) {
-  $dependence = array(
-		    'torrents' => array('jquery.json-2.3.min', 'jstorage.min'),
-		    );
-
-  $dep = $dependence[$name];
-  if ($dep) {
-    return $dep;
-  }
-  return array();
-}
-
 function load_files_cache($name, $type, $debug, $purge) {
   global $Cache;
   global $cache_key;
@@ -139,21 +126,29 @@ function load_files_cache($name, $type, $debug, $purge) {
 
   if ($type == 'js') {
     if (!$name) {
-    //Mind the sequence of loading
-      $out .= load_files(array('jquery-1.7.1.min', 'jquery-ui-1.8.18.custom.min', 'jquery.tablesorter'), $type, $debug, $purge, false, false);
-      $out .= load_files(array('ajaxbasic', 'common', 'domLib', 'domTT', 'domTT_drag', 'fadomatic', 'pm', 'pager'), $type, $debug, $purge);
+      global $js_files;
+      $out .= load_files($js_files, $type, $debug, $purge);
       $out .= ";/* constants */";
       $out .= load_constant();
     }
     else {
       $out .= load_files(dependence($name), $type, $debug, $purge);
       $out .= load_files(array($name), $type, $debug, $purge);
+
+      $langfile = $rootpath . get_langfile_path($name) . '.php';
+      if (file_exists($langfile)) {
+      	include($langfile);
+	$key = 'lang_' . $name;
+	$lang = compact($key);
+	$out .= "\n/* lang */\nhb.constant.pagelang = (" . json_encode($lang[$key]) . ');';
+      }
     }
   }
   elseif ($type == 'css') {
     global $font, $theme, $caticon;
     $css_uri = get_css_uri('', $theme);
-    $files = array(get_font_css_uri($font), 'styles/sprites.css', get_forum_pic_folder().'/forumsprites.css', $css_uri."theme.css", $css_uri."DomTT.css", 'pic/' . get_cat_folder(401, $caticon) . "sprite.css", 'styles/jqui/' . jqui_css_name($theme) . '/jquery-ui-1.8.18.custom.css', 'styles/jquery.tablesorter/jquery.tablesorter.css');
+    global $css_files;
+    $files = array_merge($css_files, array(get_font_css_uri($font), get_forum_pic_folder().'/forumsprites.css', $css_uri."theme.css", $css_uri."DomTT.css", 'pic/' . get_cat_folder(401, $caticon) . "sprite.css", 'styles/jqui/' . jqui_css_name($theme) . '/jquery-ui-1.8.18.custom.css'));   
     $out .= load_files($files, $type, $debug, $purge, true);
 
     if ($CURUSER){
@@ -204,7 +199,7 @@ function load_files($files, $type, $debug, $purge, $path = false, $minify=true) 
 
 function load_file_cache($name, $type, $debug, $purge, $path = false, $minify=true) {
   if ($debug) {
-    return load_file($name, $type, $debug, $path, $minify);
+    return load_file($name, $type, $path, !$debug);
   }
   
   global $Cache;
@@ -220,79 +215,9 @@ function load_file_cache($name, $type, $debug, $purge, $path = false, $minify=tr
       return $c;
     }
   }
-  $c = load_file($name, $type, $debug, $path, $minify);
+  $c = load_file($name, $type, $path, $minify);
   $Cache->cache_value($key, $c, 2592000);
   $Cache->cache_value($key . '_md', date('D, d M Y H:i:s') . ' GMT', 2592000);
   #  echo 'direct';
   return $c;
 }
-
-function load_file($name, $type, $debug, $fullpath=false, $minify = true) {
-  if ($fullpath) {
-    $path = $name;
-  }
-  else {
-    $path = get_path($name, $type);
-  }
-  $f = read_file($path);
-
-  if ($type == 'css') {
-    $f = css_remap($f, $path);
-  }
-  
-  if ($minify && !preg_match('/\.min$/', $name)) {
-    $f = minify($f, $type, $debug, $path);
-  }
-  return $f;
-}
-
-function css_remap($s, $path) {
-  $p = preg_replace('/^(.*\/)[^\/]+$/', '\1', $path);
-  $s = CSSMin::remap($s, false, $p);
-  return $s;
-}
-
-function get_path($resname, $type) {
-  if ($type == 'js') {
-    return 'js/'. $resname . '.js';
-  }
-  elseif ($type == 'css') {
-    return 'styles/'. $resname . '.css';
-  }
-  return '';
-}
-
-function read_file($file) {
-  if (!is_file($file)) {
-    return '';
-  }
-
-  $f = fopen($file, 'r');
-  if (!$f) {
-    return '';
-  }
-
-  $s = '';
-  do {
-    $s .= fread($f, 4096);
-  } while (!feof($f));
-  fclose($f);
-  return $s;
-}
-
-function minify($s, $type, $debug, $path) {
-  if ($debug) {
-    return $s;
-  }
-  elseif ($type == 'css') {
-    return CSSMin::minify($s);
-  }
-  elseif ($type == 'js') {
-    return JSMinPlus::minify($s) . ';';
-  }
-  else {
-    return $s;
-  }
-}
-
-
