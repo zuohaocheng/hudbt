@@ -525,7 +525,7 @@
 new RegExp( /^(([0-2]?[0-9]:[0-5][0-9])|([0-1]?[0-9]:[0-5][0-9]\s(am|pm)))$/)
 	    ],
 	    fileSize : [
-		new RegExp( /((^[0-9]+(\.[0-9]+)?)|(\.[0-9]+))[ \t]*[kmgtp]?b/i)
+		new RegExp( /((^[0-9]+(\.[0-9]+)?)|(\.[0-9]+))[ \t]*[kmgtp]?i?b/i)
 	    ]
 };
 }
@@ -941,20 +941,25 @@ is: function( s, table ) {
 format: function( s ) {
     var base = $.tablesorter.formatDigit(s);
     var multiplier = 1;
+    var b = 1024;
+    if (/i/i.test(s)) {
+	b = 1000;
+    }
+
     if (/P/i.test(s)) {
-	multiplier = 1.12589991e15;
+	multiplier = Math.pow(b, 5);
     }
     if (/T/i.test(s)) {
-	multiplier = 1099511627776;
+	multiplier = Math.pow(b, 4);
     }
     else if (/G/i.test(s)) {
-	multiplier = 1073741824;
+	multiplier = Math.pow(b, 3);
     }
     else if (/M/i.test(s)) {
-	multiplier = 1048576;
+	multiplier = b * b;
     }
     else if (/K/i.test(s)) {
-	multiplier = 1024;
+	multiplier = b;
     }
     return base * multiplier;
 },

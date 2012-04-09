@@ -60,7 +60,7 @@ $(function() {
 		    }
 
 		    validating = true;
-		    $.getJSON(cake + "tcategories/search/" + catName, function(result) {
+		    $.getJSON(cake + "tcategories/search/exact:1/" + catName, function(result) {
 			var validation = true;
 			if (result.length === 1) {
 			    if ($inputs.parent().attr('id') === 'redirect') {

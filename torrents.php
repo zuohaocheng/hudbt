@@ -19,9 +19,9 @@ define('TORRENT_COUNT_CACHE_TIME', 1800);
 
 // 种子详细数据的缓存开关，true 为使用缓存
 // 负载高时使用 true，平时设为 false
-$torrents_list_cache = false;
+$torrents_list_cache = true;
 // 种子详情缓存时间
-define('TORRENT_DETAIL_CACHE_TIME', 600);
+define('TORRENT_DETAIL_CACHE_TIME', 5);
 // -------------- 缓存配置 ------------|| END
 
 //check searchbox
@@ -139,7 +139,7 @@ else $inclbookmarked = 0;
 if (!in_array($inclbookmarked,array(0,1,2)))
   {
     $inclbookmarked = 0;
-    write_log("User " . $CURUSER["username"] . "," . $CURUSER["ip"] . " is hacking inclbookmarked field in" . $_SERVER['SCRIPT_NAME'], 'mod');
+#    write_log("User " . $CURUSER["username"] . "," . $CURUSER["ip"] . " is hacking inclbookmarked field in" . $_SERVER['SCRIPT_NAME'], 'mod');
   }
 if ($inclbookmarked == 0)  //all(bookmarked,not)
   {
@@ -181,10 +181,10 @@ elseif ($CURUSER['notifs']){
 }
 else $include_dead = 1;
 
-if (!in_array($include_dead,array(0,1,2)))
+if (!in_array($include_dead,array(0,1,2,3)))
   {
     $include_dead = 0;
-    write_log("User " . $CURUSER["username"] . "," . $CURUSER["ip"] . " is hacking incldead field in" . $_SERVER['SCRIPT_NAME'], 'mod');
+#    write_log("User " . $CURUSER["username"] . "," . $CURUSER["ip"] . " is hacking incldead field in" . $_SERVER['SCRIPT_NAME'], 'mod');
   }
 if ($include_dead == 0) { //all(active,dead)
   $addparam .= "incldead=0&";
@@ -197,6 +197,10 @@ elseif ($include_dead == 1) {		//active
 elseif ($include_dead == 2) {		//dead
   $addparam .= "incldead=2&";
   $wherea[] = "visible = 'no'";
+}
+elseif ($include_dead == 3) {
+  $addparam .= "incldead=3&";
+  $wherea[] = "startseed = 'no'";
 }
 // ----------------- end include dead ---------------------//
 if ($_GET)
@@ -223,7 +227,7 @@ else $special_state = 0;
 
 if (!in_array($special_state,array(0,1,2,3,4,5,6,7))) {
   $special_state = 0;
-  write_log("User " . $CURUSER["username"] . "," . $CURUSER["ip"] . " is hacking spstate field in " . $_SERVER['SCRIPT_NAME'], 'mod');
+#  write_log("User " . $CURUSER["username"] . "," . $CURUSER["ip"] . " is hacking spstate field in " . $_SERVER['SCRIPT_NAME'], 'mod');
 }
 if($special_state == 0)	//all
   {
@@ -322,6 +326,12 @@ if ($_GET['hot']) {
   $wherehot = true;
   $wherea[] = "picktype='hot'";
   $addparam .= 'hot=1&';
+}
+
+if ($_GET['storing']) {
+  $wherestroing = true;
+  $wherea[] = "storing=1";
+  $addparam .= 'storing=1&';
 }
 
 if ($_GET["indate"]) {
@@ -736,10 +746,10 @@ if (isset($searchstr))
       $notnewword="notnewword=1&";
     }
     $search_mode = 0 + $_GET["search_mode"];
-    if (!in_array($search_mode,array(0,1,2)))
+    if (!in_array($search_mode,array(0,1,2,3)))
       {
 	$search_mode = 0;
-	write_log("User " . $CURUSER["username"] . "," . $CURUSER["ip"] . " is hacking search_mode field in" . $_SERVER['SCRIPT_NAME'], 'mod');
+#	write_log("User " . $CURUSER["username"] . "," . $CURUSER["ip"] . " is hacking search_mode field in" . $_SERVER['SCRIPT_NAME'], 'mod');
       }
 
     $search_area = 0 + $_GET["search_area"];
@@ -768,16 +778,14 @@ if (isset($searchstr))
 	    }
 	  break;
 	}
-      case 2	:	// exact
-	{
-	  $like_expression_array[] = " LIKE '%" . $searchstr. "%'";
-	  break;
-	}
-	/*case 3 :	// parsed
-	  {
-	  $like_expression_array[] = $searchstr;
-	  break;
-	  }*/
+      case 2	: {	// exact
+	$like_expression_array[] = " LIKE '%" . $searchstr. "%'";
+	break;
+      }
+      case 3 : {	// parsed
+	$like_expression_array[] = " = '" . $searchstr . "'";
+	break;
+      }
       }
     $ANDOR = ($search_mode == 0 ? " AND " : " OR ");	// only affects mode 0 and mode 1
 
@@ -804,28 +812,26 @@ if (isset($searchstr))
 	  $wherea[] =  implode($ANDOR, $like_expression_array);
 	  break;
 	  }*/
-      case 3	:	// torrent uploader
-	{
-	  foreach ($like_expression_array as &$like_expression_array_element)
-	    $like_expression_array_element =  "users.username". $like_expression_array_element;
-
-	  if(!isset($CURUSER))	// not registered user, only show not anonymous torrents
-	    {
-	      $wherea[] =  implode($ANDOR, $like_expression_array) . " AND torrents.anonymous = 'no'";
-	    }
-	  else
-	    {
-	      if(get_user_class() > $torrentmanage_class)	// moderator or above, show all
-		{
-		  $wherea[] =  implode($ANDOR, $like_expression_array);
-		}
-	      else // only show normal torrents and anonymous torrents from hiself
-		{
-		  $wherea[] =   "(" . implode($ANDOR, $like_expression_array) . " AND torrents.anonymous = 'no') OR (" . implode($ANDOR, $like_expression_array). " AND torrents.anonymous = 'yes' AND users.id=" . $CURUSER["id"] . ") ";
-		}
-	    }
-	  break;
+      case 3 : {	// torrent uploader
+	foreach ($like_expression_array as &$like_expression_array_element) {
+	  $like_expression_array_element =  "users.username". $like_expression_array_element;
 	}
+	//show all for manager
+	$w = '(' . implode($ANDOR, $like_expression_array);
+	if (!checkPrivilege(['Torrent', 'edit'])) {
+	  // show not anonymous torrents for all
+	  $w .= " AND torrents.anonymous = 'no') ";
+	  if (isset($CURUSER)) {
+	    // show self torrents for registered users
+	    $w .=  'OR (users.id=' . $CURUSER['id'] . ') ';
+	  }
+	}
+	else {
+	  $w .= ')';
+	}
+	$wherea[] = $w;
+	break;
+      }
       case 4  :  //imdb url
 	foreach ($like_expression_array as &$like_expression_array_element)
 	  $like_expression_array_element = "torrents.url". $like_expression_array_element;
@@ -835,7 +841,7 @@ if (isset($searchstr))
 	{
 	  $search_area = 0;
 	  $wherea[] =  "torrents.name LIKE '%" . $searchstr . "%'";
-	  write_log("User " . $CURUSER["username"] . "," . $CURUSER["ip"] . " is hacking search_area field in" . $_SERVER['SCRIPT_NAME'], 'mod');
+#	  write_log("User " . $CURUSER["username"] . "," . $CURUSER["ip"] . " is hacking search_area field in" . $_SERVER['SCRIPT_NAME'], 'mod');
 	  break;
 	}
       }
@@ -946,11 +952,11 @@ if ($count)
 
 	if ($allsec == 1 || $enablespecial != 'yes'){
 	  //Modified by bluemonster 20111026
-	  $query = "SELECT torrents.id, torrents.sp_state, torrents.promotion_time_type, torrents.promotion_until, torrents.banned, torrents.picktype, torrents.pos_state, torrents.category, torrents.source, torrents.medium, torrents.codec, torrents.standard, torrents.processing, torrents.team, torrents.audiocodec, torrents.leechers, torrents.seeders, torrents.name, torrents.small_descr, torrents.times_completed, torrents.size, torrents.added, torrents.comments,torrents.anonymous,torrents.owner,torrents.url,torrents.cache_stamp,torrents.oday FROM torrents ".($search_area == 3 || $column == "owner" ? "LEFT JOIN users ON torrents.owner = users.id " : "")." $where $orderby $limit";
+	  $query = "SELECT torrents.id, torrents.sp_state, torrents.promotion_time_type, torrents.promotion_until, torrents.banned, torrents.picktype, torrents.pos_state, torrents.category, torrents.source, torrents.medium, torrents.codec, torrents.standard, torrents.processing, torrents.team, torrents.audiocodec, torrents.leechers, torrents.seeders, torrents.name, torrents.small_descr, torrents.times_completed, torrents.size, torrents.added, torrents.comments,torrents.anonymous,torrents.owner,torrents.url,torrents.cache_stamp,torrents.oday, torrents.storing FROM torrents ".($search_area == 3 || $column == "owner" ? "LEFT JOIN users ON torrents.owner = users.id " : "")." $where $orderby $limit";
 	}
 	else{
 	  //Modified by bluemonster 20111026
-	  $query = "SELECT torrents.id, torrents.sp_state, torrents.promotion_time_type, torrents.promotion_until, torrents.banned, torrents.picktype, torrents.pos_state, torrents.category, torrents.source, torrents.medium, torrents.codec, torrents.standard, torrents.processing, torrents.team, torrents.audiocodec, torrents.leechers, torrents.seeders, torrents.name, torrents.small_descr, torrents.times_completed, torrents.size, torrents.added, torrents.comments,torrents.anonymous,torrents.owner,torrents.url,torrents.cache_stamp,torrents.oday FROM torrents ".($search_area == 3 || $column == "owner" ? "LEFT JOIN users ON torrents.owner = users.id " : "")." LEFT JOIN categories ON torrents.category=categories.id $where $orderby $limit";
+	  $query = "SELECT torrents.id, torrents.sp_state, torrents.promotion_time_type, torrents.promotion_until, torrents.banned, torrents.picktype, torrents.pos_state, torrents.category, torrents.source, torrents.medium, torrents.codec, torrents.standard, torrents.processing, torrents.team, torrents.audiocodec, torrents.leechers, torrents.seeders, torrents.name, torrents.small_descr, torrents.times_completed, torrents.size, torrents.added, torrents.comments,torrents.anonymous,torrents.owner,torrents.url,torrents.cache_stamp,torrents.oday, torrents.storing FROM torrents ".($search_area == 3 || $column == "owner" ? "LEFT JOIN users ON torrents.owner = users.id " : "")." LEFT JOIN categories ON torrents.category=categories.id $where $orderby $limit";
 	}
 
 	// 缓存开关放在文件最顶部 BruceWolf 2012.03.21

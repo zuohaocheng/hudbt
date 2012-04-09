@@ -108,7 +108,7 @@ else {
 
     $small_desc = trim($row["small_descr"]);
     if ($smalldescription_main == 'yes' && $small_desc) {
-      dl_item($lang_details['row_small_description'], htmlspecialchars(),true);
+      dl_item($lang_details['row_small_description'], htmlspecialchars($row['small_descr']),true);
     }
 
     $size_info =  "<b>".$lang_details['text_size']."</b>" . mksize($row["size"]);
@@ -208,11 +208,12 @@ else {
     }
 
     if (get_user_class() >= $viewnfo_class && $CURUSER['shownfo'] != 'no' && $row["nfosz"] > 0){
-      if (!$nfo = $Cache->get_value('nfo_block_torrent_id_'.$id)){
+      $nfo = $Cache->get_value('nfo_block_torrent_id_'.$id);
+      if (!$nfo) {
 	$nfo = code($row["nfo"], $view == "magic");
 	$Cache->cache_value('nfo_block_torrent_id_'.$id, $nfo, 604800);
       }
-      dl_item("<a href=\"javascript: klappe_news('nfo')\"><img class=\"plus\" src=\"pic/trans.gif\" alt=\"Show/Hide\" id=\"picnfo\" title=\"".$lang_detail['title_show_or_hide']."\" /> ".$lang_details['text_nfo']."</a><br /><a href=\"viewnfo.php?id=".$row[id]."\" class=\"sublink\">". $lang_details['text_view_nfo']. "</a>", "<div id='knfo' style=\"display: none;\"><pre style=\"font-size:10pt; font-family: 'Courier New', monospace;\">".$nfo."</pre></div>\n", 1);
+      dl_item("<a href=\"javascript: klappe_news('nfo')\"><img class=\"plus\" src=\"pic/trans.gif\" alt=\"Show/Hide\" id=\"picnfo\" title=\"".$lang_detail['title_show_or_hide']."\" /> ".$lang_details['text_nfo']."</a><br /><a href=\"viewnfo.php?id=".$row['id']."\" class=\"sublink\">". $lang_details['text_view_nfo']. "</a>", "<div id='knfo' style=\"display: none;\"><pre style=\"font-size:10pt; font-family: 'Courier New', monospace;\">".$nfo."</pre></div><div style=\"clear:both;\"\n", 1);
     }
 
     if ($imdb_id && $showextinfo['imdb'] == 'yes' && $CURUSER['showimdb'] != 'no')
@@ -551,8 +552,8 @@ else {
     echo '<dt id="tcategories-title"><a href="//' . $CAKEURL . '/tcategories/">分类</a></dt>';
     echo '<dd>';
     include('./cake/app/webroot/index.php');
-    include('./cake/app/Model/Torrent.php');
-    include('./cake/app/Model/Tcategory.php');
+    App::uses('Torrent', 'Model');
+    App::uses('Tcategory', 'Model');
     $Torrent = new Torrent;
     $Torrent->id = $id;
     if ($Torrent->exists()) {

@@ -91,8 +91,11 @@ class HTML_BBCodeParser_Filter_Extended extends HTML_BBCodeParser_Filter
                                 'h6' => array('htmlopen'  => 'h6',
                                                 'htmlclose' => 'h6',
                                                 'allowed'   => 'all',
-                                                'attributes'=> array())
-
+					      'attributes'=> array()),
+				'hr' => array('htmlopen' => 'hr',
+					      'htmlclose' => '',
+					      'allowed' => 'none',
+					      'attributes'=> array()),
     );
 
 

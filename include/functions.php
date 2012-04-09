@@ -155,10 +155,10 @@ function get_single_value($table, $field, $suffix = "") {
 }
 
 function checkPrivilege($item) {
-  global $torrentonpromotion_class, $torrentsticky_class;
+  global $torrentonpromotion_class, $torrentsticky_class, $torrentmanage_class;
   $privilegeConfig = ['Maintenance'=>['staticResources' => UC_MODERATOR],
 		      'Tcategory' => ['lock' => UC_UPLOADER,'delete' => UC_VIP,],
-		      'Torrent' => ['startseed' => UC_VIP, 'pr' => $torrentonpromotion_class,'sticky' => $torrentsticky_class,'oday' => UC_VIP,'setstoring'=>UC_MODERATOR],
+		      'Torrent' => ['edit' => $torrentmanage_class, 'delete'=> $torrentmanage_class, 'startseed' => UC_VIP, 'pr' => $torrentonpromotion_class,'sticky' => $torrentsticky_class,'oday' => UC_VIP,'setstoring'=>UC_MODERATOR],
 		      'Posts'=>['editnotseen'=>UC_MODERATOR,'seeeditnotseen'=>UC_UPLOADER,],
 			     ];
   if (is_array($item)) {
@@ -176,7 +176,13 @@ function checkPrivilege($item) {
 
     $last_key = array_pop($item);
     if ($config && array_key_exists($last_key, $config)) {
-      return (get_user_class() >= $config[$last_key]);
+      $obj = $config[$last_key];
+      /* if (is_callable($obj)) { */
+      /* 	return $obj(); */
+      /* } */
+      /* else { */
+	return (get_user_class() >= $obj);
+      /* } */
     }
   }
   elseif (is_string($item)) {
@@ -1860,49 +1866,51 @@ function stdhead($title = "", $msgalert = true, $script = "", $place = "") {
   }
   $meta .= '<meta name="generator" content="' . PROJECTNAME . '" />';
 
-  $ratio = get_ratio($CURUSER['id']);
+  if ($CURUSER) {
+    $ratio = get_ratio($CURUSER['id']);
 
-  //// check every 15 minutes //////////////////
-  $messages = $Cache->get_value('user_'.$CURUSER["id"].'_inbox_count');
-  if ($messages == ""){
-    $messages = get_row_count("messages", "WHERE receiver=" . sqlesc($CURUSER["id"]) . " AND location<>0");
-    $Cache->cache_value('user_'.$CURUSER["id"].'_inbox_count', $messages, 900);
-  }
-  $outmessages = $Cache->get_value('user_'.$CURUSER["id"].'_outbox_count');
-  if ($outmessages == ""){
-    $outmessages = get_row_count("messages","WHERE sender=" . sqlesc($CURUSER["id"]) . " AND saved='yes'");
-    $Cache->cache_value('user_'.$CURUSER["id"].'_outbox_count', $outmessages, 900);
-  }
-  if (!$connect = $Cache->get_value('user_'.$CURUSER["id"].'_connect')){
-    $res3 = sql_query("SELECT connectable FROM peers WHERE userid=" . sqlesc($CURUSER["id"]) . " LIMIT 1");
-    if($row = mysql_fetch_row($res3))
-      $connect = $row[0];
-    else $connect = 'unknown';
-    $Cache->cache_value('user_'.$CURUSER["id"].'_connect', $connect, 900);
-  }
+    //// check every 15 minutes //////////////////
+    $messages = $Cache->get_value('user_'.$CURUSER["id"].'_inbox_count');
+    if ($messages == ""){
+      $messages = get_row_count("messages", "WHERE receiver=" . sqlesc($CURUSER["id"]) . " AND location<>0");
+      $Cache->cache_value('user_'.$CURUSER["id"].'_inbox_count', $messages, 900);
+    }
+    $outmessages = $Cache->get_value('user_'.$CURUSER["id"].'_outbox_count');
+    if ($outmessages == ""){
+      $outmessages = get_row_count("messages","WHERE sender=" . sqlesc($CURUSER["id"]) . " AND saved='yes'");
+      $Cache->cache_value('user_'.$CURUSER["id"].'_outbox_count', $outmessages, 900);
+    }
+    if (!$connect = $Cache->get_value('user_'.$CURUSER["id"].'_connect')){
+      $res3 = sql_query("SELECT connectable FROM peers WHERE userid=" . sqlesc($CURUSER["id"]) . " LIMIT 1");
+      if($row = mysql_fetch_row($res3))
+	$connect = $row[0];
+      else $connect = 'unknown';
+      $Cache->cache_value('user_'.$CURUSER["id"].'_connect', $connect, 900);
+    }
 
-  if($connect == "yes")
-    $connectable = "<b><font color=\"green\">".$lang_functions['text_yes']."</font></b>";
-  elseif ($connect == 'no')
-    $connectable = "<a href=\"faq.php#id21\"><b><font color=\"red\">".$lang_functions['text_no']."</font></b></a>";
-  else
-    $connectable = $lang_functions['text_unknown'];
+    if($connect == "yes")
+      $connectable = "<b><font color=\"green\">".$lang_functions['text_yes']."</font></b>";
+    elseif ($connect == 'no')
+      $connectable = "<a href=\"faq.php#id21\"><b><font color=\"red\">".$lang_functions['text_no']."</font></b></a>";
+    else
+      $connectable = $lang_functions['text_unknown'];
 
-  //// check every 60 seconds //////////////////
-  $activeseed = $Cache->get_value('user_'.$CURUSER["id"].'_active_seed_count');
-  if ($activeseed == ""){
-    $activeseed = get_row_count("peers","WHERE userid=" . sqlesc($CURUSER["id"]) . " AND seeder='yes'");
-    $Cache->cache_value('user_'.$CURUSER["id"].'_active_seed_count', $activeseed, 60);
-  }
-  $activeleech = $Cache->get_value('user_'.$CURUSER["id"].'_active_leech_count');
-  if ($activeleech == ""){
-    $activeleech = get_row_count("peers","WHERE userid=" . sqlesc($CURUSER["id"]) . " AND seeder='no'");
-    $Cache->cache_value('user_'.$CURUSER["id"].'_active_leech_count', $activeleech, 60);
-  }
-  $unread = $Cache->get_value('user_'.$CURUSER["id"].'_unread_message_count');
-  if ($unread == ""){
-    $unread = get_row_count("messages","WHERE receiver=" . sqlesc($CURUSER["id"]) . " AND unread='yes'");
-    $Cache->cache_value('user_'.$CURUSER["id"].'_unread_message_count', $unread, 60);
+    //// check every 60 seconds //////////////////
+    $activeseed = $Cache->get_value('user_'.$CURUSER["id"].'_active_seed_count');
+    if ($activeseed == ""){
+      $activeseed = get_row_count("peers","WHERE userid=" . sqlesc($CURUSER["id"]) . " AND seeder='yes'");
+      $Cache->cache_value('user_'.$CURUSER["id"].'_active_seed_count', $activeseed, 60);
+    }
+    $activeleech = $Cache->get_value('user_'.$CURUSER["id"].'_active_leech_count');
+    if ($activeleech == ""){
+      $activeleech = get_row_count("peers","WHERE userid=" . sqlesc($CURUSER["id"]) . " AND seeder='no'");
+      $Cache->cache_value('user_'.$CURUSER["id"].'_active_leech_count', $activeleech, 60);
+    }
+    $unread = $Cache->get_value('user_'.$CURUSER["id"].'_unread_message_count');
+    if ($unread == ""){
+      $unread = get_row_count("messages","WHERE receiver=" . sqlesc($CURUSER["id"]) . " AND unread='yes'");
+      $Cache->cache_value('user_'.$CURUSER["id"].'_unread_message_count', $unread, 60);
+    }
   }
   
   $s->assign(array(
@@ -1959,121 +1967,124 @@ function stdhead($title = "", $msgalert = true, $script = "", $place = "") {
 		   'connectable' => $connectable,
 		   ));
 
-  $alerts = array();
-  if ($CURUSER && $msgalert) {
-    if ($CURUSER['leechwarn'] == 'yes') {
-      $kicktimeout = gettime($CURUSER['leechwarnuntil'], false, false, true);
-      $text = $lang_functions['text_please_improve_ratio_within'].$kicktimeout.$lang_functions['text_or_you_will_be_banned'];
-      $alerts[] = array('href' => "faq.php#id17",
-			'text' => $text,
-			'color' => "orange");
-    }
-    
-    if($deletenotransfertwo_account) { //inactive account deletion notice
-      if ($CURUSER['downloaded'] == 0 && ($CURUSER['uploaded'] == 0 || $CURUSER['uploaded'] == $iniupload_main)) {
-	
-	$neverdelete_account = ($neverdelete_account <= UC_VIP ? $neverdelete_account : UC_VIP);
-	if (get_user_class() < $neverdelete_account) {
-	  $secs = $deletenotransfertwo_account*24*60*60;
-	  $addedtime = strtotime($CURUSER['added']);
-	  if (TIMENOW > $addedtime+($secs/3)) { // start notification if one third of the time has passed
-	    
-	    $kicktimeout = gettime(date("Y-m-d H:i:s", $addedtime+$secs), false, false, true);
-	    $text = $lang_functions['text_please_download_something_within'].$kicktimeout.$lang_functions['text_inactive_account_be_deleted'];
-	    $alerts[] = array('href' => "rules.php",
-			      'text' => $text,
-			      'color' => "gray");
+  if ($CURUSER) {
+    $alerts = array();
+    if ($msgalert) {
+      if ($CURUSER['leechwarn'] == 'yes') {
+	$kicktimeout = gettime($CURUSER['leechwarnuntil'], false, false, true);
+	$text = $lang_functions['text_please_improve_ratio_within'].$kicktimeout.$lang_functions['text_or_you_will_be_banned'];
+	$alerts[] = array('href' => "faq.php#id17",
+			  'text' => $text,
+			  'color' => "orange");
+      }
+      
+      if($deletenotransfertwo_account) { //inactive account deletion notice
+	if ($CURUSER['downloaded'] == 0 && ($CURUSER['uploaded'] == 0 || $CURUSER['uploaded'] == $iniupload_main)) {
+	  
+	  $neverdelete_account = ($neverdelete_account <= UC_VIP ? $neverdelete_account : UC_VIP);
+	  if (get_user_class() < $neverdelete_account) {
+	    $secs = $deletenotransfertwo_account*24*60*60;
+	    $addedtime = strtotime($CURUSER['added']);
+	    if (TIMENOW > $addedtime+($secs/3)) { // start notification if one third of the time has passed
+	      
+	      $kicktimeout = gettime(date("Y-m-d H:i:s", $addedtime+$secs), false, false, true);
+	      $text = $lang_functions['text_please_download_something_within'].$kicktimeout.$lang_functions['text_inactive_account_be_deleted'];
+	      $alerts[] = array('href' => "rules.php",
+				'text' => $text,
+				'color' => "gray");
+	    }
 	  }
 	}
       }
-    }
-    if($CURUSER['showclienterror'] == 'yes') {
-      $text = $lang_functions['text_banned_client_warning'];
-      $alerts[] = array('href' => "faq.php#id29",
-			'text' => $text,
-			'color' => "black");
-    }
+      if($CURUSER['showclienterror'] == 'yes') {
+	$text = $lang_functions['text_banned_client_warning'];
+	$alerts[] = array('href' => "faq.php#id29",
+			  'text' => $text,
+			  'color' => "black");
+      }
 
-    $cache_key = 'user_' . $CURUSER['id'] . '_startseed_count';
-    $no_startseed_count = $Cache->get_value($cache_key);
-    if ($no_startseed_count === false) {
-      $no_startseed_count = get_row_count('torrents', 'WHERE owner = ' . $CURUSER['id'] . ' AND startseed = "no"');
-      $Cache->cache_value($cache_key, $no_startseed_count, 300);
-    }
-    if ($no_startseed_count) {
-      $alerts[] = ['href' => 'torrents.php?search_area=3&search_mode=3&incldead=3&search=' . $CURUSER['username'],
-    		   'text' => sprintf($lang_functions['text_no_startseed'], $no_startseed_count),
-    		   'color' => 'black'];
-    }
-    
-    if ($unread) {
-      $text = $lang_functions['text_you_have'].$unread.$lang_functions['text_new_message'] . add_s($unread) . $lang_functions['text_click_here_to_read'];
-      $alerts[] = array('href' => "messages.php",
-			'text' => $text,
-			'color' => "red",
-			'id' => 'alert-message');
-    }
+      $cache_key = 'user_' . $CURUSER['id'] . '_startseed_count';
+      $no_startseed_count = $Cache->get_value($cache_key);
+      if ($no_startseed_count === false) {
+	$no_startseed_count = get_row_count('torrents', 'WHERE owner = ' . $CURUSER['id'] . ' AND startseed = "no"');
+	$Cache->cache_value($cache_key, $no_startseed_count, 300);
+      }
+      if ($no_startseed_count) {
+	$alerts[] = ['href' => 'torrents.php?search_area=3&search_mode=3&incldead=3&search=' . $CURUSER['username'],
+		     'text' => sprintf($lang_functions['text_no_startseed'], $no_startseed_count),
+		     'color' => 'black'];
+      }
+      
+      if ($unread) {
+	$text = $lang_functions['text_you_have'].$unread.$lang_functions['text_new_message'] . add_s($unread) . $lang_functions['text_click_here_to_read'];
+	$alerts[] = array('href' => "messages.php",
+			  'text' => $text,
+			  'color' => "red",
+			  'id' => 'alert-message');
+      }
 
-    $settings_script_name = $_SERVER["SCRIPT_FILENAME"];
-    if (!preg_match("/index/i", $settings_script_name))
-      {
-	$new_news = $Cache->get_value('user_'.$CURUSER["id"].'_unread_news_count');
-	if ($new_news == ""){
-	  $new_news = get_row_count("news","WHERE notify = 'yes' AND added > ".sqlesc($CURUSER['last_home']));
-	  $Cache->cache_value('user_'.$CURUSER["id"].'_unread_news_count', $new_news, 300);
+      $settings_script_name = $_SERVER["SCRIPT_FILENAME"];
+      if (!preg_match("/index/i", $settings_script_name))
+	{
+	  $new_news = $Cache->get_value('user_'.$CURUSER["id"].'_unread_news_count');
+	  if ($new_news == ""){
+	    $new_news = get_row_count("news","WHERE notify = 'yes' AND added > ".sqlesc($CURUSER['last_home']));
+	    $Cache->cache_value('user_'.$CURUSER["id"].'_unread_news_count', $new_news, 300);
+	  }
+	  if ($new_news > 0) {
+	    $text = $lang_functions['text_there_is'].is_or_are($new_news).$new_news.$lang_functions['text_new_news'];
+	    $alerts[] = array('href' => "index.php",
+			      'text' => $text,
+			      'color' => "green");
+	  }
 	}
-	if ($new_news > 0) {
-	  $text = $lang_functions['text_there_is'].is_or_are($new_news).$new_news.$lang_functions['text_new_news'];
-	  $alerts[] = array('href' => "index.php",
+
+      if (get_user_class() >= $staffmem_class) {
+	$numreports = $Cache->get_value('staff_new_report_count');
+	if ($numreports == "") {
+	  $numreports = get_row_count("reports","WHERE dealtwith=0");
+	  $Cache->cache_value('staff_new_report_count', $numreports, 900);
+	}
+	if ($numreports) {
+	  $text = $lang_functions['text_there_is'].is_or_are($numreports).$numreports.$lang_functions['text_new_report'] .add_s($numreports);
+	  $alerts[] = array('href' => "reports.php",
 			    'text' => $text,
-			    'color' => "green");
+			    'color' => "blue");
+	}
+	$nummessages = $Cache->get_value('staff_new_message_count');
+	if ($nummessages == "") {
+	  $nummessages = get_row_count("staffmessages","WHERE answered='no'");
+	  $Cache->cache_value('staff_new_message_count', $nummessages, 900);
+	}
+	if ($nummessages > 0) {
+	  $text = $lang_functions['text_there_is'].is_or_are($nummessages).$nummessages.$lang_functions['text_new_staff_message'] . add_s($nummessages);
+	  $alerts[] = array('href' => "staffbox.php",
+			    'text' => $text,
+			    'color' => "blue");
+	}
+	$numcheaters = $Cache->get_value('staff_new_cheater_count');
+	if ($numcheaters == "") {
+	  $numcheaters = get_row_count("cheaters","WHERE dealtwith=0");
+	  $Cache->cache_value('staff_new_cheater_count', $numcheaters, 900);
+	}
+	if ($numcheaters) {
+	  $text = $lang_functions['text_there_is'].is_or_are($numcheaters).$numcheaters.$lang_functions['text_new_suspected_cheater'] .add_s($numcheaters);
+	  $alerts[] = array('href' => "cheaterbox.php",
+			    'text' => $text,
+			    'color' => "blue");
 	}
       }
-
-    if (get_user_class() >= $staffmem_class) {
-      $numreports = $Cache->get_value('staff_new_report_count');
-      if ($numreports == "") {
-	$numreports = get_row_count("reports","WHERE dealtwith=0");
-	$Cache->cache_value('staff_new_report_count', $numreports, 900);
-      }
-      if ($numreports) {
-	$text = $lang_functions['text_there_is'].is_or_are($numreports).$numreports.$lang_functions['text_new_report'] .add_s($numreports);
-	$alerts[] = array('href' => "reports.php",
-			  'text' => $text,
-			  'color' => "blue");
-      }
-      $nummessages = $Cache->get_value('staff_new_message_count');
-      if ($nummessages == "") {
-	$nummessages = get_row_count("staffmessages","WHERE answered='no'");
-	$Cache->cache_value('staff_new_message_count', $nummessages, 900);
-      }
-      if ($nummessages > 0) {
-	$text = $lang_functions['text_there_is'].is_or_are($nummessages).$nummessages.$lang_functions['text_new_staff_message'] . add_s($nummessages);
-	$alerts[] = array('href' => "staffbox.php",
-			  'text' => $text,
-			  'color' => "blue");
-      }
-      $numcheaters = $Cache->get_value('staff_new_cheater_count');
-      if ($numcheaters == "") {
-	$numcheaters = get_row_count("cheaters","WHERE dealtwith=0");
-	$Cache->cache_value('staff_new_cheater_count', $numcheaters, 900);
-      }
-      if ($numcheaters) {
-	$text = $lang_functions['text_there_is'].is_or_are($numcheaters).$numcheaters.$lang_functions['text_new_suspected_cheater'] .add_s($numcheaters);
-	$alerts[] = array('href' => "cheaterbox.php",
-			  'text' => $text,
-			  'color' => "blue");
-      }
     }
-  }
 
-  if ($offlinemsg) {
-    $alerts[] = array('href' => "",
-		      'text' => $lang_functions['text_website_offline_warning'],
-		      'color' => "white");		  
+    if ($offlinemsg) {
+      $alerts[] = array('href' => "",
+			'text' => $lang_functions['text_website_offline_warning'],
+			'color' => "white");		  
+    }
+  
+    $s->assign('alerts', $alerts);
   }
   
-  $s->assign('alerts', $alerts);
   if ($CURUSER) {
     $key = $CURUSER['id'];
   }
@@ -2807,7 +2818,7 @@ function genrelist($catmode = 1) {
   global $Cache;
   if (!$ret = $Cache->get_value('category_list_mode_'.$catmode)){
     $ret = array();
-    $res = sql_query("SELECT id, mode, name, image FROM categories WHERE mode = ".sqlesc($catmode)." ORDER BY sort_index, id");
+    $res = sql_query("SELECT id, mode, name FROM categories WHERE mode = ".sqlesc($catmode)." ORDER BY sort_index, id");
     while ($row = mysql_fetch_array($res))
       $ret[] = $row;
     $Cache->cache_value('category_list_mode_'.$catmode, $ret, 152800);
@@ -3292,7 +3303,7 @@ foreach($rows as $row)
     if (get_user_class() >= $torrentmanage_class)
     {
       print('<td class="rowfollow"><div class="minor-list-vertical"><ul><li><a class="staff-quick-delete" href="'.htmlspecialchars('//' . $BASEURL . '/fastdelete.php?id='.$row['id']).'"><img class="staff_delete" src="//' . $BASEURL . '/pic/trans.gif" alt="D" title="'.$lang_functions['text_delete'].'" /></a></li>');
-      print("<li><a href=\"//$BASEURL/edit.php?returnto=" . rawurlencode($_SERVER["REQUEST_URI"]) . "&amp;id=" . $row["id"] . "\"><img class=\"staff_edit\" src=\"//$BASEURL/pic/trans.gif\" alt=\"E\" title=\"".$lang_functions['text_edit']."\" /></a></li></ul></div></td>\n");
+      print("<li><a class=\"staff-quick-edit\" href=\"//$BASEURL/edit.php?returnto=" . rawurlencode($_SERVER["REQUEST_URI"]) . "&amp;id=" . $row["id"] . "\"><img class=\"staff_edit\" src=\"//$BASEURL/pic/trans.gif\" alt=\"E\" title=\"".$lang_functions['text_edit']."\" /></a></li></ul></div></td>\n");
     }
     print("</tr>\n");
     $counter++;

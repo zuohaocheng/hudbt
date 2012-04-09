@@ -1,5 +1,5 @@
 $(function() {
-    if (!hb.config.pager) {
+    if (!('config' in hb) || !('pager' in hb.config)) {
 	return;
     }
     function gotothepage(page){
@@ -50,10 +50,6 @@ $(function() {
     $('.pager-more').click(function(e) {
 	e.preventDefault();
 	var page = hb.config.pager;
-	var dialog = $('<div></div>', {
-	    title : '跳至页码',
-	    html : '<form><label>第<input type="text" id="pager-go-to" style="width:2em;" value="' + (page.current + 1) + '" />页，共' + page.max + '页</label></form>'
-	});
 	var onOK = function() {
 	    var target = parseInt($('#pager-go-to').val()) -1;
 	    if (target >= 0 && target <= page.max) {
@@ -63,6 +59,15 @@ $(function() {
 		$('#pager-go-to').addClass('invalid');
 	    }
 	};
+	var dialog = $('<div></div>', {
+	    title : '跳至页码'
+	}).append($('<form></form>', {
+	    html : '<label>第<input type="text" id="pager-go-to" style="width:2em;" value="' + (page.current + 1) + '" />页，共' + page.max + '页</label>'
+	}).submit(function(e) {
+	    e.preventDefault();
+	    onOK();
+	}));
+
 	dialog.dialog({
 	    buttons : {
 		OK : onOK,

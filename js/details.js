@@ -129,7 +129,7 @@ $(function() {
 		var catName = this.value;
 		if (catName !== '') {
 		    validating = true;
-		    $.getJSON(cake + "tcategories/search/" + catName, function(result) {
+		    $.getJSON(cake + "tcategories/search/exact:1/" + catName, function(result) {
 			var validation = true;
 			if (result.length === 1) {
 			    var resultId = result[0].Tcategory.id;

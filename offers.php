@@ -691,7 +691,7 @@ list($pagertop, $pagerbottom, $limit) = pager($perpage, $count, $_SERVER["PHP_SE
 if($sort == "")
 $sort =  "ORDER BY added desc ";
 
-$res = sql_query("SELECT offers.id, offers.userid, offers.name, offers.added, offers.allowedtime, offers.comments, offers.yeah, offers.against, offers.category as cat_id, offers.allowed, categories.image, categories.name as cat FROM offers inner join categories on offers.category = categories.id $categ $search $sort $limit") or sqlerr(__FILE__,__LINE__);
+$res = sql_query("SELECT offers.id, offers.userid, offers.name, offers.added, offers.allowedtime, offers.comments, offers.yeah, offers.against, offers.category as cat_id, offers.allowed, categories.name as cat FROM offers inner join categories on offers.category = categories.id $categ $search $sort $limit") or sqlerr(__FILE__,__LINE__);
 $num = mysql_num_rows($res);
 
 stdhead($lang_offers['head_offers']);

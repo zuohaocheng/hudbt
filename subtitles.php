@@ -87,7 +87,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $_REQUEST["action"] == "upload") {
   else {
     $torrent_id = 0 + $_POST["torrent_id"];
 
-    $r = sql_query("SELECT owwner FROM torrents WHERE id = ". sqlesc($torrent_id)) or sqlerr(__FILE__, __LINE__);
+    $r = sql_query("SELECT owner FROM torrents WHERE id = ". sqlesc($torrent_id)) or sqlerr(__FILE__, __LINE__);
     if(!mysql_num_rows($r)) {
       echo($lang_subtitles['std_invalid_torrent_id']);
       exit;
@@ -257,6 +257,7 @@ $s->assign(array('lang' => $lang_subtitles,
 		 'lang_ids' => $lang_ids,
 		 'lang_names' => $lang_names,
 		 'beanonymous_class' => $beanonymous_class,
+		 'viewanonymous_class' => $viewanonymous_class,
 		 'letter' => $letter,
 		 'pagertop' => $pagertop,
 		 'rows' => $rows,
@@ -275,11 +276,12 @@ if ($detail_torrent_id) {
   }
 }
 
-$s->display('subtitles.tpl', php_json_encode(array('userid' => $CURUSER['id'],
+$s->display('subtitles.tpl', json_encode(array('userid' => $CURUSER['id'],
 						   'torrent' => $detail_torrent_id,
 						   'search' => $search,
 						   'letter' => $letter,
-						   'lang_id' => $lang_id)));
+						   'lang_id' => $lang_id,
+						   'page' => $limit)));
 
 stdfoot();
 ?>
