@@ -39,17 +39,47 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 	$newwidth=floor($width/$scale);
 	$newheight=floor($height/$scale);
 
-	if ($it==1)
-		$orig=@imagecreatefromgif($file["tmp_name"]);
-	elseif ($it == 2)
-		$orig=@imagecreatefromjpeg($file["tmp_name"]);
-	else
-		$orig=@imagecreatefrompng($file["tmp_name"]);
-	if(!$orig)
-	stderr($lang_bitbucketupload['std_image_processing_failed'],$lang_bitbucketupload['std_sorry_the_uploaded']."$imgtypes[$it]".$lang_bitbucketupload['std_failed_processing']);
-	$thumb = imagecreatetruecolor($newwidth, $newheight);
+
+	switch ($it) {
+	case IMAGETYPE_GIF:
+	  $orig=@imagecreatefromgif($file["tmp_name"]);
+	  break;
+	case IMAGETYPE_JPEG:
+	  $orig=@imagecreatefromjpeg($file["tmp_name"]);
+	  break;
+	case IMAGETYPE_PNG:
+	  $orig=@imagecreatefrompng($file["tmp_name"]);
+	  break;
+	default:
+	  die;
+	}
+
+	if(!$orig) {
+	  stderr($lang_bitbucketupload['std_image_processing_failed'],$lang_bitbucketupload['std_sorry_the_uploaded']."$imgtypes[$it]".$lang_bitbucketupload['std_failed_processing']);
+	}
+	
+	if ($it == IMAGETYPE_PNG) {
+	  $thumb = imagecreate($newwidth, $newheight);
+	}
+	else {
+	  $thumb = imagecreatetruecolor($newwidth, $newheight);
+	}
 	imagecopyresampled($thumb, $orig, 0, 0, 0, 0, $newwidth, $newheight, $width, $height);
-	$ret=($it==1)?imagegif($thumb, $tgtfile): ($it==2)?imagejpeg($thumb, $tgtfile):imagepng($thumb, $tgtfile);
+	switch ($it) {
+	case IMAGETYPE_GIF:
+	  $ret = imagegif($thumb, $tgtfile);
+	  break;
+	case IMAGETYPE_JPEG:
+	  $ret = imagejpeg($thumb, $tgtfile);
+	  break;
+	case IMAGETYPE_PNG:
+	  imagealphablending($thumb, false);
+	  imagesavealpha($thumb, true);
+	  $ret = imagepng($thumb, $tgtfile);
+	  break;
+	default:
+	  die;
+	}
 
 	$url = str_replace(" ", "%20", htmlspecialchars(get_protocol_prefix()."$BASEURL/bitbucket/$filename"));
 	$name = sqlesc($filename);
