@@ -14,6 +14,8 @@ if ($langid)
 }
 require_once(get_langfile_path("", false, $CURLANGDIR));
 cur_user_check ("//$BASEURL/index.php");
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
 $type = $_GET['type'];
 if ($type == 'invite')
 {

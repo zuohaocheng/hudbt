@@ -2,7 +2,7 @@
 
 $lang_takesignup = array
 (
-	'std_signup_failed' => "注册失败！（参看下面）",
+	'std_signup_failed' => "注册失败！",
 	'std_invalid_email_address' => "邮箱地址无效！",
 	'std_email_address_banned' => "邮箱地址被禁用！",
 	'std_wrong_email_address_domains' => "不允许使用该邮箱地址注册！请使用以下邮箱：",
