@@ -129,6 +129,12 @@ table.no-vertical-line {
     border-bottom: #00aa00 1px solid;
 }
 
+table.no-vertical-line tr:nth-of-type(even) td { 
+    background-color:#e0ebd8;
+    border-top: solid 1px #c6e3c6;
+    border-bottom: solid 1px #c6e3c6;
+}
+
 td.embedded
 {
     border-right: medium none;
