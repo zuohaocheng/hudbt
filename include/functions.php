@@ -1797,7 +1797,11 @@ function navbar_item($href, $text, $selected) {
 function no_login_navbar() {
   global $lang_functions;
   $file = array_pop(explode('/', $_SERVER['PHP_SELF']));
-  return navbar_item('login.php', $lang_functions['text_login'], ($file == 'login.php')) . navbar_item('signup.php', $lang_functions['text_signup'], ($file == 'signup.php'));
+  return join('', [
+	  navbar_item('login.php', $lang_functions['text_login'], ($file == 'login.php')),
+	  navbar_item('signup.php', $lang_functions['text_signup'], ($file == 'signup.php')),
+	  navbar_item('rules.php', $lang_functions['text_rules_link'], ($file == 'rules.php')),	  
+	  ]);
 }
 
 function msgalert($url, $text, $bgcolor = '', $id='') {
