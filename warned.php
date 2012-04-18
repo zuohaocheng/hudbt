@@ -3,8 +3,7 @@ require "include/bittorrent.php";
 dbconn();
 loggedinorreturn();
 parked();
-if (get_user_class() < UC_MODERATOR)
-stderr("Sorry", "Access denied.");
+checkPrivilegePanel();
 
 stdhead("Warned Users");
 $warned = number_format(get_row_count("users", "WHERE warned='yes'"));

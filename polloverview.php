@@ -4,8 +4,7 @@ dbconn();
 require_once(get_langfile_path());
 loggedinorreturn();
 
-if (get_user_class() < $pollmanage_class)
-	permissiondenied();
+checkPrivilegePanel();
 
 $pollid = 0+$_GET['id'];
 

@@ -10,7 +10,7 @@ dbconn();
 
 loggedinorreturn();
 
-if (get_user_class() < UC_MODERATOR) stderr("Error", "Permission denied.");
+checkPrivilegePanel();
 
 stdhead("Cheaters");
 begin_frame('Cheaters');

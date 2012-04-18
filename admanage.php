@@ -3,9 +3,8 @@ require "include/bittorrent.php";
 dbconn();
 require_once(get_langfile_path());
 loggedinorreturn();
+checkPrivilegePanel();
 
-if (get_user_class() < UC_MODERATOR)
-    permissiondenied();
 $allowxhtmlclass = UC_ADMINISTRATOR;
 function get_position_name($position)
 {

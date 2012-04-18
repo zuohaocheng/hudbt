@@ -2,8 +2,7 @@
 require "include/bittorrent.php";
 dbconn();
 loggedinorreturn();
-if (get_user_class() < UC_ADMINISTRATOR)
-stderr("Error", "Access denied.");
+checkPrivilegePanel();
 if ($_SERVER["REQUEST_METHOD"] == "POST")
 {
 	if ($_POST["username"] == "" || $_POST["password"] == "" || $_POST["email"] == "")

@@ -2,8 +2,7 @@
 require "include/bittorrent.php";
 dbconn();
 loggedinorreturn();
-if (get_user_class() < UC_SYSOP)
-stderr("Error", "Permission denied.");
+checkPrivilegePanel();
 $class = 0 + $_POST["class"];
 	if ($class)
 		int_check($class,true);

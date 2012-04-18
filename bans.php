@@ -2,8 +2,7 @@
 require "include/bittorrent.php";
 dbconn();
 loggedinorreturn();
-if (get_user_class() < UC_ADMINISTRATOR)
-stderr("Sorry", "Access denied.");
+checkPrivilegePanel();
 
 $remove = (int)$_GET['remove'];
 if (is_valid_id($remove))

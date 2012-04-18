@@ -3,9 +3,7 @@ ob_start();
 require_once("include/bittorrent.php");
 dbconn();
 
-if (get_user_class() < UC_SYSOP) {
-die('forbidden');
-}
+checkPrivilegePanel();
 echo "<html><head><title>Do Clean-up</title></head><body>";
 echo "<p>";
 echo "clean-up in progress...please wait<br />";

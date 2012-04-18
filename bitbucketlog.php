@@ -3,8 +3,7 @@ require "include/bittorrent.php";
 dbconn();	
 loggedinorreturn();		
 parked();
-if (get_user_class() < UC_ADMINISTRATOR)
-stderr("Sorry", "Access denied.");
+checkPrivilegePanel();
 $bucketpath = "$bitbucket";
 if (get_user_class() >= UC_MODERATOR)
 {

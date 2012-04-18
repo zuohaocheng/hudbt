@@ -2,9 +2,8 @@
 require "include/bittorrent.php";
 dbconn();
 loggedinorreturn();
+checkPrivilegePanel();
 
-if (get_user_class() < UC_MODERATOR)
-stderr("Sorry", "Access denied.");
 stdhead("Duplicate IP users");
 begin_frame("Duplicate IP users:", true);
 begin_table();

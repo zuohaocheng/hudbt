@@ -3,11 +3,8 @@ ob_start();
 require_once("include/bittorrent.php");
 dbconn();
 loggedinorreturn();
-if (get_user_class() < UC_SYSOP) {
-	die("access denied.");
-}
-mysql_connect($mysql_host,$mysql_user,$mysql_pass);
-mysql_select_db($mysql_db);
+checkPrivilegePanel();
+
 stdhead("Manage Locations");
 begin_main_frame("",false,100);
 begin_frame("Manage Locations",true,10,"100%","center");

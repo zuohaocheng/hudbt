@@ -2,8 +2,7 @@
 require "include/bittorrent.php";
 dbconn();
 loggedinorreturn();
-if (get_user_class() < UC_ADMINISTRATOR)
-stderr("Sorry", "Access denied.");
+checkPrivilegePanel();
 stdhead("Mass PM", false);
 ?>
 <div style="text-align:center">

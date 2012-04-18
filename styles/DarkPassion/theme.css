@@ -501,7 +501,6 @@ ul.menu
     margin-top: 1px;
     margin-left: 0px;
     padding-top: 3px;
-    padding-bottom: 3px;
 }
 ul.menu li
 {
@@ -512,25 +511,23 @@ ul.menu li
 ul.menu li a, ul.menu li span
 {
     border-right: #778 1px solid;
-    padding-right: 7px;
+    border-left: #778 1px solid;
     border-top: #778 1px solid;
-    padding-left: 7px;
+    border-bottom: none;
+    padding: 3px 7px;
     background: url(./shade.gif) white repeat-x left top;
     background-color: #cfe0df;
-    padding-bottom: 3px;
-    border-left: #778 1px solid;
     color: #2d2b2b;
     margin-right: 3px;
-    padding-top: 3px;
-    border-bottom: none;
     text-decoration: none;
     font-style: normal;
     font-weight: bold;
-    font-family: verdana;
+    font-family: verdana, sans-serif;
     font-variant: normal;
     text-align: center;
     display: inline-block;
     border-radius:3px 3px 0 0;
+    zoom: 1;
 }
 ul.menu li a:link
 {
@@ -540,11 +537,15 @@ ul.menu li a:visited
 {
     color: #2d2b2b;
 }
-ul.menu li a:hover
-{
-    color: #2d2b2b;
-    text-decoration: underline;
+ul.menu li a:hover {
+    color: #effcff;
+    background-image: url(./hover.png);
+    border-right: #adcdd4 1px solid;
+    border-left: #adcdd4 1px solid;
+    border-top: #adcdd4 1px solid;
+    box-shadow:0px 0px 5px #8ec8d5;
 }
+
 ul.menu li a:active
 {
     color: #2d2b2b;
@@ -554,13 +555,16 @@ ul.menu li.selected a, ul.menu li.selected span
     background-image: url(./shadeactive.gif);
     background-color: #ffffff;
     border-bottom-color: white;
-    /* font: bold 11px verdana; */
-    /* position: relative; */
     top: 1px;
 }
 ul.menu li.selected a:hover
 {
     text-decoration: none;
+    background-image: url(./hover.png);
+    color: white;
+    border-right: #bbb 1px solid;
+    border-left: #bbb 1px solid;
+    border-top: #bbb 1px solid;
 }
 .listitem
 {
@@ -780,6 +784,10 @@ dl dt {
     /* box-shadow:2px 2px 5px silver; */
 }
 
+dl dt.longt {
+    width: 40%;
+}
+
 dl dd {
     margin:0;
     padding:5px 0 5px 120px;
@@ -800,7 +808,7 @@ dl dd.first-child{
     margin: 1.5em 0;
 }
 
-.selected {
+.selected, .selected a {
     color: gray;
 }
 

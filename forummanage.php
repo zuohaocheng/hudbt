@@ -3,9 +3,7 @@ require "include/bittorrent.php";
 dbconn();
 require_once(get_langfile_path());
 loggedinorreturn();
-
-if (get_user_class() < $forummanage_class)
-    permissiondenied();
+checkPrivilegePanel();
 
 // DELETE FORUM ACTION
 if ($_GET['action'] == "del") {

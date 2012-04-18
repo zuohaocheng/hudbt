@@ -2,8 +2,8 @@
 require "include/bittorrent.php";
 dbconn();
 loggedinorreturn();
-if (get_user_class() < UC_MODERATOR)
-stderr("Error", "Access denied.");
+checkPrivilegePanel();
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if ($_POST['doit'] == 'yes') {
     $amount = 0 + $_POST['amount'];

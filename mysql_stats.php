@@ -9,8 +9,7 @@ loggedinorreturn();
 /**
  * Checks if the user is allowed to do what he tries to...
  */
-if (get_user_class() < UC_SYSOP)
-	stderr("Error", "Permission denied.");
+checkPrivilegePanel();
 
 $GLOBALS["byteUnits"] = array('Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB');
 

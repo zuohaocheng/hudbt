@@ -2,8 +2,7 @@
 require "include/bittorrent.php";
 dbconn();
 loggedinorreturn();
-if (get_user_class() < UC_ADMINISTRATOR)
-	stderr("Error", "Permission denied.");
+checkPrivilegePanel();
 
 $action = isset($_POST['action']) ? htmlspecialchars($_POST['action']) : (isset($_GET['action']) ? htmlspecialchars($_GET['action']) : 'main');
 if ($action == 'setallfree')

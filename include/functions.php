@@ -154,13 +154,53 @@ function get_single_value($table, $field, $suffix = "") {
   }
 }
 
+function checkPrivilegePanel($item = '') {
+  if ($item == '') {
+    $file = substr(strrchr($_SERVER['SCRIPT_NAME'],'/'),1);
+    $item = str_replace('.php', '', $file);
+  }
+  if (!checkPrivilege(['ManagePanels', $item])) {
+    permissiondenied();
+  }
+}
+
 function checkPrivilege($item) {
-  global $torrentonpromotion_class, $torrentsticky_class, $torrentmanage_class;
+  global $torrentonpromotion_class, $torrentsticky_class, $torrentmanage_class, $pollmanage_class, $forummanage_class;
   $privilegeConfig = ['Maintenance'=>['staticResources' => UC_MODERATOR],
 		      'Tcategory' => ['lock' => UC_UPLOADER,'delete' => UC_VIP,],
 		      'Torrent' => ['edit' => $torrentmanage_class, 'delete'=> $torrentmanage_class, 'startseed' => UC_VIP, 'pr' => $torrentonpromotion_class,'sticky' => $torrentsticky_class,'oday' => UC_VIP,'setstoring'=>UC_MODERATOR],
 		      'Posts'=>['editnotseen'=>UC_MODERATOR,'seeeditnotseen'=>UC_UPLOADER,],
-			     ];
+		      'ManagePanels' => ['deletedisabled' => UC_SYSOP,
+					 'forummanage' => $forummanage_class,
+				   'mysql_stats' => UC_SYSOP,
+				   'massmail' => UC_SYSOP,
+				   'docleanup' => UC_SYSOP,
+				   'bans' => UC_SYSOP,
+				   'maxlogin' => UC_ADMINISTRATOR,
+				   'bitbucketlog' => UC_ADMINISTRATOR,
+				   'bannedemails' => UC_SYSOP,
+				   'allowedemails' => UC_SYSOP,
+				   'location' => UC_SYSOP,
+				   'amountupload' => UC_SYSOP,
+				   'adduser' => UC_ADMINISTRATOR,
+				   'reset' => UC_ADMINISTRATOR,
+				   'staffmess' => UC_ADMINISTRATOR,
+				   'polloverview' => $pollmanage_class,
+				   'warned' => UC_MODERATOR,
+				   'freeleech' => UC_ADMINISTRATOR,
+				   'faqmanage' => UC_ADMINISTRATOR,
+				   'modrules' => UC_ADMINISTRATOR,
+				   'catmanage' => UC_ADMINISTRATOR,
+				   'cheaters' => UC_MODERATOR,
+				   'ipcheck' => UC_MODERATOR,
+				   'allagents' => UC_MODERATOR,
+				   'admanage' => UC_MODERATOR,
+				   'uploaders' => UC_UPLOADER,
+				   'stats' => UC_MODERATOR,
+				   'testip' => UC_MODERATOR,
+				   'amountbonus' => UC_MODERATOR,
+				   'clearcache' => UC_MODERATOR,]
+		      ];
   if (is_array($item)) {
     $config = $privilegeConfig;
     for($i = 0; $i < count($item) - 1; $i += 1) {

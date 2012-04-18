@@ -2,8 +2,7 @@
 require "include/bittorrent.php";
 dbconn();
 loggedinorreturn();
-if (get_user_class() < UC_SYSOP)
-stderr("Sorry", "Access denied.");
+checkPrivilegePanel();
 stdhead("Add Upload", false);
 ?>
 <table class=main width=737 border=0 cellspacing=0 cellpadding=0><tr><td class=embedded>

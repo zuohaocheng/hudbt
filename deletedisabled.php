@@ -2,9 +2,8 @@
 require "include/bittorrent.php";
 dbconn();
 loggedinorreturn();
+checkPrivilegePanel();
 require_once(get_langfile_path());
-if (get_user_class() < UC_SYSOP)
-	permissiondenied();
 
 $shownotice=false;
 if ($_SERVER["REQUEST_METHOD"] == "POST")

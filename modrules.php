@@ -2,9 +2,7 @@
 require_once("include/bittorrent.php");
 dbconn();
 loggedinorreturn();
-if (get_user_class() < UC_ADMINISTRATOR) {
-	stderr("Error","Only Administrators and above can modify the Rules, sorry.");
-}
+checkPrivilegePanel();
 
 if ($_GET["act"] == "newsect")
 {

@@ -569,8 +569,8 @@ ul.menu li a:visited
 }
 ul.menu li a:hover
 {
+    background-image: url(./hover.png);
     color: #2d2b2b;
-    text-decoration: underline;
 }
 ul.menu li a:active
 {
@@ -583,7 +583,7 @@ ul.menu li.selected a, ul.menu li.selected span
 }
 ul.menu li.selected a:hover
 {
-    text-decoration: none;
+    background-image: url(./hover.png);
 }
 .listitem
 {
@@ -803,6 +803,10 @@ dl dt {
     /* box-shadow:2px 2px 5px silver; */
 }
 
+dl dt.longt {
+    width: 40%;
+}
+
 dl dd {
     margin:0;
     padding:5px 0 5px 120px;
@@ -823,7 +827,7 @@ dl dd.first-child{
     margin: 1.5em 0;
 }
 
-.selected {
+.selected, .selected a {
     color: gray;
 }
 

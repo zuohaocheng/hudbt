@@ -775,6 +775,10 @@ dl dt {
     /* box-shadow:2px 2px 5px silver; */
 }
 
+dl dt.longt {
+    width: 40%;
+}
+
 dl dd {
     margin:0;
     padding:5px 0 5px 120px;
@@ -795,7 +799,7 @@ dl dd.first-child{
     margin: 1.5em 0;
 }
 
-.selected {
+.selected, .selected a {
     color: gray;
 }
 

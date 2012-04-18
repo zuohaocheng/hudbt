@@ -3,8 +3,7 @@ require "include/bittorrent.php";
 dbconn();
 loggedinorreturn();
 // Reset Lost Password ACTION
-if (get_user_class() < UC_ADMINISTRATOR)
-stderr("Error", "Permission denied, Administrator Only.");
+checkPrivilegePanel();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST")
 {

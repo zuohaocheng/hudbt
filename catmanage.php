@@ -4,8 +4,7 @@ dbconn();
 require_once(get_langfile_path());
 loggedinorreturn();
 
-if (get_user_class() < UC_ADMINISTRATOR)
-    permissiondenied();
+checkPrivilegePanel();
 
 function return_category_db_table_name($type)
 {
