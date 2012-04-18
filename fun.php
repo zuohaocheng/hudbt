@@ -3,37 +3,69 @@ require_once("include/bittorrent.php");
 dbconn();
 require_once(get_langfile_path());
 require_once(get_langfile_path("",true));
+loggedinorreturn();
 
-$action=$_REQUEST["action"];
-if (!$action) {
+$id = 0 + $_REQUEST['id'];
+if (array_key_exists('action', $_REQUEST)) {
+  $action=$_REQUEST["action"];
+}
+else {
   $action = 'view';
 }
-if ($action == 'delete') {
-  $id = 0 + $_REQUEST["id"];
+
+if (array_key_exists('returnto', $_REQUEST)) {
+  $returnto = htmlspecialchars($_REQUEST["returnto"]);
+}
+else {
+  $returnto = 'fun.php';
+  if ($id) {
+    $returnto .= '?id=' . $id;
+  }
+}
+
+if ($action == 'comment') {
+  checkHTTPMethod('post');
+  $funid = 0 + $_REQUEST["funid"];
+  $funcomment = $_REQUEST["fun_text"];
+  sql_query("INSERT INTO funcomment (funid, userid, text) VALUES(".sqlesc($funid).", ".$CURUSER['id'].", " . sqlesc($funcomment) . ")") ;	
+
+  $Cache->delete_value('current_fun_content_comment');
+  $Cache->delete_value('current_fun_content_comment_delete');
+
+  header('Location: ' . $returnto . '#funcomment');
+}
+else if ($action == 'delcomment'){
+  if (checkPrivilege(['Misc', 'fun'])) {
+    $funcommentdel = 0 + $_REQUEST['commentid'];
+    sql_query("DELETE FROM funcomment WHERE id=".mysql_real_escape_string($funcommentdel));
+    header('Location: ' . $returnto . '#funcomment');
+  }
+}
+else if ($action == 'delete') {
   int_check($id,true);
   $res = sql_query("SELECT userid FROM fun WHERE id=$id") or sqlerr(__FILE__,__LINE__);
   $arr = mysql_fetch_array($res);
   if (!$arr)
     stderr($lang_fun['std_error'], $lang_fun['std_invalid_id']);
-  if (get_user_class() < $funmanage_class)
+  if (!checkPrivilege(['Misc', 'fun']))
     permissiondenied();
   $sure = 0 + $_REQUEST["sure"];
-  $returnto = $_REQUEST["returnto"] ? htmlspecialchars($_REQUEST["returnto"]) : 'fun.php';
   if (!$sure || $_SERVER['REQUEST_METHOD'] != 'POST') {
     stderr($lang_fun['std_delete_fun'], "<form action=\"?action=delete&id=$id&returnto=$returnto\" method=\"POST\">" . '<input type="hidden" name="sure" value="1" />' . $lang_fun['text_please_click'] . $lang_fun['text_here_if_sure'] . '</form>',false);
   }
   
   sql_query("DELETE FROM fun WHERE id=".sqlesc($id)) or sqlerr(__FILE__, __LINE__);
+  sql_query("DELETE FROM funcomment WHERE funid=".sqlesc($id));
   $Cache->delete_value('current_fun_content');
   $Cache->delete_value('current_fun', true);
   $Cache->delete_value('current_fun_vote_count');
   $Cache->delete_value('current_fun_vote_funny_count');
-  if ($returnto != "") {
-    header("Location: $returnto");
-  }
-}
+  $Cache->delete_value('current_fun_content_comment');
+  $Cache->delete_value('current_fun_content_comment_delete');
 
-if ($action == 'new') {
+  header("Location: $returnto");
+}
+else if ($action == 'new') {
   $sql = "SELECT *, IF(ADDTIME(added, '1 0:0:0') < NOW(),true,false) AS neednew FROM fun WHERE status != 'banned' AND status != 'dull' ORDER BY added DESC LIMIT 1";
   $result = sql_query($sql) or sqlerr(__FILE__,__LINE__);
   $row = mysql_fetch_array($result);
@@ -50,7 +82,7 @@ if ($action == 'new') {
   }
   stdfoot();
 }
-if ($action == 'add') {
+else if ($action == 'add') {
   $sql = "SELECT *, IF(ADDTIME(added, '1 0:0:0') < NOW(),true,false) AS neednew FROM fun WHERE status != 'banned' AND status != 'dull' ORDER BY added DESC LIMIT 1";
   $result = sql_query($sql) or sqlerr(__FILE__,__LINE__);
   $row = mysql_fetch_array($result);
@@ -69,33 +101,22 @@ if ($action == 'add') {
     $Cache->delete_value('current_fun', true);
     $Cache->delete_value('current_fun_vote_count');
     $Cache->delete_value('current_fun_vote_funny_count');
+    $Cache->delete_value('current_fun_content_comment');
+    $Cache->delete_value('current_fun_content_comment_delete');
+
     if (mysql_affected_rows() == 1)
       $warning = $lang_fun['std_fun_added_successfully'];
     else
       stderr($lang_fun['std_error'],$lang_fun['std_error_happened']);
-    header("Location: " . get_protocol_prefix() . "$BASEURL/index.php");
+    header("Location: ". $returnto);
   }
 }
-
-if ($action == 'view') {
-?>
-<html>
-  <head>
-    <title><?php echo $lang_fun['head_fun']; ?></title>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <?php echo get_load_uri('css'); ?>
-  </head>
-  <body class="inframe">
-    <div class="table">
-      <?php current_fun(); ?>
-    </div>
-  </body>
-</html>
-<?php
+else if ($action == 'view') {
+  stdhead($lang_fun['head_fun']);
+  echo get_fun($id);
+  stdfoot();
 }
-  
-if ($action == 'edit') {
-  $id = 0+$_GET["id"];
+else if ($action == 'edit') {
   int_check($id,true);
   $res = sql_query("SELECT * FROM fun WHERE id=$id") or sqlerr(__FILE__,__LINE__);
   $arr = mysql_fetch_array($res);
@@ -123,7 +144,7 @@ if ($action == 'edit') {
     sql_query("UPDATE fun SET body=$body, title=$title WHERE id=".sqlesc($id)) or sqlerr(__FILE__, __LINE__);
     $Cache->delete_value('current_fun_content');
     $Cache->delete_value('current_fun', true);
-    header("Location: " . get_protocol_prefix() . "$BASEURL/index.php");
+    header("Location: " . $returnto);
   }
   else {
     stdhead($lang_fun['head_edit_fun']);
@@ -136,8 +157,7 @@ if ($action == 'edit') {
   }
   stdfoot();
 }
-
-if ($action == 'ban') {
+else if ($action == 'ban') {
   if (get_user_class() < $funmanage_class) {
     permissiondenied();
   }
@@ -159,9 +179,12 @@ if ($action == 'ban') {
       $Cache->delete_value('current_fun', true);
       $Cache->delete_value('current_fun_vote_count');
       $Cache->delete_value('current_fun_vote_funny_count');
+      $Cache->delete_value('current_fun_content_comment');
+      $Cache->delete_value('current_fun_content_comment_delete');
 
-      $subject = $lang_fun_target[get_user_lang($arr[userid])]['msg_fun_item_banned'];
-      $msg = $lang_fun_target[get_user_lang($arr[userid])]['msg_your_fun_item'].$title.$lang_fun_target[get_user_lang($arr[userid])]['msg_is_ban_by'].$CURUSER['username'].$lang_fun_target[get_user_lang($arr[userid])]['msg_reason'].$banreason;
+
+      $subject = $lang_fun_target[get_user_lang($arr['userid'])]['msg_fun_item_banned'];
+      $msg = $lang_fun_target[get_user_lang($arr['userid'])]['msg_your_fun_item'].$title.$lang_fun_target[get_user_lang($arr['userid'])]['msg_is_ban_by'].$CURUSER['username'].$lang_fun_target[get_user_lang($arr['userid'])]['msg_reason'].$banreason;
       sql_query("INSERT INTO messages (sender, subject, receiver, added, msg) VALUES(0, ".sqlesc($subject).", ".$arr['userid'].", '" . date("Y-m-d H:i:s") . "', " . sqlesc($msg) . ")") or sqlerr(__FILE__, __LINE__);
       $Cache->delete_value('user_'.$arr['userid'].'_unread_message_count');
       $Cache->delete_value('user_'.$arr['userid'].'_inbox_count');
@@ -172,21 +195,8 @@ if ($action == 'ban') {
     stderr($lang_fun['std_are_you_sure'], $lang_fun['std_only_against_rule']."<br /><form name=ban method=post action=fun.php?action=ban&id=".$id."><input type=hidden name=sure value=1>".$lang_fun['std_reason_required']."<input type=text style=\"width: 200px\" name=banreason><input type=submit value=".$lang_fun['submit_okay']."></form>", false);
   }
 }
-
-function funreward($funvote, $totalvote, $title, $posterid, $bonus) {
-  global $lang_fun_target, $lang_fun;
-  KPS("+",$bonus,$posterid);
-  $subject = $lang_fun_target[get_user_lang($posterid)]['msg_fun_item_reward'];
-  $msg = $funvote.$lang_fun_target[get_user_lang($posterid)]['msg_out_of'].$totalvote.$lang_fun_target[get_user_lang($posterid)]['msg_people_think'].$title.$lang_fun_target[get_user_lang($posterid)]['msg_is_fun'].$bonus.$lang_fun_target[get_user_lang($posterid)]['msg_bonus_as_reward'];
-  $sql = "INSERT INTO messages (sender, subject, receiver, added, msg) VALUES(0, ".sqlesc($subject).",". $posterid. ",'" . date("Y-m-d H:i:s") . "', " . sqlesc($msg) . ")";
-  sql_query($sql) or sqlerr(__FILE__, __LINE__);
-  $Cache->delete_value('user_'.$posterid.'_unread_message_count');
-  $Cache->delete_value('user_'.$posterid.'_inbox_count');
-}
-
-if ($action == 'vote') {
+else if ($action == 'vote') {
   checkHTTPMethod('POST');
-  $id = 0+$_POST["id"];
   int_check($id,true);
   $res = sql_query("SELECT * FROM fun WHERE id=$id") or sqlerr(__FILE__,__LINE__);
   $arr = mysql_fetch_array($res);
@@ -273,4 +283,14 @@ if ($action == 'vote') {
     header("Location: index.php");
   }
 }
-?>
+
+function funreward($funvote, $totalvote, $title, $posterid, $bonus) {
+  global $lang_fun_target, $lang_fun;
+  KPS("+",$bonus,$posterid);
+  $subject = $lang_fun_target[get_user_lang($posterid)]['msg_fun_item_reward'];
+  $msg = $funvote.$lang_fun_target[get_user_lang($posterid)]['msg_out_of'].$totalvote.$lang_fun_target[get_user_lang($posterid)]['msg_people_think'].$title.$lang_fun_target[get_user_lang($posterid)]['msg_is_fun'].$bonus.$lang_fun_target[get_user_lang($posterid)]['msg_bonus_as_reward'];
+  $sql = "INSERT INTO messages (sender, subject, receiver, added, msg) VALUES(0, ".sqlesc($subject).",". $posterid. ",'" . date("Y-m-d H:i:s") . "', " . sqlesc($msg) . ")";
+  sql_query($sql) or sqlerr(__FILE__, __LINE__);
+  $Cache->delete_value('user_'.$posterid.'_unread_message_count');
+  $Cache->delete_value('user_'.$posterid.'_inbox_count');
+}

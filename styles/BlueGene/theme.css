@@ -797,6 +797,10 @@ dl dt {
     /* box-shadow:2px 2px 5px silver; */
 }
 
+dl dt.midt {
+    width: 15%;
+}
+
 dl dt.longt {
     width: 40%;
 }
@@ -1466,10 +1470,15 @@ form .edit-hint {
     list-style-image:none;
 }
 
+form.a {
+    display: inline;
+}
+
 input.a {
     border:none;
     background-color:transparent;
     padding:0;
+    margin:0;
     vertical-align: 0;
 }
 

@@ -4537,39 +4537,89 @@ function votes($poll, $uservote = 255) {
   return $out;
 }
 
-function current_fun() {
-  global $Cache, $CURUSER, $lang_fun, $BASEURL;
-  print(get_style_addicode());
-  if (!$row = $Cache->get_value('current_fun_content')) {
-    $result = sql_query("SELECT fun.*, IF(ADDTIME(added, '1 0:0:0') < NOW(),true,false) AS neednew FROM fun WHERE status != 'banned' AND status != 'dull' ORDER BY added DESC LIMIT 1") or sqlerr(__FILE__,__LINE__);
+function get_fun($id = 0) {
+  global $Cache, $lang_fun, $BASEURL;
+
+  if ($id == 0) {
+    $content = $Cache->get_value('current_fun_content');
+    $id = $Cache->get_value('current_fun_content_id');
+
+    $sql = "SELECT fun.*, IF(ADDTIME(added, '1 0:0:0') < NOW(),true,false) AS neednew FROM fun WHERE status != 'banned' AND status != 'dull' ORDER BY added DESC LIMIT 1";
+    $is_cache = true;
+  }
+  else {
+    $content = null;
+    $is_cache = false;
+    $sql = "SELECT * FROM fun WHERE id = ". $id;
+  }
+
+  if (!$content || !$id) {
+    $result = sql_query($sql)  or sqlerr(__FILE__,__LINE__);
     $row = mysql_fetch_array($result);
-    $Cache->cache_value('current_fun_content', $row, 1043);
-  }
-  if ($row){
-    $title = $row['title'];
+
+    if (!$row) {
+      return '无';
+    }
+
+    $id = $row['id'];
     $username = get_username($row["userid"],false,true,true,true,false,false,"",false);
-    if ($CURUSER['timetype'] != 'timealive') {
-      $time = $lang_fun['text_on'].$row['added'];
-    }
-    else $time = $lang_fun['text_blank'].gettime($row['added'],true,false);
-    $Cache->new_page('current_fun', 874, true);
-    if (!$Cache->get_page()){
-      $Cache->add_row();
-      $Cache->add_part();
-      print('<div class="page-titles"><h3><a href="//' . $BASEURL . '/log.php?action=funbox">'.$title.'</h3><h4>'.$lang_fun['text_posted_by']);
-      $Cache->end_part();
-      $Cache->add_part();
-      print('</h4></div><div id="funbox-content">');
-      print(format_comment($row['body'], true, true, true)."</div>");
-      $Cache->end_part();
-      $Cache->end_row();
-      $Cache->cache_page();
-    }
-    while($Cache->next_row()){
-      echo $Cache->next_part();
-      print($username.$time);
-      echo $Cache->next_part();
+    $time = $lang_fun['text_on'].$row['added'];
+
+    $content = '<div class="page-titles"><h3><a href="//' . $BASEURL . '/log.php?action=funbox">'.$title.'</h3><h4>'.$lang_fun['text_posted_by'];
+    $content .= $username . $time;
+    $content .= '</h4></div><div id="funbox-content">';
+    $content .= format_comment($row['body'], true, true, true)."</div>";
+    if ($is_cache) {
+      $Cache->cache_value('current_fun_content', $content, 900);
+      $Cache->cache_value('current_fun_content_id', $id, 900);
     }
   }
+
+  if ($is_cache) {
+    $key = 'current_fun_content_comment';
+    if (checkPrivilege(['Misc', 'fun'])) {
+      $key .= '_delete';
+    }
+    $funcomment = $Cache->get_value($key);
+  }
+  else {
+    $funcomment = null;
+  }
+
+  if (!$funcomment) {
+    $where = 'WHERE funid=' . $id;
+    $count = get_row_count('funcomment', $where);
+    list($pt, $pb, $limit) = pager(20, $count, '?', [], 'funpage');
+    $subres = sql_query("SELECT * FROM funcomment WHERE funid=".$id."  ORDER BY id " . $limit);
+    $funcomment = '<h4>评论</h4>';
+    $funcomment .= ('<dl class="table" id="funcomment">');
+    ob_start();
+
+    while ($subrow = mysql_fetch_array($subres)) {
+      /* if ($subrow["text"]==$temptxt && $tempuserid==$subrow["userid"])continue; */
+      
+      /* $temptxt=$subrow["text"]; */
+      /* $tempuserid=$subrow["userid"]; */
+      
+      /* $temp=$subrow["text"]; */
+
+      if (checkPrivilege(['Misc', 'fun'])) {
+	$del=' <form class="a" action="fun.php" method="POST"><input type="hidden" name="action" value="delcomment" /><input type="hidden" name="commentid" value="'. $subrow['id'] . '" /><input type="submit" value="删除" class="a" /></a>';
+      }
+      dl_item(get_username($subrow['userid'],false,true,true,true,false,false,"",false).$del, format_comment($subrow['text'],true,false,true,true,600,false,false), true, 'midt');
+    }
+    $funcomment .= ob_get_clean ();
+    $funcomment .= "</dl>";
+    $funcomment .= $pb;
+
+    $funcomment .="<form action='fun.php#bottom' method='POST' name='funboxcomment'><input type='hidden' name='funid' value=" . $id . " /><input type='hidden' name='action' value='comment' />";
+    $funcomment .= '<input type="hidden" name="returnto" value="' . $_SERVER["REQUEST_URI"] . '" />';
+    $funcomment .="<input type='text' name='fun_text' id='fun_text' size='100' style='width: 80%;' />";
+      $funcomment .= "<input type='submit' class='btn' value=\"评论\"  name='tofunboxcomment'  /></form>";
+      if ($is_cache) {
+	$Cache->cache_value($key, $funcomment, 900);
+      }
+  }
+  return $content . $funcomment;
 }
 

@@ -160,40 +160,43 @@ if ($showextinfo['imdb'] == 'yes' && ($showmovies['hot'] == "yes" || $showmovies
 // ------------- start: funbox ------------------//
 if ($showfunbox_main == "yes" && (!isset($CURUSER) || $CURUSER['showfb'] == "yes")){
   // Get the newest fun stuff
-  if (!$row = $Cache->get_value('current_fun_content')){
-    $result = sql_query("SELECT fun.*, IF(ADDTIME(added, '1 0:0:0') < NOW(),true,false) AS neednew FROM fun WHERE status != 'banned' AND status != 'dull' ORDER BY added DESC LIMIT 1") or sqlerr(__FILE__,__LINE__);
+  $funid = $Cache->get_value('current_fun_content_id');
+  $neednew = $Cache->get_value('current_fun_content_neednew');
+  if (!$funid){
+    $result = sql_query("SELECT fun.id, IF(ADDTIME(added, '1 0:0:0') < NOW(),true,false) AS neednew FROM fun WHERE status != 'banned' AND status != 'dull' ORDER BY added DESC LIMIT 1") or sqlerr(__FILE__,__LINE__);
     $row = mysql_fetch_array($result);
-    $Cache->cache_value('current_fun_content', $row, 1043);
+    $funid = $row['id'];
+    $neednew = $row['neednew'];
+    $Cache->cache_value('current_fun_content_id', $funid, 900);
+    $Cache->cache_value('current_fun_content_neednew', $neednew, 900);
   }
-  if (!$row) //There is no funbox item
-    {
+
+    if (!$funid) { //There is no funbox item
       print('<h2 class="page-titles">'.$lang_index['text_funbox'].(get_user_class() >= $newfunitem_class ? "<font class=\"small\"> - [<a class=\"altlink\" href=\"fun.php?action=new\"><b>".$lang_index['text_new_fun']."</b></a>]</font>" : "")."</h2>");
     }
-  else
-    {
+  else {
       $totalvote = $Cache->get_value('current_fun_vote_count');
       if ($totalvote == ""){
-	$totalvote = get_row_count("funvotes", "WHERE funid = ".sqlesc($row['id']));
+	$totalvote = get_row_count("funvotes", "WHERE funid = ".sqlesc($funid));
 	$Cache->cache_value('current_fun_vote_count', $totalvote, 756);
       }
       $funvote = $Cache->get_value('current_fun_vote_funny_count');
       if ($funvote == ""){
-	$funvote = get_row_count("funvotes", "WHERE funid = ".sqlesc($row['id'])." AND vote='fun'");
+	$funvote = get_row_count("funvotes", "WHERE funid = ".sqlesc($funid)." AND vote='fun'");
 	$Cache->cache_value('current_fun_vote_funny_count', $funvote, 756);
       }
       //check whether current user has voted
-      $funvoted = get_row_count("funvotes", "WHERE funid = ".sqlesc($row['id'])." AND userid=".sqlesc($CURUSER[id]));
+      $funvoted = get_row_count("funvotes", "WHERE funid = ".sqlesc($funid)." AND userid=".sqlesc($CURUSER['id']));
 
       print ('<h2 class="page-titles">'.$lang_index['text_funbox']);
-      if ($CURUSER)
-	{
-	  print("<font class=\"small\">".(get_user_class() >= $log_class ? " - [<a class=\"altlink\" href=\"log.php?action=funbox\"><b>".$lang_index['text_more_fun']."</b></a>]": "").($row['neednew'] && get_user_class() >= $newfunitem_class ? " - [<a class=altlink href=\"fun.php?action=new\"><b>".$lang_index['text_new_fun']."</b></a>]" : "" ).( ($CURUSER['id'] == $row['userid'] || get_user_class() >= $funmanage_class) ? " - [<a class=\"altlink\" href=\"fun.php?action=edit&amp;id=".$row['id']."&amp;returnto=index.php\"><b>".$lang_index['text_edit']."</b></a>]" : "").(get_user_class() >= $funmanage_class ? " - [<a class=\"altlink\" href=\"fun.php?action=delete&amp;id=".$row['id']."&amp;returnto=index.php\"><b>".$lang_index['text_delete']."</b></a>] - [<a class=\"altlink\" href=\"fun.php?action=ban&amp;id=".$row['id']."&amp;returnto=index.php\"><b>".$lang_index['text_ban']."</b></a>]" : "")."</font>");
+      if ($CURUSER) {
+	  print("<font class=\"small\">".(get_user_class() >= $log_class ? " - [<a class=\"altlink\" href=\"log.php?action=funbox\"><b>".$lang_index['text_more_fun']."</b></a>]": "").($neednew && get_user_class() >= $newfunitem_class ? " - [<a class=altlink href=\"fun.php?action=new\"><b>".$lang_index['text_new_fun']."</b></a>]" : "" ).( ($CURUSER['id'] == $row['userid'] || get_user_class() >= $funmanage_class) ? " - [<a class=\"altlink\" href=\"fun.php?action=edit&amp;id=".$funid."&amp;returnto=index.php\"><b>".$lang_index['text_edit']."</b></a>]" : "").(get_user_class() >= $funmanage_class ? " - [<a class=\"altlink\" href=\"fun.php?action=delete&amp;id=".$funid."&amp;returnto=index.php\"><b>".$lang_index['text_delete']."</b></a>] - [<a class=\"altlink\" href=\"fun.php?action=ban&amp;id=".$funid."&amp;returnto=index.php\"><b>".$lang_index['text_ban']."</b></a>]" : "")."</font>");
 	}
       print("</h2>");
 
       print('<div id="funbox" class="table td text main">');
       require_once(get_langfile_path('fun.php'));
-      current_fun();
+      echo '<div>', get_fun(), '</div>';
 
       if ($CURUSER) {
 	echo '<span id="funvote">';
@@ -202,7 +205,7 @@ if ($showfunbox_main == "yes" && (!isset($CURUSER) || $CURUSER['showfb'] == "yes
 	if (!$funvoted) {
 	  echo "<span class=\"striking\">".$lang_index['text_your_opinion']."</span>";
 
-	  $id = $row['id'];
+	  $id = $funid;
 	  echo '<span class="minor-list compact"><ul>';
 	  echo '<li><form action="fun.php?action=vote" method="POST"><input type="hidden" name="id" value=' . $id . ' /><input type="hidden" name="yourvote" value="fun" /><input type="submit" class="btn" value="' . $lang_index['submit_fun'] . '"></form></li>';
 	  echo '<li><form action="fun.php?action=vote" method="POST"><input type="hidden" name="id" value=' . $id . ' /><input type="hidden" name="yourvote" value="dull" /><input type="submit" class="btn" value="' . $lang_index['submit_dull'] . '"></form></li>';
