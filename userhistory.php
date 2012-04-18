@@ -285,6 +285,12 @@ elseif ($action == "viewcomments") {
 
   echo '<div id="forum-posts"><ol>';
   while ($arr = mysql_fetch_assoc($res)) {
+    if ($arr['t_name']) {
+      $arr['postname'] = $arr['t_name'];
+    }
+    else {
+      $arr['postname'] = $arr['o_name'];
+    }
     show_single_comment($arr);
   }
   echo '</ol></div>';
@@ -311,6 +317,12 @@ elseif ($action == 'viewquotedcomments') {
   if ($commentcount > $perpage) echo $pagertop;
   echo '<div id="forum-posts"><ol>';
   while ($arr = mysql_fetch_assoc($subres)) {
+    if ($arr['t_name']) {
+      $arr['postname'] = $arr['t_name'];
+    }
+    else {
+      $arr['postname'] = $arr['o_name'];
+    }
     show_single_comment($arr);
   }
   echo '</ol></div>';

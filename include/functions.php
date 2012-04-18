@@ -2811,7 +2811,7 @@ function single_comment($row, $parent_id, $type, $floor = -1) {
 
   $post_f = ['type' => $type, 'posterid' => $row['user'], 'topicid' => $parent_id, 'postid' => $row['id'], 'added' => $row['added'], 'floor' => $floor, 'body' => $row['text'], 'highlight' => false, 'edit' => $edit, 'postname' => null, 'authorid' => null];
   if (array_key_exists('postname', $row)) {
-    $pots_f['postname'] = $row['postname'];
+    $post_f['postname'] = $row['postname'];
   }
   $maymodify = (get_user_class() >= $commanage_class);
   $privilege = array(true, $maymodify, ($row["user"] == $CURUSER["id"] || $maymodify));
