@@ -4,8 +4,8 @@ dbconn();
 require_once(get_langfile_path());
 loggedinorreturn();
 parked();
-$id = 0 + $_GET["id"];
-$type = unesc($_GET["type"]);
+$id = 0 + $_REQUEST["id"];
+$type = unesc($_REQUEST["type"]);
 
 registration_check('invitesystem',true,false);
 
@@ -32,7 +32,18 @@ if ($inv["invites"] != 1){
 } else {
 	$_s = "";
 }
-
+if ($type == 'recover'){
+	if (($CURUSER[id] != $id && get_user_class() < $viewinvite_class) || !is_valid_id($id))
+		stderr($lang_invite['std_sorry'],$lang_invite['std_permission_denied']);
+		$recinv =$_POST["invitee"];
+		$rechash=$_POST["hash"];
+		sql_query("DELETE FROM invites WHERE invitee = '".$recinv."'and hash='".$rechash."'");
+		if(mysql_affected_rows())
+		{sql_query("UPDATE users SET invites = invites+1 where id =".$id)or sqlerr(__FILE__, __LINE__);}
+		stdhead();
+		stdmsg($lang_invite['std_recover'], $lang_invite['std_recoversentto'].$recinv.$lang_invite['std_s_invite']);
+  	stdfoot();
+	}
 if ($type == 'new'){
 	if ($CURUSER['invites'] <= 0) {
 		stdmsg($lang_invite['std_sorry'],$lang_invite['std_no_invites_left'].
@@ -137,16 +148,19 @@ if ($type == 'new'){
 
 	print("<table border=1 width=737 cellspacing=0 cellpadding=5>".
 	"<h2 align=center>".$lang_invite['text_sent_invites_status']." ($number1)</h2>");
+//echo '<a class="index" href="' . htmlspecialchars('invite.php?id=' . $id . '&type=recover') . '">' . "recover" . '</a>';
 
 	if(!$num1){
 		print("<tr align=center><td colspan=6>".$lang_invite['text_no_invitation_sent']."</tr>");
 	} else {
 
-		print("<tr><td class=colhead>".$lang_invite['text_email']."</td><td class=colhead>".$lang_invite['text_hash']."</td><td class=colhead>".$lang_invite['text_send_date']."</td></tr>");
+		print("<tr><td class=colhead>".$lang_invite['text_email']."</td><td class=colhead>".$lang_invite['text_hash']."</td><td class=colhead>".$lang_invite['text_send_date']."</td><td class=colhead>".$lang_invite['text_recover']."</td></tr>");
 		for ($i = 0; $i < $num1; ++$i)
 		{
 			$arr1 = mysql_fetch_assoc($rer);
-			print("<tr><td class=rowfollow>$arr1[invitee]<td class=rowfollow>$arr1[hash]</td><td class=rowfollow>$arr1[time_invited]</td></tr>");
+			print("<tr><td class=rowfollow>$arr1[invitee]<td class=rowfollow>$arr1[hash]</td><td class=rowfollow>$arr1[time_invited]</td>");
+			print("<form method='post' action='invite.php'><input type='hidden' name='type' value='recover'><input type='hidden' name='id' value=$id><input type='hidden' name='invitee' value=".$arr1[invitee]."><input type='hidden' name='hash' value=".$arr1[hash]."><td class=rowfollow><input type='submit' value=\"".$lang_invite['text_recover']."\"></td></form>");
+		  print("</tr>");
 		}
 	}
 	print("</table>");
