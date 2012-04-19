@@ -124,6 +124,7 @@ $showtrackerload = $MAIN['showtrackerload'];
 $showshoutbox_main = $MAIN['showshoutbox'];
 $showfunbox_main = $MAIN['showfunbox'];
 $enableoffer = $MAIN['showoffer'];
+$enablerequest = $MAIN['showrequest'];
 $sptime = $MAIN['sptime'];
 $showhelpbox_main = $MAIN['showhelpbox'];
 $enablebitbucket_main = $MAIN['enablebitbucket'];

@@ -1651,6 +1651,8 @@ function menu ($selected = "home") {
     $selected = "music";
   }elseif (preg_match("/offers/i", $script_name) OR preg_match("/offcomment/i", $script_name)) {
     $selected = "offers";
+  }elseif (preg_match("/viewrequests/i", $script_name)) {
+    $selected = "requests";
   }elseif (preg_match("/upload/i", $script_name)) {
     $selected = "upload";
   }elseif (preg_match("/subtitles/i", $script_name)) {
@@ -1687,7 +1689,7 @@ function menu ($selected = "home") {
   }
   
   if ($enablerequest == 'yes') {
-    echo navbar_item('viewrequests.php', $lang_functions['text_requests'], $selected == "requests");
+    echo navbar_item('viewrequests.php', $lang_functions['text_request'], $selected == "requests");
   }
 
   echo navbar_item('upload.php', $lang_functions['text_upload'], $selected == "upload");
