@@ -68,6 +68,7 @@ $mysql_host = $BASIC['mysql_host'];
 $mysql_user = $BASIC['mysql_user'];
 $mysql_pass = $BASIC['mysql_pass'];
 $mysql_db = $BASIC['mysql_db'];
+$mysql_db_test = $BASIC['mysql_db_test'];
 if (array_key_exists('enable_memcached', $BASIC)) {
   $enable_memcached = $BASIC['enable_memcached'];
 }

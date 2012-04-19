@@ -6,6 +6,43 @@ include_once($rootpath . 'include/globalfunctions.php');
 include_once($rootpath . 'classes/class_advertisement.php');
 include($rootpath . get_langfile_path("functions.php"));
 
+$privilegeConfig = ['Maintenance'=>['staticResources' => UC_MODERATOR],
+		    'Tcategory' => ['lock' => UC_UPLOADER,'delete' => UC_VIP,],
+		    'Torrent' => ['edit' => $torrentmanage_class, 'delete'=> $torrentmanage_class, 'startseed' => UC_VIP, 'pr' => $torrentonpromotion_class,'sticky' => $torrentsticky_class,'oday' => UC_VIP,'setstoring'=>UC_MODERATOR],
+		    'Posts'=>['editnotseen'=>UC_MODERATOR,'seeeditnotseen'=>UC_UPLOADER,],
+		    'Misc' => ['fun' => $funmanage_class],
+		    'ManagePanels' => ['deletedisabled' => UC_SYSOP,
+				       'forummanage' => $forummanage_class,
+				       'mysql_stats' => UC_SYSOP,
+				       'massmail' => UC_SYSOP,
+				       'docleanup' => UC_SYSOP,
+				       'bans' => UC_SYSOP,
+				       'maxlogin' => UC_ADMINISTRATOR,
+				       'bitbucketlog' => UC_ADMINISTRATOR,
+				       'bannedemails' => UC_SYSOP,
+				       'allowedemails' => UC_SYSOP,
+				       'location' => UC_SYSOP,
+				       'amountupload' => UC_SYSOP,
+				       'adduser' => UC_ADMINISTRATOR,
+				       'reset' => UC_ADMINISTRATOR,
+				       'staffmess' => UC_ADMINISTRATOR,
+				       'polloverview' => $pollmanage_class,
+				       'warned' => UC_MODERATOR,
+				       'freeleech' => UC_ADMINISTRATOR,
+				       'faqmanage' => UC_ADMINISTRATOR,
+				       'modrules' => UC_ADMINISTRATOR,
+				       'catmanage' => UC_ADMINISTRATOR,
+				       'cheaters' => UC_MODERATOR,
+				       'ipcheck' => UC_MODERATOR,
+				       'allagents' => UC_MODERATOR,
+				       'admanage' => UC_MODERATOR,
+				       'uploaders' => UC_UPLOADER,
+				       'stats' => UC_MODERATOR,
+				       'testip' => UC_MODERATOR,
+				       'amountbonus' => UC_MODERATOR,
+				       'clearcache' => UC_MODERATOR,]
+		    ];
+
 function smarty($cachetime=300, $debug = false) {
   require_once('lib/Smarty/Smarty.class.php');
   static $smarty;
@@ -165,42 +202,9 @@ function checkPrivilegePanel($item = '') {
 }
 
 function checkPrivilege($item) {
-  global $torrentonpromotion_class, $torrentsticky_class, $torrentmanage_class, $pollmanage_class, $forummanage_class;
-  $privilegeConfig = ['Maintenance'=>['staticResources' => UC_MODERATOR],
-		      'Tcategory' => ['lock' => UC_UPLOADER,'delete' => UC_VIP,],
-		      'Torrent' => ['edit' => $torrentmanage_class, 'delete'=> $torrentmanage_class, 'startseed' => UC_VIP, 'pr' => $torrentonpromotion_class,'sticky' => $torrentsticky_class,'oday' => UC_VIP,'setstoring'=>UC_MODERATOR],
-		      'Posts'=>['editnotseen'=>UC_MODERATOR,'seeeditnotseen'=>UC_UPLOADER,],
-		      'ManagePanels' => ['deletedisabled' => UC_SYSOP,
-					 'forummanage' => $forummanage_class,
-				   'mysql_stats' => UC_SYSOP,
-				   'massmail' => UC_SYSOP,
-				   'docleanup' => UC_SYSOP,
-				   'bans' => UC_SYSOP,
-				   'maxlogin' => UC_ADMINISTRATOR,
-				   'bitbucketlog' => UC_ADMINISTRATOR,
-				   'bannedemails' => UC_SYSOP,
-				   'allowedemails' => UC_SYSOP,
-				   'location' => UC_SYSOP,
-				   'amountupload' => UC_SYSOP,
-				   'adduser' => UC_ADMINISTRATOR,
-				   'reset' => UC_ADMINISTRATOR,
-				   'staffmess' => UC_ADMINISTRATOR,
-				   'polloverview' => $pollmanage_class,
-				   'warned' => UC_MODERATOR,
-				   'freeleech' => UC_ADMINISTRATOR,
-				   'faqmanage' => UC_ADMINISTRATOR,
-				   'modrules' => UC_ADMINISTRATOR,
-				   'catmanage' => UC_ADMINISTRATOR,
-				   'cheaters' => UC_MODERATOR,
-				   'ipcheck' => UC_MODERATOR,
-				   'allagents' => UC_MODERATOR,
-				   'admanage' => UC_MODERATOR,
-				   'uploaders' => UC_UPLOADER,
-				   'stats' => UC_MODERATOR,
-				   'testip' => UC_MODERATOR,
-				   'amountbonus' => UC_MODERATOR,
-				   'clearcache' => UC_MODERATOR,]
-		      ];
+#  global $torrentonpromotion_class, $torrentsticky_class, $torrentmanage_class, $pollmanage_class, $forummanage_class, $funmanage_class;
+  global $privilegeConfig;
+
   if (is_array($item)) {
     $config = $privilegeConfig;
     for($i = 0; $i < count($item) - 1; $i += 1) {
@@ -1265,9 +1269,9 @@ function getExportedValue($input,$t = null) {
   return 'NULL';
 }
 
-function dbconn($autoclean = false) {
+function dbconn($autoclean = false, $test = false) {
   global $lang_functions;
-  global $mysql_host, $mysql_user, $mysql_pass, $mysql_db;
+  global $mysql_host, $mysql_user, $mysql_pass;
   global $useCronTriggerCleanUp;
 
   if (!mysql_pconnect($mysql_host, $mysql_user, $mysql_pass)) {
@@ -1282,7 +1286,15 @@ function dbconn($autoclean = false) {
   mysql_query("SET NAMES UTF8");
   mysql_query("SET collation_connection = 'utf8_general_ci'");
   mysql_query("SET sql_mode=''");
-  mysql_select_db($mysql_db) or die('dbconn: mysql_select_db: ' + mysql_error());
+  if ($test) {
+    global $mysql_db_test;
+    $db = $mysql_db_test;
+  }
+  else {
+    global $mysql_db;
+    $db = $mysql_db;
+  }
+  mysql_select_db($db) or die('dbconn: mysql_select_db: ' + mysql_error());
 
   userlogin();
 
@@ -1824,12 +1836,17 @@ function js_hb_config() {
   return $out;
 }
 
-function navbar_item($href, $text, $selected) {
+function navbar_item($href, $text, $selected, $selected_a = true) {
+  global $BASEURL;
   if ($selected) {
-    return '<li class="selected"><span>' . $text . '</span></li>';
+    if ($selected_a) {
+      return '<li class="selected"><a href="//' . $BASEURL . '/' . htmlspecialchars($href) .  '">' . $text . '</a></li>';
+    }
+    else {
+      return '<li class="selected"><span>' . $text . '</span></li>';
+    }
   }
   else {
-    global $BASEURL;
     return '<li><a href="//' . $BASEURL . '/' . htmlspecialchars($href) . '">' . $text . '</a></li>';
   }
 }
@@ -2386,7 +2403,7 @@ function delete_single_torrent($id, $row, $reasonstr='') {
   $interval_no_deduct_bonus_on_deletion = 30* 86400;
   $tadded = strtotime($row['added']);
 
-  deletetorrent($id, ((TIMENOW - $tadded) > $interval_no_deduct_bonus_on_deletion));
+  deletetorrent($id, ((TIMENOW - $tadded) < $interval_no_deduct_bonus_on_deletion));
 
   
   
@@ -4565,13 +4582,14 @@ function get_fun($id = 0) {
     $username = get_username($row["userid"],false,true,true,true,false,false,"",false);
     $time = $lang_fun['text_on'].$row['added'];
 
-    $content = '<div class="page-titles"><h3><a href="//' . $BASEURL . '/log.php?action=funbox">'.$title.'</h3><h4>'.$lang_fun['text_posted_by'];
+    $content = '<div class="page-titles"><h3><a href="//' . $BASEURL . '/log.php?action=funbox">'.$row['title'].'</h3><h4>'.$lang_fun['text_posted_by'];
     $content .= $username . $time;
     $content .= '</h4></div><div id="funbox-content">';
     $content .= format_comment($row['body'], true, true, true)."</div>";
     if ($is_cache) {
       $Cache->cache_value('current_fun_content', $content, 900);
       $Cache->cache_value('current_fun_content_id', $id, 900);
+      $Cache->cache_value('current_fun_content_neednew', $row['neednew'], 900);
     }
   }
 

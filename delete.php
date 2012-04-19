@@ -24,8 +24,9 @@ $row = mysql_fetch_array($res);
 if (!$row)
 	die();
 
-if ($CURUSER["id"] != $row["owner"] && get_user_class() < $torrentmanage_class)
-	bark($lang_delete['std_not_owner']);
+if ($CURUSER["id"] != $row["owner"] && !checkPrivilege(['Torrent', 'delete'])) {
+  bark($lang_delete['std_not_owner']);
+}
 
 $rt = 0 + $_POST["reasontype"];
 

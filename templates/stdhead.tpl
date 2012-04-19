@@ -17,9 +17,6 @@
   {get_load_uri('css', '')}
   {get_load_uri('js', '')}
   {/nocache}
-  <!--[if lte IE 6]>
-      <script type="text/javascript" src="js/ie6utf8.js"></script>
-      <![endif]-->
 </head>
 <body>
   <div id="wrap">
@@ -105,13 +102,13 @@
       {/if}
 
       {nocache}
-      {if $alerts}
       <div id="alert" class="minor-list"><ul>
+      {if $alerts}
 	{section name=idx loop=$alerts}
 	{msgalert($alerts[idx]['href'], $alerts[idx]['text'], $alerts[idx]['color'], $alerts[idx]['id'])}
 	{/section}
-      </ul></div>
       {/if}
+      </ul></div>
       {/nocache}
       {/if}
       <div id="outer">
