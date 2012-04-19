@@ -46,6 +46,10 @@ $lang_invite = array
 	'std_only' => "只有",
 	'std_or_above_can_invite' => "及以上的用戶才能發送邀請。",
 	'text_email_restriction_note' => "你只能發送邀請給以下郵箱：",
+	'text_recover'=> "回收",
+	'std_recover'=>"回收邀請",
+	'std_recoversentto'=>"你成功地回收了发給",
+	'std_s_invite'=>"的邀請。",
 );
 
 ?>

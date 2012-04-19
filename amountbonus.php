@@ -1,5 +1,6 @@
 <?php
 require "include/bittorrent.php";
+require_once(get_langfile_path("takemessage.php",true));
 dbconn();
 loggedinorreturn();
 if (get_user_class() < UC_MODERATOR)
@@ -14,15 +15,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 	if ($_POST["username"] == "" || $_POST["seedbonus"] == "" || $_POST["seedbonus"] == "")
 	stderr("Error", "Missing form data.");
+	require_once(get_langfile_path("delete.php",true));
 	$username = sqlesc($_POST["username"]);
 	$seedbonus = sqlesc($_POST["seedbonus"]);
-
-	sql_query("UPDATE LOW_PRIORITY users SET seedbonus=seedbonus + $seedbonus WHERE username=$username") or sqlerr(__FILE__, __LINE__);
+	$operator = $CURUSER["username"];
 	$res = sql_query("SELECT id FROM users WHERE username=$username");
 	$arr = mysql_fetch_row($res);
+	$receiver = $arr[0];
+	$lang = get_user_lang($receiver);
+	$subject = $lang_takemessage_target[$lang]['Bonus_point_added'];
+	$msg = sprintf($lang_takemessage_target[$lang]['msg'],$operator,$_POST["seedbonus"]);
+	$date = sqlesc(date("Y-m-d H:i:s"));
+	sql_query("UPDATE LOW_PRIORITY users SET seedbonus=seedbonus + $seedbonus WHERE username=$username") or sqlerr(__FILE__, __LINE__);
+	$msgsql = sprintf("INSERT INTO messages (sender, receiver, subject, added, msg) VALUES(0, %d, '%s',%s,'%s')",$receiver,$subject,$date,$msg);
+	sql_query($msgsql) or sqlerr(__FILE__, __LINE__);
 	if (!$arr)
 	stderr("Error", "Unable to update account.");
-	header("Location: " . get_protocol_prefix() . "$BASEURL/userdetails.php?id=".htmlspecialchars($arr[0]));
+  header("Location: " . get_protocol_prefix() . "$BASEURL/userdetails.php?id=".htmlspecialchars($arr[0]));
 	die;
 }
 stdhead("Update Users Upload Amounts");

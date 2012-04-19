@@ -49,6 +49,10 @@ Best Regards,
 	'std_only' => "Only ",
 	'std_or_above_can_invite' => " or above can send invitation.",
 	'text_email_restriction_note' => "You could only send invitation to email from those domains: ",
+	'text_recover'=> "Recover",
+	'std_recover'=>"Recovering Invite",
+	'std_recoversentto'=>"You have successfully recovered invite sent to",
+	'std_s_invite'=>".",	
 );
 
 ?>

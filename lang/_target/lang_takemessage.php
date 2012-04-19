@@ -17,6 +17,8 @@ $lang_takemessage_target = array
 	'mail_here' => "HERE",
 	'msg_system' => "System",
 	'msg_original_message_from' => "Original Message from ",
+	'Bonus_point_added' => "Bonus point added",
+	'msg' =>"%s have given you %s karma points.",
 	),
 	'chs' => array
 	(
@@ -33,6 +35,8 @@ $lang_takemessage_target = array
 	'mail_here' => "这里",
 	'msg_system' => "系统",
 	'msg_original_message_from' => "原短讯来自",
+	'Bonus_point_added' => "你似乎收到了魔力值",
+	'msg' =>"%s给你添加了%s魔力值。",
 	),
 	'cht' => array
 	(
@@ -49,6 +53,8 @@ $lang_takemessage_target = array
 	'mail_here' => "這裏",
 	'msg_system' => "系統",
 	'msg_original_message_from' => "原短訊來自",
+	'Bonus_point_added' => "你似乎收到了魔力值",
+	'msg' =>"%s給你添加了%s魔力值。",
 	),
 	'ko' => array
 	(
