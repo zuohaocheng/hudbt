@@ -330,7 +330,8 @@ function torrent_promotion_expire($days, $type = 2, $targettype = 1){
 	}
 
 	//7.delete regimage codes
-	sql_query("TRUNCATE TABLE `regimages`") or sqlerr(__FILE__, __LINE__);
+	//Changed from TRUNCATE TABLE because of DROP privilege
+	sql_query("DELETE FROM `regimages`") or sqlerr(__FILE__, __LINE__);
 	if ($printProgress) {
 		printProgress("delete regimage codes");
 	}
@@ -759,4 +760,4 @@ function user_to_peasant($down_floor_gb, $minratio){
 	}
 	return 'Full cleanup is done';
 }
-?>
+
