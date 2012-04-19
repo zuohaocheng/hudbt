@@ -772,9 +772,14 @@ SELECT id, rownum FROM (SELECT @x:=@x+1 AS rownum, id, userid FROM (SELECT @x:=0
 
 	print($pagerbottom);
 	if ($maypost){
-	print('<div id="forum-reply-post" class="table td"><h2><a class="index" href="'.htmlspecialchars('?action=reply&topicid='.$topicid).'">'.$lang_forums['text_add_reply'].'</a></h2><form id="compose" name="compose" method="post" action="?action=post" onsubmit="return postvalid(this);"><input type="hidden" name="id" value='.$topicid.' /><input type="hidden" name="type" value="reply" />');
-	quickreply('compose', 'body',$lang_forums['submit_add_reply']);
-	print("</form></div>");
+		if(!$locked){
+			print('<div id="forum-reply-post" class="table td"><h2><a class="index" href="'.htmlspecialchars('?action=reply&topicid='.$topicid).'">'.$lang_forums['text_add_reply'].'</a></h2><form id="compose" name="compose" method="post" action="?action=post" onsubmit="return postvalid(this);"><input type="hidden" name="id" value='.$topicid.' /><input type="hidden" name="type" value="reply" />');
+			quickreply('compose', 'body',$lang_forums['submit_add_reply']);
+			print("</form></div>");
+		}
+		else{
+			print('<center><h2><a class="index" href="'.htmlspecialchars('?action=reply&topicid='.$topicid).'">'.$lang_forums['text_add_reply'].'</a></h2><form id="compose" name="compose" method="post" action="?action=post" onsubmit="return postvalid(this);"><input type="hidden" name="id" value='.$topicid.' /></center><input type="hidden" name="type" value="reply" />');	
+		}
 	}
 	elseif ($locked)
 		print($lang_forums['text_topic_locked_new_denied']);
