@@ -26,6 +26,7 @@ $lang_takeupload = array
 	'std_torrent_existed' => "Torrent already uploaded!",
 	'std_torrent_file_too_big' => "Torrent file is too big! Max ",
 	'std_remake_torrent_note' => " bytes. Please remake the torrent file with bigger piece size or split the content into several torrents.",
+		'std_click_it' => 'click <a href="/details.php?id=%d&hit=1">here</a> to take a look',
 );
 
 ?>

@@ -26,6 +26,7 @@ $lang_takeupload = array
 	'std_torrent_existed' => "該種子已存在！",
 	'std_torrent_file_too_big' => "種子文件過大！最大允許",
 	'std_remake_torrent_note' => " bytes。請使用更大的區塊大小重新制作種子，或者將內容分為多個種子發布。",
+	'std_click_it' => '<a href="/details.php?id=%d&hit=1">點擊以檢視</a>',
 );
 
 ?>
