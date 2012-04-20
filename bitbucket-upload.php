@@ -58,12 +58,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 	  stderr($lang_bitbucketupload['std_image_processing_failed'],$lang_bitbucketupload['std_sorry_the_uploaded']."$imgtypes[$it]".$lang_bitbucketupload['std_failed_processing']);
 	}
 	
+	$thumb = imagecreatetruecolor($newwidth, $newheight);
 	if ($it == IMAGETYPE_PNG) {
-	  $thumb = imagecreate($newwidth, $newheight);
-	}
-	else {
-	  $thumb = imagecreatetruecolor($newwidth, $newheight);
-	}
+	  $trans_colour = imagecolorallocatealpha($thumb, 0, 0, 0, 127);
+	  imagefill($thumb, 0, 0, $trans_colour);
+  	}
 	imagecopyresampled($thumb, $orig, 0, 0, 0, 0, $newwidth, $newheight, $width, $height);
 	switch ($it) {
 	case IMAGETYPE_GIF:

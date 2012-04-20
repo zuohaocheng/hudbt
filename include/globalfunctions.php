@@ -88,6 +88,9 @@ function validip($ip)
 }
 
 function getip() {
+  if (php_sapi_name() == 'cli') {
+    return '::1';
+  }
 	if (isset($_SERVER)) {
 		if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && validip($_SERVER['HTTP_X_FORWARDED_FOR'])) {
 			$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
@@ -139,4 +142,4 @@ function hash_where2($name, $hash) {
 	return "($name = " . $hash . " OR $name = " . $shhash . ")";
 }
 
-?>
+

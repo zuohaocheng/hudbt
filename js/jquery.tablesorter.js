@@ -429,6 +429,7 @@
 	// if percents and regular numbers aren't being mixed.
 	ts.numberRegex = new RegExp("^(" + "[-+\u2212]?[0-9][0-9,]*(\\.[0-9,]*)?(E[-+\u2212]?[0-9][0-9,]*)?" + // Fortran-style scientific
 				    "|" + "[-+\u2212]?" + digitClass + "+[\\s\\xa0]*%?" + // Generic localised
+				    "|" + "inf.*" + //Infinite
 				    ")$", "i");
     }
 
@@ -715,6 +716,7 @@ addParser: function( parser ) {
 },
 
 formatDigit: function( s ) {
+    s = s.replace( /^inf.*$/ig, 'Infinity' );
     if ( ts.transformTable !== false ) {
 	var	out = '',
 	c;

@@ -21,6 +21,10 @@ table, .table {
     background-color: #c6e3c6
 }
 
+table {
+    border-spacing: 0px;
+}
+
 table.transparent {
     background-color:transparent;
 }
@@ -748,6 +752,9 @@ dl.table {
     margin:0 auto;
     border:1px black solid;
 }
+
+*:first-child+html dl { padding-left:-100px;} 
+*:first-child+html dl dt { position:relative; left:100px; margin-left:-100px;} 
 
 dl dt {  
     float:left; 
@@ -1484,7 +1491,7 @@ input.a:hover {
     margin: 0 auto;
 }
 
-#header {
+header {
     position:relative;
 }
 

@@ -101,10 +101,10 @@ $rows=sql_query("SELECT requests.* ,(SELECT count(DISTINCT torrentid) FROM resre
 	$res = sql_query("SELECT * FROM resreq WHERE reqid ='".$_GET["id"]."'".$limit) or sqlerr(__FILE__, __LINE__);
 	tr("基本信息", get_username($arr['userid'])."发表于".gettime($arr["added"],true,false)."\n", 1);
 	tr("悬赏", "最新竞价为".$arr['amount']."     原始竞价为".$arr["ori_amount"]."\n", 1);
-	tr("操作", "<a href=report.php?reportrequestid=".$id." >举报</a>".
-	(($arr['userid']== $CURUSER['id'] || get_user_class() >= 13)&&$arr["finish"]=="no" ?" | <a href=viewrequests.php?action=edit&id=".$id." >编辑</a>":"")."\n".
-	($arr['userid']== $CURUSER['id']||$arr["finish"]=="yes"?"":" | <a href=viewrequests.php?action=res&id=".$id." >应求</a>\n").
-	((get_user_class() >= 13||$arr['userid']== $CURUSER['id'])&&$arr['finish']=="no" ?" | <a href=viewrequests.php?action=delete&id=".$id." ".(mysql_num_rows($res)?">删除":"title='回收返还80%魔力值'>回收")."</a>":"")."\n"
+	tr("操作", "<div class=\"minor-list list-seperator\"><ul><li><a href=report.php?reportrequestid=".$id." >举报</a></li>".
+	(($arr['userid']== $CURUSER['id'] || get_user_class() >= 13)&&$arr["finish"]=="no" ?"<li><a href=viewrequests.php?action=edit&id=".$id." >编辑</a></li>":"")."\n".
+	($arr['userid']== $CURUSER['id']||$arr["finish"]=="yes"?"":"<li><a href=viewrequests.php?action=res&id=".$id." >应求</a></li>\n").
+	((get_user_class() >= 13||$arr['userid']== $CURUSER['id'])&&$arr['finish']=="no" ?"<li><a href=viewrequests.php?action=delete&id=".$id." ".(mysql_num_rows($res)?">删除":"title='回收返还80%魔力值'>回收")."</a></li>":"")."</ul></div>\n"
 	,1);
 	if($arr["finish"]=="no")tr("追加悬赏","<form action=viewrequests.php method=post> <input type=hidden name=action value=addamount><input type=hidden name=reqid value=".$arr["id"]."><input size=6 name=amount value=1000 ><input type=submit value=提交 > 追加悬赏每次将扣减25个魔力值作为手续费</form>",1);
 	tr("介绍",format_comment(unesc($arr["descr"])),1);
@@ -152,28 +152,11 @@ $rows=sql_query("SELECT requests.* ,(SELECT count(DISTINCT torrentid) FROM resre
 	
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	print ("
-	<table style='border:1px solid #000000;'>
-	<tr><td class=\"text\" align=\"center\"><b>".$lang_details['text_quick_comment']."</b><br /><br />
+	print ("<div id=\"forum-reply-post\" class=\"table td\"><h2><a class=\"index\" href=comment.php?action=add&pid=$id&type=request>添加评论</a></h2>
 	<form id=\"compose\" name=\"comment\" method=\"post\" action=\"".htmlspecialchars("comment.php?action=add&type=request")."\" onsubmit=\"return postvalid(this);\">
 	<input type=\"hidden\" name=\"pid\" value=\"".$id."\" /><br />");
 quickreply('comment', 'body', "添加");
-print("</form></td></tr></table>");
-	
-	
-	print ("
-	
-<a class=\"index\" href=comment.php?action=add&pid=$id&type=request>添加评论</a></td></tr></table>");
+print("</form></div>");
 
 	stdfoot();
 	

@@ -17,11 +17,10 @@
 	  </ul>
 	</div>
 
-	<table cellpadding="5" cellspacing="0" class="no-vertical-line">
+	<table cellpadding="5" class="no-vertical-line">
 	  <thead>
 	<tr>
 			<th><?php echo $this->Paginator->sort('name');?></th>
-			<th><?php echo $this->Paginator->sort('created');?></th>
 			<th><?php echo $this->Paginator->sort('hidden');?></th>
 			<th><?php echo $this->Paginator->sort('locked');?></th>
 			<th><?php echo $this->Paginator->sort('redirect_to_id');?></th>
@@ -32,7 +31,6 @@
 	<?php foreach ($tcategories as $tcategory): ?>
 	<tr>
 	  <td><?php echo $this->Html->link(h($tcategory['Tcategory']['name']), array('action' => 'view', $tcategory['Tcategory']['id'])); ?>&nbsp;</td>
-		<td><?php echo h($tcategory['Tcategory']['created']); ?>&nbsp;</td>
 		<td><?php echo h($tcategory['Tcategory']['hidden']); ?>&nbsp;</td>
 		<td><?php echo h($tcategory['Tcategory']['locked']); ?>&nbsp;</td>
 		<td>

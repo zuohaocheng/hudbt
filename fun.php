@@ -27,17 +27,23 @@ if ($action == 'comment') {
   checkHTTPMethod('post');
   $funid = 0 + $_REQUEST["funid"];
   $funcomment = $_REQUEST["fun_text"];
-  sql_query("INSERT INTO funcomment (funid, userid, text) VALUES(".sqlesc($funid).", ".$CURUSER['id'].", " . sqlesc($funcomment) . ")") ;	
+  if (strlen(trim($funcomment)) != 0) {
+    sql_query("INSERT INTO funcomment (funid, userid, text, added) VALUES(".sqlesc($funid).", ".$CURUSER['id'].", " . sqlesc($funcomment) . ', ' . sqlesc(date("Y-m-d H:i:s")) . ")") ;	
 
-  $Cache->delete_value('current_fun_content_comment');
-  $Cache->delete_value('current_fun_content_comment_delete');
+    $Cache->delete_value('current_fun_content_comment');
+    $Cache->delete_value('current_fun_content_comment_delete');
+  }
 
   header('Location: ' . $returnto . '#funcomment');
 }
-else if ($action == 'delcomment'){
+else if ($action == 'delcomment') {
+  checkHTTPMethod('post');
   if (checkPrivilege(['Misc', 'fun'])) {
     $funcommentdel = 0 + $_REQUEST['commentid'];
     sql_query("DELETE FROM funcomment WHERE id=".mysql_real_escape_string($funcommentdel));
+    $Cache->delete_value('current_fun_content_comment');
+    $Cache->delete_value('current_fun_content_comment_delete');
+
     header('Location: ' . $returnto . '#funcomment');
   }
 }
@@ -113,7 +119,7 @@ else if ($action == 'add') {
 }
 else if ($action == 'view') {
   stdhead($lang_fun['head_fun']);
-  echo get_fun($id);
+  echo get_fun($id, 100);
   stdfoot();
 }
 else if ($action == 'edit') {

@@ -361,7 +361,7 @@ $mainCats = array('1' => array('401', '413', '414', '415'),
 		  '5' => array('403', '419', '420', '421'),
 		  '6' => array('412', '409'),
 		  '7' => array('407'),
-		  '8' => array('408', '422', '423', '425'),
+		  '8' => array('408', '422', '423', '424', '425'),
 		  '9' => array('404'),
 		  '10' => array('411', '426'),
 		  '11' => array('406'),
@@ -822,7 +822,7 @@ if (isset($searchstr))
 	if (!checkPrivilege(['Torrent', 'edit'])) {
 	  // show not anonymous torrents for all
 	  $w .= " AND torrents.anonymous = 'no') ";
-	  if (isset($CURUSER)) {
+	  if (isset($CURUSER) && (strstr($searchstr, $CURUSER['username']) || strstr($CURUSER['username'], $searchstr))) {
 	    // show self torrents for registered users
 	    $w .=  'OR (users.id=' . $CURUSER['id'] . ') ';
 	  }

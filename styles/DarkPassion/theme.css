@@ -22,6 +22,10 @@ table, .table {
     background-color: #eff1ff;
 }
 
+table {
+    border-spacing: 0px;
+}
+
 table.transparent {
     background-color:transparent;
 }
@@ -771,6 +775,9 @@ dl.table {
     border:1px black solid;
 }
 
+*:first-child+html dl { padding-left:-100px;} 
+*:first-child+html dl dt { position:relative; left:100px; margin-left:-100px;} 
+
 dl dt {  
     float:left; 
     font-weight:bold;  
@@ -1462,7 +1469,7 @@ input.a:hover {
     margin: 0 auto;
 }
 
-#header {
+header {
     position:relative;
     background:url(../hustlogo.png) no-repeat 85% bottom;
 }

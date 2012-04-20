@@ -39,10 +39,8 @@ if ($type == 'recover'){
 		$rechash=$_POST["hash"];
 		sql_query("DELETE FROM invites WHERE invitee = '".$recinv."'and hash='".$rechash."'");
 		if(mysql_affected_rows())
-		{sql_query("UPDATE users SET invites = invites+1 where id =".$id)or sqlerr(__FILE__, __LINE__);}
-		stdhead();
-		stdmsg($lang_invite['std_recover'], $lang_invite['std_recoversentto'].$recinv.$lang_invite['std_s_invite']);
-  	stdfoot();
+		{sql_query("UPDATE users SET invites = invites+1 where id =".$id)or sqlerr(__FILE__, __LINE__);
+		stdmsg($lang_invite['std_recover'], $lang_invite['std_recoversentto'].$recinv.$lang_invite['std_s_invite']);}
 	}
 if ($type == 'new'){
 	if ($CURUSER['invites'] <= 0) {

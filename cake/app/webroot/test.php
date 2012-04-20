@@ -1,4 +1,13 @@
 <?php
+global $NEXUSPHP;
+if (!isset($NEXUSPHP)) {
+  require('../../../include/bittorrent.php');
+  dbconn(false, true);
+  
+  $s = smarty();
+  $s->addTemplateDir('../../../templates');
+  $s->setCompileDir('../../../templates_c');
+}
 /**
  * Web Access Frontend for TestSuite
  *

@@ -16,6 +16,7 @@ $lang_staffpanel = [
 		    'reset' => ['name' => '重置密码', 'desc' => '重置密码'],
 		    'staffmess' => ['name' => '群PM', 'desc' => '群发PM'],
 		    'polloverview' => ['name' => '投票', 'desc' => '管理投票'],
+		    'makepoll' => ['name' => '新建投票', 'desc' => '研究一下大家在想什么'],
 		    'warned' => ['name' => '被警告的用户', 'desc' => '查看所有被警告的用户'],
 		    'freeleech' => ['name' => '优惠', 'desc' => '设置优惠.'],
 		    'faqmanage' => ['name' => '常见问题管理', 'desc' => '增删改常见问题界面'],

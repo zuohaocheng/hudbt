@@ -165,10 +165,10 @@ if ($action){
 				$text.='<option value="'. get_protocol_prefix() . $BASEURL .'/bitbucket/'.$sor["name"].'">'.$sor["name"].'</option>';
 			}
 
-			usercpmenu ("personal");
 			if ($type == 'saved') {
 				print('<span class="red">'.$lang_usercp['text_saved']."</span>\n");
 			}
+			usercpmenu ("personal");
 
 			echo '<dl class="table">';
 			form ("personal");
@@ -372,7 +372,12 @@ dl_item($lang_usercp['row_school'], "<select name=school>$schools</select>", 1);
 			if($CURUSER['id'] == GUEST_UID) {
 				bark('Guest 用户不能进行个人设置');
 			}
+			if ($type == 'saved') {
+			  print('<span class="red">'.$lang_usercp['text_saved']."</span>\n");
+			}
 			usercpmenu ("tracker");
+
+
 $brsectiontype = $browsecatmode;
 $spsectiontype = $specialcatmode;
 if ($enablespecial == 'yes')
@@ -405,10 +410,6 @@ if ($showstandard) $standards = searchbox_item_list("standards");
 if ($showprocessing) $processings = searchbox_item_list("processings");
 if ($showteam) $teams = searchbox_item_list("teams");
 if ($showaudiocodec) $audiocodecs = searchbox_item_list("audiocodecs");
-}
-
-if ($type == 'saved') {
-  print('<span class="red">'.$lang_usercp['text_saved']."</span>\n");
 }
 
 echo '<dl class="table">';
@@ -649,11 +650,12 @@ echo '</dl>';
 			if($CURUSER['id'] == GUEST_UID) {
 				bark('Guest 用户不能进行个人设置');
 			}
-			usercpmenu ("forum");
 
 			if ($type == 'saved') {
 			  print('<span class="red">'.$lang_usercp['text_saved']."</span>\n");
 			}
+			usercpmenu ("forum");
+
 			echo '<dl class="table">';
 			form ("forum");
 
@@ -809,11 +811,12 @@ EOD;
 			if($CURUSER['id'] == GUEST_UID) {
 				bark('Guest 用户不能进行个人设置');
 			}
-			usercpmenu ("security");
 
 			if ($type == 'saved') {
 			  print("<span class=\"red\">".$lang_usercp['text_saved'].($_GET["mail"] == "1" ? $lang_usercp['std_confirmation_email_sent'] : "")." ".($_GET["passkey"] == "1" ? $lang_usercp['std_passkey_reset'] : "")." ".($_GET["password"] == "1" ? $lang_usercp['std_password_changed'] : "")." ".($_GET["privacy"] == "1" ? $lang_usercp['std_privacy_level_updated'] : "")."</span>\n");
 			}
+			usercpmenu ("security");
+
 			echo '<dl class="table">';
 			if ($type == 'save') {
 				print('<form method="post" action="usercp.php"><input type="hidden" name="action" value="security"><input type="hidden" name="type" value="confirm">');

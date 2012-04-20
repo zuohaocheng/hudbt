@@ -312,6 +312,25 @@ var argsFromUri = function(uri) {
     return args;
 };
 
+// Used in index.php & fun.php
+$(function() {
+    $('#funcomment').find('.username').each(function() {
+	var user = $(this);
+	user.after($('<a />', {
+	    href : '#',
+	    text : '回复',
+	    'class' : 'funcomment-reply'
+	}).click(function(e) {
+	    e.preventDefault();
+	    var target = $('#fun_text');
+
+	    var id = user.find('.user-id').text();
+	    var val = target.val().replace(/^@\[user=[0-9]+\] */ig, '');
+	    target.val('@[user=' + id + '] ' + val).focus();
+	}));
+    });
+});
+
 var editPr = function() {
     $pr_type = $('#sel_spstate');
     if ($pr_type.length) {

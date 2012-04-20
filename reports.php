@@ -70,7 +70,7 @@ while ($row = mysql_fetch_array($reportres))
 			}
 			break;
 		}
-/*
+
 		case "request":
 		{
 			$type = "Request";
@@ -84,7 +84,7 @@ while ($row = mysql_fetch_array($reportres))
 			}
 			break;
 		}
-*/
+
 		case "post":
 		{
 			$type = $lang_reports['text_forum_post'];

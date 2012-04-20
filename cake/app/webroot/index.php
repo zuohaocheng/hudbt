@@ -3,6 +3,10 @@ global $NEXUSPHP;
 if (!isset($NEXUSPHP)) {
   require('../../../include/bittorrent.php');
   $dispatch = true;
+
+  $s = smarty();
+  $s->addTemplateDir('../../../templates');
+  $s->setCompileDir('../../../templates_c');
 }
 else {
   $dispatch = false;

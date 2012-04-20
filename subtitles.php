@@ -250,7 +250,7 @@ if (get_user_class() >= UC_PEASANT) {
   }
 }
 
-$s = smarty(300);
+$s = smarty(0);
 $s->assign(array('lang' => $lang_subtitles,
 		 'size' => $size,
 		 'maxsubsize_main' => $maxsubsize_main,

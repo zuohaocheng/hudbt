@@ -363,7 +363,6 @@ else {
     $polls = sql_query('SELECT polls.*, pollanswers.selection FROM polls LEFT JOIN pollanswers ON polls.id = pollanswers.pollid AND pollanswers.userid=' .  sqlesc($CURUSER["id"]) . ' ORDER BY id DESC ' . $limit) or sqlerr(__FILE__, __LINE__);
     stdhead($lang_log['head_previous_polls']);
     logmenu("poll");
-    echo $pagertop;
     print('<div id="polls"><ol>');
 
     function srt($a,$b) {

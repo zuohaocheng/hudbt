@@ -3,8 +3,7 @@ require "include/bittorrent.php";
 dbconn();
 require_once(get_langfile_path());
 loggedinorreturn();
-if (get_user_class() < $pollmanage_class)
-  permissiondenied();
+checkPrivilegePanel();
 
 $action = $_GET["action"];
 $pollid = $_GET["pollid"];

@@ -77,18 +77,21 @@ if (!$Cache->get_page()){
 	  $Cache->add_row();
 	  $Cache->add_part();
 	    print("<li><a href=\"javascript: klappe_news('a".$array['id']."')\"><img class=\"" . ($counter == 0 ? 'minus' : 'plus') . "\" src=\"pic/trans.gif\" id=\"pica".$array['id']."\" alt=\"Show/Hide\" title=\"".$lang_index['title_show_or_hide']."\" />&nbsp;" . date("Y.m.d",strtotime($array['added'])) . " - " ."<b>". $array['title'] . "</b></a>");
-	  print("<div id=\"ka".$array['id']."\" style=\"display: " . ($counter == 0 ? 'block' : 'none'). ";\"> ".format_comment($array["body"],0)." </div></li>");
 	  $Cache->end_part();
 	  $Cache->add_part();
-	    print("  &nbsp; [<a class=\"faqlink\" href=\"news.php?action=edit&amp;newsid=" . $array['id'] . "\"><b>".$lang_index['text_e']."</b></a>]");
-	  print(" [<a class=\"faqlink\" href=\"news.php?action=delete&amp;newsid=" . $array['id'] . "\"><b>".$lang_index['text_d']."</b></a>]");
+	    print(" [<a class=\"faqlink\" href=\"news.php?action=edit&amp;newsid=" . $array['id'] . "\">".$lang_index['text_e']."</a>] ");
+	  print(" [<a class=\"faqlink\" href=\"news.php?action=delete&amp;newsid=" . $array['id'] . "\">".$lang_index['text_d']."</a>]");
 	  $Cache->end_part();
+	  $Cache->add_part();
+	  print("<div id=\"ka".$array['id']."\" style=\"display: " . ($counter == 0 ? 'block' : 'none'). ";\"> ".format_comment($array["body"],0)." </div></li>");
+	  $Cache->end_part();
+
 	  $Cache->end_row();
 	  ++$counter;
       }
       $Cache->break_loop();
       $Cache->add_whole_row();
-      print("</div>\n");
+      print("</ul></div>\n");
       $Cache->end_whole_row();
     }
   $Cache->cache_page();
@@ -96,8 +99,10 @@ if (!$Cache->get_page()){
 echo $Cache->next_row();
 while($Cache->next_row()){
   echo $Cache->next_part();
-  if (get_user_class() >= $newsmanage_class)
+  if (get_user_class() >= $newsmanage_class) {
     echo $Cache->next_part();
+  }
+  echo $Cache->next_part();
 }
 echo $Cache->next_row();
 // ------------- end: recent news ------------------//
@@ -190,7 +195,7 @@ if ($showfunbox_main == "yes" && (!isset($CURUSER) || $CURUSER['showfb'] == "yes
 
       print ('<h2 class="page-titles">'.$lang_index['text_funbox']);
       if ($CURUSER) {
-	  print("<font class=\"small\">".(get_user_class() >= $log_class ? " - [<a class=\"altlink\" href=\"log.php?action=funbox\"><b>".$lang_index['text_more_fun']."</b></a>]": "").($neednew && get_user_class() >= $newfunitem_class ? " - [<a class=altlink href=\"fun.php?action=new\"><b>".$lang_index['text_new_fun']."</b></a>]" : "" ).( ($CURUSER['id'] == $row['userid'] || get_user_class() >= $funmanage_class) ? " - [<a class=\"altlink\" href=\"fun.php?action=edit&amp;id=".$funid."&amp;returnto=index.php\"><b>".$lang_index['text_edit']."</b></a>]" : "").(get_user_class() >= $funmanage_class ? " - [<a class=\"altlink\" href=\"fun.php?action=delete&amp;id=".$funid."&amp;returnto=index.php\"><b>".$lang_index['text_delete']."</b></a>] - [<a class=\"altlink\" href=\"fun.php?action=ban&amp;id=".$funid."&amp;returnto=index.php\"><b>".$lang_index['text_ban']."</b></a>]" : "")."</font>");
+	  print("<font class=\"small\">".(get_user_class() >= $log_class ? " - [<a class=\"altlink\" href=\"log.php?action=funbox\"><b>".$lang_index['text_more_fun']."</b></a>]": "").($neednew && get_user_class() >= $newfunitem_class ? " - [<a class=\"altlink\" href=\"fun.php?action=new\"><b>".$lang_index['text_new_fun']."</b></a>]" : "" ).( ($CURUSER['id'] == $row['userid'] || get_user_class() >= $funmanage_class) ? " - [<a class=\"altlink\" href=\"fun.php?action=edit&amp;id=".$funid."&amp;returnto=index.php\"><b>".$lang_index['text_edit']."</b></a>]" : "").(get_user_class() >= $funmanage_class ? " - [<a class=\"altlink\" href=\"fun.php?action=delete&amp;id=".$funid."&amp;returnto=index.php\"><b>".$lang_index['text_delete']."</b></a>] - [<a class=\"altlink\" href=\"fun.php?action=ban&amp;id=".$funid."&amp;returnto=index.php\"><b>".$lang_index['text_ban']."</b></a>]" : "")."</font>");
 	}
       print("</h2>");
 
@@ -199,20 +204,20 @@ if ($showfunbox_main == "yes" && (!isset($CURUSER) || $CURUSER['showfb'] == "yes
       echo '<div>', get_fun(), '</div>';
 
       if ($CURUSER) {
-	echo '<span id="funvote">';
+	echo '<div id="funvote" class="minor-list compact">';
 	print("<b>".$funvote."</b>" . $lang_index['text_out_of'] . $totalvote . $lang_index['text_people_found_it']);
 
 	if (!$funvoted) {
 	  echo "<span class=\"striking\">".$lang_index['text_your_opinion']."</span>";
 
 	  $id = $funid;
-	  echo '<span class="minor-list compact"><ul>';
-	  echo '<li><form action="fun.php?action=vote" method="POST"><input type="hidden" name="id" value=' . $id . ' /><input type="hidden" name="yourvote" value="fun" /><input type="submit" class="btn" value="' . $lang_index['submit_fun'] . '"></form></li>';
-	  echo '<li><form action="fun.php?action=vote" method="POST"><input type="hidden" name="id" value=' . $id . ' /><input type="hidden" name="yourvote" value="dull" /><input type="submit" class="btn" value="' . $lang_index['submit_dull'] . '"></form></li>';
-	  echo '</ul></span></span>';
-	  echo "<span id=\"voteaccept\" style=\"display: none;\">" . $lang_index['text_vote_accepted'];
+	  echo '<ul>';
+	  echo '<li><form action="fun.php?action=vote" method="post"><input type="hidden" name="id" value="' . $id . '" /><input type="hidden" name="yourvote" value="fun" /><input type="submit" class="btn" value="' . $lang_index['submit_fun'] . '" /></form></li>';
+	  echo '<li><form action="fun.php?action=vote" method="post"><input type="hidden" name="id" value="' . $id . '" /><input type="hidden" name="yourvote" value="dull" /><input type="submit" class="btn" value="' . $lang_index['submit_dull'] . '" /></form></li>';
+	  echo '</ul></div>';
+	  echo "<div id=\"voteaccept\" style=\"display: none;\">" . $lang_index['text_vote_accepted'];
 	}
-	echo '</span>';
+	echo '</div>';
       }
       print("</div>");
     }
@@ -554,12 +559,12 @@ if ($showtrackerload == "yes") {
   // ------------- start: links ------------------//
   print('<h2 class="page-titles">'.$lang_index['text_links']);
   if (get_user_class() >= $applylink_class)
-    print("<font class=\"small\"> - [<a class=\"altlink\" href=\"linksmanage.php?action=apply\"><b>".$lang_index['text_apply_for_link']."</b></a>]</font>");
+    print("<span class=\"small\"> - [<a class=\"altlink\" href=\"linksmanage.php?action=apply\"><b>".$lang_index['text_apply_for_link']."</b></a>]</span>");
     if (get_user_class() >= $linkmanage_class)
       {
-	print("<font class=\"small\">");
+	print("<span class=\"small\">");
 	print(" - [<a class=\"altlink\" href=\"linksmanage.php\"><b>".$lang_index['text_manage_links']."</b></a>]\n");
-	print("</font>");
+	print("</span>");
       }
       print("</h2>");
       $Cache->new_page('links', 86400, false);
@@ -585,9 +590,10 @@ if ($showtrackerload == "yes") {
   <div class="main center medium"><?php echo $lang_index['text_browser_note'] ?></div>
   <?php
 	// ------------- end: browser, client and code note ------------------//
-	if ($CURUSER)
+	if ($CURUSER) {
 	  $USERUPDATESET[] = "last_home = ".sqlesc(date("Y-m-d H:i:s"));
-	  $Cache->delete_value('user_'.$CURUSER["id"].'_unread_news_count');
-	  end_main_frame();
-	  stdfoot();
-  ?>
+	}
+	$Cache->delete_value('user_'.$CURUSER["id"].'_unread_news_count');
+	end_main_frame();
+	stdfoot();
+

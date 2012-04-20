@@ -10,9 +10,6 @@ parked();
  * @property Tcategory $Tcategory
  */
 
-$s = smarty();
-$s->addTemplateDir('../../../templates');
-$s->setCompileDir('../../../templates_c');
 dbconn();
 loggedinorreturn();
 parked();

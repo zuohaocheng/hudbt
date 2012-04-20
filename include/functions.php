@@ -27,6 +27,7 @@ $privilegeConfig = ['Maintenance'=>['staticResources' => UC_MODERATOR],
 				       'reset' => UC_ADMINISTRATOR,
 				       'staffmess' => UC_ADMINISTRATOR,
 				       'polloverview' => $pollmanage_class,
+				       'makepoll' => $pollmanage_class,
 				       'warned' => UC_MODERATOR,
 				       'freeleech' => UC_ADMINISTRATOR,
 				       'faqmanage' => UC_ADMINISTRATOR,
@@ -100,15 +101,15 @@ function get_load_uri($type, $script_name ="", $absolute = true) {
 
   $addition = '';
   if (array_key_exists('purge', $_GET) && $_GET['purge']) {
-    $addition .= '&purge=1';
+    $addition .= '&amp;purge=1';
   }
   if (array_key_exists('debug', $_GET) && $_GET['debug']) {
-    $addition .= '&debug=1';
+    $addition .= '&amp;debug=1';
     $debug = true;
   }
   else {
     include('include/loadRevision.php');
-    $addition .= '&rev=' . $loadRevision;
+    $addition .= '&amp;rev=' . $loadRevision;
     $debug = false;
   }
 
@@ -129,7 +130,7 @@ function get_load_uri($type, $script_name ="", $absolute = true) {
     }
 
     if (file_exists('js/' . $filename)) {
-      $hrefs[] = $pagename . '?format=js&name=' . $name . $addition;
+      $hrefs[] = $pagename . '?format=js&amp;name=' . $name . $addition;
     }
     
     return join(array_map(function($href) {
@@ -138,10 +139,10 @@ function get_load_uri($type, $script_name ="", $absolute = true) {
   }
   elseif ($type == 'css') {
     if ($debug) {
-      $addition .= '&font=' . get_font_type();
-      $addition .= '&theme=' . get_css_id();
+      $addition .= '&amp;font=' . get_font_type();
+      $addition .= '&amp;theme=' . get_css_id();
       if ($CURUSER) {
-	$addition .= '&caticon=' . $CURUSER['caticon'];
+	$addition .= '&amp;caticon=' . $CURUSER['caticon'];
       }
       $href= $pagename . '?format=css' . $addition;
     }
@@ -267,8 +268,8 @@ function sqlerr($file = '', $line = '', $stack = true) {
 
 function format_comment($text, $strip_html = true, $xssclean = false, $newtab = false, $imageresizer = true, $image_max_width = 0, $enableimage = true, $enableflash = true , $imagenum = -1, $image_max_height = 0, $adid = 0) {
   global $Cache;
-  $cache = ($image_max_width == 0 && $image_max_height == 0 && $newtab == false);
-  if ($cache) {
+  #$is_cache = ($image_max_width == 0 && $image_max_height == 0 && $newtab == false);
+  if ($is_cache) {
     $key = 'bbcode-' . md5($text);
     $html = $Cache->get_value($key);
     if ($html) {
@@ -278,7 +279,11 @@ function format_comment($text, $strip_html = true, $xssclean = false, $newtab = 
   
   global $SITENAME, $BASEURL, $enableattach_attachment;
   require_once('HTML/BBCodeParser.php');
-  $filters = array('Extended', 'Basic', 'Email', 'Lists', 'Attachments', 'Refs', 'Smiles');
+  $filters = [];
+  if ($enableimage) {
+    $filters[] = 'Template';
+  }
+  $filters = array_merge($filters, ['Extended', 'Basic', 'Email', 'Lists', 'Attachments', 'Refs', 'Smiles']);
   if ($enableimage) {
     $filters[] = 'Images';
   }
@@ -298,7 +303,7 @@ function format_comment($text, $strip_html = true, $xssclean = false, $newtab = 
   }
   $parser = new HTML_BBCodeParser($opts);
   $out = '<div class="bbcode">' . $parser->qparse($text) . '</div>';
-  if ($cache) {
+  if ($is_cache) {
     $Cache->cache_value($key, $out, 86400 * 7);
   }
   return $out;
@@ -1207,13 +1212,13 @@ function maxslots () {
   if ($maxdlsystem == "yes") {
     if (get_user_class() < UC_VIP) {
       if ($max > 0)
-	print ("<font class='color_slots'>".$lang_functions['text_slots']."</font><a href=\"faq.php#id215\">$max</a>");
+	print ("<span class='color_slots'>".$lang_functions['text_slots']."</span><a href=\"faq.php#id215\">$max</a>");
       else
-	print ("<font class='color_slots'>".$lang_functions['text_slots']."</font>".$lang_functions['text_unlimited']);
+	print ("<span class='color_slots'>".$lang_functions['text_slots']."</span>".$lang_functions['text_unlimited']);
     }else
-      print ("<font class='color_slots'>".$lang_functions['text_slots']."</font>".$lang_functions['text_unlimited']);
+      print ("<span class='color_slots'>".$lang_functions['text_slots']."</span>".$lang_functions['text_unlimited']);
   }else
-    print ("<font class='color_slots'>".$lang_functions['text_slots']."</font>".$lang_functions['text_unlimited']);
+    print ("<span class='color_slots'>".$lang_functions['text_slots']."</span>".$lang_functions['text_unlimited']);
 }
 
 function WriteConfig ($configname = NULL, $config = NULL) {
@@ -1572,7 +1577,7 @@ function tr_small($x,$y,$noesc=0,$relation='') {
   print("<tr".( $relation ? " relation = \"$relation\"" : "")."><td width=\"1%\" class=\"rowhead nowrap\" valign=\"top\" align=\"right\">".$x."</td><td width=\"99%\" class=\"rowfollow\" valign=\"top\" align=\"left\">".$a."</td></tr>\n");
 }
 
-function dl_item($title, $desc, $noesc = false, $class = '') {
+function dl_item($title, $desc, $noesc = false, $class = '', $id = '') {
   static $first = true;
   if (!$noesc) {
     $desc = htmlspecialchars($desc);
@@ -1581,6 +1586,9 @@ function dl_item($title, $desc, $noesc = false, $class = '') {
   echo '<dt';
   if ($class) {
     echo ' class="' . $class . '"';
+  }
+  if ($id) {
+    echo ' id="' . $id . '"';
   }
   echo '>' . $title . '</dt><dd';
   if ($first) {
@@ -1952,9 +1960,9 @@ function stdhead($title = "", $msgalert = true, $script = "", $place = "") {
     }
 
     if($connect == "yes")
-      $connectable = "<b><font color=\"green\">".$lang_functions['text_yes']."</font></b>";
+      $connectable = "<span class=\"green\">".$lang_functions['text_yes']."</span>";
     elseif ($connect == 'no')
-      $connectable = "<a href=\"faq.php#id21\"><b><font color=\"red\">".$lang_functions['text_no']."</font></b></a>";
+      $connectable = "<a href=\"faq.php#id21\" class=\"striking\">".$lang_functions['text_no']."</a>";
     else
       $connectable = $lang_functions['text_unknown'];
 
@@ -2073,7 +2081,7 @@ function stdhead($title = "", $msgalert = true, $script = "", $place = "") {
 	$Cache->cache_value($cache_key, $no_startseed_count, 300);
       }
       if ($no_startseed_count) {
-	$alerts[] = ['href' => 'torrents.php?search_area=3&search_mode=3&incldead=3&search=' . $CURUSER['username'],
+	$alerts[] = ['href' => 'torrents.php?search_area=3&amp;search_mode=3&amp;incldead=3&amp;search=' . $CURUSER['username'],
 		     'text' => sprintf($lang_functions['text_no_startseed'], $no_startseed_count),
 		     'color' => 'black'];
       }
@@ -2458,6 +2466,13 @@ function pager($rpp, $count, $href, $opts = array(), $pagename = "page") {
       $page = $pagedefault;
   }
 
+  if (isset($opts['anchor'])) {
+    $surfix = '#' . $opts['anchor'];
+  }
+  else {
+    $surfix = '';
+  }
+
   $mp = $pages - 1;
   $pagerprev = '';
   $pagernext = '';
@@ -2466,7 +2481,7 @@ function pager($rpp, $count, $href, $opts = array(), $pagename = "page") {
   $is_presto = strpos($_SERVER['HTTP_USER_AGENT'], 'Presto');
   $as = "&lt;&lt;&nbsp;".$lang_functions['text_prev'];
   if ($page >= 1) {
-    $pagerprev = "<a href=\"".htmlspecialchars($href.$pagename."=" . ($page - 1) ). "\" title=\"".($is_presto ? $lang_functions['text_shift_pageup_shortcut'] : $lang_functions['text_alt_pageup_shortcut'])."\">";
+    $pagerprev = "<a href=\"".htmlspecialchars($href . $pagename . "=" . ($page - 1) . $surfix ). "\" title=\"".($is_presto ? $lang_functions['text_shift_pageup_shortcut'] : $lang_functions['text_alt_pageup_shortcut'])."\">";
     $pagerprev .= $as;
     $pagerprev .= "</a>";
   }
@@ -2476,7 +2491,7 @@ function pager($rpp, $count, $href, $opts = array(), $pagename = "page") {
 
   $as = $lang_functions['text_next']."&nbsp;&gt;&gt;";
   if ($page < $mp && $mp >= 0) {
-    $next_page_href = $href.$pagename."=" . ($page + 1);
+    $next_page_href = $href . $pagename."=" . ($page + 1) . $surfix;
     $pagernext .= "<a href=\"".htmlspecialchars($next_page_href). "\" title=\"".($is_presto ? $lang_functions['text_shift_pagedown_shortcut'] : $lang_functions['text_alt_pagedown_shortcut'])."\">";
     $pagernext .= $as;
     $pagernext .= "</a>";
@@ -2507,7 +2522,7 @@ function pager($rpp, $count, $href, $opts = array(), $pagename = "page") {
       $end = $count;
       $text = "$start&nbsp;-&nbsp;$end";
       if ($i != $page)
-      $pagerarr[] = "<a class=\"pagenumber\" href=\"".htmlspecialchars($href.$pagename."=".$i)."\">$text</a>";
+      $pagerarr[] = "<a class=\"pagenumber\" href=\"".htmlspecialchars($href . $pagename . "=" . $i . $surfix)."\">$text</a>";
       else
       $pagerarr[] = "<span class=\"selected\">$text</span>";
     }
@@ -3465,7 +3480,7 @@ function get_username($id, $big = false, $link = true, $bold = true, $target = f
   else {
     $username = $lang_functions['text_orphaned'];
   }
-  $username = "<span class=\"nowrap\">" . ( $bracket == true ? "(" . $username . ")" : $username) . "</span>";
+  $username = "<span class=\"username nowrap\"><span class=\"user-id\">$id</span>" . ( $bracket == true ? "(" . $username . ")" : $username) . "</span>";
   
   if (func_num_args() == 1) { //One argument=is default display of username, save it in static array
     $usernameArray[$id] = $username;
@@ -4556,19 +4571,21 @@ function votes($poll, $uservote = 255) {
   return $out;
 }
 
-function get_fun($id = 0) {
+function get_fun($id = 0, $pager_count = null) {
   global $Cache, $lang_fun, $BASEURL;
 
+  $is_cache = false;
   if ($id == 0) {
-    $content = $Cache->get_value('current_fun_content');
-    $id = $Cache->get_value('current_fun_content_id');
+    if (is_null($pager_count)) {
+      $content = $Cache->get_value('current_fun_content');
+      $id = $Cache->get_value('current_fun_content_id');
+      $is_cache = true;
+    }
 
     $sql = "SELECT fun.*, IF(ADDTIME(added, '1 0:0:0') < NOW(),true,false) AS neednew FROM fun WHERE status != 'banned' AND status != 'dull' ORDER BY added DESC LIMIT 1";
-    $is_cache = true;
   }
   else {
     $content = null;
-    $is_cache = false;
     $sql = "SELECT * FROM fun WHERE id = ". $id;
   }
 
@@ -4584,7 +4601,7 @@ function get_fun($id = 0) {
     $username = get_username($row["userid"],false,true,true,true,false,false,"",false);
     $time = $lang_fun['text_on'].$row['added'];
 
-    $content = '<div class="page-titles"><h3><a href="//' . $BASEURL . '/log.php?action=funbox">'.$row['title'].'</h3><h4>'.$lang_fun['text_posted_by'];
+    $content = '<div class="page-titles"><h3><a href="//' . $BASEURL . '/fun.php?id=' . $id . '">'.$row['title'].'</a></h3><h4>'.$lang_fun['text_posted_by'];
     $content .= $username . $time;
     $content .= '</h4></div><div id="funbox-content">';
     $content .= format_comment($row['body'], true, true, true)."</div>";
@@ -4595,7 +4612,7 @@ function get_fun($id = 0) {
     }
   }
 
-  if ($is_cache) {
+  if ($is_cache && (!isset($_REQUEST['funpage']) || $_REQUEST['funpage'] == 0) ) {
     $key = 'current_fun_content_comment';
     if (checkPrivilege(['Misc', 'fun'])) {
       $key .= '_delete';
@@ -4608,10 +4625,21 @@ function get_fun($id = 0) {
 
   if (!$funcomment) {
     $where = 'WHERE funid=' . $id;
-    $count = get_row_count('funcomment', $where);
-    list($pt, $pb, $limit) = pager(20, $count, '?', [], 'funpage');
-    $subres = sql_query("SELECT * FROM funcomment WHERE funid=".$id."  ORDER BY id " . $limit);
-    $funcomment = '<h4>评论</h4>';
+    $funcomment = '<h4>评论';
+    $query = "SELECT * FROM funcomment " . $where . " ORDER BY id DESC ";
+    if (!is_null($pager_count)) {
+      $count = get_row_count('funcomment', $where);
+      $href= '?';
+      $href .= 'id=' . $id . '&';
+      list($pt, $pb, $limit) = pager($pager_count, $count, $href, ['anchor' => 'funcomment'], 'funpage');
+    }
+    else {
+      $limit = 'LIMIT 10';
+      $funcomment .= ' [<a href="//' . $BASEURL . '/fun.php#funcomment">查看更多</a>]';
+    }
+    $funcomment .= '</h4>';
+    $subres = sql_query($query . $limit) or sqlerr(__FILE__, __LINE__);
+
     $funcomment .= ('<dl class="table" id="funcomment">');
     ob_start();
 
@@ -4624,17 +4652,19 @@ function get_fun($id = 0) {
       /* $temp=$subrow["text"]; */
 
       if (checkPrivilege(['Misc', 'fun'])) {
-	$del=' <form class="a" action="fun.php" method="POST"><input type="hidden" name="action" value="delcomment" /><input type="hidden" name="commentid" value="'. $subrow['id'] . '" /><input type="submit" value="删除" class="a" /></a>';
+	$del=' <form class="a" action="fun.php" method="post"><input type="hidden" name="action" value="delcomment" /><input type="hidden" name="commentid" value="'. $subrow['id'] . '" /><input type="submit" value="删除" class="a" /></form>';
       }
       dl_item(get_username($subrow['userid'],false,true,true,true,false,false,"",false).$del, format_comment($subrow['text'],true,false,true,true,600,false,false), true, 'midt');
     }
     $funcomment .= ob_get_clean ();
     $funcomment .= "</dl>";
-    $funcomment .= $pb;
+    if (isset($pb)) {
+      $funcomment .= $pb;
+    }
 
-    $funcomment .="<form action='fun.php#bottom' method='POST' name='funboxcomment'><input type='hidden' name='funid' value=" . $id . " /><input type='hidden' name='action' value='comment' />";
+    $funcomment .="<form action='fun.php#bottom' method='post' name='funboxcomment'><input type='hidden' name='funid' value='" . $id . "' /><input type='hidden' name='action' value='comment' />";
     $funcomment .= '<input type="hidden" name="returnto" value="' . $_SERVER["REQUEST_URI"] . '" />';
-    $funcomment .="<input type='text' name='fun_text' id='fun_text' size='100' style='width: 80%;' />";
+    $funcomment .="<input type='text' name='fun_text' placeholder='你有什么看法?' id='fun_text' size='100' style='width: 80%;' />";
       $funcomment .= "<input type='submit' class='btn' value=\"评论\"  name='tofunboxcomment'  /></form>";
       if ($is_cache) {
 	$Cache->cache_value($key, $funcomment, 900);

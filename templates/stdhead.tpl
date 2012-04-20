@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -20,7 +20,7 @@
 </head>
 <body>
   <div id="wrap">
-    <div id="header">
+    <header>
       {if $logo_main == ""}
       <div class="logo">{$SITENAME}</div>
       <div class="slogan">{$SLOGAN}</div>
@@ -35,7 +35,7 @@
 	{if $enabledonation}
 	<a href="//{$BASEURL}/donate.php"><img src="//{$BASEURL}/{$forum_pic}/donate.gif" alt="Make a donation" style="margin-left: 5px; margin-top: 50px;" /></a>
 	{/if}
-    </div></div>
+    </div></header>
     <div id="page">
       {if !$CURUSER} 
       <div id="nav-reg-signup" class="big minor-list list-seperator minor-nav"><ul>{nocache}{no_login_navbar()}{/nocache}</ul></div>
@@ -52,7 +52,7 @@
 	<li><a href="//{$BASEURL}/staffbox.php"><img class="staffbox" alt="staffbox" title="{$lang['title_staffbox']}" src="//{$BASEURL}/pic/trans.gif" /> {$totalsm}</a></li>
 	{/if}
 
-	<li><a href="//{$BASEURL}/messages.php"><img class="{if $unread}inboxnew{else}inbox{/if}" src="//{$BASEURL}/pic/trans.gif" alt="inbox" title={if $unread}{$lang['title_inbox_new_messages']}{else}$lang['title_inbox_no_new_messages']}{/if} />
+	<li><a href="//{$BASEURL}/messages.php"><img class="{if $unread}inboxnew{else}inbox{/if}" src="//{$BASEURL}/pic/trans.gif" alt="inbox" title="{if $unread}{$lang['title_inbox_new_messages']}{else}$lang['title_inbox_no_new_messages']}{/if}" />
 	{if $messages}{$messages}({$unread}{$lang['text_message_new']})
 	{else}
 	0
@@ -62,14 +62,14 @@
 	<li><a href="//{$BASEURL}/messages.php?action=viewmailbox&amp;box=-1"><img class="sentbox" alt="sentbox" title="{$lang['title_sentbox']}" src="//{$BASEURL}/pic/trans.gif" /> {if $outmessages}{$outmessages}{else}0{/if}</a></li>
 	<li><a href="//{$BASEURL}/friends.php"><img class="buddylist" alt="Buddylist" title="{$lang['title_buddylist']}" src="//{$BASEURL}/pic/trans.gif" /></a></li>
 	<li><a href="//{$BASEURL}/getrss.php"><img class="rss" alt="RSS" title="{$lang['title_get_rss']}" src="//{$BASEURL}/pic/trans.gif" /></a></li>
-	</ul></div>
+	 </ul></div>
 	</div>
 
 	<div id="header-userinfo">
 	  <div class="minor-list list-seperator compact">
 	    <ul>
-	      <li><span class="medium">{$lang['text_welcome_back']}, {get_username($id)}</li>
-	      <li><form action="//{$BASEURL}/logout.php" method="POST"><input type="submit" class="a" value="{$lang['text_logout']}" /></form></li>
+	      <li>{$lang['text_welcome_back']}, {get_username($id)}</li>
+	      <li><form action="//{$BASEURL}/logout.php" method="post"><input type="submit" class="a" value="{$lang['text_logout']}" /></form></li>
 	      {if get_user_class() >= $UC_MODERATOR}
 	      <li><a href="//{$BASEURL}/staffpanel.php">{$lang['text_staff_panel']}</a></li>
 	      {/if} 

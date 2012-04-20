@@ -60,7 +60,12 @@ if (file_exists($rootpath . 'config/allconfig.php')) {
 }
 
 $SITENAME = $BASIC['SITENAME'];
-$BASEURL = $BASIC['BASEURL'];
+if (isset($_SERVER['HTTP_HOST'])) {
+  $BASEURL = $_SERVER['HTTP_HOST'] . $BASIC['BASEDIR'];
+}
+else {
+  $BASEURL = $BASIC['BASEURL'];
+}
 $CAKEURL = $BASIC['BASEURL'] . '/' . $BASIC['CAKEDIR'];
 $announce_urls = array();
 $announce_urls[] = $BASIC['announce_url'];

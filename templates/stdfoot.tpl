@@ -1,7 +1,7 @@
       </div>
       <a href="#" id="back-to-top" title="回到页首" style="display:none;"></a>
     </div>
-    <div id="footer">
+    <footer>
       {if $footerad}
       <div style="margin-top: 10px; text-align:center;" id="ad_footer">{$footerad[0]}</div>
       {/if}
@@ -15,7 +15,7 @@
 	SQL query list: 
 	<ul>
 	  {foreach $queries as $query}
-	  <li>{$query}</li>
+	  <li>{htmlspecialchars($query)}</li>
 	  {/foreach}
 	</ul>
 	Memcached key read:
@@ -39,7 +39,8 @@
       </div>
       {$analyticscode_tweak}
       {$cnzz}
-    </div>
+    </footer>
+  </div>
   </body>
 </html>
 
