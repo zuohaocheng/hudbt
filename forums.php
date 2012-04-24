@@ -1196,11 +1196,8 @@ elseif ($action == "viewforum") {
 			$lpusername = get_username($lpuserid);
 			$lpadded = gettime($arr["added"],true,false);
 			$onmouseover = "";
-			if ($enabletooltip_tweak == 'yes' && $CURUSER['showlastpost'] != 'no'){
-				if ($CURUSER['timetype'] != 'timealive')
+			if ($enabletooltip_tweak == 'yes'){
 					$lastposttime = $lang_forums['text_at_time'].$arr["added"];
-				else
-					$lastposttime = $lang_forums['text_blank'].gettime($arr["added"],true,false,true);
 				$lptext = format_comment(mb_substr($arr['body'],0,100,"UTF-8") . (mb_strlen($arr['body'],"UTF-8") > 100 ? " ......" : "" ),true,false,false,true,600,false,false);
 				$lastpost_tooltip[$counter]['id'] = "lastpost_" . $counter;
 				$lastpost_tooltip[$counter]['content'] = $lang_forums['text_last_posted_by'].$lpusername.$lastposttime."<br />".$lptext;
@@ -1251,7 +1248,7 @@ elseif ($action == "viewforum") {
 
 		print("</tbody></table>");
 		print($pagerbottom);
-		if ($enabletooltip_tweak == 'yes' && $CURUSER['showlastpost'] != 'no')
+		if ($enabletooltip_tweak == 'yes')
 			create_tooltip_container($lastpost_tooltip, 400);
 	} // if
 	else
