@@ -44,7 +44,7 @@ function success($action) {
 }
 
 // Bonus exchange
-if ($_POST["userid"] || $_POST["points"] || $_POST["bonus"] || $_POST["art"]){
+if ($_POST["points"] || $_POST["bonus"] || $_POST["art"]){
   write_log("User " . $CURUSER["username"] . "," . $CURUSER["ip"] . " is trying to cheat at bonus system",'mod');
   die($lang_mybonus['text_cheat_alert']);
 }
@@ -148,10 +148,15 @@ if($CURUSER['seedbonus'] >= $points) {
     $points = 0+$_POST["bonusgift"];
     $message = $_POST["message"];
     //==gift for peeps with no more options
-    $usernamegift = sqlesc(trim($_POST["username"]));
-    $res = sql_query("SELECT id, bonuscomment FROM users WHERE username=" . $usernamegift);
-    $arr = mysql_fetch_assoc($res);
-    $useridgift = $arr['id'];
+    if (isset($_REQUEST['userid'])) {
+      $useridgift = 0 + $_REQUEST['userid'];
+    }
+    else {
+      $usernamegift = sqlesc(trim($_REQUEST["username"]));
+      $res = sql_query("SELECT id, bonuscomment FROM users WHERE username=" . $usernamegift);
+      $arr = mysql_fetch_assoc($res);
+      $useridgift = $arr['id'];
+    }
     $userseedbonus = $arr['seedbonus'];
     $receiverbonuscomment = $arr['bonuscomment'];
     if ($points < 25 || $points > 10000) {

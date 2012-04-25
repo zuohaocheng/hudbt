@@ -35,13 +35,9 @@ $(function() {
 		    submits.removeAttr('disabled');
 		    $target = $('#mybonus-result-text');
 		    if (result.success) {
-			$target.html(result.text);
 			$('#bonus, .bonus').text(result.bonus);
 			$('#uploaded').text(result.uploaded);
 			$('#invites').text(result.invites);
-		    }
-		    else {
-			$target.html(result.text + '<br />' + result.desc);
 		    }
 		    $target.html(result.text);
 		    $target.dialog({

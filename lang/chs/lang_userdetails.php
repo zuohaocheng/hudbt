@@ -10,6 +10,7 @@ $lang_userdetails = array
 	'text_remove_from_blocks' => "从黑名单中删除",
 	'text_add_to_friends' => "加入好友列表",
 	'text_add_to_blocks' => "加入黑名单",
+	'text_send_bonus' => '赠送魔力值',
 	'text_flush_ghost_torrents' => "清除冗余种子，点击",
 	'text_here' => "这里",
 	'row_invitation' => "邀请",

@@ -144,11 +144,11 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 	$enabled = $user["enabled"] == 'yes';
 	$moviepicker = $user["picker"] == 'yes';
 
-	print('<h1 id="page-title">' . get_username($user[id], true,false) . $country."</h1>");
+	print('<h1 id="page-title">' . get_username($user['id'], true,false) . $country."</h1>");
 
 	if (!$enabled)
 	print("<p><b>".$lang_userdetails['text_account_disabled_note']."</b></p>");
-	elseif ($CURUSER["id"] <> $user["id"])
+	elseif ($CURUSER["id"] != $user["id"])
 	{
 		$r = sql_query("SELECT id FROM friends WHERE userid=$CURUSER[id] AND friendid=$id") or sqlerr(__FILE__, __LINE__);
 		$friend = mysql_num_rows($r);
@@ -165,15 +165,16 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 			print("<a href=\"friends.php?action=add&amp;type=friend&amp;targetid=".$id."\">".$lang_userdetails['text_add_to_friends']."</a>");
 			print("</li><li><a href=\"friends.php?action=add&amp;type=block&amp;targetid=".$id."\">".$lang_userdetails['text_add_to_blocks']."</a>");
 		}
+		echo '</li><li><a href="//' . $BASEURL . '/mybonus.php" id="send-bonus">' . $lang_userdetails['text_send_bonus'] . '</a>';
 		print('</li></ul></div>');
 	}
 	begin_main_frame();
-	if ($CURUSER[id] == $user[id] || get_user_class() >= $cruprfmanage_class)
+	if ($CURUSER['id'] == $user['id'] || get_user_class() >= $cruprfmanage_class)
 		print("<h2>".$lang_userdetails['text_flush_ghost_torrents']."<a class=\"altlink\" href=\"takeflush.php?id=".$id."\">".$lang_userdetails['text_here']."</a></h2>\n");
 	?>
 	<table width="100%" border="1" cellspacing="0" cellpadding="5">
 	<?php
-	if (($user["privacy"] != "strong") OR (get_user_class() >= $prfmanage_class) || $CURUSER[id] == $user[id]){
+	if (($user["privacy"] != "strong") OR (get_user_class() >= $prfmanage_class) || $CURUSER['id'] == $user['id']){
 	//Xia Zuojie: Taste compatibility is extremely slow. It can takes thounsands of datebase queries. It is disabled until someone makes it fast.
 	/*
 		if (isset($CURUSER) && $CURUSER[id] != $user[id])
@@ -382,7 +383,7 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 	if ($showpmbutton)
 	print("<a href=\"sendmessage.php?receiver=".htmlspecialchars($user[id])."\"><img class=\"f_pm\" src=\"pic/trans.gif\" alt=\"PM\" title=\"".$lang_userdetails['title_send_pm']."\" /></a>");
 
-	print("<a href=\"report.php?user=".htmlspecialchars($user[id])."\"><img class=\"f_report\" src=\"pic/trans.gif\" alt=\"Report\" title=\"".$lang_userdetails['title_report_user']."\" /></a>");
+	print("<a href=\"report.php?user=".htmlspecialchars($user['id'])."\"><img class=\"f_report\" src=\"pic/trans.gif\" alt=\"Report\" title=\"".$lang_userdetails['title_report_user']."\" /></a>");
 	print("</td></tr>");
 	}
 	print("</table>\n");
@@ -405,7 +406,7 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 		print("<input type=\"hidden\" name=\"userid\" value=\"".$id."\" />");
 		print("<input type=\"hidden\" name=\"returnto\" value=\"".htmlspecialchars("userdetails.php?id=$id")."\" />");
 		print("<table width=\"100%\" class=\"main\" border=\"1\" cellspacing=\"0\" cellpadding=\"5\">\n");
-		tr($lang_userdetails['row_title'], "<input type=\"text\" size=\"60\" name=\"title\" value=\"" . htmlspecialchars(trim($user[title])) . "\" />", 1);
+		tr($lang_userdetails['row_title'], "<input type=\"text\" size=\"60\" name=\"title\" value=\"" . htmlspecialchars(trim($user['title'])) . "\" />", 1);
 		$avatar = htmlspecialchars(trim($user["avatar"]));
 
 		tr($lang_userdetails['row_privacy_level'], "<input type=\"radio\" name=\"privacy\" value=\"low\"".($user["privacy"] == "low" ? " checked=\"checked\"" : "")." />".$lang_userdetails['radio_low']."<input type=\"radio\" name=\"privacy\" value=\"normal\"".($user["privacy"] == "normal" ? " checked=\"checked\"" : "")." />".$lang_userdetails['radio_normal']."<input type=\"radio\" name=\"privacy\" value=\"strong\"".($user["privacy"] == "strong" ? " checked=\"checked\"" : "")." />".$lang_userdetails['radio_strong'], 1);
@@ -546,5 +547,6 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 	}
 	end_main_frame();
 }
+echo '<script type="text/javascript">hb.user=' . json_encode(['id' => $id]) . ';</script>';
 stdfoot();
-?>
+
