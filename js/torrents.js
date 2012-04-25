@@ -234,25 +234,32 @@ $(function() {
 
     //Handling quick delete
     var quickDelete;
+    var quickEdit;
     if (isManager) {
 	quickDelete = function(a) {
 	    a.click(function(e) {
-		var $this = $(this);
-		e.preventDefault();
-		var tr = $this.parent().parent().parent().parent().parent();
-		if (confirm('确认删除本种子?')) {
-		    $.post($this.attr('href') + '&sure=1&format=json', function(res) {
-			if (res.success) {
-			    tr.remove();
-			}
-		    }, 'json');
+		var id = argsFromUri(this.href).id;
+		if (id) {
+		    e.preventDefault();
+		    deleteTorrent(id);
 		}
 	    });
 	};
 	quickDelete(target.find('.staff-quick-delete'));
+	quickEdit = function(a) {
+	    a.click(function (e) {
+		var id = argsFromUri(this.href).id;
+		if (id) {
+		    e.preventDefault();
+		    editTorrent(id);
+		}
+	    });
+	};
+	quickEdit(target.find('.staff-quick-edit'));
     }
     else {
 	quickDelete = function() {};
+	quickEdit = quickDelete;
     }
 
     //Convert json to html
@@ -456,11 +463,11 @@ $(function() {
 	    tr += towner;
 
 	    if (isManager) {
-		href = 'fastdelete.php?id=' + id;
+		href = 'edit.php?id=' + id + '#delete';
 		var fastdelete = '<li><a href="' + href + '" class="staff-quick-delete"><img class="staff_delete" alt="D" src="pic/trans.gif" title="' + lang.text_delete + '" /></a></li>';
 
 		href = 'edit.php?id=' + id + '&returnto=' + returnto;
-		var fastedit = '<li><a href="' + href + '"><img class="staff_edit" alt="E" src="pic/trans.gif" title="' + lang.text_edit + '" /></a></li>';
+		var fastedit = '<li><a class="staff-quick-edit" href="' + href + '"><img class="staff_edit" alt="E" src="pic/trans.gif" title="' + lang.text_edit + '" /></a></li>';
 
 		var edit = '<td><div class="minor-list-vertical"><ul>' + fastdelete + fastedit + '</ul></div></td>';
 		tr += edit;
@@ -477,6 +484,7 @@ $(function() {
 	}
 	if (isManager) {
 	    quickDelete(newRows.find('.staff-quick-delete'));
+	    quickEdit(newRows.find('.staff-quick-edit'));
 	}
 
 	var cont = res['continue'];
@@ -532,7 +540,7 @@ $(function() {
 		sortHeader(!result['continue']);
 		table.show();
 		table.after(result.pager.bottom);
-		$('.pages a').click(function(e) {
+		$('.pages a[href^="?"]').click(function(e) {
 		    e.preventDefault();
 		    var uri = argsFromUri(this.href);
 		    getFromUriWithHistory(uri);

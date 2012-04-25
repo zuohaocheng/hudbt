@@ -179,27 +179,25 @@ else {
 			"<option" . (($row["picktype"] == "recommended") ? " selected=\"selected\"" : "" ) . " value=\"3\">".$lang_edit['select_recommended']."</option>" .
 			"</select>";
 		}
-		dl_item($lang_edit['row_pick'], $pickcontent, 1);
+		dl_item($lang_edit['row_pick'], $pickcontent, true, '', 'pr');
 	}
 
 	print("<dd class=\"toolbox\"><input id=\"qr\" type=\"submit\" value=\"".$lang_edit['submit_edit_it']."\" /> <input type=\"reset\" value=\"".$lang_edit['submit_revert_changes']."\" /></dd>\n");
 	print("</dl>\n");
 	print("</form>\n");
 	print("<br /><br />");
-	print("<form method=\"post\" action=\"delete.php\">\n");
-	print("<input type=\"hidden\" name=\"id\" value=\"$id\" />\n");
-	if (isset($_GET["returnto"]))
-	print("<input type=\"hidden\" name=\"returnto\" value=\"" . htmlspecialchars($_GET["returnto"]) . "\" />\n");
-	print("<table style=\"margin:0 auto;\" border=\"1\" cellspacing=\"0\" cellpadding=\"5\">\n");
-	print("<tr><td class=\"colhead\" align=\"left\" style='padding-bottom: 3px' colspan=\"2\">".$lang_edit['text_delete_torrent']."</td></tr>");
-	tr("<input name=\"reasontype\" type=\"radio\" value=\"1\" />&nbsp;".$lang_edit['radio_dead'], $lang_edit['text_dead_note'], 1);
-	tr("<input name=\"reasontype\" type=\"radio\" value=\"2\" />&nbsp;".$lang_edit['radio_dupe'], "<input type=\"text\" style=\"width: 200px\" name=\"reason[]\" />", 1);
-	tr("<input name=\"reasontype\" type=\"radio\" value=\"3\" />&nbsp;".$lang_edit['radio_nuked'], "<input type=\"text\" style=\"width: 200px\" name=\"reason[]\" />", 1);
-	tr("<input name=\"reasontype\" type=\"radio\" value=\"4\" />&nbsp;".$lang_edit['radio_rules'], "<input type=\"text\" style=\"width: 200px\" name=\"reason[]\" />".$lang_edit['text_req'], 1);
-	tr("<input name=\"reasontype\" type=\"radio\" value=\"5\" checked=\"checked\" />&nbsp;".$lang_edit['radio_other'], "<input type=\"text\" style=\"width: 200px\" name=\"reason[]\" />".$lang_edit['text_req'], 1);
-	print("<tr><td class=\"toolbox\" colspan=\"2\" align=\"center\"><input type=\"submit\" style='height: 25px' value=\"".$lang_edit['submit_delete_it']."\" /></td></tr>\n");
-	print("</table>");
-	print("</form>\n");
+	print("<form id=\"delete\" method=\"post\" action=\"//" . $CAKEURL . "/torrents/delete/$id\"><div class=\"table td\" style=\"width: 50%;text-align:center;padding:5px;\">\n");
+	if (isset($_GET["returnto"])) {
+	  print("<input type=\"hidden\" name=\"data[returnto]\" value=\"" . htmlspecialchars($_GET["returnto"]) . "\" />\n");
+	}
+	$reasons = [$lang_edit['radio_dead'], $lang_edit['radio_dupe'], $lang_edit['radio_nuked'], $lang_edit['radio_rules'], $lang_edit['radio_other']];
+	echo '<input type="hidden" name="_method" value="DELETE" /><select id="reason-type" name="data[reasonType]">';
+	foreach ($reasons as $k => $reason) {
+	  echo '<option value="', $k, '">', $reason, '</option>';
+	}
+	echo '</select><input type="text" id="reason-detail" name="data[reasonDetail]" placeholder="详细理由" />';
+	echo "<input type=\"submit\" style='height: 25px' value=\"".$lang_edit['submit_delete_it']."\" />";
+	print("</div></form>\n");
 }
 stdfoot();
-?>
+

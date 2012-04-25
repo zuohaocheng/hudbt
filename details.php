@@ -17,10 +17,6 @@ $res = sql_query("SELECT torrents.cache_stamp, torrents.sp_state, torrents.url, 
   or sqlerr();
 $row = mysql_fetch_array($res);
 
-if (get_user_class() >= $torrentmanage_class || $CURUSER["id"] == $row["owner"])
-  $owned = 1;
-else $owned = 0;
-
 if (!$row)
   stderr($lang_details['std_error'], $lang_details['std_no_torrent_id']);
 // BruceWolf Added at 2011-04-22
@@ -73,6 +69,8 @@ else {
       $url .= "&returnto=" . rawurlencode($_GET["returnto"]);
     }
     $editlink = "a title=\"".$lang_details['title_edit_torrent']."\" href=\"$url\"";
+    $prlink = "a href=\"$url#pr\" id=\"set-pr\"";
+    $deletelink = "a title=\"".$lang_details['title_delete_torrent']."\" href=\"$url#delete\" id=\"torrent-delete\"";
 
     // ------------- start upped by block ------------------//
     if($row['anonymous'] == 'yes') {
@@ -135,8 +133,11 @@ else {
       $actions .= "<li><a title=\"".$lang_details['title_download_torrent']."\" href=\"download.php?id=".$id."\"><img class=\"dt_download\" src=\"pic/trans.gif\" alt=\"download\" />&nbsp;<span class=\"small\">".$lang_details['text_download_torrent']."</span></a></li>";
     }
 
-    if ($owned == 1) {
+    if (checkPrivilege(['Torrent', 'edit']) || $CURUSER["id"] == $row["owner"]) {
       $actions .= "<li><$editlink><img class=\"dt_edit\" src=\"pic/trans.gif\" alt=\"edit\" />&nbsp;<span class=\"small\">".$lang_details['text_edit_torrent'] . "</span></a></li>";
+    }
+    if (checkPrivilege(['Torrent', 'delete']) || $CURUSER["id"] == $row["owner"]) {
+      $actions .= '<li><' . $deletelink . '>' . $lang_details['text_delete_torrent'] . '</a></li>';
     }
 
     if (get_user_class() >= $askreseed_class && $row['seeders'] == 0) {
@@ -145,8 +146,8 @@ else {
 
     $actions .= "<li><a title=\"".$lang_details['title_report_torrent']."\" href=\"report.php?torrent=$id\"><img class=\"dt_report\" src=\"pic/trans.gif\" alt=\"report\" />&nbsp;<span class=\"small\">".$lang_details['text_report_torrent']."</span></a></li>";
 
-    if(get_user_class() >= $torrentsticky_class) {
-      $actions .= '<li><a href="#" id="set-pr">设定优惠</a></li>';
+    if (checkPrivilege(['Torrent', 'sticky'])) {
+      $actions .= '<li><' . $prlink . '>设定优惠</a></li>';
     }
 
     $actions .= '</ul></div>';

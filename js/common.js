@@ -305,7 +305,8 @@ var argsFromUri = function(uri) {
     if (query.length !== 2) {
 	return {};
     }
-    $.each(query[1].split('&'), function(idx, obj) {
+    query = query[1].split('#')[0];
+    $.each(query.split('&'), function(idx, obj) {
 	var t = obj.split('=');
 	args[t[0]] = decodeURIComponent(t[1]);
     });
@@ -415,3 +416,192 @@ var editPr = function() {
 
     }
 };
+
+var createOptions = function(options, defaultOpt) {
+    return $.map(options, function(v, k) {
+	if (v.length === 0) {
+	    return '';
+	}
+
+	var out = '<option value="' + k + '"';
+	if (k === defaultOpt) {
+	    out += ' selected="selected"';
+	}
+	out += '>' + v + '</option>';
+	return out;
+    }).join('');
+};
+
+var jqui_dialog = function(title, html, timeout) {
+    var dialog = $('<div />', {
+	title : title,
+	html : html
+    });
+    var close = function() {
+	dialog.dialog('close');
+    };
+    dialog.dialog({
+	modal : true,
+	autoOpen : true,
+	buttons : {
+	    OK : close
+	},
+	'close' : function() {
+	    dialog.remove();
+	}
+    });
+    if (timeout) {
+	setTimeout(close, timeout);
+    }
+};
+
+var jqui_form = function(form, title, callback, buttons) {
+    form.submit(function(e) {
+	e.preventDefault();
+	onOK();
+    });
+    var dialog = $('<div />', {
+	title : title
+    }).append('<div id="dialog-hint"></div>').append(form);
+
+    var onOK = function() {
+	var valid = true;
+	form.find('.required').each(function() {
+	    var $this = $(this);
+	    if ($this.val().trim().length === 0) {
+		$this.addClass('invalid');
+		valid = false;
+	    }
+	});
+	if (!valid) {
+	    $('#dialog-hint').text('存在无效字段');
+	    return;
+	}
+	$.post(form.attr('action'), form.serialize(), function(result) {
+	    if (callback) {
+		if (callback(result, dialog)) {
+		    dialog.dialog('close');
+		}
+	    }
+	    else {
+		dialog.dialog('close');
+	    }
+	}, 'json');
+    };
+
+    var defaultButtons = {
+	OK : onOK,
+	Cancel : function() {
+	    dialog.dialog('close');
+	}
+    };
+    if (buttons) {
+	for (var key in defaultButtons) {
+	    buttons[key] = defaultButtons[key];
+	}
+    }
+    else {
+	buttons = defaultButtons;
+    }
+    
+    dialog.dialog({
+	modal : true,
+	autoOpen : true,
+	buttons : buttons,
+	'close' : function() {
+	    dialog.remove();
+	}
+    });
+};
+
+var editTorrent = (function() {
+    var prDict = ['', '普通', '免费', '2X', '2X免费', '50%', '2X 50%', '30%'];
+    var untilDict = ['使用全局设置', '永久', '直到'];
+    var posDict = {
+	normal : '普通',
+	sticky : '置顶'
+    }; 
+
+    return function(id, callback) {
+	var cake = hb.constant.url.cake;
+	$.getJSON('//' + cake + '/torrents/view/' + id + '.json', function(result) {
+	    var putTarget = '//' + cake + '/torrents/edit/' + id + '.json?%2Fcake%2Ftorrents%2Fedit%2F' + id + '=';
+	    var torrent = result.Torrent;
+	    var time;
+	    if (torrent.promotion_time_type === '2') {
+		time = torrent.promotion_until;
+	    }
+	    else {
+		var new_date = new Date();
+		time = new_date.getFullYear() 
+		    + '-' + (new_date.getMonth() + 1) 
+		    + '-' + new_date.getDate() 
+		    + ' ' + new_date.getHours() 
+		    + ':' + new_date.getMinutes() 
+		    + ':' + new_date.getSeconds();
+	    }
+	    var html = '<div id="dialog-hint"></div><input type="hidden" name="_method" value="PUT" /><input type="hidden" name="data[Torrent][id]" value="' + id + '" id="TorrentId"><ul><li><label>促销种子<select id="sel_spstate" name="data[Torrent][sp_state]" style="width: 100px;">' + createOptions(prDict, parseInt(torrent.sp_state)) + '</select></label> <select id="promotion_time_type" name="data[Torrent][promotion_time_type]" style="width: 100px;" disabled="disabled">' + createOptions(untilDict, parseInt(torrent.promotion_time_type)) + '</select></li><li><label id="pr-expire">截止日期<input type="text" name="data[Torrent][promotion_until]" id="promotionuntil" style="width: 120px;" value="' + time + '"></label></li><li id="expand-pr" style="display: none; "></li><li><label>种子位置<select name="data[Torrent][pos_state]" style="width: 100px;">' + createOptions(posDict, torrent.pos_state) +'</select></label></li>';
+	    html += '<li><input type="hidden" name="data[Torrent][oday]" value="no"><label><input type="checkbox" id="sel_oday" name="data[Torrent][oday]" value="yes"';
+	    if (torrent.oday === 'yes') {
+		html += ' checked="checked"';
+	    }
+	    html += '>0day资源</label></li></ul>';
+	    var form = $('<form></form>', {
+		html : html,
+		'class' : 'minor-list',
+		action : putTarget,
+		method : 'post'
+	    });
+	    var title = '设定优惠'
+	    jqui_form(form, title, function(result) {
+		if (result.success) {
+		    if (callback) {
+			callback();
+		    }
+		    return true;
+		}
+		else {
+		    $('#dialog-hint').text(result.message);
+		    return false;
+		}
+	    }, {
+		'打开完整编辑' : function() {
+		    location.href = '//' + hb.constant.url.base + '/edit.php?id=' + id;
+		},
+	    });
+	    editPr();
+	});
+    }
+})();
+
+var deleteTorrent = (function() {
+    return (function(id) {
+	var cake = hb.constant.url.cake;
+	var deleteTarget = '//' + cake + '/torrents/delete/' + id + '.json';
+	var reasons = ['断种', '重复', '劣质', '违规', '其它'];
+ 	var html = '<input type="hidden" name="_method" value="DELETE" /><select id="reason-type" name="data[reasonType]">' + createOptions(reasons, 0) + '</select><input style="display: none;" type="text" id="reason-detail" name="data[reasonDetail]" title="详细理由" />';
+	var form = $('<form></form>', {
+	    html : html,
+	    'class' : 'minor-list',
+	    action : deleteTarget,
+	    method : 'post'
+	});
+	form.find('#reason-type').change(function() {
+	    var reasonDetail=$('#reason-detail');
+	    var val=parseInt(this.value);
+	    if(val===0) {
+		reasonDetail.fadeOut().removeClass('required');
+	    }
+	    else {
+		if(val===1||val===2) {
+		    reasonDetail.attr('placeholder','可选').removeClass('required').fadeIn();
+		}
+		else {
+		reasonDetail.attr('placeholder','必填').addClass('required').removeClass('invalid').fadeIn();
+		}
+	    }
+	});
+	jqui_form(form, '删除种子', function(result) {
+	});
+    });
+})();

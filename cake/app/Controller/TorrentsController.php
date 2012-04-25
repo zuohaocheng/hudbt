@@ -130,19 +130,75 @@ class TorrentsController extends AppController {
  * @param string $id
  * @return void
  */
-/*	public function delete($id = null) {
-		if (!$this->request->is('post')) {
-			throw new MethodNotAllowedException();
-		}
-		$this->Torrent->id = $id;
-		if (!$this->Torrent->exists()) {
-			throw new NotFoundException(__('Invalid torrent'));
-		}
-		if ($this->Torrent->delete()) {
-			$this->Session->setFlash(__('Torrent deleted'));
-			$this->redirect(array('action' => 'index'));
-		}
-		$this->Session->setFlash(__('Torrent was not deleted'));
-		$this->redirect(array('action' => 'index'));
-		}*/
+	public function delete($id = null) {
+	  include(get_langfile_path('delete.php'));
+	  if (!$this->request->is('delete')) {
+	    throw new MethodNotAllowedException();
+	  }
+	  $this->Torrent->id = $id;
+	  if (!$this->Torrent->exists()) {
+	    throw new NotFoundException(__('Invalid torrent'));
+	  }
+
+	  $data = $this->request->data;
+
+	  if (!checkPrivilege(['Torrent', 'delete'])) {
+	    $torrent = $this->Torrent->read('owner', $id);
+	    if ($CURUSER["id"] != $torrent["Torrent"]['owner']) {
+	      throw new Exception('Access denied');
+	    }
+	  }
+
+	  $rt = 0 + $data["reasonType"];
+
+	  if (!is_int($rt) || $rt < 1 || $rt > 5) {
+	    $result = ['success' => false, 'message' => $lang_delete['std_invalid_reason']."$rt."];	  
+	  }
+	  else {
+	    if (isset($data["reasonDetail"])) {
+	      $reason = trim($data["reasonDetail"]);
+	      if ($reason == '') {
+		unset($reason);
+	      }
+	    }
+
+	    if ($rt == 1) {
+	      $reasonstr = "Dead: 0 seeders, 0 leechers = 0 peers total";
+	    }
+	    elseif ($rt == 2) {
+	      $reasonstr = "Dupe" . (isset($reason) ? (": " . $reason) : "!");
+	    }
+	    elseif ($rt == 3) {
+	      $reasonstr = "Nuked" . (isset($reason) ? (": " . $reason) : "!");
+	    }
+	    elseif ($rt == 4) {
+	      if (!isset($reason)) {
+		$result = ['success' => false, 'message' => $lang_delete['std_describe_violated_rule']."$rt."];
+	      }
+	      $reasonstr = $SITENAME." rules broken: " . $reason;
+	    }
+	    else {
+	      if (!isset($reason)) {
+		$result = ['success' => false, 'message' => $lang_delete['std_enter_reason']."$rt."];
+	      }
+	      $reasonstr = $reason;
+	    }
+	    $this->Torrent->reason = $reasonstr;
+	  }
+
+	  if (!isset($result)) {
+	    if ($this->Torrent->delete()) {
+	      #	    $this->Session->setFlash(__('Torrent deleted'));
+	      #	    $this->redirect(array('action' => 'index'));
+	      $result = ['success' => true, 'message' => __('Torrent deleted')];
+	    }
+	    else {
+	      $result = ['success' => false, 'message' => __('Torrent was not deleted')];
+	      /* $this->Session->setFlash(__('Torrent was not deleted')); */
+	      /* $this->redirect(array('action' => 'index')); */
+	    }
+	  }
+	  $this->set(compact('result'));
+	  $this->set('_serialize', 'result');
+	}
 }

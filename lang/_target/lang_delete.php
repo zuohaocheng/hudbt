@@ -5,20 +5,14 @@ $lang_delete_target = array
 	'en' => array
 	(
 	'msg_torrent_deleted' => "Your torrent was deleted",
-	'msg_the_torrent_you_uploaded' => "The torrent you uploaded ",
-	'msg_the_torrent_you_downloaded' => "The torrent you downloaded'",//Added by bluemonster 20111110
-	'msg_was_deleted_by' => " was delete by ",
-	'msg_reason_is' => ". The reason: ",
-	'msg_blank' => '.',
+	'msg_torrent_uploaded' => "The torrent you uploaded [b]%s[/b] was deleted by [user=%s], reason: %s。",
+	'msg_torrent_downloaded' => "The torrent you downloaded [b]%s[/b] was deleted by [user=%s], reason: %s。",
 	),
 	'chs' => array
 	(
 	'msg_torrent_deleted' => "种子被删除",
-	'msg_the_torrent_you_uploaded' => "你上传的种子",
-	'msg_the_torrent_you_downloaded' => "你下载过的种子",//Added by bluemonster 20111110
-	'msg_was_deleted_by' => "被",
-	'msg_reason_is' => "删除。原因：",
-	'msg_blank' => '删除。',
+	'msg_torrent_uploaded' => "你上传的种子[b]%s[/b]被[user=%s]删除。原因：%s。",
+	'msg_torrent_downloaded' => "你下载过的种子[b]%s[/b]被[user=%s]删除。原因：%s。",//Added by bluemonster 20111110
 	),
 	'cht' => array
 	(
