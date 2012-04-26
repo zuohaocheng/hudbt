@@ -374,24 +374,20 @@ $(function() {
 	    if (pr) {
 		var state = pr.state;
 		var prDict = hb.constant.pr[state - 1];
-		var prLabel = '<li><img class="' + prDict.name + '" alt="' + lang[prDict.lang] + '" src="pic/trans.gif" /></li>'
-		mainTitleDecorators += prLabel;
-
+		
 		var expire = pr.expire;
-		var hexpire = '<ul class="prs"><li><span>[<span class="';
+		var hexpire = "";
 		var $time = $('<span></span>', {text : lang.text_will_end_in});
 		if (expire) {
-		    hexpire += 'pr-limit" title="' + expire.raw + '">' + expire.canonical;
+		    hexpire += lang.text_until+expire.raw;
 		}
 		else {
-		    hexpire += 'pr-eternal">' + lang.text_will_end_in + lang.text_forever;
+		    hexpire += lang.text_until + lang.text_forever;
 		}
-		hexpire += '</span>]</span></li></ul>';
-		desc += hexpire;
-	    }
-	    div_desc += desc;
-	    div_desc += '</div>';
-
+		var prLabel = '<li><img class="' + prDict.name + '" title="'+hexpire+'" alt="' + lang[prDict.lang] + '" src="pic/trans.gif" /></li>'
+		mainTitleDecorators += prLabel;
+		}
+		
 	    if (torrent.oday) {
 		var oday = '<li><img src="pic/ico_0day.gif" alt="' + lang.text_oday + '" title="' + lang.text_oday + '"/></li>';
 		mainTitleDecorators += oday;

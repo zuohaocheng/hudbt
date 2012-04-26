@@ -47,7 +47,7 @@ else {
       if (isset($_GET["returnto"]))
 	print("<p><b>".$lang_details['text_go_back'] . "<a href=\"".htmlspecialchars($_GET["returnto"])."\">" . $lang_details['text_whence_you_came']."</a></b></p>");
     }
-    $sp_torrent = get_torrent_promotion_append($row['sp_state'],'word');
+    $sp_torrent = get_torrent_promotion_append($row['sp_state'],"",true,$row["added"], $row['promotion_time_type'], $row['promotion_until']);
 
     $s=htmlspecialchars($row["name"]);
     print('<h1 id="page-title">'.$s.'</h1><a id="top"></a>');

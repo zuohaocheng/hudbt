@@ -3185,10 +3185,6 @@ foreach($rows as $row)
     if ($sp_torrent != '') {
       $sp_torrent = '<li>' . $sp_torrent . '</li>';
     }
-    $sp_torrent_sub = get_torrent_promotion_append_sub($row['sp_state'],"",true,$row["added"], $row['promotion_time_type'], $row['promotion_until']);
-    if ($sp_torrent_sub != '') {
-      $sp_torrent_sub = '<li>' . $sp_torrent_sub . '</li>';
-    }
 
     $picked_torrent = "";
 
@@ -3903,11 +3899,20 @@ function get_torrent_bg_color($promotion = 1)
 function get_torrent_promotion_append($promotion = 1,$forcemode = "",$showtimeleft = false, $added = "", $promotionTimeType = 0, $promotionUntil = '') {
   global $BASEURL;
   global $CURUSER,$lang_functions, $promotion_text;
-
-  list($pr_state) = get_pr_state($promotion);
-  if ($pr_state == 1) {
-    return '';
+	
+	list($pr_state, $expire) = get_pr_state($promotion, $added, $promotionTimeType, $promotionUntil);
+  if ($pr_state != 1) {
+    if ($expire) {
+      $cexpire = date("Y-m-d H:i:s", $expire);
+      //$timeout = gettime($cexpire, false, false, true, false, true);
+      //$ret = '[<span class="pr-limit" title="' . $cexpire . '">'.$lang_functions['text_will_end_in'].$timeout."</span>]";
+    }
+    else
+    	$cexpire = $lang_functions['text_forever'];
   }
+  else 
+    return '';
+  $cexpire = $lang_functions['text_until'].$cexpire;
 
   $prDict = $promotion_text[$pr_state -1];
   $text = $lang_functions[$prDict['lang']];
@@ -3919,9 +3924,8 @@ function get_torrent_promotion_append($promotion = 1,$forcemode = "",$showtimele
     $mode = 'icon';
   }
 
-
 if ($mode == 'icon') {
-    $ret = '<img class="' . $prDict['name'] . '" alt="' . $text . '" src="//' . $BASEURL . '/pic/trans.gif" />';
+    $ret = '<img class="' . $prDict['name'] . '" alt="' . $text .'"title="'.$cexpire.'" src="//' . $BASEURL . '/pic/trans.gif" />';
   }
   return $ret;
 }
