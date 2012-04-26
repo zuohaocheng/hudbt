@@ -290,6 +290,7 @@ $lang_functions = array
 	'text_please_download_something_within' => "Please download something within ",
 	'text_inactive_account_be_deleted' => ". Inactive accounts (with no transfer amount) will be deleted.",
 	'text_no_startseed' => '%dtorrents you uploaded have not started seeding yet.Keep that in mind :)',
+	'text_until' =>"until",
 );
 
 ?>

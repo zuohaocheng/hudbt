@@ -34,7 +34,10 @@ else
 	// End ||
 	parked();
 	$letdown = $_GET['letdown'];
-	if (!$letdown && $CURUSER['showdlnotice'] == 1)
+	$noticequery = sprintf("SELECT COUNT(userid) FROM snatched where userid = %d",$CURUSER['id']);
+	$noticeres = sql_query($noticequery) or sqlerr(__FILE__, __LINE__);
+	$noticearr = mysql_fetch_array($noticeres);
+	if (!$letdown && (!$noticearr[0]))
 	{
 		header("Location: " . get_protocol_prefix() . "$BASEURL/downloadnotice.php?torrentid=".$id."&type=firsttime");
 	}

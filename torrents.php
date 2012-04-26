@@ -915,9 +915,7 @@ if($torrent_count_cache) {
 	  $count += $row[0];
 }
 
-if ($CURUSER["torrentsperpage"])
-  $torrentsperpage = (int)$CURUSER["torrentsperpage"];
-elseif ($torrentsperpage_main)
+if ($torrentsperpage_main)
   $torrentsperpage = $torrentsperpage_main;
 else $torrentsperpage = 50;
 

@@ -364,8 +364,14 @@ foreach ($promotionrules_torrent as $rule)
 $ret = sql_query("INSERT INTO torrents (filename, owner, visible, anonymous, name, size, numfiles, type, url, small_descr, descr, ori_descr, category, source, medium, codec, audiocodec, standard, processing, team, save_as, sp_state, added, last_action, nfo, info_hash) VALUES (".sqlesc($fname).", ".sqlesc($CURUSER["id"]).", 'yes', ".sqlesc($anonymous).", ".sqlesc($torrent).", ".sqlesc($totallen).", ".count($filelist).", ".sqlesc($type).", ".sqlesc($url).", ".sqlesc($small_descr).", ".sqlesc($descr).", ".sqlesc($descr).", ".sqlesc($catid).", ".sqlesc($sourceid).", ".sqlesc($mediumid).", ".sqlesc($codecid).", ".sqlesc($audiocodecid).", ".sqlesc($standardid).", ".sqlesc($processingid).", ".sqlesc($teamid).", ".sqlesc($dname).", ".sqlesc($sp_state) .
 		 ", " . sqlesc(date("Y-m-d H:i:s")) . ", " . sqlesc(date("Y-m-d H:i:s")) . ", ".sqlesc($nfo).", " . sqlesc(stripslashes($infohash)). ")");
 if (!$ret) {
-	if (mysql_errno() == 1062)
-	bark($lang_takeupload['std_torrent_existed']);
+	if (mysql_errno() == 1062){
+		$dupequery = "SELECT id FROM torrents where info_hash=".sqlesc(stripslashes($infohash));
+		$duperes = sql_query($dupequery)or sqlerr(__FILE__, __LINE__);
+		$dupearr = mysql_fetch_row($duperes);
+		$dupeid = $dupearr[0];
+		$torrlink = sprintf($lang_takeupload['std_click_it'],$dupeid);
+		stderr($lang_takeupload['std_upload_failed'],$lang_takeupload['std_torrent_existed'].$torrlink,false);
+	}
 	bark("mysql puked: ".mysql_error());
 	//bark("mysql puked: ".preg_replace_callback('/./s', "hex_esc2", mysql_error()));
 }

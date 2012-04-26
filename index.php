@@ -112,7 +112,7 @@ if ($showextinfo['imdb'] == 'yes' && ($showmovies['hot'] == "yes" || $showmovies
     $type = array('hot', 'classic');
     foreach($type as $type_each)
       {
-	if($showmovies[$type_each] == 'yes' && (!isset($CURUSER) || $CURUSER['show' . $type_each] == 'yes'))
+	if($showmovies[$type_each] == 'yes')
 	  {
 	    $Cache->new_page($type_each.'_resources', 900, true);
 	    if (!$Cache->get_page())
@@ -163,7 +163,7 @@ if ($showextinfo['imdb'] == 'yes' && ($showmovies['hot'] == "yes" || $showmovies
   }
 // ------------- end: hot and classic movies ------------------//
 // ------------- start: funbox ------------------//
-if ($showfunbox_main == "yes" && (!isset($CURUSER) || $CURUSER['showfb'] == "yes")){
+if ($showfunbox_main == "yes"){
   // Get the newest fun stuff
   $funid = $Cache->get_value('current_fun_content_id');
   $neednew = $Cache->get_value('current_fun_content_neednew');

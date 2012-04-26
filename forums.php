@@ -779,9 +779,14 @@ SELECT id, rownum FROM (SELECT @x:=@x+1 AS rownum, id, userid FROM (SELECT @x:=0
 
 	print($pagerbottom);
 	if ($maypost){
-	print('<div id="forum-reply-post" class="table td"><h2><a class="index" href="'.htmlspecialchars('?action=reply&topicid='.$topicid).'">'.$lang_forums['text_add_reply'].'</a></h2><form id="compose" name="compose" method="post" action="?action=post" onsubmit="return postvalid(this);"><input type="hidden" name="id" value='.$topicid.' /><input type="hidden" name="type" value="reply" />');
-	quickreply('compose', 'body',$lang_forums['submit_add_reply']);
-	print("</form></div>");
+		if(!$locked){
+			print('<div id="forum-reply-post" class="table td"><h2><a class="index" href="'.htmlspecialchars('?action=reply&topicid='.$topicid).'">'.$lang_forums['text_add_reply'].'</a></h2><form id="compose" name="compose" method="post" action="?action=post" onsubmit="return postvalid(this);"><input type="hidden" name="id" value='.$topicid.' /><input type="hidden" name="type" value="reply" />');
+			quickreply('compose', 'body',$lang_forums['submit_add_reply']);
+			print("</form></div>");
+		}
+		else{
+			print('<center><h2><a class="index" href="'.htmlspecialchars('?action=reply&topicid='.$topicid).'">'.$lang_forums['text_add_reply'].'</a></h2><form id="compose" name="compose" method="post" action="?action=post" onsubmit="return postvalid(this);"><input type="hidden" name="id" value='.$topicid.' /></center><input type="hidden" name="type" value="reply" />');	
+		}
 	}
 	elseif ($locked)
 		print($lang_forums['text_topic_locked_new_denied']);
@@ -1205,11 +1210,8 @@ elseif ($action == "viewforum") {
 			$lpusername = get_username($lpuserid);
 			$lpadded = gettime($arr["added"],true,false);
 			$onmouseover = "";
-			if ($enabletooltip_tweak == 'yes' && $CURUSER['showlastpost'] != 'no'){
-				if ($CURUSER['timetype'] != 'timealive')
+			if ($enabletooltip_tweak == 'yes'){
 					$lastposttime = $lang_forums['text_at_time'].$arr["added"];
-				else
-					$lastposttime = $lang_forums['text_blank'].gettime($arr["added"],true,false,true);
 				$lptext = format_comment(mb_substr($arr['body'],0,100,"UTF-8") . (mb_strlen($arr['body'],"UTF-8") > 100 ? " ......" : "" ),true,false,false,true,600,false,false);
 				$lastpost_tooltip[$counter]['id'] = "lastpost_" . $counter;
 				$lastpost_tooltip[$counter]['content'] = $lang_forums['text_last_posted_by'].$lpusername.$lastposttime."<br />".$lptext;
@@ -1260,7 +1262,7 @@ elseif ($action == "viewforum") {
 
 		print("</tbody></table>");
 		print($pagerbottom);
-		if ($enabletooltip_tweak == 'yes' && $CURUSER['showlastpost'] != 'no')
+		if ($enabletooltip_tweak == 'yes')
 			create_tooltip_container($lastpost_tooltip, 400);
 	} // if
 	else

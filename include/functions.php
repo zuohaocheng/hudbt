@@ -3050,11 +3050,10 @@ if (isset($wait) && $wait)
 {
   print('<th class="unsortable">'.$lang_functions['col_wait']."</th>\n");
 }
-if ($CURUSER['showcomnum'] != 'no') { ?>
+ ?>
 <th value="3"><a href="?<?php echo $oldlink?>sort=3&amp;type=<?php echo $link[3]?>"><img class="comments" src="//<?php echo $BASEURL; ?>/pic/trans.gif" alt="comments" title="<?php echo $lang_functions['title_number_of_comments'] ?>" /></a></th>
-<?php } ?>
 
-<th value="4"><a href="?<?php echo $oldlink?>sort=4&amp;type=<?php echo $link[4]?>"><img class="time" src="//<?php echo $BASEURL; ?>/pic/trans.gif" alt="time" title="<?php echo ($CURUSER['timetype'] != 'timealive' ? $lang_functions['title_time_added'] : $lang_functions['title_time_alive'])?>" /></a></th>
+<th value="4"><a href="?<?php echo $oldlink?>sort=4&amp;type=<?php echo $link[4]?>"><img class="time" src="//<?php echo $BASEURL; ?>/pic/trans.gif" alt="time" title="<?php echo  $lang_functions['title_time_added']?>" /></a></th>
 <th value="5"><a href="?<?php echo $oldlink?>sort=5&amp;type=<?php echo $link[5]?>"><img class="size" src="//<?php echo $BASEURL; ?>/pic/trans.gif" alt="size" title="<?php echo $lang_functions['title_size'] ?>" /></a></th>
 <th value="7"><a href="?<?php echo $oldlink?>sort=7&amp;type=<?php echo $link[7]?>"><img class="seeders" src="//<?php echo $BASEURL; ?>/pic/trans.gif" alt="seeders" title="<?php echo $lang_functions['title_number_of_seeders'] ?>" /></a></th>
 <th value="8"><a href="?<?php echo $oldlink?>sort=8&amp;type=<?php echo $link[8]?>"><img class="leechers" src="//<?php echo $BASEURL; ?>/pic/trans.gif" alt="leechers" title="<?php echo $lang_functions['title_number_of_leechers'] ?>" /></a></th>
@@ -3073,7 +3072,7 @@ if ($caticonrow['secondicon'] == 'yes')
 $has_secondicon = true;
 else $has_secondicon = false;
 $counter = 0;
-if ($smalldescription_main == 'no' || $CURUSER['showsmalldescr'] == 'no')
+if ($smalldescription_main == 'no')
   $displaysmalldescr = false;
 else $displaysmalldescr = true;
 foreach($rows as $row)
@@ -3103,34 +3102,7 @@ foreach($rows as $row)
     $mouseovertorrent = "";
     $tooltipblock = "";
     $has_tooltip = false;
-    if ($enabletooltip_tweak == 'yes')
-      $tooltiptype = $CURUSER['tooltip'];
-    else
-      $tooltiptype = 'off';
-    switch ($tooltiptype){
-      case 'minorimdb' : {
-        if ($showextinfo['imdb'] == 'yes' && $row["url"])
-          {
-          $url = $row['url'];
-          $cache = $row['cache_stamp'];
-          $type = 'minor';
-          $has_tooltip = true;
-          }
-        break;
-        }
-      case 'medianimdb' :
-        {
-        if ($showextinfo['imdb'] == 'yes' && $row["url"])
-          {
-          $url = $row['url'];
-          $cache = $row['cache_stamp'];
-          $type = 'median';
-          $has_tooltip = true;
-          }
-        break;
-        }
-      case 'off' :  break;
-    }
+
     if (!$has_tooltip)
       $short_torrent_name_alt = "title=\"".htmlspecialchars($dispname)."\"";
     else{
@@ -3150,7 +3122,7 @@ foreach($rows as $row)
     if($count_dispname > $max_length_of_torrent_name)
       $dispname=mb_substr($dispname, 0, $max_length_of_torrent_name-2,"UTF-8") . "..";
 
-    if ($row['pos_state'] == 'sticky' && $CURUSER['appendsticky'] == 'yes')
+    if ($row['pos_state'] == 'sticky')
       $stickyicon = "<img class=\"sticky\" src=\"//$BASEURL/pic/trans.gif\" alt=\"Sticky\" title=\"".$lang_functions['title_sticky']."\" />";
     else $stickyicon = "";
     
@@ -3174,13 +3146,9 @@ foreach($rows as $row)
     if ($sp_torrent != '') {
       $sp_torrent = '<li>' . $sp_torrent . '</li>';
     }
-    $sp_torrent_sub = get_torrent_promotion_append_sub($row['sp_state'],"",true,$row["added"], $row['promotion_time_type'], $row['promotion_until']);
-    if ($sp_torrent_sub != '') {
-      $sp_torrent_sub = '<li>' . $sp_torrent_sub . '</li>';
-    }
 
     $picked_torrent = "";
-    if ($CURUSER['appendpicked'] != 'no'){
+
     if($row['picktype']=="hot")
     $picked_torrent = "<li>[<span class='hot'>".$lang_functions['text_hot']."</span>]</li>";
     elseif($row['picktype']=="classic")
@@ -3190,26 +3158,26 @@ foreach($rows as $row)
     //Added by bluemonster 20111026
     if($row['oday']=="yes")
     {
-      if (($CURUSER['appendpromotion'] == 'icon' && $forcemode == "") || $forcemode == 'icon'){  
+      if ($forcemode == "" || $forcemode == 'icon'){  
       //$picked_torrent = " <b>[<font class='recommended'>".$lang_functions['text_oday']."</font>]</b>";
       $sp_torrent.="<li><img src=\"pic/ico_0day.gif\" border=0 alt=\"0day\" title=\"".$lang_functions['text_oday']."\" /></li>";
       }
-      elseif (($CURUSER['appendpromotion'] == 'word' && $forcemode == "") || $forcemode == 'word'){
-      $sp_torrent.= "<li>[<span class='oday' ".$onmouseover.">".$lang_functions['text_oday']."</span>]</li>";
+      else if ($forcemode == 'word'){
+-     $sp_torrent.= "<li>[<span class='oday' ".$onmouseover.">".$lang_functions['text_oday']."</span>]</li>";
       }
     }
 
     if($row['storing']==1)
     {
-      if (($CURUSER['appendpromotion'] == 'icon' && $forcemode == "") || $forcemode == 'icon'){  
+      if ( $forcemode == "" || $forcemode == 'icon'){  
       $sp_torrent.="<li><img src=\"pic/ico_storing.png\" border=0 alt=\"0day\" title=\"".$lang_functions['text_storing']."\" /></li>";
       }
-      elseif (($CURUSER['appendpromotion'] == 'word' && $forcemode == "") || $forcemode == 'word'){
-      $sp_torrent.= "<li>[<span class='oday' ".$onmouseover.">".$lang_functions['text_storing']."</span>]</li>";
-      }
+      else if ($forcemode == 'word'){
+-     $sp_torrent.= "<li>[<span class='oday' ".$onmouseover.">".$lang_functions['text_storing']."</span>]</li>";
+			}
     }
-    }
-    if ($CURUSER['appendnew'] != 'no' && strtotime($row["added"]) >= $last_browse)
+    
+    if (strtotime($row["added"]) >= $last_browse)
       print("<li>(<span class='new'>".$lang_functions['text_new_uppercase']."</span>)</li>");
 
     $banned_torrent = ($row["banned"] == 'yes' ? " <li>(<span class=\"striking\">".$lang_functions['text_banned']."</span>)</li>" : "");
@@ -3222,12 +3190,11 @@ foreach($rows as $row)
     print('<ul class="prs">' . $sp_torrent_sub . '</ul></div></div>');
 
       $act = "";
-      if ($CURUSER["dlicon"] != 'no' && $CURUSER["downloadpos"] != "no")
+      if ($CURUSER["downloadpos"] != "no")
       $act .= "<li><a href=\"//$BASEURL/download.php?id=".$id."\"><img class=\"download\" src=\"//$BASEURL/pic/trans.gif\" style='padding-bottom: 2px;' alt=\"download\" title=\"".$lang_functions['title_download_torrent']."\" /></a></li>" ;
-      if ($CURUSER["bmicon"] == 'yes'){
         $bookmark = " href=\"javascript: bookmark(".$id.");\"";
         $act .= "<li><a id=\"bookmark".$id."\" ".$bookmark." >".get_torrent_bookmark_state($CURUSER['id'], $id)."</a></li>";
-      }
+      
 
     print('<div class="torrent-utilty-icons minor-list-vertical"><ul>'.$act."</ul></div>\n");
 
@@ -3243,8 +3210,7 @@ foreach($rows as $row)
       print("<td class=\"rowfollow nowrap\">".$lang_functions['text_none']."</td>\n");
     }
     
-    if ($CURUSER['showcomnum'] != 'no')
-    {
+
     print("<td class=\"rowfollow\">");
     $nl = "";
 
@@ -3254,7 +3220,7 @@ foreach($rows as $row)
     if (!$row["comments"]) {
       print("<a href=\"//$BASEURL/comment.php?action=add&amp;pid=".$id."&amp;type=torrent\" title=\"".$lang_functions['title_add_comments']."\">" . $row["comments"] .  "</a>");
     } else {
-      if ($enabletooltip_tweak == 'yes' && $CURUSER['showlastcom'] != 'no')
+      if ($enabletooltip_tweak == 'yes')
       {
         if (!$lastcom = $Cache->get_value('torrent_'.$id.'_last_comment_content')){
           $res2 = sql_query("SELECT user, added, text FROM comments WHERE torrent = $id ORDER BY id DESC LIMIT 1");
@@ -3265,10 +3231,7 @@ foreach($rows as $row)
         $hasnewcom = ($lastcom['user'] != $CURUSER['id'] && $timestamp >= $last_browse);
         if ($lastcom)
         {
-          if ($CURUSER['timetype'] != 'timealive')
             $lastcomtime = $lang_functions['text_at_time'].$lastcom['added'];
-          else
-            $lastcomtime = $lang_functions['text_blank'].gettime($lastcom["added"],true,false,true);
             $lastcom_tooltip[$counter]['id'] = "lastcom_" . $counter;
             $lastcom_tooltip[$counter]['content'] = ($hasnewcom ? "<b>(<font class='new'>".$lang_functions['text_new_uppercase']."</font>)</b> " : "").$lang_functions['text_last_commented_by'].get_username($lastcom['user']) . $lastcomtime."<br />". format_comment(mb_substr($lastcom['text'],0,100,"UTF-8") . (mb_strlen($lastcom['text'],"UTF-8") > 100 ? " ......" : "" ),true,false,false,true,600,false,false);
             $onmouseover = "onmouseover=\"domTT_activate(this, event, 'content', document.getElementById('" . $lastcom_tooltip[$counter]['id'] . "'), 'trail', false, 'delay', 500,'lifetime',3000,'fade','both','styleClass','niceTitle','fadeMax', 87,'maxWidth', 400);\"";
@@ -3281,7 +3244,7 @@ foreach($rows as $row)
     }
 
     print("</td>");
-    }
+    
 
     $time = $row["added"];
     $time = gettime($time,false,true);
@@ -3335,10 +3298,8 @@ foreach($rows as $row)
 }
 }
 print("</tbody></table>");
-if ($CURUSER['appendpromotion'] == 'highlight')
-  print("<p align=\"center\"> ".$lang_functions['text_promoted_torrents_note']."</p>\n");
 
-if($enabletooltip_tweak == 'yes' && (!isset($CURUSER) || $CURUSER['showlastcom'] == 'yes'))
+if($enabletooltip_tweak == 'yes')
 create_tooltip_container($lastcom_tooltip, 400);
 create_tooltip_container($torrent_tooltip, 500);
 }
@@ -3788,7 +3749,7 @@ function permissiondenied(){
 
 function gettime($time, $withago = true, $twoline = false, $forceago = false, $oneunit = false, $isfuturetime = false){
   global $lang_functions, $CURUSER;
-  if ($CURUSER['timetype'] != 'timealive' && !$forceago){
+  if (!$forceago){
     $newtime = $time;
     if ($twoline){
     $newtime = str_replace(" ", "<br />", $newtime);
@@ -3893,53 +3854,26 @@ function get_second_icon($row, $catimgurl) {//for CHDBits
 function get_torrent_bg_color($promotion = 1)
 {
   global $CURUSER;
-
-  if ($CURUSER['appendpromotion'] == 'highlight'){
-    $global_promotion_state = get_global_sp_state();
-    if ($global_promotion_state == 1){
-      if($promotion==1)
-        $sphighlight = "";
-      elseif($promotion==2)
-        $sphighlight = " class='free_bg'";
-      elseif($promotion==3)
-        $sphighlight = " class='twoup_bg'";
-      elseif($promotion==4)
-        $sphighlight = " class='twoupfree_bg'";
-      elseif($promotion==5)
-        $sphighlight = " class='halfdown_bg'";
-      elseif($promotion==6)
-        $sphighlight = " class='twouphalfdown_bg'";
-      elseif($promotion==7)
-        $sphighlight = " class='thirtypercentdown_bg'";
-      else $sphighlight = "";
-    }
-    elseif($global_promotion_state == 2)
-      $sphighlight = " class='free_bg'";
-    elseif($global_promotion_state == 3)
-      $sphighlight = " class='twoup_bg'";
-    elseif($global_promotion_state == 4)
-      $sphighlight = " class='twoupfree_bg'";
-    elseif($global_promotion_state == 5)
-      $sphighlight = " class='halfdown_bg'";
-    elseif($global_promotion_state == 6)
-      $sphighlight = " class='twouphalfdown_bg'";
-    elseif($global_promotion_state == 7)
-      $sphighlight = " class='thirtypercentdown_bg'";
-    else
-      $sphighlight = "";
-  }
-  else $sphighlight = "";
-  return $sphighlight;
+  return "";
 }
 
 function get_torrent_promotion_append($promotion = 1,$forcemode = "",$showtimeleft = false, $added = "", $promotionTimeType = 0, $promotionUntil = '') {
   global $BASEURL;
   global $CURUSER,$lang_functions, $promotion_text;
-
-  list($pr_state) = get_pr_state($promotion);
-  if ($pr_state == 1) {
-    return '';
+	
+	list($pr_state, $expire) = get_pr_state($promotion, $added, $promotionTimeType, $promotionUntil);
+  if ($pr_state != 1) {
+    if ($expire) {
+      $cexpire = date("Y-m-d H:i:s", $expire);
+      //$timeout = gettime($cexpire, false, false, true, false, true);
+      //$ret = '[<span class="pr-limit" title="' . $cexpire . '">'.$lang_functions['text_will_end_in'].$timeout."</span>]";
+    }
+    else
+    	$cexpire = $lang_functions['text_forever'];
   }
+  else 
+    return '';
+  $cexpire = $lang_functions['text_until'].$cexpire;
 
   $prDict = $promotion_text[$pr_state -1];
   $text = $lang_functions[$prDict['lang']];
@@ -3948,14 +3882,11 @@ function get_torrent_promotion_append($promotion = 1,$forcemode = "",$showtimele
     $mode = $forcemode;
   }
   else {
-    $mode = $CURUSER['appendpromotion'];
+    $mode = 'icon';
   }
 
-  if ($mode == 'word') {
-    $ret = '[<span class="' . $prDict['name'] . '">' . $text . '</span>]';
-  }
-  else if ($mode == 'icon') {
-    $ret = '<img class="' . $prDict['name'] . '" alt="' . $text . '" src="//' . $BASEURL . '/pic/trans.gif" />';
+if ($mode == 'icon') {
+    $ret = '<img class="' . $prDict['name'] . '" alt="' . $text .'"title="'.$cexpire.'" src="//' . $BASEURL . '/pic/trans.gif" />';
   }
   return $ret;
 }

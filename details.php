@@ -43,7 +43,7 @@ else {
       if (isset($_GET["returnto"]))
 	print("<p><b>".$lang_details['text_go_back'] . "<a href=\"".htmlspecialchars($_GET["returnto"])."\">" . $lang_details['text_whence_you_came']."</a></b></p>");
     }
-    $sp_torrent = get_torrent_promotion_append($row['sp_state'],'word');
+    $sp_torrent = get_torrent_promotion_append($row['sp_state'],"",true,$row["added"], $row['promotion_time_type'], $row['promotion_until']);
 
     $s=htmlspecialchars($row["name"]);
     print('<h1 id="page-title">'.$s.'</h1><a id="top"></a>');
@@ -88,12 +88,8 @@ else {
     }
     
     if ($CURUSER["downloadpos"] != "no") {
-	if ($CURUSER['timetype'] != 'timealive') {
+
 	  $uploadtime = $lang_details['text_at'].$row['added'];
-	}
-	else {
-	  $uploadtime = $lang_details['text_blank'].gettime($row['added'],true,false);
-	}
 	
 	$dt= $lang_details['row_download'];
 	$dd = ("<a class=\"index\" href=\"download.php?id=$id\">" . htmlspecialchars($torrentnameprefix ."." .$row["save_as"]) . ".torrent</a>&nbsp;&nbsp;<a id=\"bookmark" . $row['id'] . "\" href=\"javascript: bookmark(".$row['id'].",0);\">".get_torrent_bookmark_state($CURUSER['id'], $row['id'], false)."</a><br />".$lang_details['row_upped_by']."&nbsp;".$uprow.$uploadtime);
@@ -200,7 +196,7 @@ else {
 
     // ---------------- end subtitle block -------------------//
 
-    if ($CURUSER['showdescription'] != 'no' && !empty($row["descr"])){
+    if (!empty($row["descr"])){
       $torrentdetailad=$Advertisement->get_ad('torrentdetail');
       if ($Advertisement->enable_ad() && $torrentdetailad) {
 	dl_item("", "<div align=\"left\" style=\"margin-bottom: 10px\" id=\"ad_torrentdetail\">".$torrentdetailad[0]."</div>", 1);
@@ -217,7 +213,7 @@ else {
       dl_item("<a href=\"javascript: klappe_news('nfo')\"><img class=\"plus\" src=\"pic/trans.gif\" alt=\"Show/Hide\" id=\"picnfo\" title=\"".$lang_detail['title_show_or_hide']."\" /> ".$lang_details['text_nfo']."</a><br /><a href=\"viewnfo.php?id=".$row['id']."\" class=\"sublink\">". $lang_details['text_view_nfo']. "</a>", "<div id='knfo' style=\"display: none;\"><pre style=\"font-size:10pt; font-family: 'Courier New', monospace;\">".$nfo."</pre></div><div style=\"clear:both;\"\n", 1);
     }
 
-    if ($imdb_id && $showextinfo['imdb'] == 'yes' && $CURUSER['showimdb'] != 'no')
+    if ($imdb_id && $showextinfo['imdb'] == 'yes')
       {
 	$thenumbers = $imdb_id;
 
@@ -631,7 +627,6 @@ else {
   }
 
   // -----------------COMMENT SECTION ---------------------//
-  if ($CURUSER['showcomment'] != 'no'){
     $count = get_row_count("comments","WHERE torrent=".sqlesc($id));
     if ($count) {
       $page = '';
@@ -660,7 +655,7 @@ else {
 	commenttable($allrows,"torrent",$id,false, $offset);
 	print($pagerbottom);
       }
-  }
+  
 
   print ('<div id="forum-reply-post" class="table td"><h2><a class="index" href="'. htmlspecialchars("comment.php?action=add&pid=".$id."&type=torrent") .'">'.$lang_details['text_quick_comment']."</a></h2>");
   echo $lang_details['comment_warning'];

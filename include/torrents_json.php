@@ -60,7 +60,7 @@ if($row['storing']==1) {
   $comments = array('count' => $row['comments']);
 
   if ($row["comments"]) {
-    if ($enabletooltip_tweak == 'yes' && $CURUSER['showlastcom'] != 'no') {
+    if ($enabletooltip_tweak == 'yes') {
       if (!$lastcom = $Cache->get_value('torrent_'.$id.'_last_comment_content')){
 	$res2 = sql_query("SELECT user, added, text FROM comments WHERE torrent = $id ORDER BY id DESC LIMIT 1");
 	$lastcom = mysql_fetch_array($res2);
@@ -68,12 +68,7 @@ if($row['storing']==1) {
       }
       $timestamp = strtotime($lastcom["added"]);
       $hasnewcom = ($lastcom['user'] != $CURUSER['id'] && $timestamp >= $last_browse);
-      /* if ($lastcom) { */
-      /*   if ($CURUSER['timetype'] != 'timealive')  */
-      /*     $lastcomtime = $lang_functions['text_at_time'].$lastcom['added']; */
-      /*   else */
-      /*     $lastcomtime = $lang_functions['text_blank'].gettime($lastcom["added"],true,false,true); */
-      /* } */
+
 
       if ($hasnewcom) {
 	$comments['new'] = array('author' => $lastcom['user'], 'time' => $timestamp, 'content' => $lastcom['text']);
@@ -158,7 +153,7 @@ function torrenttable_api($rows, $variant = "torrent", $swap_headings = false) {
     $has_secondicon = true;
   else $has_secondicon = false;
   $counter = 0;
-  if ($smalldescription_main == 'no' || $CURUSER['showsmalldescr'] == 'no')
+  if ($smalldescription_main == 'no')
     $displaysmalldescr = false;
   else $displaysmalldescr = true;
 
