@@ -16,11 +16,13 @@ function usercpmenu ($selected = "home") {
 	global $lang_usercp;
 	begin_main_frame();
 	print ("<div id=\"usercpnav\"><ul id=\"usercpmenu\" class=\"menu\">");
-	print ("<li" . ($selected == "home" ? " class=selected" : "") . "><a href=\"usercp.php\">".$lang_usercp['text_user_cp_home']."</a></li>");
-	print ("<li" . ($selected == "personal" ? " class=selected" : "") . "><a href=\"?action=personal\">".$lang_usercp['text_personal_settings']."</a></li>");
-	print ("<li" . ($selected == "tracker" ? " class=selected" : "") . "><a href=\"?action=tracker\">".$lang_usercp['text_tracker_settings']."</a></li>");
-	print ("<li" . ($selected == "forum" ? " class=selected" : "") . "><a href=\"?action=forum\">".$lang_usercp['text_forum_settings']."</a></li>");
-	print ("<li" . ($selected == "security" ? " class=selected" : "") . "><a href=\"?action=security\">".$lang_usercp['text_security_settings']."</a></li>");
+	echo navbar_item('usercp.php', $lang_usercp['text_user_cp_home'], $selected == "home", true);
+	echo navbar_item('usercp.php?action=personal', $lang_usercp['text_personal_settings'], $selected == "personal", true);
+	echo navbar_item('usercp.php?action=tracker', $lang_usercp['text_tracker_settings'], $selected == "tracker", true);
+	echo navbar_item('usercp.php?action=forum', $lang_usercp['text_forum_settings'], $selected == "forum", true);
+	echo navbar_item('usercp.php?action=security', $lang_usercp['text_security_settings'], $selected == "security", true);
+	echo navbar_item('usercp.php?action=js', $lang_usercp['text_user_js'], $selected == "js", true);
+	echo navbar_item('usercp.php?action=css', $lang_usercp['text_user_css'], $selected == "css", true);
 	print ("</ul></div>");
 	end_main_frame();
 }
@@ -70,10 +72,10 @@ function goback ($where = "-1") {
 	return $goback;
 }
 
-$action = isset($_POST['action']) ? htmlspecialchars($_POST['action']) : (isset($_GET['action']) ? htmlspecialchars($_GET['action']) : '');
-$type = isset($_POST['type']) ? htmlspecialchars($_POST['type']) : (isset($_GET['type']) ? htmlspecialchars($_GET['type']) : '');
+$action = htmlspecialchars($_REQUEST['action']);
+$type = htmlspecialchars($_REQUEST['type']);
 
-$allowed_actions = array("personal","tracker","forum","security");
+$allowed_actions = array("personal","tracker","forum","security", 'js', 'css');
 if ($action){
 	if (!in_array($action, $allowed_actions))
 		stderr($lang_usercp['std_error'], $lang_usercp['std_invalid_action']);
@@ -144,20 +146,20 @@ if ($action){
 			$countries = "<option value=0>---- ".$lang_usercp['select_none_selected']." ----</option>\n";
 			$ct_r = sql_query("SELECT id,name FROM countries ORDER BY name") or die;
 			while ($ct_a = mysql_fetch_array($ct_r))
-			$countries .= "<option value=".htmlspecialchars($ct_a[id])."" . (htmlspecialchars($CURUSER["country"]) == htmlspecialchars($ct_a['id']) ? " selected" : "") . ">".htmlspecialchars($ct_a[name])."</option>\n";
+			$countries .= "<option value=".htmlspecialchars($ct_a['id'])."" . (htmlspecialchars($CURUSER["country"]) == htmlspecialchars($ct_a['id']) ? " selected" : "") . ">".htmlspecialchars($ct_a['name'])."</option>\n";
 			$isplist = "<option value=0>---- ".$lang_usercp['select_none_selected']." ----</option>\n";
 			$isp_r = sql_query("SELECT id,name FROM isp ORDER BY id ASC") or die;
 			while ($isp_a = mysql_fetch_array($isp_r))
-			$isplist .= "<option value=".htmlspecialchars($isp_a[id])."" . (htmlspecialchars($CURUSER["isp"]) == htmlspecialchars($isp_a['id']) ? " selected" : "") . ">".htmlspecialchars($isp_a[name])."</option>\n";
+			$isplist .= "<option value=".htmlspecialchars($isp_a['id'])."" . (htmlspecialchars($CURUSER["isp"]) == htmlspecialchars($isp_a['id']) ? " selected" : "") . ">".htmlspecialchars($isp_a['name'])."</option>\n";
 			$downloadspeed = "<option value=0>---- ".$lang_usercp['select_none_selected']." ----</option>\n";
 			$ds_a = sql_query("SELECT id,name FROM downloadspeed ORDER BY id") or die;
 			while ($ds_b = mysql_fetch_array($ds_a))
-			$downloadspeed .= "<option value=".htmlspecialchars($ds_b[id])."" . (htmlspecialchars($CURUSER["download"]) == htmlspecialchars($ds_b['id']) ? " selected" : "") . ">".htmlspecialchars($ds_b[name])."</option>\n";
+			$downloadspeed .= "<option value=".htmlspecialchars($ds_b['id'])."" . (htmlspecialchars($CURUSER["download"]) == htmlspecialchars($ds_b['id']) ? " selected" : "") . ">".htmlspecialchars($ds_b['name'])."</option>\n";
 
 			$uploadspeed = "<option value=0>---- ".$lang_usercp['select_none_selected']." ----</option>\n";
 			$us_a = sql_query("SELECT id,name FROM uploadspeed ORDER BY id") or die;
 			while ($us_b = mysql_fetch_array($us_a))
-			$uploadspeed .= "<option value=".htmlspecialchars($us_b[id])."" . (htmlspecialchars($CURUSER["upload"]) == htmlspecialchars($us_b['id']) ? " selected" : "") . ">".htmlspecialchars($us_b[name])."</option>\n";
+			$uploadspeed .= "<option value=".htmlspecialchars($us_b['id'])."" . (htmlspecialchars($CURUSER["upload"]) == htmlspecialchars($us_b['id']) ? " selected" : "") . ">".htmlspecialchars($us_b['name'])."</option>\n";
 			$ra=sql_query("SELECT * FROM bitbucket WHERE public = '1'");
 			$options='';
 			while ($sor=mysql_fetch_array($ra))
@@ -231,8 +233,8 @@ dl_item($lang_usercp['row_school'], "<select name=school>$schools</select>", 1);
 				for ($i = 0; $i < $rows; ++$i)
 					{
 						$a = mysql_fetch_assoc($r);
-						if ($_POST[$cbname.$a[id]] == 'yes')
-						$return .= "[".$cbname.$a[id]."]";
+						if ($_POST[$cbname.$a['id']] == 'yes')
+						$return .= "[".$cbname.$a['id']."]";
 					}
 				return $return;
 				}
@@ -241,8 +243,8 @@ dl_item($lang_usercp['row_school'], "<select name=school>$schools</select>", 1);
 				for ($i = 0; $i < $rows; ++$i)
 				{
 					$a = mysql_fetch_assoc($r);
-					if ($_POST["cat$a[id]"] == 'yes')
-					$notifs .= "[cat$a[id]]";
+					if ($_POST["cat$a['id']"] == 'yes')
+					$notifs .= "[cat$a['id']]";
 				}*/
 				$notifs .= browsecheck("categories", "cat");
 				$notifs .= browsecheck("sources", "sou");
@@ -371,7 +373,7 @@ echo '<dl class="table">';
 				if ($i && $numinrow == 0){
 					$categories .= "</tr>".($brenablecatrow ? "<tr><td class=embedded align=left><b>".$brcatrow[$rownum]."</b></td></tr>" : "")."<tr>";
 				}
-				$categories .= "<td align=left class=bottom style=\"padding-bottom: 4px;padding-left: ".$catpadding."px\"><input class=checkbox name=cat".$cat[id]." type=\"checkbox\" " . (strpos($CURUSER['notifs'], "[cat".$cat[id]."]") !== false ? " checked" : "")." value='yes'>".return_category_image($cat['id'], "torrents.php?allsec=1&amp;")."</td>\n";
+				$categories .= "<td align=left class=bottom style=\"padding-bottom: 4px;padding-left: ".$catpadding."px\"><input class=checkbox name=cat".$cat['id']." type=\"checkbox\" " . (strpos($CURUSER['notifs'], "[cat".$cat['id']."]") !== false ? " checked" : "")." value='yes'>".return_category_image($cat['id'], "torrents.php?allsec=1&amp;")."</td>\n";
 				$i++;
 			}
 			$categories .= "</tr>";
@@ -387,7 +389,7 @@ echo '<dl class="table">';
 					if ($i && $numinrow == 0){
 						$categories .= "</tr>".($spenablecatrow ? "<tr><td class=embedded align=left><b>".$spcatrow[$rownum]."</b></td></tr>" : "")."<tr>";
 					}
-					$categories .= "<td align=left class=bottom style=\"padding-bottom: 4px;padding-left: ".$catpadding."px\"><input class=checkbox name=cat".$cat[id]." type=\"checkbox\" " . (strpos($CURUSER['notifs'], "[cat".$cat[id]."]") !== false ? " checked" : "")." value='yes'><img src=pic/" .get_cat_folder($cat['id']). htmlspecialchars($cat[image]) . " border='0' alt=\"" .$cat[name]."\" title=\"" .$cat[name]."\"></td>\n";
+					$categories .= "<td align=left class=bottom style=\"padding-bottom: 4px;padding-left: ".$catpadding."px\"><input class=checkbox name=cat".$cat['id']." type=\"checkbox\" " . (strpos($CURUSER['notifs'], "[cat".$cat['id']."]") !== false ? " checked" : "")." value='yes'><img src=pic/" .get_cat_folder($cat['id']). htmlspecialchars($cat[image]) . " border='0' alt=\"" .$cat[name]."\" title=\"" .$cat[name]."\"></td>\n";
 					$i++;
 				}
 			$categories .= "</tr>";
@@ -401,7 +403,7 @@ echo '<dl class="table">';
 				foreach ($sources as $source)
 				{
 					$categories .= ($i && $i % $catsperrow == 0) ? "</tr><tr>" : "";
-					$categories .= "<td align=left class=bottom style=\"padding-bottom: 4px;padding-left: ".$catpadding."px\"><input class=checkbox name=sou$source[id] type=\"checkbox\" " . (strpos($CURUSER['notifs'], "[sou".$source[id]."]") !== false ? " checked" : "") . " value='yes'>$source[name]</td>\n";
+					$categories .= "<td align=left class=bottom style=\"padding-bottom: 4px;padding-left: ".$catpadding."px\"><input class=checkbox name=sou$source[id] type=\"checkbox\" " . (strpos($CURUSER['notifs'], "[sou".$source['id']."]") !== false ? " checked" : "") . " value='yes'>$source[name]</td>\n";
 					$i++;
 				}
 				$categories .= "</tr>";
@@ -412,7 +414,7 @@ echo '<dl class="table">';
 				foreach ($media as $medium)
 				{
 					$categories .= ($i && $i % $catsperrow == 0) ? "</tr><tr>" : "";
-					$categories .= "<td align=left class=bottom style=\"padding-bottom: 4px;padding-left: ".$catpadding."px\"><input class=checkbox name=med$medium[id] type=\"checkbox\" " . (strpos($CURUSER['notifs'], "[med".$medium[id]."]") !== false ? " checked" : "") . " value='yes'>$medium[name]</td>\n";
+					$categories .= "<td align=left class=bottom style=\"padding-bottom: 4px;padding-left: ".$catpadding."px\"><input class=checkbox name=med$medium[id] type=\"checkbox\" " . (strpos($CURUSER['notifs'], "[med".$medium['id']."]") !== false ? " checked" : "") . " value='yes'>$medium[name]</td>\n";
 					$i++;
 				}
 				$categories .= "</tr>";
@@ -423,7 +425,7 @@ echo '<dl class="table">';
 				foreach ($codecs as $codec)
 				{
 					$categories .= ($i && $i % $catsperrow == 0) ? "</tr><tr>" : "";
-					$categories .= "<td align=left class=bottom style=\"padding-bottom: 4px;padding-left: ".$catpadding."px\"><input class=checkbox name=cod$codec[id] type=\"checkbox\" " . (strpos($CURUSER['notifs'], "[cod".$codec[id]."]") !== false ? " checked" : "") . " value='yes'>$codec[name]</td>\n";
+					$categories .= "<td align=left class=bottom style=\"padding-bottom: 4px;padding-left: ".$catpadding."px\"><input class=checkbox name=cod$codec[id] type=\"checkbox\" " . (strpos($CURUSER['notifs'], "[cod".$codec['id']."]") !== false ? " checked" : "") . " value='yes'>$codec[name]</td>\n";
 					$i++;
 				}
 				$categories .= "</tr>";
@@ -445,7 +447,7 @@ echo '<dl class="table">';
 				foreach ($standards as $standard)
 				{
 					$categories .= ($i && $i % $catsperrow == 0) ? "</tr><tr>" : "";
-					$categories .= "<td align=left class=bottom style=\"padding-bottom: 4px;padding-left: ".$catpadding."px\"><input class=checkbox name=sta$standard[id] type=\"checkbox\" " . (strpos($CURUSER['notifs'], "[sta".$standard[id]."]") !== false ? " checked" : "") . " value='yes'>$standard[name]</td>\n";
+					$categories .= "<td align=left class=bottom style=\"padding-bottom: 4px;padding-left: ".$catpadding."px\"><input class=checkbox name=sta$standard[id] type=\"checkbox\" " . (strpos($CURUSER['notifs'], "[sta".$standard['id']."]") !== false ? " checked" : "") . " value='yes'>$standard[name]</td>\n";
 					$i++;
 				}
 				$categories .= "</tr>";
@@ -467,7 +469,7 @@ echo '<dl class="table">';
 				foreach ($teams as $team)
 				{
 					$categories .= ($i && $i % $catsperrow == 0) ? "</tr><tr>" : "";
-					$categories .= "<td align=left class=bottom style=\"padding-bottom: 4px;padding-left: ".$catpadding."px\"><input class=checkbox name=tea$team[id] type=\"checkbox\" " . (strpos($CURUSER['notifs'], "[tea".$team[id]."]") !== false ? " checked" : "") . " value='yes'>$team[name]</td>\n";
+					$categories .= "<td align=left class=bottom style=\"padding-bottom: 4px;padding-left: ".$catpadding."px\"><input class=checkbox name=tea$team[id] type=\"checkbox\" " . (strpos($CURUSER['notifs'], "[tea".$team['id']."]") !== false ? " checked" : "") . " value='yes'>$team[name]</td>\n";
 					$i++;
 				}
 				$categories .= "</tr>";
@@ -517,8 +519,6 @@ echo '<dl class="table">';
 			}
 			dl_item($lang_usercp['row_stylesheet'], "<select id=\"stylesheet\" name=\"stylesheet\">\n$stylesheets\n</select>&nbsp;&nbsp;<font class=small>".$lang_usercp['text_stylesheet_note']."<a href=\"aboutnexus.php#stylesheet\" ><b>".$lang_usercp['text_stylesheet_link']."</b></a></font>.",1);
 			dl_item($lang_usercp['row_category_icons'], "<select id==\"caticon\" name=\"caticon\">".$categoryicons."</select>",1);
-			dl_item($lang_usercp['row_font_size'], "<select name=fontsize><option value=small ".($CURUSER['fontsize'] == 'small' ? " selected" : "").">".$lang_usercp['select_small']."</option><option value=medium ".($CURUSER['fontsize'] == 'medium' ? " selected" : "").">".$lang_usercp['select_medium']."</option><option value=large ".($CURUSER['fontsize'] == 'large' ? " selected" : "").">".$lang_usercp['select_large']."</option></select>",1);
-
 
 			$s = "<select name=\"sitelanguage\">\n";
 
@@ -590,7 +590,7 @@ echo '</dl>';
 			dl_item($lang_usercp['row_view_avatars'], "<input type=checkbox name=avatars" . ($CURUSER["avatars"] == "yes" ? " checked" : "") . ">".$lang_usercp['checkbox_low_bandwidth_note'],1);
 			dl_item($lang_usercp['row_view_signatures'], "<input type=checkbox name=signatures" . ($CURUSER["signatures"] == "yes" ? " checked" : "") . ">".$lang_usercp['checkbox_low_bandwidth_note'],1);
 			dl_item($lang_usercp['row_click_on_topic'], "<input type=radio name=clicktopic" . ($CURUSER["clicktopic"] == "firstpage" ? " checked" : "") . " value=\"firstpage\">".$lang_usercp['text_go_to_first_page']."<input type=radio name=clicktopic" . ($CURUSER["clicktopic"] == "lastpage" ? " checked" : "") . " value=\"lastpage\">".$lang_usercp['text_go_to_last_page'],1);
-			dl_item($lang_usercp['row_forum_signature'], "<textarea name=signature style=\"width:700px\" rows=10>" . $CURUSER[signature] . "</textarea><br />".$lang_usercp['text_signature_note'],1);
+			dl_item($lang_usercp['row_forum_signature'], "<textarea name=signature style=\"width:700px\" rows=10>" . $CURUSER['signature'] . "</textarea><br />".$lang_usercp['text_signature_note'],1);
 			submit();
 			print("</dl>");
 			stdfoot();
@@ -774,6 +774,132 @@ EOD;
 			stdfoot();
 			die;
 			break;
+	case 'js': {
+	  require_once('./cake/app/webroot/index.php');
+	  App::uses('User', 'Model');
+	  $User = new User;
+	  $User->id = $CURUSER['id'];
+	  if (strtoupper($_SERVER['REQUEST_METHOD']) == 'POST') {
+	    require_once('lib/jsminplus.php');
+	    $js = $_REQUEST['user-js'];
+	    ob_start();
+	    $js_result = JSMinPlus::minify($js);
+	    if (!$js_result) {
+	      $hints = ob_get_contents();
+	    }
+	    else {
+	      $result = $User->Property->find('first', ['conditions' => ['user_id' => $CURUSER['id']],
+							    'fields' => ['id']]);
+	      if ($result) {
+		$User->Property->id = $result['Property']['id'];
+	      }
+	      else {
+		$User->Property->create();
+	      }
+	      
+	      if ($User->Property->save([
+					     'user_id' => $CURUSER['id'],
+					     'js' => $js,
+					     ])) {
+		$hints = $lang_usercp['text_saved'];
+		$file = 'cache/users/' . $CURUSER['id'] . '.js';
+		if ($js_result == '') {
+		  unlink($file);
+		}
+		else {
+		  $fd = fopen($file, 'w');
+		  fwrite($fd, $js_result);
+		  fclose($fd);
+		}
+	      }
+	      else {
+		$hints = 'Unable to save';
+	      }
+	    }
+	    ob_end_clean();
+	    $value = $js;
+	  }
+	  else {
+	    $js = $User->read('Property.js', $User->id);
+	    if ($js) {
+	      $value = $js['Property']['js'];
+	    }
+	  }
+	  stdhead();
+	  if (isset($hints)) {
+	    echo '<span class="red">', $hints, '</span>';
+	  }
+	  usercpmenu('js');
+	  echo '<dl class="table">';
+	  form ("js");
+	  dl_item('', $lang_usercp['text_user_js_hints'], true);
+	  dl_item($lang_usercp['text_user_js'], '<textarea name="user-js" style="width:700px;font-family:menlo,monaco,courier,monospace" rows="40" autofocus="true">' . $value . '</textarea>', true);
+	  submit();
+	  print("</dl>");
+	  stdfoot();
+	  die;
+	  break;
+	}
+	case 'css': {
+	  require_once('./cake/app/webroot/index.php');
+	  App::uses('User', 'Model');
+	  $User = new User;
+	  $User->id = $CURUSER['id'];
+	  if (strtoupper($_SERVER['REQUEST_METHOD']) == 'POST') {
+	    require_once('lib/CSSMin.php');
+	    $css = $_REQUEST['user-css'];
+	    ob_start();
+	    $css_result = CSSMin::minify($css);
+	    $result = $User->Property->find('first', ['conditions' => ['user_id' => $CURUSER['id']],
+						      'fields' => ['id']]);
+	    if ($result) {
+	      $User->Property->id = $result['Property']['id'];
+	    }
+	    else {
+	      $User->Property->create();
+	    }
+	    
+	    if ($User->Property->save([
+				       'user_id' => $CURUSER['id'],
+				       'css' => $css,
+				       ])) {
+	      $hints = $lang_usercp['text_saved'];
+	      $file = 'cache/users/' . $CURUSER['id'] . '.css';
+	      if ($css_result == '') {
+		unlink($file);
+	      }
+	      else {
+		$fd = fopen($file, 'w');
+		fwrite($fd, $css_result);
+		fclose($fd);
+	      }
+	    }
+	    else {
+	      $hints = 'Unable to save';
+	    }
+	    $value = $css;
+	  }
+	  else {
+	    $css = $User->read('Property.css', $User->id);
+	    if ($css) {
+	      $value = $css['Property']['css'];
+	    }
+	  }
+	  
+	  stdhead();
+	  if (isset($hints)) {
+	    echo '<span class="red">', $hints, '</span>';
+	  }
+	  usercpmenu('css');
+	  echo '<dl class="table">';
+	  form ("css");
+	  dl_item($lang_usercp['text_user_css'], '<textarea name="user-css" style="width:700px;font-family:menlo,monaco,courier,monospace" rows="40" autofocus="true">' . $value . '</textarea>', true);
+	  submit();
+	  print("</dl>");
+	  stdfoot();
+	  die;
+	  break;
+	}
 	}
 }
 }
@@ -843,13 +969,13 @@ if ($prolinkpoint_bonus)
 	dl_item($lang_usercp['row_promotion_link'], $prolinkclick. " [<a href=\"promotionlink.php\">".$lang_usercp['text_read_more']."</a>]", 1);
 	//dl_item($lang_usercp['row_promotion_link'], $prolinkclick. " [<a href=\"promotionlink.php?updatekey=1\">".$lang_usercp['text_update_promotion_link']."</a>] [<a href=\"promotionlink.php\">".$lang_usercp['text_read_more']."</a>]", 1);
 }
-dl_item($lang_usercp['row_invitations'],$CURUSER[invites]." [<a href=\"invite.php?id=".$CURUSER[id]."\" title=\"".$lang_usercp['link_send_invitation']."\">".$lang_usercp['text_send']."</a>]",1);
+dl_item($lang_usercp['row_invitations'],$CURUSER['invites']." [<a href=\"invite.php?id=".$CURUSER['id']."\" title=\"".$lang_usercp['link_send_invitation']."\">".$lang_usercp['text_send']."</a>]",1);
 dl_item($lang_usercp['row_karma_points'], $CURUSER['seedbonus']." [<a href=\"mybonus.php\" title=\"".$lang_usercp['link_use_karma_points']."\">".$lang_usercp['text_use']."</a>]", 1);
-dl_item($lang_usercp['row_written_comments'], $commentcount." [<a href=\"userhistory.php?action=viewcomments&id=".$CURUSER[id]."\" title=\"".$lang_usercp['link_view_comments']."\">".$lang_usercp['text_view']."</a>]", 1);
-dl_item($lang_usercp['row_quoted_comments'], $quotedcommentcount." [<a href=\"userhistory.php?action=viewquotedcomments&id=".$CURUSER[id]."\" title=\"".$lang_usercp['link_view_comments']."\">".$lang_usercp['text_view']."</a>]", 1);
+dl_item($lang_usercp['row_written_comments'], $commentcount." [<a href=\"userhistory.php?action=viewcomments&id=".$CURUSER['id']."\" title=\"".$lang_usercp['link_view_comments']."\">".$lang_usercp['text_view']."</a>]", 1);
+dl_item($lang_usercp['row_quoted_comments'], $quotedcommentcount." [<a href=\"userhistory.php?action=viewquotedcomments&id=".$CURUSER['id']."\" title=\"".$lang_usercp['link_view_comments']."\">".$lang_usercp['text_view']."</a>]", 1);
 if ($forumposts) {
-  dl_item($lang_usercp['row_forum_posts'], $forumposts." [<a href=\"userhistory.php?action=viewposts&id=".$CURUSER[id]."\" title=\"".$lang_usercp['link_view_posts']."\">".$lang_usercp['text_view']."</a>] (".$dayposts.$lang_usercp['text_posts_per_day']."; ".$percentages.$lang_usercp['text_of_total_posts'].")", 1);
-  dl_item($lang_usercp['row_quoted_posts'], $quotedforumposts." [<a href=\"userhistory.php?action=viewquotedposts&id=".$CURUSER[id]."\" title=\"".$lang_usercp['link_view_posts']."\">".$lang_usercp['text_view']."</a>]", 1);
+  dl_item($lang_usercp['row_forum_posts'], $forumposts." [<a href=\"userhistory.php?action=viewposts&id=".$CURUSER['id']."\" title=\"".$lang_usercp['link_view_posts']."\">".$lang_usercp['text_view']."</a>] (".$dayposts.$lang_usercp['text_posts_per_day']."; ".$percentages.$lang_usercp['text_of_total_posts'].")", 1);
+  dl_item($lang_usercp['row_quoted_posts'], $quotedforumposts." [<a href=\"userhistory.php?action=viewquotedposts&id=".$CURUSER['id']."\" title=\"".$lang_usercp['link_view_posts']."\">".$lang_usercp['text_view']."</a>]", 1);
 }
 ?>
 </dl>
@@ -865,7 +991,7 @@ print("<table border=0 cellspacing=0 cellpadding=3 width=940><tr>".
 "<td class=colhead align=center>".$lang_usercp['col_topic_starter']."</td>".
 "<td class=colhead align=center width=20%>".$lang_usercp['col_last_post']."</td>".
 "</tr>");
-$res_topics = sql_query("SELECT * FROM readposts INNER JOIN topics ON topics.id = readposts.topicid WHERE readposts.userid = ".$CURUSER[id]." ORDER BY readposts.id DESC LIMIT 5") or sqlerr();
+$res_topics = sql_query("SELECT * FROM readposts INNER JOIN topics ON topics.id = readposts.topicid WHERE readposts.userid = ".$CURUSER['id']." ORDER BY readposts.id DESC LIMIT 5") or sqlerr();
 while ($topicarr = mysql_fetch_assoc($res_topics))
 {
 	$topicid = $topicarr["id"];

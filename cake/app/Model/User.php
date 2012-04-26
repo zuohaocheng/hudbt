@@ -553,6 +553,13 @@ class User extends AppModel {
 	*/
 //The Associations below have been created with all possible keys, those that are not needed can be removed
 
+	public $hasOne = [
+			  'Property' => [
+					 'className' => 'UserProperty',
+					 'foreignKey' => 'user_id',
+					 ],
+			  ];
+
 /**
  * hasMany associations
  *

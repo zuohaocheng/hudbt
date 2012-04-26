@@ -95,6 +95,28 @@ function get_user_lang($user_id) {
   return $lang['site_lang_folder'];
 }
 
+function get_user_static_resources($type, $id) {
+  if ($type == 'js') {
+    $key = 'js';
+  }
+  else {
+    $key = 'css';
+  }
+
+  require_once('./cake/app/webroot/index.php');
+  App::uses('User', 'Model');
+  $User = new User;
+  $User->id = $id;
+  $result = $User->read('Property.' . $key, $User->id);
+  if ($result) {
+    $value = $result['Property'][$key];
+  }
+  else {
+    $value = '';
+  }
+  return $value;
+}
+
 function get_load_uri($type, $script_name ="", $absolute = true) {
   global $CURUSER, $BASEURL;
   $name = ($script_name == "" ? substr(strrchr($_SERVER['SCRIPT_NAME'],'/'),1) : $script_name);
@@ -132,6 +154,16 @@ function get_load_uri($type, $script_name ="", $absolute = true) {
     if (file_exists('js/' . $filename)) {
       $hrefs[] = $pagename . '?format=js&amp;name=' . $name . $addition;
     }
+
+    $userjs = 'cache/users/' . $CURUSER['id'] . '.js';
+    if (file_exists($userjs)) {
+      if ($debug) {
+	$hrefs[] = $pagename . '?format=js&amp;user=' . $CURUSER['id'];
+      }
+      else {
+	$hrefs[] = '//' . $BASEURL . '/' . $userjs;
+      }
+    }
     
     return join(array_map(function($href) {
 	  return '<script type="text/javascript" src="' . $href . '"></script>';
@@ -153,9 +185,21 @@ function get_load_uri($type, $script_name ="", $absolute = true) {
 	$cat = 1;
       }
       $lang = get_langfolder_cookie();
-      $href = '//' . $BASEURL . '/cache/css-' . $lang . '-cat' . $cat . '-' . get_font_type() . '-theme' . get_css_id() . '.css';
+      $hrefs = ['//' . $BASEURL . '/cache/css-' . $lang . '-cat' . $cat . '-theme' . get_css_id() . '.css'];
     }
-    return '<link rel="stylesheet" href="' . $href . '" type="text/css" media="screen" />';
+
+    $usercss = 'cache/users/' . $CURUSER['id'] . '.css';
+    if (file_exists($usercss)) {
+      if ($debug) {
+	$hrefs[] = $pagename . '?format=css&amp;user=' . $CURUSER['id'];
+      }
+      else {
+	$hrefs[] = '//' . $BASEURL . '/' . $usercss;
+      }
+    }
+    return join(array_map(function($href) {
+	  return '<link rel="stylesheet" href="' . $href . '" type="text/css" media="screen" />';
+	}, $hrefs));
   }
   return '';
 }

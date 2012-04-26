@@ -65,6 +65,17 @@ function expires($seconds = 1800) {
     header("Expires: $time");
 }
 
+if (isset($_REQUEST['user'])) {
+  $userid = 0 + $_REQUEST['user'];
+  if ($userid == 0 && isset($CURUSER)) {
+    $userid = $CURUSER['id'];
+  }
+  if ($userid != 0) {
+    echo get_user_static_resources($type, $userid);
+  }
+  die;
+}
+
 $cache_key = generate_key($name, $type, $multifile);
 $lastMod = false;
 if (!$debug && !$purge) {

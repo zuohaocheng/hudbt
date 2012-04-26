@@ -8,6 +8,9 @@ $lang_usercp = array
 	'text_tracker_settings' => "&nbsp;&nbsp;网&nbsp;&nbsp;站&nbsp;&nbsp;设&nbsp;&nbsp;定&nbsp;&nbsp;",
 	'text_forum_settings' => "&nbsp;&nbsp;论&nbsp;&nbsp;坛&nbsp;&nbsp;设&nbsp;&nbsp;定&nbsp;&nbsp;",
 	'text_security_settings' => "&nbsp;&nbsp;安&nbsp;&nbsp;全&nbsp;&nbsp;设&nbsp;&nbsp;定&nbsp;&nbsp;",
+	'text_user_js' => '用户JavaScript',
+	'text_user_js_hints' => '本站有全局加载jQuery和jQuery UI，请自由使用。<br />若需加载他人的JavaScript，加入"<code>$.getScript("/cache/users/USERID.js");</code>"，替换其中的USERID即可，但请千万提防恶意代码。需加载他人的样式，则使用"<code>$("head").append($(\'<link rel="stylesheet" type="text/css" />\').attr(\'href\', \'/cache/users/USERID.css\'));</code>"。',
+	'text_user_css' => '用户CSS',
 	'row_save_settings' => "保存设定",
 	'submit_save_settings' => "保存设定！&nbsp;(只需点击一次)",
 	'std_error' => "错误",
@@ -245,7 +248,7 @@ $lang_usercp = array
 	'text_show_advertisement_note' => "我想看到广告",
 	'row_promotion_link' => "宣传链接",
 	'text_update_promotion_link' => "更新宣传链接",
-	'text_read_more' => "了解更多"
+	'text_read_more' => "了解更多",
 );
 
-?>
+
