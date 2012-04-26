@@ -18,43 +18,11 @@ $refresh = ($CURUSER['sbrefresh'] ? $CURUSER['sbrefresh'] : 120)
 <html><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="Refresh" content="<?php echo $refresh?>; url=<?php echo get_protocol_prefix() . $BASEURL?>/shoutbox.php?type=<?php echo $where?>">
-<link rel="stylesheet" href="<?php echo get_font_css_uri()?>" type="text/css">
-<link rel="stylesheet" href="<?php echo get_css_uri()."theme.css"?>" type="text/css">
-
 <?php
-print(get_style_addicode());
+  echo get_load_uri('css');
+  echo get_load_uri('js');
 $startcountdown = "startcountdown(".$CURUSER['sbrefresh'].")";
 ?>
-<script type="text/javascript">
-//<![CDATA[
-var t;
-function startcountdown(time)
-{
-parent.document.getElementById('countdown').innerHTML=time;
-time=time-1;
-t=setTimeout("startcountdown("+time+")",1000);
-}
-function countdown(time)
-{
-	if (time <= 0){
-	parent.document.getElementById("hbtext").disabled=false;
-	parent.document.getElementById("hbsubmit").disabled=false;
-	parent.document.getElementById("hbsubmit").value=parent.document.getElementById("sbword").innerHTML;
-	}
-	else {
-	parent.document.getElementById("hbsubmit").value=time;
-	time=time-1;
-	setTimeout("countdown("+time+")", 1000); 
-	}
-}
-function hbquota(){
-parent.document.getElementById("hbtext").disabled=true;
-parent.document.getElementById("hbsubmit").disabled=true;
-var time=10;
-countdown(time);
-//]]>
-}
-</script>
 </head>
 <body class='inframe' <?php if ($_GET["type"] != "helpbox"){?> onload="<?php echo $startcountdown?>" <?php } else {?> onload="hbquota()" <?php } ?>>
 <?php

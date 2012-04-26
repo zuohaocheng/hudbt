@@ -98,7 +98,7 @@ function maketable($res, $mode = 'seeding')
 		//torrent name
 		$dispname = $nametitle = htmlspecialchars($arr["torrentname"]);
 		$count_dispname=mb_strlen($dispname,"UTF-8");
-		$max_lenght_of_torrent_name=($CURUSER['fontsize'] == 'large' ? 70 : 80);
+		$max_lenght_of_torrent_name = 70;
 		if($count_dispname > $max_lenght_of_torrent_name)
 			$dispname=mb_substr($dispname, 0, $max_lenght_of_torrent_name,"UTF-8") . "..";
 		if ($smalldescription_main == 'yes'){

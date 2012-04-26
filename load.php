@@ -22,7 +22,6 @@ if ($type == 'js') {
 }
 elseif ($type == 'css') {
   header('Content-type: text/css');
-  $font = $_REQUEST['font'];
   $theme = 0 + $_REQUEST['theme'];
   $caticon = 0 + $_REQUEST['caticon'];
 }
@@ -97,8 +96,8 @@ function generate_key($name, $type, $multiple) {
     $key .= 'm_';
   }
   if ($type =='css' && $multiple) {
-    global $font, $theme, $caticon;
-    $key .= 'css_' . $font . '-' . $theme . '-' . $caticon;
+    global $theme, $caticon;
+    $key .= 'css_' . $theme . '-' . $caticon;
   }
   else {
     $key .= $name . $type;
@@ -145,10 +144,10 @@ function load_files_cache($name, $type, $debug, $purge) {
     }
   }
   elseif ($type == 'css') {
-    global $font, $theme, $caticon;
+    global $theme, $caticon;
     $css_uri = get_css_uri('', $theme);
     global $css_files;
-    $files = array_merge($css_files, array(get_font_css_uri($font), get_forum_pic_folder().'/forumsprites.css', $css_uri."theme.css", $css_uri."DomTT.css", 'pic/' . get_cat_folder(401, $caticon) . "sprite.css", 'styles/jqui/' . jqui_css_name($theme) . '/jquery-ui-1.8.18.custom.css'));   
+    $files = array_merge($css_files, array(get_forum_pic_folder().'/forumsprites.css', $css_uri."theme.css", $css_uri."DomTT.css", 'pic/' . get_cat_folder(401, $caticon) . "sprite.css", 'styles/jqui/' . jqui_css_name($theme) . '/jquery-ui-1.8.18.custom.css'));   
     $out .= load_files($files, $type, $debug, $purge, true);
 
     if ($CURUSER){

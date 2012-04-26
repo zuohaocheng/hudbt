@@ -264,12 +264,6 @@ dl_item($lang_usercp['row_school'], "<select name=school>$schools</select>", 1);
 				$stylesheet = $_POST["stylesheet"];
 				$caticon = $_POST["caticon"];
 				$sitelanguage = $_POST["sitelanguage"];
-				$fontsize = $_POST["fontsize"];
-				if ($fontsize == 'large')
-					$updateset[] = "fontsize = 'large'";
-				elseif ($fontsize == 'small')
-					$updateset[] = "fontsize = 'small'";
-				else $updateset[] = "fontsize = 'medium'";
 				$updateset[] = "notifs = " . sqlesc($notifs);
 
 				if (is_valid_id($stylesheet))

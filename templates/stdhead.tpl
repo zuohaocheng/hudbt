@@ -3,7 +3,6 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   {$meta}
-  {get_style_addicode()}
   <title>{nocache}{$title}{/nocache}</title>
   <link rel="shortcut icon" href="//{$BASEURL}/favicon.ico" type="image/x-icon" />
   <link rel="apple-touch-icon" href="//{$BASEURL}/pic/icon.png" />

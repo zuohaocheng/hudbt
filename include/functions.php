@@ -139,12 +139,11 @@ function get_load_uri($type, $script_name ="", $absolute = true) {
   }
   elseif ($type == 'css') {
     if ($debug) {
-      $addition .= '&amp;font=' . get_font_type();
       $addition .= '&amp;theme=' . get_css_id();
       if ($CURUSER) {
 	$addition .= '&amp;caticon=' . $CURUSER['caticon'];
       }
-      $href= $pagename . '?format=css' . $addition;
+      $hrefs= [$pagename . '?format=css' . $addition];
     }
     else {
       if ($CURUSER) {
@@ -1771,29 +1770,6 @@ function jqui_css_name($theme = -1) {
     $ss_uri = get_single_value("stylesheets","jqui","WHERE id=".sqlesc($defcss));
   }
   return $ss_uri;
-}
-
-function get_font_type() {
-  global $CURUSER;
-  if ($CURUSER['fontsize'] == 'large')
-    $file = 'large';
-  elseif ($CURUSER['fontsize'] == 'small')
-    $file = 'small';
-  else $file = 'medium';
-  return $file;
-}
-
-function get_font_css_uri($type = '') {
-  if (!$type) {
-    $type = get_font_type();
-  }
-  return "styles/" . $type . 'font.css';
-}
-
-
-function get_style_addicode() {
-  $cssRow = get_css_row();
-  return $cssRow['addicode'];
 }
 
 function get_cat_folder($cat = 401, $caticon = -1) {

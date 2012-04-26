@@ -33,11 +33,6 @@ function css() {
     $themes['theme' . $obj['id']] = [$uri . 'theme.css', $uri . 'DomTT.css', 'styles/jqui/' . $obj['jqui'] . '/jquery-ui-1.8.18.custom.css'];
   }
 
-  $fonts = [];
-  foreach (['small', 'medium', 'large'] as $o) {
-    $fonts[$o] = [get_font_css_uri($o)];
-  }
-
   $caticons = [];
   foreach (get_category_icon_rows() as $obj) {
     $caticons['cat' . $obj['id']] = ['pic/category/chd/' . $obj['folder'] . 'sprite.css'];
@@ -48,9 +43,9 @@ function css() {
     $langs[$obj] = [get_forum_pic_folder_for($obj) . '/forumsprites.css'];
   }
 
-  $basics = ['styles/sprites.css', 'styles/common.css', 'styles/jquery.tablesorter/jquery.tablesorter.css'];
+  $basics = ['styles/sprites.css', 'styles/common.css', 'styles/jquery.tablesorter/jquery.tablesorter.css', 'styles/font.css'];
 
-  foreach (array_prod([$themes, $fonts, $caticons, $langs], '-', ['' => $basics]) as $filename =>$files) {
+  foreach (array_prod([$themes, $caticons, $langs], '-', ['' => $basics]) as $filename =>$files) {
     $out = load_files($files, 'css', true);
     $fd = fopen('cache/css' . $filename . '.css', 'w');
     fwrite($fd, $out);
