@@ -7,6 +7,13 @@ parked();
 if ($enableextforum == 'yes') //check whether internal forum is disabled
 	permissiondenied();
 
+if ($_REQUEST['format'] == 'json') {
+  $format = 'json';
+}
+else {
+  $format = 'html';
+}
+
 // ------------- start: functions ------------------//
 //print forum stats
 function forum_stats () {
@@ -714,7 +721,7 @@ SELECT id, rownum FROM (SELECT @x:=@x+1 AS rownum, id, userid FROM (SELECT @x:=0
 		print("<input type=\"hidden\" name=\"page\" value=\"".$page."\" />\n");}//These ifs are just to make the url cleaner.Feel no guilty to delete them if you don't like them
 		print("<input type=\"hidden\" name=\"showori_body\" value=\"".($showori ? '0' : '1')."\" /><input type=\"submit\" class=\"medium\" value=\"".($showori ? $lang_forums[text_shownow] : $lang_forums['text_showori'])."\" /></form></li>\n");
 		
-		print("<li><form method=\"post\" action=\"".htmlspecialchars("?action=movetopic&topicid=".$topicid)."\">\n"."&nbsp;".$lang_forums['text_move_thread_to']."&nbsp;<select class=\"med\" name=\"forumid\">");
+		print("<li><form method=\"post\" id=\"forum-movetopic\" action=\"".htmlspecialchars("?action=movetopic&topicid=".$topicid)."\">\n"."&nbsp;".$lang_forums['text_move_thread_to']."&nbsp;<select class=\"med\" name=\"forumid\">");
 		$forums = get_forum_row();
 		foreach ($forums as $arr){
 			if ($arr["id"] != $forumid && get_user_class() >= $arr["minclasswrite"])
@@ -788,12 +795,13 @@ SELECT id, rownum FROM (SELECT @x:=@x+1 AS rownum, id, userid FROM (SELECT @x:=0
 //-------- Action: Move topic
 
 elseif ($action == "movetopic") {
-	$forumid = 0+$_POST["forumid"];
+	$forumid = 0+$_REQUEST["forumid"];
 
 	$topicid = 0+$_GET["topicid"];
 	$ismod = is_forum_moderator($topicid,'topic');
-	if (!is_valid_id($forumid) || !is_valid_id($topicid) || (get_user_class() < $postmanage_class && !$ismod))
-		permissiondenied();
+	if (!is_valid_id($forumid) || !is_valid_id($topicid) || (get_user_class() < $postmanage_class && !$ismod)) {
+	  permissiondenied();
+	}
 
 	// Make sure topic and forum is valid
 
@@ -835,7 +843,13 @@ elseif ($action == "movetopic") {
 
 	// Redirect to forum page
 
-	header("Location: " . get_protocol_prefix() . "$BASEURL/forums.php?action=viewforum&forumid=$forumid");
+	if ($format == 'json') {
+	  header('Content-type: application/json');
+	  echo json_encode(['success' => true]);
+	}
+	else {
+	  header("Location: " . get_protocol_prefix() . "$BASEURL/forums.php?action=viewforum&forumid=$forumid");
+	}
 
 	die;
 }

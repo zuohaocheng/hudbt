@@ -455,6 +455,31 @@ var jqui_dialog = function(title, html, timeout) {
     }
 };
 
+var jqui_confirm = function(title, html, onOK) {
+    var dialog = $('<div />', {
+	title : title,
+	html : html
+    });
+    var close = function() {
+	dialog.dialog('close');
+    };
+    dialog.dialog({
+	modal : true,
+	autoOpen : true,
+	buttons : {
+	    OK : function() {
+		if (onOK()) {
+		    close();
+		}
+	    },
+	    Cancel : close
+	},
+	'close' : function() {
+	    dialog.remove();
+	}
+    });
+};
+
 var jqui_form = function(form, title, callback, buttons) {
     form.submit(function(e) {
 	e.preventDefault();
