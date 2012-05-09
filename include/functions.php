@@ -1702,7 +1702,7 @@ function menu ($selected = "home") {
 
   echo navbar_item('upload.php', $lang_functions['text_upload'], $selected == "upload");
   echo navbar_item('subtitles.php', $lang_functions['text_subtitles'], $selected == "subtitles");
-  echo navbar_item('usercp.php', $lang_functions['text_user_cp'], $selected == "usercp");
+ // echo navbar_item('usercp.php', $lang_functions['text_user_cp'], $selected == "usercp");
   echo navbar_item('topten.php', $lang_functions['text_top_ten'], $selected == "topten");
   global $log_class;
   if (get_user_class() >= $log_class) {

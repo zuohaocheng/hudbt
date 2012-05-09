@@ -195,6 +195,7 @@ $lang_functions = array
 	'text_awaiting_five_votes' => "<i>等待5票</i>",
 	'text_invite' => "邀請 ",
 	'text_send' => "發送",
+	'text_users' => "查看用戶",
 	'text_tracks' => "曲目",
 	'text_label' => "唱片公司",
 	'text_tags' => "標簽",

@@ -195,6 +195,7 @@ $lang_functions = array
 	'text_awaiting_five_votes' => "<i>awaiting 5 votes</i>",
 	'text_invite' => "Invite ",
 	'text_send' => "Send",
+	'text_users' => "Users",
 	'text_tracks' => "Tracks",
 	'text_label' => "Label",
 	'text_tags' => "Tags",

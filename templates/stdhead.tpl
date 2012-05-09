@@ -79,6 +79,8 @@
 	      <li><a href="//{$BASEURL}/torrents.php?inclbookmarked=1&amp;allsec=1&amp;incldead=0">{$lang['text_bookmarks']}</a></li>
 	      <li><a href="//{$BASEURL}/mybonus.php" title="{$lang['text_use']}"><span class = 'color_bonus'>{$lang['text_bonus']}</span>: <span id="bonus">{number_format($CURUSER['seedbonus'], 1)}</span></a></li>
 	      <li><a href="//{$BASEURL}/invite.php?id={$id}" title="{$lang['text_send']}"><span class = "color_invite">{$lang['text_invite']}</span>: <span id="invites">{$CURUSER['invites']}</span></a></li>
+	      <li><a href="//{$BASEURL}/usercp.php?id={$id}" title="{$lang['text_user_cp']}">{$lang['text_user_cp']}</a></li>	   
+	      <li><a href="//{$BASEURL}/users.php" title="{$lang['text_users']}">{$lang['text_users']}</a></li>	    	       
 	    </ul>
 	  </div>
 
