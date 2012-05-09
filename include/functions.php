@@ -1310,7 +1310,7 @@ function dbconn($autoclean = false, $test = false) {
 function get_user_row($id) {
   global $Cache, $CURUSER;
   static $curuserRowUpdated = false;
-  static $neededColumns = array('id', 'noad', 'class', 'enabled', 'privacy', 'avatar', 'signature', 'uploaded', 'downloaded', 'last_access', 'username', 'donor', 'leechwarn', 'warned', 'title');
+  static $neededColumns = array('id', 'noad', 'class', 'enabled', 'privacy', 'avatar', 'signature', 'uploaded', 'downloaded', 'last_access', 'username', 'donor', 'leechwarn', 'warned', 'title','color');
   if ($id == $CURUSER['id']) {
     $row = array();
     foreach($neededColumns as $column) {
@@ -3333,6 +3333,14 @@ function get_username($id, $big = false, $link = true, $bold = true, $target = f
     return $usernameArray[$id];
   }
   $arr = get_user_row($id);
+  	?>
+	
+<style type="text/css">
+.Custom_Color_<?php print($id."{color:#".$arr["color"]); ?>}
+A.Custom_Color_<?php print($id.":link{color:#".$arr["color"]); ?>}
+A.Custom_Color_<?php print($id.":visited{color:#".$arr["color"]); ?>}
+</style>
+<?php
   if ($arr){
     if ($big) {
       $donorpic = "starbig";
@@ -3368,8 +3376,14 @@ function get_username($id, $big = false, $link = true, $bold = true, $target = f
     }
 
     if ($link) {
-      $link_ext .= ' class="'. get_user_class_name($arr['class'],true) . '_Name"';
+    	if($arr["color"]!="FFFFFF"){
+    		$link_ext .= ' class="Custom_Color_'.$id.'"';
+      	$username = '<a ' . $link_ext . ' href="//' . $BASEURL . '/userdetails.php?id=' . $id . '">' . $username . '</a>';
+			}
+    elseif($arr["color"]=="FFFFFF"){
+     	$link_ext .= ' class="'. get_user_class_name($arr['class'],true) . '_Name"';
       $username = '<a ' . $link_ext . ' href="//' . $BASEURL . '/userdetails.php?id=' . $id . '">' . $username . '</a>';
+    	}
     }
     $username .= $pics;
 

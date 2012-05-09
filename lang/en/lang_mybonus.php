@@ -123,6 +123,9 @@ where<ul><li><b>A</b> is an intermediate variable</li><li><b>Ti</b> is the <b>i<
 	'bonus_ratio_not_allowed' => "Bonus ratio not allowed! Only users whose ratio below 0.8 need charity.",
 	'std_no_users_need_charity' => "No users need charity at the moment.",
 	'text_success_charity' => "Thank you! Your generosity is appreciated."
+	'text_change_color' => "Customize your ID color",
+	'text_change_color_note' => "Need camouflage?<br>FFFFFF means using default color£¡",
+	'text_success_color' => "Congratulations£¡You have changed your ID color!",
 );
 
 ?>

@@ -123,6 +123,9 @@ $lang_mybonus = array
 	'bonus_ratio_not_allowed' => "分享率不符合要求！只有分享率低于0.8的用戶需要慈善輔助說明。",
 	'std_no_users_need_charity' => "暫時沒有需要慈善輔助說明的用戶。",
 	'text_success_charity' => "謝謝！感謝你的慷慨捐贈。"
+	'text_change_color' => "改變顏色",
+	'text_change_color_note' => "給你點顏色瞧瞧！<br>全F的白色表示恢復系統默認顏色！",
+	'text_success_color' => "祝賀你，你成功地改變了顏色！",
 );
 
 ?>

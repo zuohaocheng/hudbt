@@ -128,7 +128,7 @@ if (!$action) {
   $otheroptions[7] = '<ul><li><label for="gift-username">' . $lang_mybonus['text_username'] . '</label><input type="text" name="username" id="gift-username" style="width: 150px;" maxlength="24" /></li><li><label for="giftselect">' . $lang_mybonus['text_to_be_given'] . '</label><select name="bonusgift" id="giftselect"> <option value="25"> 25</option><option value="50"> 50</option><option value="100"> 100</option> <option value="200"> 200</option> <option value="300"> 300</option> <option value="400"> 400</option><option value="500"> 500</option><option value="1000" selected="selected"> 1,000</option><option value="5000"> 5,000</option><option value="10000"> 10,000</option><option value="0">' . $lang_mybonus['text_custom'] . '</option></select><input type="text" name="bonusgift" id="giftcustom" style="width: 80px; display: none;" disabled="disabled" />' . $lang_mybonus['text_karma_points'] . '</li><li><label for="gift-message">' . $lang_mybonus['text_message'] . '</label><input type="text" name="message" id="gift-message" style="width: 350px;" maxlength="100" /></li></ul>';
   
   $otheroptions[9] = '<ul><li><label for="ratiocharity">' . $lang_mybonus['text_ratio_below'] . '</label><select name="ratiocharity" id="ratiocharity"><option value="0.1"> 0.1</option><option value="0.2"> 0.2</option><option value="0.3" selected="selected"> 0.3</option> <option value="0.4"> 0.4</option> <option value="0.5"> 0.5</option> <option value="0.6"> 0.6</option><option value="0.7"> 0.7</option><option value="0.8"> 0.8</option></select>'. $lang_mybonus['text_and_downloaded_above'].'10 GB</li><li><label for="charityselect">' . $lang_mybonus['text_to_be_given'] . '</label><select name="bonuscharity" id="charityselect" > <option value="1000"> 1,000</option><option value="2000"> 2,000</option><option value="3000" selected="selected"> 3,000</option> <option value="5000"> 5,000</option> <option value="8000"> 8,000</option> <option value="10000"> 10,000</option><option value="20000"> 20,000</option><option value="50000"> 50,000</option></select>' . $lang_mybonus['text_karma_points'] . '</li></ul>';
-
+	$otheroptions[10]='<script type="text/javascript" src="js/jscolor/jscolor.js"></script><input class="color" name="color"/>';
   function textForItem($i, $variant_value = false) {
     global $otheroptions;
     $bonusarray = bonusarray($i);
@@ -160,6 +160,7 @@ if (!$action) {
   echo textForItem(7, true);
   echo implode("\n", array_map('textForItem', $seq));
   echo textForItem(9, true);
+  echo textForItem(10, true);
   
   print("</ul></div>");
 ?>
