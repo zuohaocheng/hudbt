@@ -2537,7 +2537,7 @@ function post_format_author_info($id, $stat = false) {
   
   $arr2 = get_user_row($id);
 
-  $avatar = ($CURUSER["avatars"] == "yes" ? htmlspecialchars($arr2["avatar"]) : "");
+  $avatar = htmlspecialchars($arr2["avatar"]);
 
   if (!$avatar) {
     $avatar = "pic/default_avatar.png";
@@ -2708,7 +2708,7 @@ function post_body_container($postid, $body, $highlight, $edit, $signature, $pri
   if ($edit) {
     $container .= post_body_edited($edit);
   }
-  if ($CURUSER["signatures"] == "yes" && $signature && $type == 'post') {
+  if ($signature && $type == 'post') {
     $container .= '<div class="signature">' . format_comment($signature,false,false,false,true,550,true,false, 1,150) . '</div>';
   }
   $container .= '</div>';

@@ -131,7 +131,7 @@ else {
     $body2 = "<a href=friends.php?id=$userid&action=delete&type=friend&targetid=" . $friend['id'] . ">".$lang_friends['text_remove_from_friends']."</a>".
       "<br /><br /><a href=sendmessage.php?receiver=" . $friend['id'] . ">".$lang_friends['text_send_pm']."</a>";
 
-    $avatar = ($CURUSER["avatars"] == "yes" ? htmlspecialchars($friend["avatar"]) : "");
+    $avatar = htmlspecialchars($friend["avatar"]);
     if (!$avatar)
       $avatar = "pic/default_avatar.png";
 

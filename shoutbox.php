@@ -13,7 +13,7 @@ if (isset($_GET['del']))
 	}
 }
 $where=$_GET["type"];
-$refresh = ($CURUSER['sbrefresh'] ? $CURUSER['sbrefresh'] : 120)
+$refresh = 120;
 ?>
 <html><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -23,7 +23,7 @@ $refresh = ($CURUSER['sbrefresh'] ? $CURUSER['sbrefresh'] : 120)
 
 <?php
 print(get_style_addicode());
-$startcountdown = "startcountdown(".$CURUSER['sbrefresh'].")";
+$startcountdown = "startcountdown(".$refresh.")";
 ?>
 <script type="text/javascript">
 //<![CDATA[
@@ -93,7 +93,7 @@ else
 }
 }
 
-$limit = ($CURUSER['sbnum'] ? $CURUSER['sbnum'] : 70); 
+$limit = 70; 
 if ($where == "helpbox")
 {
 $sql = "SELECT * FROM shoutbox WHERE type='hb' ORDER BY date DESC LIMIT ".$limit;

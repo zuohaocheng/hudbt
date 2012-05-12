@@ -245,19 +245,17 @@ function insert_compose_frame($id, $type = 'new')
 // ------------- end: functions ------------------//
 // ------------- start: Global variables ------------------//
 $maxsubjectlength = 100;
-$postsperpage = $CURUSER["postsperpage"];
-if (!$postsperpage){
-	if (is_numeric($forumpostsperpage))
-		$postsperpage = $forumpostsperpage;//system-wide setting
-	else $postsperpage = 10;
-}
+
+if (is_numeric($forumpostsperpage))
+	$postsperpage = $forumpostsperpage;//system-wide setting
+else $postsperpage = 10;
 //get topics per page
-$topicsperpage = $CURUSER["topicsperpage"];
-if (!$topicsperpage){
-	if (is_numeric($forumtopicsperpage_main))
-		$topicsperpage = $forumtopicsperpage_main;//system-wide setting
-	else $topicsperpage = 20;
-}
+$topicsperpage = 0;
+
+if (is_numeric($forumtopicsperpage_main))
+	$topicsperpage = $forumtopicsperpage_main;//system-wide setting
+else $topicsperpage = 20;
+
 $today_date = date("Y-m-d",TIMENOW);
 // ------------- end: Global variables ------------------//
 
@@ -570,12 +568,7 @@ elseif ($action == "viewtopic") {
 	  }
 	}
 	else {
-	  if ($CURUSER["clicktopic"] == "firstpage") {
 		$page = 0;
-	  }
-	  else {
-	    $page = $pages-1;
-	  }
 	}
 	list($pagertop, $pagerbottom, $limit, $next_page_href, $offset) = pager($postsperpage, $postcount, "?".$addparam . '&' , array('page' => $page));
 	//------ Get posts
