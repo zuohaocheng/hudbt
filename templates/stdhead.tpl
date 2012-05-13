@@ -52,7 +52,7 @@
 	<li><a href="//{$BASEURL}/staffbox.php"><img class="staffbox" alt="staffbox" title="{$lang['title_staffbox']}" src="//{$BASEURL}/pic/trans.gif" /> {$totalsm}</a></li>
 	{/if}
 
-	<li><a href="//{$BASEURL}/messages.php"><img class="{if $unread}inboxnew{else}inbox{/if}" src="//{$BASEURL}/pic/trans.gif" alt="inbox" title="{if $unread}{$lang['title_inbox_new_messages']}{else}$lang['title_inbox_no_new_messages']}{/if}" />
+	<li><a href="//{$BASEURL}/messages.php"><img class="{if $unread}inboxnew{else}inbox{/if}" src="//{$BASEURL}/pic/trans.gif" alt="inbox" title="{if $unread}{$lang['title_inbox_new_messages']}{else}{$lang['title_inbox_no_new_messages']}{/if}" />
 	{if $messages}{$messages}({$unread}{$lang['text_message_new']})
 	{else}
 	0
