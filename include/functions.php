@@ -3905,12 +3905,15 @@ if ($mode == 'icon') {
   return $ret;
 }
 
-function get_user_id_from_name($username){
+function get_user_id_from_name($username,$sqlerrorreturn=1){
   global $lang_functions;
   $res = sql_query("SELECT id FROM users WHERE LOWER(username)=LOWER(" . sqlesc($username).")");
   $arr = mysql_fetch_array($res);
   if (!$arr){
-    stderr($lang_functions['std_error'],$lang_functions['std_no_user_named']."'".$username."'");
+  	if($sqlerrorreturn)
+    	stderr($lang_functions['std_error'],$lang_functions['std_no_user_named']."'".$username."'");
+    else
+    	return "NULL";
   }
   else return $arr['id'];
 }
