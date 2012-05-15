@@ -1,3 +1,3 @@
 $(function() {
-    $('#uploaders-works').tablesorter();
+    $('table').tablesorter();
 });

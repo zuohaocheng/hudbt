@@ -5,6 +5,14 @@ require_once(get_langfile_path());
 require_once(get_langfile_path("",true));
 loggedinorreturn();
 
+$format = strtolower($_REQUEST['format']);
+if ($format == 'json') {
+  header('Content-type: application/json; charset=utf-8');
+}
+else {
+  $format = 'html';
+}
+
 if ($_SERVER["REQUEST_METHOD"] != "POST")
 	stderr($lang_takemessage['std_error'], $lang_takemessage['std_permission_denied']);
 
@@ -154,19 +162,23 @@ EOD;
 
 			}
 		}
-		if (!$returnto)
-		$returnto = "" . get_protocol_prefix() . "$BASEURL/messages.php";
+		if (!$returnto) {
+		  $returnto = "" . get_protocol_prefix() . "$BASEURL/messages.php";
+		}
 	}
 
-	if ($returnto)
-	{
-		header("Location: $returnto");
-		die;
-	}
+if ($format == 'json') {
+  echo json_encode(['success' => true]);
+  die;
+}
+elseif ($returnto) {
+  header("Location: $returnto");
+  die;
+}
 
-	stdhead();
-	stdmsg($lang_takemessage['std_succeeded'], (($n_pms > 1) ? "$n".$lang_takemessage['std_messages_out_of']."$n_pms".$lang_takemessage['std_were'] : $lang_takemessage['std_message_was']).
-	$lang_takemessage['std_successfully_sent'] . ($l ? " $l profile comment" . (($l>1) ? $lang_takemessage['std_s_were'] : $lang_takemessage['std_was']) . $lang_takemessage['std_updated'] : ""));
+stdhead();
+stdmsg($lang_takemessage['std_succeeded'], (($n_pms > 1) ? "$n".$lang_takemessage['std_messages_out_of']."$n_pms".$lang_takemessage['std_were'] : $lang_takemessage['std_message_was']).
+       $lang_takemessage['std_successfully_sent'] . ($l ? " $l profile comment" . (($l>1) ? $lang_takemessage['std_s_were'] : $lang_takemessage['std_was']) . $lang_takemessage['std_updated'] : ""));
 stdfoot();
 exit;
-?>
+

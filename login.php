@@ -64,12 +64,17 @@ elseif ($securelogin == "no")
 	$sec = "disabled=\"disabled\"";
 elseif ($securelogin == "op")
 	$sec = "";
+elseif ($securelogin == "op-yes")
+	$sec = 'checked="checked"';
+
 
 if ($securetracker == "yes") 
 	$sectra = "checked=\"checked\" disabled=\"disabled\"";
 elseif ($securetracker == "no")
 	$sectra = "disabled=\"disabled\"";
 elseif ($securetracker == "op")
+	$sectra = '';
+elseif ($securetracker == "op-yes")
 	$sectra = 'checked="checked"';
 ?>
 <tr><td class="toolbox" colspan="2" align="left"><?php echo $lang_login['text_advanced_options']?></td></tr>

@@ -1,7 +1,7 @@
 <?php
 //Caching class (Based on file From ProjectGazelle)
-
-class NPCache extends Memcache{
+require('classes/class_apccache.php');
+class NPCache extends APECache {
 	var $isEnabled;
 	var $clearCache = 0;
 	var $language = 'en';
@@ -16,7 +16,7 @@ class NPCache extends Memcache{
 	var $languageFolderArray = array();
 
 	function __construct($host = 'localhost', $port = 11211) {
-		$success = $this->pconnect($host, $port); // Connect to memcache
+		$success = $this->connect($host, $port); // Connect to memcache
 		if ($success) {
 			$this->isEnabled = 1;
 		} else {

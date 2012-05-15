@@ -185,19 +185,22 @@ else {
 	print("<dd class=\"toolbox\"><input id=\"qr\" type=\"submit\" value=\"".$lang_edit['submit_edit_it']."\" /> <input type=\"reset\" value=\"".$lang_edit['submit_revert_changes']."\" /></dd>\n");
 	print("</dl>\n");
 	print("</form>\n");
-	print("<br /><br />");
-	print("<form id=\"delete\" method=\"post\" action=\"//" . $CAKEURL . "/torrents/delete/$id\"><div class=\"table td\" style=\"width: 50%;text-align:center;padding:5px;\">\n");
-	if (isset($_GET["returnto"])) {
-	  print("<input type=\"hidden\" name=\"data[returnto]\" value=\"" . htmlspecialchars($_GET["returnto"]) . "\" />\n");
+
+	if (checkPrivilege(['Torrent', 'delete'], $id)) {
+	  print("<br /><br />");
+	  print("<form id=\"delete\" method=\"post\" action=\"//" . $CAKEURL . "/torrents/delete/$id\"><div class=\"table td\" style=\"width: 50%;text-align:center;padding:5px;\">\n");
+	  if (isset($_GET["returnto"])) {
+	    print("<input type=\"hidden\" name=\"data[returnto]\" value=\"" . htmlspecialchars($_GET["returnto"]) . "\" />\n");
+	  }
+	  $reasons = [$lang_edit['radio_dead'], $lang_edit['radio_dupe'], $lang_edit['radio_nuked'], $lang_edit['radio_rules'], $lang_edit['radio_other']];
+	  echo '<input type="hidden" name="_method" value="DELETE" /><select id="reason-type" name="data[reasonType]">';
+	  foreach ($reasons as $k => $reason) {
+	    echo '<option value="', $k, '">', $reason, '</option>';
+	  }
+	  echo '</select><input type="text" id="reason-detail" name="data[reasonDetail]" placeholder="详细理由" />';
+	  echo "<input type=\"submit\" style='height: 25px' value=\"".$lang_edit['submit_delete_it']."\" />";
+	  print("</div></form>\n");
 	}
-	$reasons = [$lang_edit['radio_dead'], $lang_edit['radio_dupe'], $lang_edit['radio_nuked'], $lang_edit['radio_rules'], $lang_edit['radio_other']];
-	echo '<input type="hidden" name="_method" value="DELETE" /><select id="reason-type" name="data[reasonType]">';
-	foreach ($reasons as $k => $reason) {
-	  echo '<option value="', $k, '">', $reason, '</option>';
-	}
-	echo '</select><input type="text" id="reason-detail" name="data[reasonDetail]" placeholder="详细理由" />';
-	echo "<input type=\"submit\" style='height: 25px' value=\"".$lang_edit['submit_delete_it']."\" />";
-	print("</div></form>\n");
 }
 stdfoot();
 

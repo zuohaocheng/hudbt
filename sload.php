@@ -43,9 +43,9 @@ function css() {
     $langs[$obj] = [get_forum_pic_folder_for($obj) . '/forumsprites.css'];
   }
 
-  $basics = ['styles/sprites.css', 'styles/common.css', 'styles/jquery.tablesorter/jquery.tablesorter.css', 'styles/font.css'];
+  $basics = $css_files;
 
-  foreach (array_prod([$themes, $caticons, $langs], '-', ['' => $basics]) as $filename =>$files) {
+  foreach (array_kronecker_product([$themes, $caticons, $langs], '-', ['' => $basics]) as $filename =>$files) {
     $out = load_files($files, 'css', true);
     $fd = fopen('cache/css' . $filename . '.css', 'w');
     fwrite($fd, $out);

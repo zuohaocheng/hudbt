@@ -4,9 +4,9 @@ require_once('lib/CSSMin.php');
 
 //Mind the sequence of loading
 $js_files = ['jquery-1.7.1.min', 'jquery.json-2.3.min', 'jstorage.min', 'jquery-ui-1.8.18.custom.min', 'jquery.tablesorter', 'ajaxbasic', 'common', 'domLib', 'domTT', 'domTT_drag', 'fadomatic', 'pm', 'pager'];
-$css_files = ['styles/sprites.css', 'styles/common.css', 'styles/jquery.tablesorter/jquery.tablesorter.css'];
+$css_files = ['styles/sprites.css', 'styles/common.css', 'styles/jquery.tablesorter/jquery.tablesorter.css', 'styles/font.css'];
 
-function array_prod($arrays, $delimiter = '', $obj = ['' => []]) {
+function array_kronecker_product($arrays, $delimiter = '', $obj = ['' => []]) {
   $array = array_pop($arrays);
   $nobj = [];
 
@@ -19,7 +19,7 @@ function array_prod($arrays, $delimiter = '', $obj = ['' => []]) {
     return $nobj;
   }
   else {
-    return array_prod($arrays, $delimiter, $nobj);
+    return array_kronecker_product($arrays, $delimiter, $nobj);
   }
 }
 

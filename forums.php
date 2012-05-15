@@ -173,7 +173,6 @@ function insert_compose_frame($id, $type = 'new')
 	$body = "";
 	$edit = "";
 	print("<form id=\"compose\" method=\"post\" name=\"compose\" action=\"?action=post\">\n");
-	echo $addition;
 	switch ($type){
 		case 'new':
 		{
@@ -480,10 +479,12 @@ elseif ($action == "post") {
 
 	$headerstr = "Location: " . get_protocol_prefix() . "$BASEURL/forums.php?action=viewtopic&topicid=$topicid";
 
-	if ($type == 'edit')
-		header($headerstr."&page=p".$postid."#pid".$postid);
-	else
-		header($headerstr."&page=last#pid$postid");
+	if ($type == 'edit') {
+	  header($headerstr."&page=p".$postid."#pid".$postid, true, 303);
+	}
+	else {
+	  header($headerstr."&page=last#pid$postid", true, 303);
+	}
 	die;
 }
 
@@ -1055,7 +1056,7 @@ elseif ($action == "viewforum") {
 	
 	$num = get_row_count("topics","WHERE forumid=".sqlesc($forumid).$wherea);
 
-	list($pagertop, $pagerbottom, $limit) = pager($topicsperpage, $num, "?"."action=viewforum&forumid=".$forumid.$addparam."&");
+	list($pagertop, $pagerbottom, $limit) = pager($topicsperpage, $num, "?"."action=viewforum&forumid=".$forumid . $addparam."&", ['link' => 'bottom']);
 	if ($_GET["sort"]){
 		switch ($_GET["sort"]){
 			case 'firstpostasc': 
@@ -1485,9 +1486,7 @@ foreach ($overforums as $a) {
 		}
 		$posttodaycount = $Cache->get_value('forum_'.$forumid.'_post_'.$today_date.'_count');
 		if ($posttodaycount == ""){
-			$res3 = sql_query("SELECT COUNT(posts.id) FROM posts LEFT JOIN topics ON posts.topicid = topics.id WHERE posts.added > ".sqlesc(date("Y-m-d"))." AND topics.forumid=".sqlesc($forumid)) or sqlerr(__FILE__, __LINE__);
-			$row3 = mysql_fetch_row($res3);
-			$posttodaycount = $row3[0];
+			$posttodaycount = get_row_count('posts', "LEFT JOIN topics ON posts.topicid = topics.id WHERE posts.added > ".sqlesc(date("Y-m-d"))." AND topics.forumid=".sqlesc($forumid));
 			$Cache->cache_value('forum_'.$forumid.'_post_'.$today_date.'_count', $posttodaycount, 1800);
 		}
 		if ($posttodaycount > 0)

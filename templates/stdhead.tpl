@@ -12,10 +12,13 @@
     {js_hb_config()}
     //]]>
   </script>
-  {nocache}
   {get_load_uri('css', '')}
+  {nocache}
   {get_load_uri('js', '')}
   {/nocache}
+  <!--[if lt IE 9]>
+  <script type="text/javascript" src="//{$BASEURL}/load.php?name=html5shiv.js"></script>
+  <![endif]-->
 </head>
 <body>
   <div id="wrap">
@@ -24,15 +27,14 @@
       <div class="logo">{$SITENAME}</div>
       <div class="slogan">{$SLOGAN}</div>
       {else}
-      <div><a href="//{$BASEURL}/index.php"><img id="logo-img" src="//{$BASEURL}/{$logo_main}" alt="{$SITENAME}" title="{$SITENAME} - {$SLOGAN}" /></a></div>  
+      <div><a href="//{$BASEURL}/index.php"><img id="logo-img" src="//{$BASEURL}/{$logo_main}" alt="{$SITENAME}" title="{$SITENAME} - {$SLOGAN}" /></a></div>
+      {/if}
+      {if $headerad}
+      <div id="ad_header">{$headerad[0]}</div>
       {/if}
       <div id="donate">
-	{if $headerad}
-	<span id="ad_header">{$headerad[0]}</span>
-	{/if}
-
 	{if $enabledonation}
-	<a href="//{$BASEURL}/donate.php"><img src="//{$BASEURL}/{$forum_pic}/donate.gif" alt="Make a donation" style="margin-left: 5px; margin-top: 50px;" /></a>
+	<a href="//{$BASEURL}/donate.php"><img id="donation-img" src="//{$BASEURL}/{$forum_pic}/donate.gif" alt="Make a donation" /></a>
 	{/if}
     </div></header>
     <div id="page">
@@ -46,12 +48,12 @@
 	<div id="header-icons" class="medium">{$lang['text_the_time_is_now']}{$smarty.now|date_format:"%H:%M"}
 	  <div class="minor-list horizon-compact"><ul>
 	{if get_user_class() >= $staffmem_class}
-	<li><a href="//{$BASEURL}/cheaterbox.php"><img class="cheaterbox" alt="cheaterbox" title="{$lang['title_cheaterbox']}" src="//{$BASEURL}/pic/trans.gif" /> {$totalcheaters}</a></li>
-	<li><a href="//{$BASEURL}/reports.php"><img class="reportbox" alt="reportbox" title="{$lang['title_reportbox']}" src="//{$BASEURL}/pic/trans.gif" /> {$totalreports}</a></li>
-	<li><a href="//{$BASEURL}/staffbox.php"><img class="staffbox" alt="staffbox" title="{$lang['title_staffbox']}" src="//{$BASEURL}/pic/trans.gif" /> {$totalsm}</a></li>
+	<li><a href="//{$BASEURL}/cheaterbox.php" title="{$lang['title_cheaterbox']}"><img class="cheaterbox" alt="cheaterbox"src="//{$BASEURL}/pic/trans.gif" /> {$totalcheaters}</a></li>
+	<li><a href="//{$BASEURL}/reports.php" title="{$lang['title_reportbox']}"><img class="reportbox" alt="reportbox"src="//{$BASEURL}/pic/trans.gif" /> {$totalreports}</a></li>
+	<li><a href="//{$BASEURL}/staffbox.php" title="{$lang['title_staffbox']}"><img class="staffbox" alt="staffbox"src="//{$BASEURL}/pic/trans.gif" /> {$totalsm}</a></li>
 	{/if}
 
-	<li><a href="//{$BASEURL}/messages.php"><img class="{if $unread}inboxnew{else}inbox{/if}" src="//{$BASEURL}/pic/trans.gif" alt="inbox" title="{if $unread}{$lang['title_inbox_new_messages']}{else}$lang['title_inbox_no_new_messages']}{/if}" />
+	<li><a href="//{$BASEURL}/messages.php" title="{if $unread}{$lang['title_inbox_new_messages']}{else}{$lang['title_inbox_no_new_messages']}{/if}"><img class="{if $unread}inboxnew{else}inbox{/if}" src="//{$BASEURL}/pic/trans.gif" alt="inbox" />
 	{if $messages}{$messages}({$unread}{$lang['text_message_new']})
 	{else}
 	0
@@ -95,7 +97,7 @@
       </div>
 
       {if $belownavad}
-      <div style="margin-bottom: 10px;text-align:center" id="ad_belownav">
+      <div id="ad_belownav">
 	{$belownavad[0]}
       </div>
       {/if}
@@ -104,7 +106,11 @@
       <div id="alert" class="minor-list"><ul>
       {if $alerts}
 	{section name=idx loop=$alerts}
-	{msgalert($alerts[idx]['href'], $alerts[idx]['text'], $alerts[idx]['color'], $alerts[idx]['id'])}
+	{if isset($alerts[idx]['id'])}
+	{msgalert($alerts[idx]['href'], $alerts[idx]['text'], $alerts[idx]['color'],$alerts[idx]['id'])}
+	{else}
+	{msgalert($alerts[idx]['href'], $alerts[idx]['text'], $alerts[idx]['color'])}
+	{/if}
 	{/section}
       {/if}
       </ul></div>

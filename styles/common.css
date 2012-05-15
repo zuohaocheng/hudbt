@@ -1,3 +1,27 @@
 .username .user-id {
     display: none;
 }
+
+#logo-img {
+    height: 95px;
+    width: 275px;
+}
+
+#donation-img {
+    margin-left: 5px; margin-top: 50px;
+}
+
+#ad_belownav {
+    margin-bottom: 10px;
+    text-align:center;
+}
+
+#ad_header {
+    position: absolute;
+    top:0px;
+    right:150px;
+}
+
+.bbcode {
+    position:relative;
+}

@@ -77,10 +77,12 @@ class TorrentsController extends AppController {
 		}
 		if ($this->request->is('post') || $this->request->is('put')) {
 		  $data = $this->request->data;
-		  $d = ['Tcategory' => ['Tcategory' => $data['Tcategory']['Tcategory']]];
+		  $d = ['Torrent' => ['id' => $data['Torrent']['id']],
+			'Tcategory' => ['Tcategory' => $data['Tcategory']['Tcategory']]];
+		  $catEdit = isset($data['Tcategory']['Tcategory']);
 
-		  $keys = ['id'];
-
+		  $keys = [];
+		  $modEdit = false;
 		  if (checkPrivilege(['Torrent', 'oday'])) {
 		    $keys[] = 'oday';
 		  }
@@ -95,13 +97,24 @@ class TorrentsController extends AppController {
 
 		  foreach ($keys as $key) {
 		    if (isset($data['Torrent'][$key])) {
+		      $modEdit = true;
 		      $d['Torrent'][$key] = $data['Torrent'][$key];
 		    }
 		  }
 
 			if ($this->Torrent->save($d)) {
+			  $data = $this->Torrent->read(null, $id);
+			  global $CURUSER;
+			  if ($modEdit) {
+			    write_log("Torrent " . $this->Torrent->id . ' (' . $data['Torrent']['name'] . ") was edited by " . $CURUSER['username'] . ", Promotion Mod Edit", 'normal');
+			  }
+			  if ($catEdit) {
+			    write_log("Torrent " . $this->Torrent->id . ' (' . $data['Torrent']['name'] . ") was edited by " . $CURUSER['username'] . ", Category Edit", 'normal');
+			  }
+
+
 			  $tcategories = [];
-			  foreach ($this->Torrent->read(null, $id)['Tcategory'] as $tc) {
+			  foreach ($data['Tcategory'] as $tc) {
 			    $tc = $this->Torrent->Tcategory->read(null, $tc['id'])['Tcategory'];
 			    $tcategories[] = ['id' => $tc['id'], 'name' => $tc['name'], 'showName' => $tc['showName'], 'hidden' => $tc['hidden']];
 			  }
@@ -131,6 +144,7 @@ class TorrentsController extends AppController {
  * @return void
  */
 	public function delete($id = null) {
+	  global $CURUSER, $self_deletion_before_torrent;
 	  include(get_langfile_path('delete.php'));
 	  if (!$this->request->is('delete')) {
 	    throw new MethodNotAllowedException();
@@ -141,17 +155,13 @@ class TorrentsController extends AppController {
 	  }
 
 	  $data = $this->request->data;
-
-	  if (!checkPrivilege(['Torrent', 'delete'])) {
-	    $torrent = $this->Torrent->read('owner', $id);
-	    if ($CURUSER["id"] != $torrent["Torrent"]['owner']) {
-	      throw new Exception('Access denied');
-	    }
+	  if (!checkPrivilege(['Torrent', 'delete'], $id)) {
+	    $result = ['success' => false, 'message' => __('You can\'t delete this torrent.')];
 	  }
 
 	  $rt = 0 + $data["reasonType"];
 
-	  if (!is_int($rt) || $rt < 1 || $rt > 5) {
+	  if (!is_int($rt) || $rt < 0 || $rt > 4) {
 	    $result = ['success' => false, 'message' => $lang_delete['std_invalid_reason']."$rt."];	  
 	  }
 	  else {
@@ -162,16 +172,16 @@ class TorrentsController extends AppController {
 	      }
 	    }
 
-	    if ($rt == 1) {
+	    if ($rt == 0) {
 	      $reasonstr = "Dead: 0 seeders, 0 leechers = 0 peers total";
 	    }
-	    elseif ($rt == 2) {
+	    elseif ($rt == 1) {
 	      $reasonstr = "Dupe" . (isset($reason) ? (": " . $reason) : "!");
 	    }
-	    elseif ($rt == 3) {
+	    elseif ($rt == 2) {
 	      $reasonstr = "Nuked" . (isset($reason) ? (": " . $reason) : "!");
 	    }
-	    elseif ($rt == 4) {
+	    elseif ($rt == 3) {
 	      if (!isset($reason)) {
 		$result = ['success' => false, 'message' => $lang_delete['std_describe_violated_rule']."$rt."];
 	      }

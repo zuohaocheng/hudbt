@@ -20,6 +20,7 @@ $lang_reports = array
 	'text_user' => "用户",
 	'text_user_does_not_exist' => "用户不存在或已被删除。",
 	'text_offer' => "候选",
+	'text_request' => "求种",
 	'text_offer_does_not_exist' => "候选不存在或已被删除。",
 	'text_forum_post' => "论坛帖子",
 	'text_post_does_not_exist' => "论坛帖子不存在或已被删除。",
@@ -38,4 +39,4 @@ $lang_reports = array
 	'submit_delete' => "删除",
 );
 
-?>
+

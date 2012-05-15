@@ -60,7 +60,7 @@ if (file_exists($rootpath . 'config/allconfig.php')) {
 }
 
 $SITENAME = $BASIC['SITENAME'];
-if (isset($_SERVER['HTTP_HOST'])) {
+if (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] != '127.0.0.1') {
   $BASEURL = $_SERVER['HTTP_HOST'] . $BASIC['BASEDIR'];
 }
 else {
@@ -395,6 +395,8 @@ $thirtypercentleechbecome_torrent = $TORRENT['thirtypercentleechbecome'];
 $normalbecome_torrent = $TORRENT['normalbecome'];
 $uploaderdouble_torrent = $TORRENT['uploaderdouble'];
 $deldeadtorrent_torrent = $TORRENT['deldeadtorrent'];
+$self_deletion_before_torrent = 86400 * intval($TORRENT['self_deletion_before']);
+$no_deduct_bonus_on_deletion_torrent = 86400 * intval($TORRENT['no_deduct_bonus_on_deletion']);
 
 $sns = $SNS;
 

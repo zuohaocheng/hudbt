@@ -45,7 +45,6 @@ function etag($etag, $notModifiedExit = true) {
 }
  
 function lastModified($modifiedTime, $notModifiedExit = true) {
-#    $modifiedTime = date('D, d M Y H:i:s', $modifiedTime) . ' GMT';
   $ret = false;
     if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && $modifiedTime == $_SERVER['HTTP_IF_MODIFIED_SINCE']) {
       if ($notModifiedExit) {
@@ -61,19 +60,8 @@ function lastModified($modifiedTime, $notModifiedExit = true) {
 }
  
 function expires($seconds = 1800) {
-    $time = date('D, d M Y H:i:s', time() + $seconds) . ' GMT';
-    header("Expires: $time");
-}
-
-if (isset($_REQUEST['user'])) {
-  $userid = 0 + $_REQUEST['user'];
-  if ($userid == 0 && isset($CURUSER)) {
-    $userid = $CURUSER['id'];
-  }
-  if ($userid != 0) {
-    echo get_user_static_resources($type, $userid);
-  }
-  die;
+  $time = date('r', time() + $seconds);
+  header("Expires: $time");
 }
 
 $cache_key = generate_key($name, $type, $multifile);
@@ -81,6 +69,7 @@ $lastMod = false;
 if (!$debug && !$purge) {
   expires(900);
   $modified = $Cache->get_value($cache_key . '_md');
+
   if ($modified) {
     lastModified($modified,  etag($cache_key, false));
     $lastMod = true;
@@ -148,9 +137,9 @@ function load_files_cache($name, $type, $debug, $purge) {
       $langfile = $rootpath . get_langfile_path($name) . '.php';
       if (file_exists($langfile)) {
       	include($langfile);
-	$key = 'lang_' . $name;
-	$lang = compact($key);
-	$out .= "\n/* lang */\nhb.constant.pagelang = (" . json_encode($lang[$key]) . ');';
+	$lang_key = 'lang_' . $name;
+	$lang = compact($lang_key);
+	$out .= "\n/* lang */\nhb.constant.pagelang = (" . json_encode($lang[$lang_key]) . ');';
       }
     }
   }
@@ -172,7 +161,7 @@ function load_files_cache($name, $type, $debug, $purge) {
 
   if (!$debug) {
     $Cache->cache_value($key, $out, 2592000);
-    $Cache->cache_value($key . '_md', date('D, d M Y H:i:s') . ' GMT', 2592000);
+    $Cache->cache_value($key . '_md', date('r'), 2592000);
   }
   return $out;
 }
@@ -227,7 +216,7 @@ function load_file_cache($name, $type, $debug, $purge, $path = false, $minify=tr
   }
   $c = load_file($name, $type, $path, $minify);
   $Cache->cache_value($key, $c, 2592000);
-  $Cache->cache_value($key . '_md', date('D, d M Y H:i:s') . ' GMT', 2592000);
+  $Cache->cache_value($key . '_md', date('r'), 2592000);
   #  echo 'direct';
   return $c;
 }

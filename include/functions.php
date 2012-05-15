@@ -5,10 +5,26 @@ if(!defined('IN_TRACKER'))
 include_once($rootpath . 'include/globalfunctions.php');
 include_once($rootpath . 'classes/class_advertisement.php');
 include($rootpath . get_langfile_path("functions.php"));
+if (!defined('HB_CAKE')) {
+  require_once('./cake/app/webroot/index.php');
+}
 
 $privilegeConfig = ['Maintenance'=>['staticResources' => UC_MODERATOR],
 		    'Tcategory' => ['lock' => UC_UPLOADER,'delete' => UC_VIP,],
-		    'Torrent' => ['edit' => $torrentmanage_class, 'delete'=> $torrentmanage_class, 'startseed' => UC_VIP, 'pr' => $torrentonpromotion_class,'sticky' => $torrentsticky_class,'oday' => UC_VIP,'setstoring'=>UC_MODERATOR],
+		    'Torrent' => ['edit' => $torrentmanage_class,
+				  'delete'=> [$torrentmanage_class,
+					      function($id) {
+	if (is_null($id)) {
+	  return true;
+	}
+	global $CURUSER, $self_deletion_before_torrent;
+        App::uses('Torrent', 'Model');
+	$Torrent = new Torrent;
+	$Torrent->id = $id;
+	$data = $Torrent->read(['owner', 'added'], $id);
+	return (($CURUSER["id"] == $data["Torrent"]['owner']) && ((TIMENOW - strtotime($data['Torrent']['added'])) < $self_deletion_before_torrent));
+      }
+					      ], 'startseed' => UC_VIP, 'pr' => $torrentonpromotion_class,'sticky' => $torrentsticky_class,'oday' => UC_VIP,'setstoring'=>UC_MODERATOR],
 		    'Posts'=>['editnotseen'=>UC_MODERATOR,'seeeditnotseen'=>UC_UPLOADER,],
 		    'Misc' => ['fun' => $funmanage_class],
 		    'ManagePanels' => ['deletedisabled' => UC_SYSOP,
@@ -30,7 +46,7 @@ $privilegeConfig = ['Maintenance'=>['staticResources' => UC_MODERATOR],
 				       'makepoll' => $pollmanage_class,
 				       'warned' => UC_MODERATOR,
 				       'freeleech' => UC_ADMINISTRATOR,
-				       'faqmanage' => UC_ADMINISTRATOR,
+				       'faqmanage' => UC_MODERATOR,
 				       'modrules' => UC_ADMINISTRATOR,
 				       'catmanage' => UC_ADMINISTRATOR,
 				       'cheaters' => UC_MODERATOR,
@@ -51,7 +67,7 @@ function smarty($cachetime=300, $debug = false) {
     $smarty = new Smarty;
     global $enable_memcached;
     if ($enable_memcached) {
-      $smarty->caching_type = 'memcache';
+      $smarty->caching_type = 'apc';
     }
     $smarty->setCaching(Smarty::CACHING_LIFETIME_SAVED);
   }
@@ -103,7 +119,6 @@ function get_user_static_resources($type, $id) {
     $key = 'css';
   }
 
-  require_once('./cake/app/webroot/index.php');
   App::uses('User', 'Model');
   $User = new User;
   $User->id = $id;
@@ -141,14 +156,17 @@ function get_load_uri($type, $script_name ="", $absolute = true) {
   }
   
   if ($type == 'js') {
-    if ($debug) {
-      $hrefs = [$pagename . '?format=js'  . $addition];
-    }
-    else {
-      $lang = get_langfolder_cookie();
-      $hrefs = ['//' . $BASEURL . '/cache/js-common-' . $lang . '.js'];
+    $hrefs = [];
+    if ($script_name == '') {
+      if ($debug) {
+	$hrefs[] = $pagename . '?format=js'  . $addition;
+      }
+      else {
+	$lang = get_langfolder_cookie();
+	$hrefs[] ='//' . $BASEURL . '/cache/js-common-' . $lang . '.js';
 
-      $filename = preg_replace('/\.php$/i', '.js', $name);
+	$filename = preg_replace('/\.php$/i', '.js', $name);
+      }
     }
 
     if (file_exists('js/' . $filename)) {
@@ -156,7 +174,7 @@ function get_load_uri($type, $script_name ="", $absolute = true) {
     }
 
     $userjs = 'cache/users/' . $CURUSER['id'] . '.js';
-    if (file_exists($userjs)) {
+    if (file_exists($userjs) && $name != 'usercp.php') {
       if ($debug) {
 	$hrefs[] = $pagename . '?format=js&amp;user=' . $CURUSER['id'];
       }
@@ -245,8 +263,26 @@ function checkPrivilegePanel($item = '') {
   }
 }
 
-function checkPrivilege($item) {
-#  global $torrentonpromotion_class, $torrentsticky_class, $torrentmanage_class, $pollmanage_class, $forummanage_class, $funmanage_class;
+function checkSubPrivilege($obj, $opts) {
+  if (is_array($obj)) {
+    $result = false;
+    foreach ($obj as $sobj) {
+      if (checkSubPrivilege($sobj, $opts)) {
+	$result = true;
+	break;
+      }
+    }
+    return $result;
+  }
+  else if (is_callable($obj)) {
+    return $obj($opts);
+  }
+  else {
+    return (get_user_class() >= $obj);
+  }
+};
+
+function checkPrivilege($item, $opts = null) {
   global $privilegeConfig;
 
   if (is_array($item)) {
@@ -265,17 +301,13 @@ function checkPrivilege($item) {
     $last_key = array_pop($item);
     if ($config && array_key_exists($last_key, $config)) {
       $obj = $config[$last_key];
-      /* if (is_callable($obj)) { */
-      /* 	return $obj(); */
-      /* } */
-      /* else { */
-	return (get_user_class() >= $obj);
-      /* } */
+
+      return checkSubPrivilege($obj, $opts);
     }
   }
   elseif (is_string($item)) {
     if (array_key_exists($item, $privilegeConfig)) {
-      return (get_user_class() >= $privilegeConfig[$item]);
+      return checkSubPrivilege($privilegeConfig[$item], $opts);
     }
   }
   throw 'Invalid input';
@@ -294,6 +326,18 @@ function stdmsg($heading, $text, $htmlstrip = false) {
 }
 
 function stderr($heading, $text, $htmlstrip = true, $head = true, $foot = true, $die = true) {
+  global $format;
+  if (isset($format) && $format == 'json') {
+    echo json_encode(['success' => false, 'message' => $text]);
+    die;
+  }
+  elseif (php_sapi_name() == 'cli') {
+    echo '== ', $heading, ' ==';
+    echo "\n";
+    echo $text;
+    echo "\n";
+    die;
+  }
   if ($head) stdhead();
   stdmsg($heading, $text, $htmlstrip);
   if ($foot) stdfoot();
@@ -311,12 +355,14 @@ function sqlerr($file = '', $line = '', $stack = true) {
 
 function format_comment($text, $strip_html = true, $xssclean = false, $newtab = false, $imageresizer = true, $image_max_width = 0, $enableimage = true, $enableflash = true , $imagenum = -1, $image_max_height = 0, $adid = 0) {
   global $Cache;
-  #$is_cache = ($image_max_width == 0 && $image_max_height == 0 && $newtab == false);
+  $is_cache = ($image_max_width == 0 && $image_max_height == 0 && $newtab == false);
   if ($is_cache) {
     $key = 'bbcode-' . md5($text);
-    $html = $Cache->get_value($key);
-    if ($html) {
-      return $html;
+    if (!isset($_REQUEST['purge'])) {
+      $html = $Cache->get_value($key);
+      if ($html) {
+	return $html;
+      }
     }
   }
   
@@ -325,6 +371,7 @@ function format_comment($text, $strip_html = true, $xssclean = false, $newtab = 
   $filters = [];
   if ($enableimage) {
     $filters[] = 'Template';
+    $filters[] = 'Span';
   }
   $filters = array_merge($filters, ['Extended', 'Basic', 'Email', 'Lists', 'Attachments', 'Refs', 'Smiles']);
   if ($enableimage) {
@@ -336,7 +383,6 @@ function format_comment($text, $strip_html = true, $xssclean = false, $newtab = 
   $filters[] = 'Links';
 
   $text = htmlspecialchars($text, ENT_HTML401 | ENT_NOQUOTES);
-  /* $text = preg_replace("/ /", "&nbsp;", $text); */
   $text = str_replace("\r", "", $text);
   $text = str_replace("\n", " <br />", $text);
 
@@ -763,7 +809,7 @@ function get_torrent_2_user_value($user_snatched_arr) {
   return $torrent_2_user_value;
 }
 
-function cur_user_check ($redir) {
+function cur_user_check ($redir = '') {
   global $lang_functions;
   global $CURUSER;
   if ($CURUSER) {
@@ -1245,17 +1291,13 @@ function validip_format($ip) {
 function maxslots () {
   global $lang_functions;
   global $CURUSER, $maxdlsystem;
-  $gigs = $CURUSER["uploaded"] / (1024*1024*1024);
+  $gigs = $CURUSER["downloaded"] / (1024*1024*1024);
   $ratio = (($CURUSER["downloaded"] > 0) ? ($CURUSER["uploaded"] / $CURUSER["downloaded"]) : 1);
-  if ($ratio < 0.5 || $gigs < 5) $max = 1;
-  elseif ($ratio < 0.65 || $gigs < 6.5) $max = 2;
-  elseif ($ratio < 0.8 || $gigs < 8) $max = 3;
-  elseif ($ratio < 0.95 || $gigs < 9.5) $max = 4;
-  else $max = 0;
+  $max = get_maxslots($downloaded, $ratio);
   if ($maxdlsystem == "yes") {
     if (get_user_class() < UC_VIP) {
       if ($max > 0)
-	print ("<span class='color_slots'>".$lang_functions['text_slots']."</span><a href=\"faq.php#id215\">$max</a>");
+	print ("<span class='color_slots'>".$lang_functions['text_slots']."</span><a href=\"faq.php#id66\">$max</a>");
       else
 	print ("<span class='color_slots'>".$lang_functions['text_slots']."</span>".$lang_functions['text_unlimited']);
     }else
@@ -1323,6 +1365,7 @@ function dbconn($autoclean = false, $test = false) {
   global $useCronTriggerCleanUp;
 
   if (!mysql_pconnect($mysql_host, $mysql_user, $mysql_pass)) {
+    header('HTTP/1.0 502 Internal Server Error');
     switch (mysql_errno()) {
     case 1040:
     case 2002:
@@ -2408,6 +2451,7 @@ function send_pm($from, $to, $subject, $msg) {
 
 function pager($rpp, $count, $href, $opts = array(), $pagename = "page") {
   global $lang_functions,$add_key_shortcut;
+  $prev_page_href = '';
   $next_page_href = '';
   $pages = ceil($count / $rpp);
 
@@ -2447,7 +2491,8 @@ function pager($rpp, $count, $href, $opts = array(), $pagename = "page") {
   $is_presto = strpos($_SERVER['HTTP_USER_AGENT'], 'Presto');
   $as = "&lt;&lt;&nbsp;".$lang_functions['text_prev'];
   if ($page >= 1) {
-    $pagerprev = "<a href=\"".htmlspecialchars($href . $pagename . "=" . ($page - 1) . $surfix ). "\" title=\"".($is_presto ? $lang_functions['text_shift_pageup_shortcut'] : $lang_functions['text_alt_pageup_shortcut'])."\">";
+    $prev_page_href = $href . $pagename . "=" . ($page - 1) . $surfix;
+    $pagerprev = "<a href=\"".htmlspecialchars($prev_page_href). "\" title=\"".($is_presto ? $lang_functions['text_shift_pageup_shortcut'] : $lang_functions['text_alt_pageup_shortcut'])."\">";
     $pagerprev .= $as;
     $pagerprev .= "</a>";
   }
@@ -2484,23 +2529,43 @@ function pager($rpp, $count, $href, $opts = array(), $pagename = "page") {
       $dotted = 0;
       $start = $i * $rpp + 1;
       $end = $start + $rpp - 1;
-      if ($end > $count)
-      $end = $count;
+      if ($end > $count) {
+	$end = $count;
+      }
       $text = "$start&nbsp;-&nbsp;$end";
-      if ($i != $page)
-      $pagerarr[] = "<a class=\"pagenumber\" href=\"".htmlspecialchars($href . $pagename . "=" . $i . $surfix)."\">$text</a>";
-      else
-      $pagerarr[] = "<span class=\"selected\">$text</span>";
+      if ($i != $page) {
+	$pagerarr[] = "<a class=\"pagenumber\" href=\"".htmlspecialchars($href . $pagename . "=" . $i . $surfix)."\">$text</a>";
+      }
+      else {
+	$pagerarr[] = "<span class=\"selected\">$text</span>";
+      }
     }
     $pagerarr[] = $pagernext;
     
     $pagerstr = '<ul><li>'.join("</li><li>", $pagerarr).'</li></ul>';
-    $pagertop = "<div id='pagertop' class=\"pages minor-list list-seperator\">$pagerstr</div>\n";
-    $pagerbottom = "<div id='pagerbottom' class=\"pages minor-list list-seperator\" style=\"margin-bottom:0.6em;\">$pagerstr</div>\n";
+    $pagertop = "<div id='pagertop' class=\"pages minor-list list-seperator\">$pagerstr";
+    $pagerbottom = "<div id='pagerbottom' class=\"pages minor-list list-seperator\" style=\"margin-bottom:0.6em;\">$pagerstr";
+
+    $links = '<link rel="start" href="' . substr($href, 0, -1) . '" />';
+    if ($prev_page_href) {
+      $links .= '<link rel="prev" href="' . $prev_page_href . '" />';
+    }
+    if ($next_page_href) {
+      $links .= '<link rel="next" href="' . $next_page_href . '" />';
+    }
+
+    if (isset($opts['link']) && $opts['link'] == 'bottom') {
+      $pagerbottom .= $links;
+    }
+    else {
+      $pagertop .= $links;
+    }
+    $pagertop .= "</div>";
+    $pagerbottom .= "</div>";
   }
   else {
-    $pagertop = "<div id='pagertop' class=\"pages minor-list\"><div class=\"\">$pager</div>\n";
-    $pagerbottom = "<div id='pagerbottom' class=\"pages minor-list\"><div class=\"\">$pager</div>\n";
+    $pagertop = "<div id='pagertop' class=\"pages minor-list\"></div>\n";
+    $pagerbottom = "<div id='pagerbottom' class=\"pages minor-list\"></div>\n";
   }
 
   $start = $page * $rpp;
@@ -2587,7 +2652,7 @@ function post_format_author_info($id, $stat = false) {
   $out .= '</div>';
   if ($first) {
     if ($stat) {
-      $out .= '<div class="user-stats minor-list-vertical"><ul><li>' . user_class_image($arr2['class']) . '</li>' . post_author_stats($id, $arr2) . '</ul></div>';
+      $out .= '<div class="user-stats minor-list-vertical"><ul>' . post_author_stats($id, $arr2) . '</ul></div>';
     }
     $out .= '<div class="forum-user-toolbox minor-list horizon-compact compact"><ul>' . post_author_toolbox($arr2) . '</ul></div>';
   }
@@ -3407,7 +3472,7 @@ function get_username($id, $big = false, $link = true, $bold = true, $target = f
   else {
     $username = $lang_functions['text_orphaned'];
   }
-  $username = "<span class=\"username nowrap\"><span class=\"user-id\">$id</span>" . ( $bracket == true ? "(" . $username . ")" : $username) . "</span>";
+  $username = "<span class=\"username nowrap user-" . $id . "\"><span class=\"user-id\">$id</span>" . ( $bracket == true ? "(" . $username . ")" : $username) . "</span>";
   
   if (func_num_args() == 1) { //One argument=is default display of username, save it in static array
     $usernameArray[$id] = $username;
@@ -3751,7 +3816,7 @@ function smile_row($formname, $taname){
   return $smilerow;
 }
 function getSmileIt($formname, $taname, $smilyNumber) {
-  return "<a href=\"javascript: SmileIT('[em$smilyNumber]','".$formname."','".$taname."')\"  onmouseover=\"domTT_activate(this, event, 'content', '".htmlspecialchars("<table><tr><td><img src=\'pic/smilies/$smilyNumber.gif\' alt=\'\' /></td></tr></table>")."', 'trail', false, 'delay', 0,'lifetime',10000,'styleClass','smilies','maxWidth', 400);\"><img style=\"max-width: 25px;\" src=\"pic/smilies/$smilyNumber.gif\" alt=\"\" /></a>";
+  return "<a href=\"#\" class=\"smileit\" smile=\"$smilyNumber\" form=\"$formname\"><img style=\"max-width: 25px;\" src=\"pic/smilies/$smilyNumber.gif\" alt=\"\" /></a>";
 }
 
 function classlist($selectname,$maxclass, $selected, $minClass = 0){
@@ -4500,8 +4565,14 @@ function get_fun($id = 0, $pager_count = null) {
 
     $content = '<div class="page-titles"><h3><a href="//' . $BASEURL . '/fun.php?id=' . $id . '">'.$row['title'].'</a></h3><h4>'.$lang_fun['text_posted_by'];
     $content .= $username . $time;
-    $content .= '</h4></div><div id="funbox-content">';
-    $content .= format_comment($row['body'], true, true, true)."</div>";
+    $content .= '</h4></div>';
+    if (is_null($pager_count)) {
+      $content .= '<div id="funbox-content">';
+    }
+    $content .= format_comment($row['body'], true, true, true);
+    if (is_null($pager_count)) {
+      $content .= "</div>";
+    }
     if ($is_cache) {
       $Cache->cache_value('current_fun_content', $content, 900);
       $Cache->cache_value('current_fun_content_id', $id, 900);
@@ -4537,7 +4608,7 @@ function get_fun($id = 0, $pager_count = null) {
     $funcomment .= '</h4>';
     $subres = sql_query($query . $limit) or sqlerr(__FILE__, __LINE__);
 
-    $funcomment .= ('<dl class="table" id="funcomment">');
+    $funcomment .= ('<dl class="table midt" id="funcomment">');
     ob_start();
 
     while ($subrow = mysql_fetch_array($subres)) {
@@ -4551,7 +4622,7 @@ function get_fun($id = 0, $pager_count = null) {
       if (checkPrivilege(['Misc', 'fun'])) {
 	$del=' <form class="a" action="fun.php" method="post"><input type="hidden" name="action" value="delcomment" /><input type="hidden" name="commentid" value="'. $subrow['id'] . '" /><input type="submit" value="删除" class="a" /></form>';
       }
-      dl_item(get_username($subrow['userid'],false,true,true,true,false,false,"",false).$del, format_comment($subrow['text'],true,false,true,true,600,false,false), true, 'midt');
+      dl_item(get_username($subrow['userid'],false,true,true,true,false,false,"",false).$del, format_comment($subrow['text'],true,false,true,true,600,false,false), true);
     }
     $funcomment .= ob_get_clean ();
     $funcomment .= "</dl>";

@@ -209,12 +209,7 @@ if (!isset($self)) {
       }
     }
     if ($maxdlsystem == "yes") {
-      if($gigs > 10) 
-	if ($ratio < 0.5) $max = 1;
-      elseif ($ratio < 0.65) $max = 2;
-      elseif ($ratio < 0.8) $max = 3;
-      elseif ($ratio < 0.95) $max = 4;
-      else $max = 0;
+      $max = get_maxslots($az['downloaded'], $ratio);
       
       if ($max > 0) {
 	$res = sql_query("SELECT COUNT(*) AS num FROM peers WHERE userid='$userid' AND seeder='no'") or err("Tracker error 5");

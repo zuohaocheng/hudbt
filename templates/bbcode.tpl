@@ -1,9 +1,9 @@
-<script type="text/javascript">hb.bbcode={php_json_encode($config)};</script>
+<script type="text/javascript">hb.bbcode={json_encode($config)};</script>
 <div id="bbcode-toolbar"></div>
 {if $attach}
 <iframe src="attachment.php" width="100%" height="24" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe>
 {/if}
-<div style="margin:1.5em 3em; width:20%; float:right; text-align:center;">
+<div style="margin:1.5em 1.5em 0 0; width:20%; float:right; text-align:center;">
   <div class="minor-list smiles" style="margin-bottom: 1.5em;">
     <ul>
       {foreach $smilies as $smily}

@@ -225,7 +225,6 @@ $(function() {
 		}
 
 		modifyCss(wThis, $this.find('h2'), wTitleD);
-		modifyCss(wThis, $this.find('h3'), wDescD);
 	    });
 	    //console.profileEnd();
 	};
@@ -362,7 +361,7 @@ $(function() {
 	    }
 
 	    var div_main = '<div class="torrent-title">' + mainTitle;
-	    var div_desc = '<div class="torrent-title">';
+	    var div_desc = '<div class="torrent-title">' + desc;
 
 	    var mainTitleDecorators = '<ul class="prs">';
 

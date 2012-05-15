@@ -19,17 +19,11 @@ function get_global_sp_state() {
 function get_pr_state($promotion, $added = '', $promotionTimeType = 0, $promotionUntil = '') {
   //PRCONFIG
   static $sp_global_table = array(array(1,2,3,4,5,6,7),
-         array(2,2,2,2,2,2,2),
-         array(3,3,3,3,3,3,3),
-         array(4,4,4,4,4,4,4),
-         array(5,5,5,5,5,5,5),
-         array(6,6,6,6,6,6,6));
-/* array(array(1,2,3,4,5,6,7), */
-          /*    array(2,2,4,4,2,4,2), */
-          /*    array(3,4,3,4,6,6,3), */
-          /*    array(4,4,4,4,4,4,4), */
-          /*    array(5,2,6,4,6,6,7), */
-          /*    array(6,4,6,4,6,6,6)); */
+             array(2,2,4,4,2,4,2),
+             array(3,4,3,4,6,6,3),
+             array(4,4,4,4,4,4,4),
+             array(5,2,6,4,6,6,7),
+             array(6,4,6,4,6,6,6));
 
   $gstate = get_global_sp_state();
   if (!$gstate) {
@@ -59,6 +53,17 @@ function get_pr_state($promotion, $added = '', $promotionTimeType = 0, $promotio
   }
 
   return array($state, $expire);
+}
+
+function get_maxslots($downloaded, $ratio) {
+  if ($downloaded > 10) {
+    if ($ratio < 0.5) $max = 1;
+    elseif ($ratio < 0.65) $max = 2;
+    elseif ($ratio < 0.8) $max = 3;
+    elseif ($ratio < 0.95) $max = 4;
+    else $max = 0;
+  }
+  return $max;
 }
 
 // IP Validation

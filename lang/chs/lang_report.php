@@ -14,10 +14,10 @@ $lang_report = array
 	'std_are_you_sure' => "确认",
 	'text_are_you_sure_user' => "你确信用户",
 	'text_to_staff' => "违反了规则，要向管理组举报？",
-	'text_not_for_leechers' => "请<b>不要</b>用于举报吸血鬼，系统有脚本对付他们。",
-	'text_reason_is' => "原因<font class=striking>(必需填写)</font> ",
+	'text_not_for_leechers' => "请<b>不要</b>用于举报吸血鬼，蝴蝶娘有办法对付他们。",
+	'text_reason_is' => '原因<span class="striking">(必须填写)</span> ',
 	'submit_confirm' => "确信",
-	'text_reason_note' => "<b><font class=striking>请注意！</font></b>&nbsp;如果没有理由乱举报，你会受到警告。",
+	'text_reason_note' => '<b><span class="striking">请注意！</span></b>&nbsp;如果没有理由乱举报，你会受到警告。',
 	'std_invalid_torrent_id' => "无效的种子ID！",
 	'text_are_you_sure_torrent' => "你确信种子",
 	'std_invalid_forum_id' => "无效的论坛帖子ID！",
@@ -38,4 +38,4 @@ $lang_report = array
 	'text_are_you_sure_subtitle' => "你确信字幕",
 );
 
-?>
+

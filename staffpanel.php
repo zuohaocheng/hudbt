@@ -8,11 +8,11 @@ stdhead("Administration");
 print("<h1 class=\"center\">Administration</h1>");
 $panels = $lang_staffpanel;
 
-echo '<dl class="table">';
+echo '<dl class="table longt">';
 $c = 0;
 foreach ($panels as $name => $panel) {
   if (checkPrivilege(['ManagePanels', $name])) {
-    dl_item($panel['name'], '<a href="//' . $BASEURL . '/' . $name . '.php' . '">' . $panel['desc'] . '</a>', true, 'longt');
+    dl_item($panel['name'], '<a href="//' . $BASEURL . '/' . $name . '.php' . '">' . $panel['desc'] . '</a>', true);
     ++$c;
   }
 }

@@ -788,9 +788,6 @@ dl.table {
     border:1px black solid;
 }
 
-*:first-child+html dl { padding-left:-100px;} 
-*:first-child+html dl dt { position:relative; left:100px; margin-left:-100px;} 
-
 dl dt {  
     float:left; 
     font-weight:bold;  
@@ -804,12 +801,20 @@ dl dt {
     /* box-shadow:2px 2px 5px silver; */
 }
 
-dl dt.midt {
-    width: 15%;
+dl.midt dt {
+    width: 20%;
 }
 
-dl dt.longt {
+dl.midt dd {
+    padding-left: 22%;
+}
+
+dl.longt dt {
     width: 40%;
+}
+
+dl.longt dd {
+    padding-left: 42%;
 }
 
 dl dd {
@@ -824,7 +829,7 @@ dl dd.no-dt {
     padding-left: 0;
 }
 
-dl dd.first-child{
+dl dd.first-child, dl dd:first-of-type {
     border-top:none;
 }
 

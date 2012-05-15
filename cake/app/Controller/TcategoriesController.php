@@ -60,7 +60,7 @@ class TcategoriesController extends AppController {
         [ 
             'table' => 'tcategories', 
             'alias' => 'Tcategory', 
-            'type' => 'inner',  
+            'type' => 'INNER',  
             'conditions'=> [ 
                 'Tcategory.id = TcategoriesTorrent.tcategory_id', 
                 'Tcategory.id' => $id 

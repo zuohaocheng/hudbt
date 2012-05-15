@@ -576,7 +576,7 @@ if ($_GET["del_offer"]){
 		{
 			$added = sqlesc(date("Y-m-d H:i:s"));
 			$subject = sqlesc($lang_offers_target[get_user_lang($num["userid"])]['msg_offer_deleted']);
-			$msg = sqlesc($lang_offers_target[get_user_lang($num["userid"])]['msg_your_offer'].$num[name].$lang_offers_target[get_user_lang($num["userid"])]['msg_was_deleted_by']. "[url=userdetails.php?id=".$CURUSER['id']."]".$CURUSER['username']."[/url]".$lang_offers_target[get_user_lang($num["userid"])]['msg_blank'].($reason != "" ? $lang_offers_target[get_user_lang($num["userid"])]['msg_reason_is'].$reason : ""));
+			$msg = sqlesc($lang_offers_target[get_user_lang($num["userid"])]['msg_your_offer'].$num['name'].$lang_offers_target[get_user_lang($num["userid"])]['msg_was_deleted_by']. "[user=".$CURUSER['id']."]".$lang_offers_target[get_user_lang($num["userid"])]['msg_blank'].($reason != "" ? $lang_offers_target[get_user_lang($num["userid"])]['msg_reason_is'].$reason : ""));
 			sql_query("INSERT INTO messages (sender, receiver, msg, added, subject) VALUES(0, $num[userid], $msg, $added, $subject)") or sqlerr(__FILE__, __LINE__);
 		}
 		write_log("Offer: $offer ($num[name]) was deleted by $CURUSER[username]".($reason != "" ? " (".$reason.")" : ""),'normal');

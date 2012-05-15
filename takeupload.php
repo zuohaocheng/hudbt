@@ -394,9 +394,7 @@ KPS("+",$uploadtorrent_bonus,$CURUSER["id"]);
 //===end
 
 //Tcategory
-include('./cake/app/webroot/index.php');
-include('./cake/app/Model/Torrent.php');
-
+App::uses('Torrent', 'Model');
 $Torrent = new Torrent;
 $Torrent->id = $id;
 if ($Torrent->exists()) {
@@ -498,4 +496,4 @@ if ($format == 'json') {
 else {
   header("Location: $location");
 }
-?>
+

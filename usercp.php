@@ -45,7 +45,7 @@ function getimageheight ($imagewidth, $imageheight)
 	return $imageheight;
 }
 function form($name) {
-	return print('<form method="post" action="usercp.php"><input type="hidden" name="action" value="'.htmlspecialchars($name).'"><input type="hidden" name="type" value="save">');
+	return print('<form method="post" action="usercp.php?action=' . $name . '"><input type="hidden" name="type" value="save">');
 }
 function submit() {
 	global $lang_usercp;
@@ -775,7 +775,6 @@ EOD;
 			die;
 			break;
 	case 'js': {
-	  require_once('./cake/app/webroot/index.php');
 	  App::uses('User', 'Model');
 	  $User = new User;
 	  $User->id = $CURUSER['id'];
@@ -784,7 +783,7 @@ EOD;
 	    $js = $_REQUEST['user-js'];
 	    ob_start();
 	    $js_result = JSMinPlus::minify($js);
-	    if (!$js_result) {
+	    if ($js_result === false) {
 	      $hints = ob_get_contents();
 	    }
 	    else {
@@ -841,7 +840,6 @@ EOD;
 	  break;
 	}
 	case 'css': {
-	  require_once('./cake/app/webroot/index.php');
 	  App::uses('User', 'Model');
 	  $User = new User;
 	  $User->id = $CURUSER['id'];
@@ -893,6 +891,7 @@ EOD;
 	  usercpmenu('css');
 	  echo '<dl class="table">';
 	  form ("css");
+	  dl_item('', $lang_usercp['text_user_css_hints'], true);
 	  dl_item($lang_usercp['text_user_css'], '<textarea name="user-css" style="width:700px;font-family:menlo,monaco,courier,monospace" rows="40" autofocus="true">' . $value . '</textarea>', true);
 	  submit();
 	  print("</dl>");

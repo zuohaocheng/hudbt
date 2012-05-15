@@ -111,6 +111,8 @@ class HTML_BBCodeParser_Filter_Extended extends HTML_BBCodeParser_Filter
 
    function _preparse() {
 	$options = PEAR::getStaticProperty('HTML_BBCodeParser','_options');
+	$o  = $options['open'];
+        $c  = $options['close'];
         $oe = $options['open_esc'];
         $ce = $options['close_esc'];
 
@@ -118,6 +120,10 @@ class HTML_BBCodeParser_Filter_Extended extends HTML_BBCodeParser_Filter
 					 "!".$oe."pre".$ce."(.*)".$oe."/pre".$ce."!Ui",
 					 array($this, 'removeBr'),
 					 $this->_text);
+	$this->_preparsed = preg_replace(
+					 "!".$oe."hr".$ce."!Ui",
+					 $o."hr".$c.$o."/hr".$c,
+					 $this->_preparsed);
    }
 
    function removeBr($s) {

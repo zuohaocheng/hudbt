@@ -147,8 +147,6 @@ class Torrent extends AppModel {
 		)
 	);
 
-#	static $interval_no_deduct_bonus_on_deletion = 30 * 86400;
-
 	public function beforeDelete() {
 	  if (!$this->reason) {
 	    return false;
@@ -226,9 +224,9 @@ class Torrent extends AppModel {
 	  }
 
 	  //deduct bonus
-	  $interval_no_deduct_bonus_on_deletion = 30* 86400;
+	  global $no_deduct_bonus_on_deletion_torrent;
 	  $tadded = strtotime($data['Torrent']['added']);
-	  if ((TIMENOW - $tadded) < $interval_no_deduct_bonus_on_deletion) {
+	  if ((TIMENOW - $tadded) < $no_deduct_bonus_on_deletion_torrent) {
 	    global $uploadtorrent_bonus;
 	    KPS("-", $uploadtorrent_bonus, $data['Torrent']['owner']);
 	  }

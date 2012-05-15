@@ -13,14 +13,13 @@ if (!$count){
 	stderr($lang_reports['std_oho'], $lang_reports['std_no_report']);
 }
 stdhead($lang_reports['head_reports']);
-$perpage = 10;
+$perpage = 20;
 list($pagertop, $pagerbottom, $limit) = pager($perpage, $count, "reports.php?");
-begin_main_frame();
 print("<h1 align=center>".$lang_reports['text_reports']."</h1>");
-print("<table border=1 cellspacing=0 cellpadding=5 align=center>\n");
-print("<tr><td class=colhead><nobr>".$lang_reports['col_added']."</nobr></td><td class=colhead>".$lang_reports['col_reporter']."</td><td class=colhead>".$lang_reports['col_reporting']."</td><td class=colhead><nobr>".$lang_reports['col_type']."</nobr></td><td class=colhead>".$lang_reports['col_reason']."</td><td class=colhead><nobr>".$lang_reports['col_dealt_with']."</nobr></td><td class=colhead><nobr>".$lang_reports['col_action']."</nobr></td>");
+echo '<form method="post" action="takeupdate.php">';
+echo ('<table cellpadding="5">');
+echo "<thead><tr><th class=\"nowrap\">".$lang_reports['col_added']."</th><th>".$lang_reports['col_reporter']."</th><th>".$lang_reports['col_reporting']."</th><th class=\"nowrap\">".$lang_reports['col_type']."</th><th>".$lang_reports['col_reason']."</th><th class=\"nowrap\">".$lang_reports['col_dealt_with']."</th><th class=\"nowrap\">".$lang_reports['col_action'].'</th></thead><tfoot><tr><td class="colhead" colspan="7" align="right"><input type="submit" name="setdealt" value="', $lang_reports['submit_set_dealt'], '" /><input type="submit" name="delete" value="', $lang_reports['submit_delete'], '" /></td></tr></tfoot><tbody>';
 
-print("<form method=post action=takeupdate.php>");
 $reportres = sql_query("SELECT * FROM reports ORDER BY dealtwith ASC, id DESC $limit");
 
 while ($row = mysql_fetch_array($reportres))
@@ -73,7 +72,7 @@ while ($row = mysql_fetch_array($reportres))
 
 		case "request":
 		{
-			$type = "Request";
+			$type = $lang_reports['text_request'];
 			$res = sql_query("SELECT id, request FROM requests WHERE id=".sqlesc($row['reportid']));
 			if (mysql_num_rows($res) == 0)
 				$reporting = "Request doesn't exist or is deleted.";
@@ -143,13 +142,12 @@ while ($row = mysql_fetch_array($reportres))
 		}
 	}
 
-	print("<tr><td class=rowfollow><nobr>".gettime($row['added'])."</nobr></td><td class=rowfollow>" . get_username($row['addedby']) . "</td><td class=rowfollow>".$reporting."</td><td class=rowfollow><nobr>".$type."</nobr></td><td class=rowfollow>".htmlspecialchars($row['reason'])."</td><td class=rowfollow><nobr>".$dealtwith."</nobr></td><td class=rowfollow><input type=\"checkbox\" name=\"delreport[]\" value=\"" . $row[id] . "\" /></td></tr>\n");
+	print("<tr><td class=\"nowrap\">".gettime($row['added'])."</td><td>" . get_username($row['addedby']) . "</td><td>".$reporting."</td><td class=\"nowrap\">".$type."</td><td>".htmlspecialchars($row['reason'])."</td><td class=\"nowrap\">".$dealtwith."</td><td><input type=\"checkbox\" name=\"delreport[]\" value=\"" . $row['id'] . "\" /></td></tr>\n");
 }
 ?>
-<tr><td class="colhead" colspan="7" align="right"><input type="submit" name="setdealt" value="<?php echo $lang_reports['submit_set_dealt']?>" /><input type="submit" name="delete" value="<?php echo $lang_reports['submit_delete']?>" /></td></tr> 
+</tbody>
+</table> 
 </form>
 <?php
-print("</table>");
 print($pagerbottom);
-end_main_frame();
 stdfoot();

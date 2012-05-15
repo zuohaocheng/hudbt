@@ -17,6 +17,8 @@ $lang_uploaders = array
 	'text_username' => "用户名",
 	'text_torrent_size' => "种子大小",
 	'text_torrent_num' => "种子数",
+	'text_mods' => "管理员",
+	'col_log_num' => "日志量",
 );
 
-?>
+

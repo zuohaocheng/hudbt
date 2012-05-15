@@ -102,28 +102,8 @@ $(function() {
 	    //Auto complete
 	    var cache = {};
 	    var lastXhr;
-	    input.autocomplete({
-		source: function( request, response ) {
-		    var term = request.term;
-		    if ( term in cache ) {
-			response( cache[ term ] );
-			return;
-		    }
 
-		    lastXhr = $.getJSON(cake + "tcategories/search/", request, function( data, status, xhr ) {
-			data = $.map(data, function(item) {
-			    return item.Tcategory.name;
-			});
-
-			cache[ term ] = data;
-			if ( xhr === lastXhr ) {
-			    response( data );
-			}
-		    });
-		}
-	    });
-
-	    input.blur(function() {
+	    var input_validate = function() {
 		$inputs.removeClass('invalid-ref');
 
 		var catName = this.value;
@@ -150,6 +130,7 @@ $(function() {
 			    input.attr('value', result[0].Tcategory.name);
 			    $inputs.removeClass('invalid');
 			    in_id.attr('value', result[0].Tcategory.id);
+			    lastTcategoryEvent();
 			}
 			else {
 			    input.focus();
@@ -165,6 +146,32 @@ $(function() {
 			$inputs.remove();
 		    }
 		}
+	    };
+	    input.blur(function() {
+		var t = this;
+		setTimeout(function() {
+		    input_validate.call(t);
+		}, 100);
+	    });
+	    input.autocomplete({
+		source: function( request, response ) {
+		    var term = request.term;
+		    if ( term in cache ) {
+			response( cache[ term ] );
+			return;
+		    }
+
+		    lastXhr = $.getJSON(cake + "tcategories/search/", request, function( data, status, xhr ) {
+			data = $.map(data, function(item) {
+			    return item.Tcategory.name;
+			});
+
+			cache[ term ] = data;
+			if ( xhr === lastXhr ) {
+			    response( data );
+			}
+		    });
+		},
 	    });
 	});
 
@@ -341,6 +348,8 @@ $(function() {
 
     $('#torrent-delete').click(function(e) {
 	e.preventDefault();
-	deleteTorrent(hb.torrent.id);
+	deleteTorrent(hb.torrent.id, function() {
+	    location.href = "//" + hb.constant.url.base + '/torrents.php';
+	});
     });
 });

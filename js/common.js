@@ -15,8 +15,16 @@ function confirm_delete(id, note, addon) {
 
 // smileit.js
 
+$(function() {
+    $('.smileit').click(function(e) {
+	e.preventDefault();
+	var $this = $(this);
+	SmileIT('[em' + $this.attr('smile') + ']', $this.attr('form'));
+    });
+});
+
 function SmileIT(smile,form,text){
-    doInsert(smile, '', false, document.forms[form].elements[text]);
+    doInsert(smile, '', false, $(document.forms[form]).find('textarea')[0]);
 }
 
 var is_ie = $.browser.msie;
@@ -315,7 +323,7 @@ var argsFromUri = function(uri) {
 
 // Used in index.php & fun.php
 $(function() {
-    $('#funcomment').find('.username').each(function() {
+    $('#funcomment dt .username').each(function() {
 	var user = $(this);
 	user.after($('<a />', {
 	    href : '#',
@@ -432,7 +440,7 @@ var createOptions = function(options, defaultOpt) {
     }).join('');
 };
 
-var jqui_dialog = function(title, html, timeout) {
+var jqui_dialog = function(title, html, timeout, callback) {
     var dialog = $('<div />', {
 	title : title,
 	html : html
@@ -448,6 +456,9 @@ var jqui_dialog = function(title, html, timeout) {
 	},
 	'close' : function() {
 	    dialog.remove();
+	    if (callback) {
+		callback();
+	    }
 	}
     });
     if (timeout) {
@@ -491,7 +502,7 @@ var jqui_form = function(form, title, callback, buttons) {
 
     var onOK = function() {
 	var valid = true;
-	form.find('.required').each(function() {
+	form.find('.required, input[required]').each(function() {
 	    var $this = $(this);
 	    if ($this.val().trim().length === 0) {
 		$this.addClass('invalid');
@@ -600,7 +611,7 @@ var editTorrent = (function() {
 })();
 
 var deleteTorrent = (function() {
-    return (function(id) {
+    return (function(id, callback) {
 	var cake = hb.constant.url.cake;
 	var deleteTarget = '//' + cake + '/torrents/delete/' + id + '.json';
 	var reasons = ['断种', '重复', '劣质', '违规', '其它'];
@@ -627,6 +638,24 @@ var deleteTorrent = (function() {
 	    }
 	});
 	jqui_form(form, '删除种子', function(result) {
+	    if (result.success) {
+		jqui_dialog('成功', result.message, 3000, callback);
+		return true;
+	    }
+	    else {
+		$('#dialog-hint').text(result.message);
+		return false;
+	    }	    
 	});
     });
 })();
+
+$('form').submit(function() {
+    $(this).find(':submit').attr('disabled', 'disabled');
+});
+
+$.getCSS = function(a) {
+    var link = $('<link rel="stylesheet" type="text/css" />').attr('href', a);
+    $("head").append(link);
+    return link;
+};

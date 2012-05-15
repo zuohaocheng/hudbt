@@ -28,7 +28,7 @@ if ($action == 'comment') {
   $funid = 0 + $_REQUEST["funid"];
   $funcomment = $_REQUEST["fun_text"];
   if (strlen(trim($funcomment)) != 0) {
-    sql_query("INSERT INTO funcomment (funid, userid, text, added) VALUES(".sqlesc($funid).", ".$CURUSER['id'].", " . sqlesc($funcomment) . ', ' . sqlesc(date("Y-m-d H:i:s")) . ")") ;	
+    sql_query("INSERT INTO funcomment (funid, userid, text, added) VALUES(".sqlesc($funid).", ".$CURUSER['id'].", " . sqlesc($funcomment) . ', ' . sqlesc(date("Y-m-d H:i:s")) . ")") or sqlerr(__FILE__,__LINE__);
 
     $Cache->delete_value('current_fun_content_comment');
     $Cache->delete_value('current_fun_content_comment_delete');
@@ -104,6 +104,9 @@ else if ($action == 'add') {
     $sql = "INSERT INTO fun (userid, added, body, title, status) VALUES (".sqlesc($CURUSER['id']).",".sqlesc(date("Y-m-d H:i:s")).",".sqlesc($body).",".sqlesc($title).", 'normal')";
     sql_query($sql) or sqlerr(__FILE__, __LINE__);
     $Cache->delete_value('current_fun_content');
+    $Cache->delete_value('current_fun_content_id');
+    $Cache->delete_value('current_fun_content_neednew');
+    $Cache->delete_value('current_fun_content_owner');
     $Cache->delete_value('current_fun', true);
     $Cache->delete_value('current_fun_vote_count');
     $Cache->delete_value('current_fun_vote_funny_count');

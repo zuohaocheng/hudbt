@@ -8,6 +8,24 @@ loggedinorreturn();
 define('PM_DELETED',0); // Message was deleted
 define('PM_INBOX',1); // Message located in Inbox for reciever
 define('PM_SENTBOX',-1); // GET value for sent box
+
+function get_user_prop_msg($id) {
+  if ($id == 0) {
+    global $lang_messages;
+    return array('id' => 0, 'username' => $lang_messages['text_system']);
+  }
+  else {
+    return get_user_prop($id);
+  }
+}
+  
+function msg_json_pre($message) {
+  $message['receiver'] = get_user_prop_msg($message['receiver']);
+  $message['sender'] = get_user_prop_msg($message['sender']);
+  $message['msg'] = format_comment($message['msg']);
+  return $message;
+}
+
 // Determine action
 $action = strtolower($_REQUEST['action']);
 if (!$action) {
@@ -15,7 +33,10 @@ if (!$action) {
 }
 
 $format = strtolower($_REQUEST['format']);
-if ($format != 'json') {
+if ($format == 'json') {
+  header('Content-type: application/json; charset=utf-8');
+}
+else {
   $format = 'html';
 }
 
@@ -192,24 +213,6 @@ else {
   stdfoot();
 }
 elseif ($format == 'json') {
-  header('Content-type: application/json; charset=utf-8');
-  header('');
-  function get_user_prop_msg($id) {
-    if ($id == 0) {
-      global $lang_messages;
-      return array('id' => 0, 'username' => $lang_messages['text_system']);
-    }
-    else {
-      return get_user_prop($id);
-    }
-  }
-  
-  function msg_json_pre($message) {
-    $message['receiver'] = get_user_prop_msg($message['receiver']);
-    $message['sender'] = get_user_prop_msg($message['sender']);
-    $message['msg'] = format_comment($message['msg']);
-    return $message;
-  }
   echo php_json_encode(array_map('msg_json_pre',$messages));
 }
 
@@ -277,6 +280,10 @@ $subject = $lang_messages['text_no_subject'];
 sql_query("UPDATE messages SET unread='no' WHERE id=" . sqlesc($pm_id) . " AND receiver=" . sqlesc($CURUSER['id']) . " LIMIT 1");
 $Cache->delete_value('user_'.$CURUSER['id'].'_unread_message_count');
 // Display message
+if ($format == 'json') {
+  echo json_encode(msg_json_pre($message));
+}
+else {
 stdhead("PM ($subject)"); ?>
 <h1><?php echo $subject?></h1>
 <?php
@@ -296,7 +303,7 @@ messagemenu($mailbox);
 <td colspan="2" align="left"><?php echo $body?></td>
 </tr>
 <tr>
-<td align=left>
+<td align="left">
 <?php if($message['sender'] != $CURUSER['id']){
 print("<form action=\"messages.php\" method=\"post\"><input type=\"hidden\" name=\"action\" value=\"moveordel\"><input type=\"hidden\" name=\"id\" value=".$pm_id.">
 <input type=\"submit\" name=\"move\" value=".$lang_messages['submit_move_to']."><select name=\"box\"><option value=\"1\">".$lang_messages['text_inbox']."</option>");
@@ -308,69 +315,63 @@ echo("<option value=\"" . $row['boxnumber'] . "\">" . htmlspecialchars($row['nam
 print("</select></form>");
 }
 ?>
-</td><td align="right" ><font color=white>[ <a href="messages.php?action=deletemessage&id=<?php echo $pm_id?>"><?php echo $lang_messages['text_delete'] ?></a> ]<?php echo $reply?> [ <a
-
-href="messages.php?action=forward&id=<?php echo $pm_id?>"><?php echo $lang_messages['text_forward_pm'] ?></a> ]</font></td>
+</td><td align="right" ><span style="color: white">[ <a href="messages.php?action=deletemessage&id=<?php echo $pm_id?>"><?php echo $lang_messages['text_delete'] ?></a> ]<?php echo $reply?> [ <a href="messages.php?action=forward&id=<?php echo $pm_id?>"><?php echo $lang_messages['text_forward_pm'] ?></a> ]</font></td>
 </tr>
 </table>
 <?php
 stdfoot();
 }
-if ($action == "moveordel")
-{
+}
+if ($action == "moveordel") {
 $pm_id = (int) $_POST['id'];
 $pm_box = (int) $_POST['box'];
 $pm_messages = $_POST['messages'];
-if ($_POST['markread'])
-{
-	if ($pm_id)
-	{
+if ($_POST['markread']) {
+	if ($pm_id) {
 //Mark a single message as read
 	@sql_query("UPDATE messages SET unread='no' WHERE id=" . sqlesc($pm_id) . " AND receiver=" . $CURUSER['id'] . " LIMIT 1");
 	}
-	else
-	{
+	else {
 // Mark multiple messages as read
 	@sql_query("UPDATE messages SET unread='no' WHERE id IN (" . implode(", ", array_map("sqlesc",$pm_messages)) . ") AND receiver=" .$CURUSER['id']);
 	}
 	$Cache->delete_value('user_'.$CURUSER['id'].'_unread_message_count');
 // Check if messages were moved
-	if (@mysql_affected_rows() == 0)
-	{
-	stderr($lang_messages['std_error'],$lang_messages['std_cannot_mark_messages']);
+	if (@mysql_affected_rows() == 0) {
+	  stderr($lang_messages['std_error'],$lang_messages['std_cannot_mark_messages']);
 	}
-
-	header("Location: messages.php?action=viewmailbox&box=" . $pm_box);
+	else {
+	  if ($format == 'json') {
+	    echo json_encode(['success' => true]);
+	  }
+	  else {
+	    header("Location: messages.php?action=viewmailbox&box=" . $pm_box);
+	  }
+	}
 	exit();
 }
-elseif ($_POST['move'])
-{
-if ($pm_id)
-{
-// Move a single message
-@sql_query("UPDATE messages SET location=" . sqlesc($pm_box) . " WHERE id=" . sqlesc($pm_id) . " AND receiver=" . $CURUSER['id'] . " LIMIT 1");
+elseif ($_POST['move']) {
+  if ($pm_id) {
+    // Move a single message
+    @sql_query("UPDATE messages SET location=" . sqlesc($pm_box) . " WHERE id=" . sqlesc($pm_id) . " AND receiver=" . $CURUSER['id'] . " LIMIT 1");
 
+  }
+  else {
+    // Move multiple messages
+    @sql_query("UPDATE messages SET location=" . sqlesc($pm_box) . " WHERE id IN (" . implode(", ", array_map("sqlesc",$pm_messages)) . ') AND receiver=' .$CURUSER['id']);
+  }
+  // Check if messages were moved
+  if (@mysql_affected_rows() == 0) {
+    stderr($lang_messages['std_error'],$lang_messages['std_cannot_move_messages']);
+  }
+  $Cache->delete_value('user_'.$CURUSER['id'].'_unread_message_count');
+  $Cache->delete_value('user_'.$CURUSER['id'].'_inbox_count');
+  $Cache->delete_value('user_'.$CURUSER["id"].'_outbox_count');
+  header("Location: messages.php?action=viewmailbox&box=" . $pm_box);
+  exit();
 }
-else
-{
-// Move multiple messages
-@sql_query("UPDATE messages SET location=" . sqlesc($pm_box) . " WHERE id IN (" . implode(", ", array_map("sqlesc",$pm_messages)) . ') AND receiver=' .$CURUSER['id']);
-}
-// Check if messages were moved
-if (@mysql_affected_rows() == 0)
-{
-stderr($lang_messages['std_error'],$lang_messages['std_cannot_move_messages']);
-}
-	$Cache->delete_value('user_'.$CURUSER['id'].'_unread_message_count');
-	$Cache->delete_value('user_'.$CURUSER['id'].'_inbox_count');
-	$Cache->delete_value('user_'.$CURUSER["id"].'_outbox_count');
-header("Location: messages.php?action=viewmailbox&box=" . $pm_box);
-exit();
-}
-elseif ($_POST['delete'])
-{
-if ($pm_id)
-{
+elseif ($_POST['delete']) {
+  if ($pm_id) {
 // Delete a single message
 $res = sql_query("SELECT * FROM messages WHERE id=" . sqlesc($pm_id)) or sqlerr(__FILE__,__LINE__);
 $message = mysql_fetch_assoc($res);
@@ -728,7 +729,7 @@ echo("<option value=\"" . $row['boxnumber'] . "\">" . $row['name'] . "</option>\
 }
 }
 ?>
-</select> <input class=btn type="submit" value=<?php echo $lang_messages['submit_go'] ?>></form>
+</select> <input class="btn" type="submit" value=<?php echo $lang_messages['submit_go'] ?>></form>
 <?php
 }
 function messagemenu ($selected = 1) {
@@ -748,4 +749,4 @@ function messagemenu ($selected = 1) {
 	print ("</ul></div>");
 	end_main_frame();
 }
-?>
+

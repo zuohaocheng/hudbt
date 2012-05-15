@@ -9,7 +9,7 @@ if (!$enable_memcached) {
 }
 require_once($rootpath . 'classes/class_cache.php'); //Require the caching class
 
-$Cache = NEW NPCache(); //Load the caching class
+$Cache = NEW NPCache(/* 'unix:/tmp/memcached.sock', 0 */); //Load the caching class
 $Cache->setLanguageFolderArray(get_langfolder_list());
 define('TIMENOW', time());
 $USERUPDATESET = array();

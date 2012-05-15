@@ -132,7 +132,7 @@ else {
     if (checkPrivilege(['Torrent', 'edit']) || $CURUSER["id"] == $row["owner"]) {
       $actions .= "<li><$editlink><img class=\"dt_edit\" src=\"pic/trans.gif\" alt=\"edit\" />&nbsp;<span class=\"small\">".$lang_details['text_edit_torrent'] . "</span></a></li>";
     }
-    if (checkPrivilege(['Torrent', 'delete']) || $CURUSER["id"] == $row["owner"]) {
+    if (checkPrivilege(['Torrent', 'delete'], $id)) {
       $actions .= '<li><' . $deletelink . '>' . $lang_details['text_delete_torrent'] . '</a></li>';
     }
 
@@ -190,7 +190,7 @@ else {
 	  }
 	}
       }
-    print("<td class=\"embedded\"><form method=\"get\" action=\"http://shooter.cn/sub/\" target=\"_blank\"><input type=\"search\" name=\"searchword\" id=\"keyword\" style=\"width: 250px\" value=\"".$moviename."\" /><input type=\"submit\" value=\"".$lang_details['submit_search_at_shooter']."\" /></form></td><td class=\"embedded\"><form method=\"get\" action=\"http://www.opensubtitles.org/en/search2/\" target=\"_blank\"><input type=\"hidden\" id=\"moviename\" name=\"MovieName\" /><input type=\"hidden\" name=\"action\" value=\"search\" /><input type=\"hidden\" name=\"SubLanguageID\" value=\"all\" /><input onclick=\"document.getElementById('moviename').value=document.getElementById('keyword').value;\" type=\"submit\" value=\"".$lang_details['submit_search_at_opensubtitles']."\" /></form></td>\n");
+    print("<td class=\"embedded\"><form method=\"get\" action=\"http://shooter.cn/sub/\" target=\"_blank\"><input type=\"search\" name=\"searchword\" id=\"keyword\" style=\"width: 250px\" value=\"".$moviename."\" /><input type=\"submit\" value=\"".$lang_details['submit_search_at_shooter']."\" /><input type=\"submit\" formaction=\"http://www.opensubtitles.org/en/search2/\" value=\"" . $lang_details['submit_search_at_opensubtitles'] . "\" /></form></td>\n");
     print("</tr></table>");
     echo '</dd>';
 
@@ -548,7 +548,6 @@ else {
 
     echo '<dt id="tcategories-title"><a href="//' . $CAKEURL . '/tcategories/">分类</a></dt>';
     echo '<dd>';
-    include('./cake/app/webroot/index.php');
     App::uses('Torrent', 'Model');
     App::uses('Tcategory', 'Model');
     $Torrent = new Torrent;
@@ -591,7 +590,7 @@ else {
     $thanksby = "";
     $nothanks = "";
     $thanks_said = 0;
-    $thanks_sql = sql_query("SELECT userid FROM thanks WHERE torrentid=".sqlesc($torrentid)." ORDER BY id DESC LIMIT 400");
+    $thanks_sql = sql_query("SELECT userid FROM thanks WHERE torrentid=".sqlesc($torrentid)." ORDER BY id DESC LIMIT 20") or sqlerr(__FILE__, __LINE__);
     $thanksCount = get_row_count("thanks", "WHERE torrentid=".sqlesc($torrentid));
     $thanks_all = mysql_num_rows($thanks_sql);
     if ($thanks_all) {
@@ -604,7 +603,9 @@ else {
 	}
       }
     }
-    else $nothanks = $lang_details['text_no_thanks_added'];
+    else {
+      $nothanks = $lang_details['text_no_thanks_added'];
+    }
 
     if (!$thanks_said) {
       $thanks_said = get_row_count("thanks", "WHERE torrentid=$torrentid AND userid=".sqlesc($CURUSER['id']));

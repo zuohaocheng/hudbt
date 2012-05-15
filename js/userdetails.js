@@ -25,7 +25,7 @@ $(function() {
     $('#send-bonus').click(function(e) {
 	e.preventDefault();
 	var form = $('<form></form>', {
-	    html : '<input type="hidden" name="option" value="7"><input type="hidden" name="userid" value="'+ hb.user.id +'" /><ul><li><label>赠送魔力值数量: <input type="number" name="bonusgift" value="1000" class="required" /></label></li><li><label>留言: <input type="text" name="message" maxlength="100" /></label></li></ul>',
+	    html : '<input type="hidden" name="option" value="7"><input type="hidden" name="userid" value="'+ hb.user.id +'" /><ul><li><label>赠送魔力值数量: <input type="number" name="bonusgift" min="25" max="10000" value="1000" required /></label></li><li><label>留言: <input type="text" name="message" maxlength="100" /></label></li></ul>',
 	    'class' : 'minor-list',
 	    action : '//' + hb.constant.url.base + '/takebonusexchange.php?format=json',
 	    method : 'post'

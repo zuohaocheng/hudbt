@@ -1,7 +1,10 @@
 <?php
 global $NEXUSPHP;
+if (!defined('HB_CAKE')) {
+  define('HB_CAKE', true);
+}
 if (!isset($NEXUSPHP)) {
-  require('../../../include/bittorrent.php');
+  require_once('../../../include/bittorrent.php');
   $dispatch = true;
 
   $s = smarty();
