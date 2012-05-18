@@ -22,7 +22,12 @@ function torrentInfoForRow($row) {
   $info['desc'] = $dissmall_descr;
 
   if ($row['pos_state'] == 'sticky') {
-    $info['sticky'] = true;
+  	if ($row["pos_state_until"]!=NULL) {
+			$pos = array('sticky' => true);
+    	$expire = $row["pos_state_until"];
+    	$pos['expire'] = $expire;
+    	$info['position'] = $pos;
+  	}
   }
 
   if ($row['picktype'] != 'normal'){

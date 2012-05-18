@@ -291,7 +291,7 @@ $lang_functions = array
 	'text_please_download_something_within' => "請在",
 	'text_inactive_account_be_deleted' => "內做些下載。沒有流量的用戶會被移除賬號。",
 	'text_no_startseed' => '你發佈的%d個種子尚未開始做種，不要忘記了~',
-	'text_until' => "直到",
+	'text_until' => "至",
 );
 
 ?>

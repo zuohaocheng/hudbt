@@ -90,7 +90,7 @@ class TorrentsController extends AppController {
 		  }
 
 		  if (checkPrivilege(['Torrent', 'sticky'])) {
-		    $keys[] = 'pos_state';
+		    array_push($keys, 'pos_state', 'pos_state_until');
 		  }
 
 		  foreach ($keys as $key) {

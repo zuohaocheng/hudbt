@@ -349,8 +349,10 @@ $(function() {
 
 	    href = 'details.php?id=' + id + '&hit=1';
 	    var mainTitle = '';
-	    if (torrent.sticky) {
-		mainTitle += '<img class="sticky" src="pic/trans.gif" alt="Sticky" title="' + lang.text_sticky + '">';
+	    var position = torrent.position;
+	    if (position) {
+	    	var posexpire = position.expire;
+		mainTitle += '<img class="sticky" src="pic/trans.gif" alt="Sticky" title="' + lang.text_sticky + lang.text_until+posexpire+'">';
 	    }
 	    mainTitle += '<h2 class="transparentbg"><a href="' + href + '" title="' + textMainTitle + '">' + textMainTitle + '</a></h2>';
 	    var desc;

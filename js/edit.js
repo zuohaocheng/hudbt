@@ -11,6 +11,7 @@ $(function() {
     });
 
     editPr();
+    editPos();
 
     $('#reason-type').change(function() {
 	var reasonDetail=$('#reason-detail');

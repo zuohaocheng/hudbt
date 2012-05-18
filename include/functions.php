@@ -3122,8 +3122,8 @@ foreach($rows as $row)
     if($count_dispname > $max_length_of_torrent_name)
       $dispname=mb_substr($dispname, 0, $max_length_of_torrent_name-2,"UTF-8") . "..";
 
-    if ($row['pos_state'] == 'sticky')
-      $stickyicon = "<img class=\"sticky\" src=\"//$BASEURL/pic/trans.gif\" alt=\"Sticky\" title=\"".$lang_functions['title_sticky']."\" />";
+    if ($row['pos_state'] == 'sticky'&&($row['pos_state_until']!="0000-00-00 00:00:00"))
+      $stickyicon = "<img class=\"sticky\" src=\"//$BASEURL/pic/trans.gif\" alt=\"Sticky\" title=\"".$lang_functions['title_sticky'].$lang_functions['text_until'].$row['pos_state_until']."\" />";
     else $stickyicon = "";
     
     if ($displaysmalldescr) {

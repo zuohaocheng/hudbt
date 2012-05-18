@@ -303,7 +303,7 @@ $lang_functions = array
 	'text_view_all_posts' => "显示全部帖子",
 	'text_posts' => "帖子：",
 	'text_poll_votes' => "投票数：",
-	'text_until' => "直到",
+	'text_until' => "至",
 );
 
 ?>
