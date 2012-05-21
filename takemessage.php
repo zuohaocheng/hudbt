@@ -36,9 +36,9 @@ if ($_SERVER["REQUEST_METHOD"] != "POST")
 		else
 		{
 			$origmsgsendername = get_plain_username($origmsgrow['sender']);
-			$origfrom = "[url=userdetails.php?id=".$origmsgrow['sender']."]".$origmsgsendername."[/url]";
+			$origfrom = "[user=".$origmsgrow['sender']."]"."[/url]";
 		}
-		$msg = "-------- ".$lang_takemessage_target[get_user_lang($receiver)]['msg_original_message_from'] . $origfrom . " --------\n" . $origmsgrow['msg']."\n\n".($msg ? "-------- [url=userdetails.php?id=".$CURUSER["id"]."]".$CURUSER["username"]."[/url][i] Wrote at ".date("Y-m-d H:i:s").":[/i] --------\n".$msg : "");
+		$msg = "-------- ".$lang_takemessage_target[get_user_lang($receiver)]['msg_original_message_from'] . $origfrom . " --------\n" . $origmsgrow['msg']."\n\n".($msg ? "-------- [user=".$CURUSER["id"]."]"."[/url][i] Wrote at ".date("Y-m-d H:i:s").":[/i] --------\n".$msg : "");
 		
 	}
 	else
