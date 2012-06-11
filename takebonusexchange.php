@@ -34,7 +34,7 @@ function success($action) {
      header("Location: mybonus.php?do=$action");
   }
   else {
-    $row = mysql_fetch_array(sql_query("SELECT seedbonus, title, uploaded, invites FROM users WHERE id=".sqlesc($CURUSER['id']))) or sqlerr(__FILE__, __LINE__);
+    $row = mysql_fetch_array(sql_query("SELECT seedbonus, title, uploaded, invites,color FROM users WHERE id=".sqlesc($CURUSER['id']))) or sqlerr(__FILE__, __LINE__);
     echo php_json_encode(array('success' => true, 'title' => '成功', 'text' => bonusTextFromAction($action, $row['title']), 'bonus' => number_format($row['seedbonus'], 1), 'uploaded' => mksize($row['uploaded']), 'invites' => $row['invites']));
   }
 
@@ -107,6 +107,14 @@ if($CURUSER['seedbonus'] >= $points) {
     $bonuscomment = date("Y-m-d") . " - " .$points. " Points for custom title. Old title is ".htmlspecialchars(trim($CURUSER["title"]))." and new title is $title\n " .htmlspecialchars($bonuscomment);
     sql_query("UPDATE LOW_PRIORITY users SET title = $title, seedbonus = seedbonus - $points, bonuscomment = ".sqlesc($bonuscomment)." WHERE id = ".sqlesc($userid)) or sqlerr(__FILE__, __LINE__);
     success('title');
+  }
+   elseif($art == "color") {
+    //===custom title
+    $color = $_POST["color"];
+    $color = sqlesc($color);
+    $bonuscomment = date("Y-m-d") . " - " .$points. " Points for custom color. New color is $color\n " .htmlspecialchars($bonuscomment);
+    sql_query("UPDATE LOW_PRIORITY users SET color = $color, seedbonus = seedbonus - $points, bonuscomment = ".sqlesc($bonuscomment)." WHERE id = ".sqlesc($userid)) or sqlerr(__FILE__, __LINE__);
+    success('color');
   }
   elseif($art == "noad" && $enablead_advertisement == 'yes' && $enablebonusnoad_advertisement == 'yes') {
     if (($enablenoad_advertisement == 'yes' && get_user_class() >= $noad_advertisement) || strtotime($CURUSER['noaduntil']) >= TIMENOW || get_user_class() < $bonusnoad_advertisement)

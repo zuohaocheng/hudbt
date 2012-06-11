@@ -52,7 +52,6 @@
 	<li><a href="//{$BASEURL}/reports.php" title="{$lang['title_reportbox']}"><img class="reportbox" alt="reportbox"src="//{$BASEURL}/pic/trans.gif" /> {$totalreports}</a></li>
 	<li><a href="//{$BASEURL}/staffbox.php" title="{$lang['title_staffbox']}"><img class="staffbox" alt="staffbox"src="//{$BASEURL}/pic/trans.gif" /> {$totalsm}</a></li>
 	{/if}
-
 	<li><a href="//{$BASEURL}/messages.php" title="{if $unread}{$lang['title_inbox_new_messages']}{else}{$lang['title_inbox_no_new_messages']}{/if}"><img class="{if $unread}inboxnew{else}inbox{/if}" src="//{$BASEURL}/pic/trans.gif" alt="inbox" />
 	{if $messages}{$messages}({$unread}{$lang['text_message_new']})
 	{else}
@@ -80,6 +79,8 @@
 	      <li><a href="//{$BASEURL}/torrents.php?inclbookmarked=1&amp;allsec=1&amp;incldead=0">{$lang['text_bookmarks']}</a></li>
 	      <li><a href="//{$BASEURL}/mybonus.php" title="{$lang['text_use']}"><span class = 'color_bonus'>{$lang['text_bonus']}</span>: <span id="bonus">{number_format($CURUSER['seedbonus'], 1)}</span></a></li>
 	      <li><a href="//{$BASEURL}/invite.php?id={$id}" title="{$lang['text_send']}"><span class = "color_invite">{$lang['text_invite']}</span>: <span id="invites">{$CURUSER['invites']}</span></a></li>
+	      <li><a href="//{$BASEURL}/usercp.php?id={$id}" title="{$lang['text_user_cp']}">{$lang['text_user_cp']}</a></li>	   
+	      <li><a href="//{$BASEURL}/users.php" title="{$lang['text_users']}">{$lang['text_users']}</a></li>	    	       
 	    </ul>
 	  </div>
 

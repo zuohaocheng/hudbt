@@ -278,8 +278,13 @@ function torrent_promotion_expire($days, $type = 2, $targettype = 1){
 	sql_query("UPDATE torrents SET sp_state = 1, promotion_time_type=0, promotion_until='0000-00-00 00:00:00' WHERE promotion_time_type=2 AND promotion_until < ".sqlesc(date("Y-m-d H:i:s",TIMENOW))) or sqlerr(__FILE__, __LINE__);
 
 	//End: expire torrent promotion
+	
+	//Start:expire sticky torrents
+		sql_query("UPDATE torrents SET pos_state = 'normal', pos_state_until='0000-00-00 00:00:00' WHERE pos_state = 'sticky' AND pos_state_until < ".sqlesc(date("Y-m-d H:i:s",TIMENOW))) or sqlerr(__FILE__, __LINE__);
+	//End: expire sticky torrents
+	
 	if ($printProgress) {
-		printProgress("expire torrent promotion");
+		printProgress("expire torrent promotion and position state");
 	}
 	//automatically pick hot
 	if ($hotdays_torrent)

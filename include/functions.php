@@ -1396,7 +1396,7 @@ function dbconn($autoclean = false, $test = false) {
 function get_user_row($id) {
   global $Cache, $CURUSER;
   static $curuserRowUpdated = false;
-  static $neededColumns = array('id', 'noad', 'class', 'enabled', 'privacy', 'avatar', 'signature', 'uploaded', 'downloaded', 'last_access', 'username', 'donor', 'leechwarn', 'warned', 'title');
+  static $neededColumns = array('id', 'noad', 'class', 'enabled', 'privacy', 'avatar', 'signature', 'uploaded', 'downloaded', 'last_access', 'username', 'donor', 'leechwarn', 'warned', 'title','color');
   if ($id == $CURUSER['id']) {
     $row = array();
     foreach($neededColumns as $column) {
@@ -1788,7 +1788,7 @@ function menu ($selected = "home") {
 
   echo navbar_item('upload.php', $lang_functions['text_upload'], $selected == "upload");
   echo navbar_item('subtitles.php', $lang_functions['text_subtitles'], $selected == "subtitles");
-  echo navbar_item('usercp.php', $lang_functions['text_user_cp'], $selected == "usercp");
+ // echo navbar_item('usercp.php', $lang_functions['text_user_cp'], $selected == "usercp");
   echo navbar_item('topten.php', $lang_functions['text_top_ten'], $selected == "topten");
   global $log_class;
   if (get_user_class() >= $log_class) {
@@ -2622,7 +2622,7 @@ function post_format_author_info($id, $stat = false) {
   
   $arr2 = get_user_row($id);
 
-  $avatar = ($CURUSER["avatars"] == "yes" ? htmlspecialchars($arr2["avatar"]) : "");
+  $avatar = htmlspecialchars($arr2["avatar"]);
 
   if (!$avatar) {
     $avatar = "pic/default_avatar.png";
@@ -2793,7 +2793,7 @@ function post_body_container($postid, $body, $highlight, $edit, $signature, $pri
   if ($edit) {
     $container .= post_body_edited($edit);
   }
-  if ($CURUSER["signatures"] == "yes" && $signature && $type == 'post') {
+  if ($signature && $type == 'post') {
     $container .= '<div class="signature">' . format_comment($signature,false,false,false,true,550,true,false, 1,150) . '</div>';
   }
   $container .= '</div>';
@@ -3207,8 +3207,8 @@ foreach($rows as $row)
     if($count_dispname > $max_length_of_torrent_name)
       $dispname=mb_substr($dispname, 0, $max_length_of_torrent_name-2,"UTF-8") . "..";
 
-    if ($row['pos_state'] == 'sticky')
-      $stickyicon = "<img class=\"sticky\" src=\"//$BASEURL/pic/trans.gif\" alt=\"Sticky\" title=\"".$lang_functions['title_sticky']."\" />";
+    if ($row['pos_state'] == 'sticky'&&($row['pos_state_until']!="0000-00-00 00:00:00"))
+      $stickyicon = "<img class=\"sticky\" src=\"//$BASEURL/pic/trans.gif\" alt=\"Sticky\" title=\"".$lang_functions['title_sticky'].$lang_functions['text_until'].$row['pos_state_until']."\" />";
     else $stickyicon = "";
     
     if ($displaysmalldescr) {
@@ -3418,6 +3418,14 @@ function get_username($id, $big = false, $link = true, $bold = true, $target = f
     return $usernameArray[$id];
   }
   $arr = get_user_row($id);
+  	?>
+	
+<style type="text/css">
+.Custom_Color_<?php print($id."{color:#".$arr["color"]); ?>}
+A.Custom_Color_<?php print($id.":link{color:#".$arr["color"]); ?>}
+A.Custom_Color_<?php print($id.":visited{color:#".$arr["color"]); ?>}
+</style>
+<?php
   if ($arr){
     if ($big) {
       $donorpic = "starbig";
@@ -3453,8 +3461,14 @@ function get_username($id, $big = false, $link = true, $bold = true, $target = f
     }
 
     if ($link) {
-      $link_ext .= ' class="'. get_user_class_name($arr['class'],true) . '_Name"';
+    	if($arr["color"]!="FFFFFF"){
+    		$link_ext .= ' class="Custom_Color_'.$id.'"';
+      	$username = '<a ' . $link_ext . ' href="//' . $BASEURL . '/userdetails.php?id=' . $id . '">' . $username . '</a>';
+			}
+    elseif($arr["color"]=="FFFFFF"){
+     	$link_ext .= ' class="'. get_user_class_name($arr['class'],true) . '_Name"';
       $username = '<a ' . $link_ext . ' href="//' . $BASEURL . '/userdetails.php?id=' . $id . '">' . $username . '</a>';
+    	}
     }
     $username .= $pics;
 
@@ -3976,12 +3990,15 @@ if ($mode == 'icon') {
   return $ret;
 }
 
-function get_user_id_from_name($username){
+function get_user_id_from_name($username,$sqlerrorreturn=1){
   global $lang_functions;
   $res = sql_query("SELECT id FROM users WHERE LOWER(username)=LOWER(" . sqlesc($username).")");
   $arr = mysql_fetch_array($res);
   if (!$arr){
-    stderr($lang_functions['std_error'],$lang_functions['std_no_user_named']."'".$username."'");
+  	if($sqlerrorreturn)
+    	stderr($lang_functions['std_error'],$lang_functions['std_no_user_named']."'".$username."'");
+    else
+    	return "NULL";
   }
   else return $arr['id'];
 }

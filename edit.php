@@ -149,10 +149,12 @@ else {
 		}
 		
 		if (checkPrivilege(['Torrent', 'sticky'])) {
-			$pickcontent .= "<b>".$lang_edit['row_torrent_position'].":&nbsp;</b>"."<select name=\"sel_posstate\" style=\"width: 100px;\">" .
+			$pickcontent .= "<b>".$lang_edit['row_torrent_position'].":&nbsp;</b>"."<select id=\"sel_posstate\" name=\"sel_posstate\" style=\"width: 100px;\">" .
 			"<option" . (($row["pos_state"] == "normal") ? " selected=\"selected\"" : "" ) . " value=\"0\">".$lang_edit['select_normal']."</option>" .
 			"<option" . (($row["pos_state"] == "sticky") ? " selected=\"selected\"" : "" ) . " value=\"1\">".$lang_edit['select_sticky']."</option>" .
 			"</select>&nbsp;&nbsp;&nbsp;";
+				$pickcontent .= "<label id='pos-expire'><b>截止日期:&nbsp;</b><input type=\"text\" name=\"posstateuntil\" id=\"posstateuntil\" style=\"width: 120px;\" value=\"". (($row["pos_state"]!="sticky")? date("Y-m-d H:i:s") :$row["pos_state_until"]) . "\" />". "</label><br />";
+				$pickcontent .='<div id="expand-pos"></div>';
 		}
 		
 		//Added by bluemonster 20111025

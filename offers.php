@@ -171,9 +171,8 @@ if ($_GET["off_details"]){
 
 	//if pending
 	if ($num["allowed"] == "pending"){
-		tr($lang_offers['row_vote'], "<b>".
-		"<a href=\"?id=".$id."&amp;vote=yeah\"><font color=\"green\">".$lang_offers['text_for']."</font></a></b>".(get_user_class() >= $againstoffer_class ? " - <b><a href=\"?id=".$id."&amp;vote=against\">".
-		"<font color=\"red\">".$lang_offers['text_against']."</font></a></b>" : ""), 1);
+		tr($lang_offers['row_vote'],'<form class="a" action="offers.php" method="post"><input type="submit" name="votebutton "value="'.$lang_offers['text_for'].'"/><input type="hidden" name="vote" value="yeah"/><input type="hidden" name="id" value="'.$id.'"/></form>'.
+		(get_user_class() >= $againstoffer_class ?'<form class="a" action="offers.php" method="post"><input type="submit" name="votebutton "value="'.$lang_offers['text_against'].'"/><input type="hidden" name="vote" value="against"/><input type="hidden" name="id" value="'.$id.'"/>':'').'</form>',1);
 		tr($lang_offers['row_vote_results'], 
 	"<b>".$lang_offers['text_for'].":</b> $za  <b>".$lang_offers['text_against']."</b> $protiv &nbsp; &nbsp; <a href=\"?id=".$id."&amp;offer_vote=1\"><i>".$lang_offers['text_see_vote_detail']."</i></a>", 1);
 	}
@@ -456,9 +455,9 @@ if ($_GET["offer_vote"]){
 //=== end offer votes list
 
 //=== offer votes
-if ($_GET["vote"]){
-	$offerid = 0 + htmlspecialchars($_GET["id"]);
-	$vote = htmlspecialchars($_GET["vote"]);
+if ($_POST["vote"]){
+	$offerid = 0 + htmlspecialchars($_POST["id"]);
+	$vote = htmlspecialchars($_POST["vote"]);
 	if ($vote == 'against' && get_user_class() < $againstoffer_class)
 		stderr($lang_offers['std_error'], $lang_offers['std_smell_rat']);
 	if ($vote =='yeah' || $vote =='against')

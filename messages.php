@@ -78,13 +78,19 @@ else {
 //search
 		$keyword = mysql_real_escape_string(trim($_GET["keyword"]));
 		$place = $_GET["place"];
-		if($keyword)
+		if($keyword){
+			$sender_id=get_user_id_from_name($keyword,0);
+			if($keyword==$lang_messages['text_system']){
+				$sender_id=0;
+			}
 			switch ($place){
 				case "body": $wherea=" AND msg LIKE '%$keyword%' "; break;
 				case "title": $wherea=" AND subject LIKE '%$keyword%' "; break;
-				case "both": $wherea=" AND (msg LIKE '%$keyword%' or subject LIKE '%$keyword%') "; break;
-				default: $wherea=" AND (msg LIKE '%$keyword%' or subject LIKE '%$keyword%') "; break;
-				}
+				case "all": $wherea=" AND (msg LIKE '%$keyword%' or subject LIKE '%$keyword%' or sender LIKE '%$sender_id%') "; break;
+				case "sender": $wherea=" AND sender LIKE '%$keyword%'"; break;
+				default: $wherea=" AND (msg LIKE '%$keyword%' or subject LIKE '%$keyword%' or sender LIKE '%sender_id%') "; break;
+			}
+		}
 		else {
 		  $wherea="";
 		}
@@ -709,9 +715,10 @@ $place = $_GET['place'];
 <form action="messages.php" method="get">
 <input type="hidden" name="action" value="viewmailbox"><?php echo $lang_messages['text_search'] ?>&nbsp;&nbsp;<input id="searchinput" name="keyword" type="text" value="<?php echo $_GET['keyword']?>" style="width: 200px"/>
 <?php echo $lang_messages['text_in'] ?>&nbsp;<select name="place">
-<option value="both" <?php echo ($place == 'both' ? " selected" : "")?>><?php echo $lang_messages['select_both'] ?></option>
+<option value="all" <?php echo ($place == 'all' ? " selected" : "")?>><?php echo $lang_messages['select_all'] ?></option>
 <option value="title" <?php echo ($place == 'title' ? " selected" : "")?>><?php echo $lang_messages['select_title'] ?></option>
 <option value="body" <?php echo ($place == 'body' ? " selected" : "")?>><?php echo $lang_messages['select_body'] ?></option>
+<option value="sender" <?php echo ($place == 'sender' ? " selected" : "")?>><?php echo $lang_messages['text_sender'] ?></option>
 </select>
 <?php echo $lang_messages['text_jump_to'] ?><select name="box">
 <option value="1" <?php echo ($selected == PM_INBOX ? " selected" : "")?>><?php echo $lang_messages['select_inbox'] ?></option>

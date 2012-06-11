@@ -292,10 +292,6 @@ dl_item($lang_usercp['row_school'], "<select name=school>$schools</select>", 1);
 
 				$pmnum = ($_POST["pmnum"] < 1 || $_POST["pmnum"] > 100 ? 20 : floor($_POST["pmnum"]));
 				$updateset[] = "pmnum = " . $pmnum;
-				$sbnum = ($_POST["sbnum"] ? max(10, min(500, 0 + $_POST["sbnum"])) : 70);		
-				$updateset[] = "sbnum = " . $sbnum;
-				$sbrefresh = ($_POST["sbrefresh"] ? max(10, min(3600, 0 + $_POST["sbrefresh"])) : 120);
-				$updateset[] = "sbrefresh = " . $sbrefresh;
 
 				if ($_POST["hidehb"] == 'yes')
 					$hidehb = 'yes';
@@ -535,7 +531,6 @@ echo '<dl class="table">';
 
 			dl_item($lang_usercp['row_pm_boxes'], $lang_usercp['text_show']."<input type=text name=pmnum size=5 value=".$CURUSER['pmnum']." >".$lang_usercp['text_pms_per_page'], 1);
 if ($showshoutbox_main == "yes") //system side setting for shoutbox
-			dl_item($lang_usercp['row_shoutbox'], $lang_usercp['text_show_last']."<input type=text name=sbnum size=5 value=".$CURUSER['sbnum']." >".$lang_usercp['text_messages_at_shoutbox']."<br />".$lang_usercp['text_refresh_shoutbox_every']."<input type=text name=sbrefresh size=5 value=".$CURUSER['sbrefresh']." >".$lang_usercp['text_seconds'].($showhelpbox_main == 'yes' ? "<br /><input type=checkbox name=hidehb".($CURUSER["hidehb"] == "yes" ? " checked" : "") ." value=yes>".$lang_usercp['text_hide_helpbox_messages'] : ""), 1);
 			dl_item($lang_usercp['row_torrent_detail'], ($enablenfo_main == 'yes' && get_user_class() >= UC_POWER_USER ? "<input type=checkbox name=shownfo".($CURUSER["shownfo"] == "yes" ? " checked" : "") ." value=yes>".$lang_usercp['text_show_nfo']."<br />" : ""),1);
 			if ($enablead_advertisement == 'yes'){
 				dl_item($lang_usercp['row_show_advertisements'],"<input type=\"checkbox\" name=\"showad\"".($CURUSER["noad"] == "yes" ? "" : " checked=\"checked\"") .($showaddisabled ? " disabled=\"disabled\"" : ""). " value=\"yes\" />".$lang_usercp['text_show_advertisement_note'].($enablenoad_advertisement == 'yes' ? "<br />".get_user_class_name($noad_advertisement,false,true,true).$lang_usercp['text_can_turn_off_advertisement'] : "").($enablebonusnoad_advertisement == 'yes' ? "<br />".get_user_class_name($bonusnoad_advertisement,false,true,true).$lang_usercp['text_buy_no_advertisement']."<a href=\"mybonus.php\"><b>".$lang_usercp['text_bonus_center']."</b></a>" : ""), 1);
@@ -552,18 +547,10 @@ echo '</dl>';
 				$showtooltipsetting = false;
 			if ($type == 'save') {
 				$updateset = array();
-				$avatars = ($_POST["avatars"] != "" ? "yes" : "no");
 				$ttlastpost = ($_POST["ttlastpost"] != "" ? "yes" : "no");
-				$signatures = ($_POST["signatures"] != "" ? "yes" : "no");
 				$signature = trim($_POST["signature"]);
 
-				$updateset[] = "topicsperpage = " . min(100, 0 + $_POST["topicsperpage"]);
-				$updateset[] = "postsperpage = " . min(100, 0 + $_POST["postsperpage"]);
-				$updateset[] = "avatars = " . sqlesc($avatars);
-				$updateset[] = "signatures = " . sqlesc($signatures);
-				$clicktopic = $_POST["clicktopic"];
-				$updateset[] = "clicktopic = ".sqlesc($clicktopic);
-				$updateset[] = "signature = " . sqlesc($signature);
+
 
 				$query = "UPDATE LOW_PRIORITY users SET " . implode(",", $updateset) . " WHERE id =".sqlesc($CURUSER["id"]);
 				$result = sql_query($query);
@@ -585,12 +572,7 @@ echo '</dl>';
 			echo '<dl class="table">';
 			form ("forum");
 
-			dl_item($lang_usercp['row_topics_per_page'], "<input type=text size=10 name=topicsperpage value=$CURUSER[topicsperpage]>".$lang_usercp['text_zero_equals_default'],1);
-			dl_item($lang_usercp['row_posts_per_page'], "<input type=text size=10 name=postsperpage value=$CURUSER[postsperpage]> ".$lang_usercp['text_zero_equals_default'],1);
-			dl_item($lang_usercp['row_view_avatars'], "<input type=checkbox name=avatars" . ($CURUSER["avatars"] == "yes" ? " checked" : "") . ">".$lang_usercp['checkbox_low_bandwidth_note'],1);
-			dl_item($lang_usercp['row_view_signatures'], "<input type=checkbox name=signatures" . ($CURUSER["signatures"] == "yes" ? " checked" : "") . ">".$lang_usercp['checkbox_low_bandwidth_note'],1);
-			dl_item($lang_usercp['row_click_on_topic'], "<input type=radio name=clicktopic" . ($CURUSER["clicktopic"] == "firstpage" ? " checked" : "") . " value=\"firstpage\">".$lang_usercp['text_go_to_first_page']."<input type=radio name=clicktopic" . ($CURUSER["clicktopic"] == "lastpage" ? " checked" : "") . " value=\"lastpage\">".$lang_usercp['text_go_to_last_page'],1);
-			dl_item($lang_usercp['row_forum_signature'], "<textarea name=signature style=\"width:700px\" rows=10>" . $CURUSER['signature'] . "</textarea><br />".$lang_usercp['text_signature_note'],1);
+			dl_item($lang_usercp['row_forum_signature'], "<textarea name=signature style=\"width:700px\" rows=10>" . $CURUSER[signature] . "</textarea><br />".$lang_usercp['text_signature_note'],1);
 			submit();
 			print("</dl>");
 			stdfoot();

@@ -60,7 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $_REQUEST["action"] == "upload") {
     exit;
   }
 
-  $accept_ext = array('sub' => sub, 'srt' => srt, 'zip' => zip, 'rar' => rar, 'ace' => ace, 'txt' => txt, 'SUB' => SUB, 'SRT' => SRT, 'ZIP' => ZIP, 'RAR' => RAR, 'ACE' => ACE, 'TXT' => TXT, 'ssa' => ssa, 'ass' => ass, 'cue' => cue);
+  $accept_ext = array('sub' => "sub", 'srt' => "srt", 'zip' => "zip", 'rar' => "rar", 'ace' => "ace", 'txt' => "txt", 'ssa' => "ssa", 'ass' => "ass", 'cue' => "cue",'7z'  => "7z",'bz2' => "bz2",'gz' => "gz",'tar' => "tar",'tbz' => "tbz",'tgz' => "tgz");
   $ext_l = strrpos($file['name'], ".");
   $ext = strtolower(substr($file['name'], $ext_l+1, strlen($file['name'])-($ext_l+1)));
 

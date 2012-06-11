@@ -425,6 +425,79 @@ var editPr = function() {
     }
 };
 
+//edit position status Added by Eggsorer
+
+var editPos = function() {
+    $pos_state = $('#sel_posstate');
+		$pos_time = $('#posstateuntil');
+
+	var validatePosTime = (function() {
+	    var expand_pos = $("#expand-pos");
+	    var expand_pos_inited = false;
+	    var pos_timeBox = $pos_time;
+	    return function() {
+		if ($pos_state.val() !== '1') {
+		    $('#pos-expire').fadeOut();
+		    expand_pos.slideUp();
+		}
+		else {
+		    $('#pos-expire').fadeIn();
+		    if (!expand_pos_inited) {
+			expand_pos_inited = true;
+			expand_pos.html('<label><select id="pos_time_select_day"><option value="0">0</option><option value="1" selected="selected">1</option><option value="2">2</option><option value="3">3</option><option value="5">5</option><option value="7">7</option><option value="10">10</option><option value="15">15</option><option value="20">20</option><option value="30">30</option><option value="40">40</option><option value="50">50</option><option value="60">60</option><option value="90">90</option><option value="180">180</option><option value="365">365</option></select>天</label><label><select id="pos_time_select_hour"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="8">8</option><option value="10">10</option><option value="12">12</option><option value="15">15</option><option value="18">18</option><option value="20">20</option></select>小时</label><label><select id="pos_time_select_minute"><option value="0">0</option><option value="5">5</option><option value="10">10</option><option value="15">15</option><option value="20">20</option><option value="25">25</option><option value="30">30</option><option value="45">45</option></select>分钟</label>');
+			expand_pos.append($('<input />', {
+			    type : 'button',
+			    value : '延长置顶时间'
+			}).click(function() {
+			    var pos_new_date = new Date();
+
+			    var pos_day = $('#pos_time_select_day').val();
+			    var pos_hour = $('#pos_time_select_hour').val();
+			    var pos_minute = $('#pos_time_select_minute').val();
+
+			    // 换算成毫秒
+			    var pos_time_period = (pos_day * 24 * 3600 + pos_hour * 3600 + pos_minute * 60) * 1000;
+			    var pos_default_unixtime = str2date(pos_timeBox.val());
+			    pos_new_date.setTime(pos_default_unixtime.valueOf() + pos_time_period);
+
+			    pos_timeBox.val(pos_new_date.getFullYear() 
+					+ '-' + (pos_new_date.getMonth() + 1) 
+					+ '-' + pos_new_date.getDate() 
+					+ ' ' + pos_new_date.getHours() 
+					+ ':' + pos_new_date.getMinutes() 
+					+ ':' + pos_new_date.getSeconds());
+
+			    return false;
+			}));
+		    }
+		    
+		    expand_pos.slideDown();
+		}
+	    };
+	})();
+
+	validatePosTime();
+
+	$pos_state.change(validatePosTime);
+
+	function str2date(string) {
+	    var default_date = new Date();
+	    
+	    date_part = string.split(' ')[0].split('-');
+	    time_part = string.split(' ')[1].split(':');
+	    
+	    default_date.setFullYear(date_part[0]);
+	    default_date.setMonth(date_part[1] - 1);
+	    default_date.setDate(date_part[2]);
+	    default_date.setHours(time_part[0]);
+	    default_date.setMinutes(time_part[1]);
+	    default_date.setSeconds(time_part[2]);
+	    
+	    return default_date;
+	}
+
+    
+};
 var createOptions = function(options, defaultOpt) {
     return $.map(options, function(v, k) {
 	if (v.length === 0) {
@@ -564,6 +637,7 @@ var editTorrent = (function() {
 	    var putTarget = '//' + cake + '/torrents/edit/' + id + '.json?%2Fcake%2Ftorrents%2Fedit%2F' + id + '=';
 	    var torrent = result.Torrent;
 	    var time;
+	    var pos_time;
 	    if (torrent.promotion_time_type === '2') {
 		time = torrent.promotion_until;
 	    }
@@ -576,7 +650,20 @@ var editTorrent = (function() {
 		    + ':' + new_date.getMinutes() 
 		    + ':' + new_date.getSeconds();
 	    }
-	    var html = '<div id="dialog-hint"></div><input type="hidden" name="_method" value="PUT" /><input type="hidden" name="data[Torrent][id]" value="' + id + '" id="TorrentId"><ul><li><label>促销种子<select id="sel_spstate" name="data[Torrent][sp_state]" style="width: 100px;">' + createOptions(prDict, parseInt(torrent.sp_state)) + '</select></label> <select id="promotion_time_type" name="data[Torrent][promotion_time_type]" style="width: 100px;" disabled="disabled">' + createOptions(untilDict, parseInt(torrent.promotion_time_type)) + '</select></li><li><label id="pr-expire">截止日期<input type="text" name="data[Torrent][promotion_until]" id="promotionuntil" style="width: 120px;" value="' + time + '"></label></li><li id="expand-pr" style="display: none; "></li><li><label>种子位置<select name="data[Torrent][pos_state]" style="width: 100px;">' + createOptions(posDict, torrent.pos_state) +'</select></label></li>';
+	 //position 
+	    if (torrent.pos_state === 'sticky') {
+		pos_time = torrent.pos_state_until;
+	    }
+	    else {
+		var pos_new_date = new Date();
+		pos_time = pos_new_date.getFullYear() 
+		    + '-' + (pos_new_date.getMonth() + 1) 
+		    + '-' + pos_new_date.getDate() 
+		    + ' ' + pos_new_date.getHours() 
+		    + ':' + pos_new_date.getMinutes() 
+		    + ':' + pos_new_date.getSeconds();
+	    }
+	    var html = '<div id="dialog-hint"></div><input type="hidden" name="_method" value="PUT" /><input type="hidden" name="data[Torrent][id]" value="' + id + '" id="TorrentId"><ul><li><label>促销种子<select id="sel_spstate" name="data[Torrent][sp_state]" style="width: 100px;">' + createOptions(prDict, parseInt(torrent.sp_state)) + '</select></label> <select id="promotion_time_type" name="data[Torrent][promotion_time_type]" style="width: 100px;" disabled="disabled">' + createOptions(untilDict, parseInt(torrent.promotion_time_type)) + '</select></li><li><label id="pr-expire">截止日期<input type="text" name="data[Torrent][promotion_until]" id="promotionuntil" style="width: 120px;" value="' + time + '"></label></li><li id="expand-pr" style="display: none; "></li><li><label>种子位置<select name="data[Torrent][pos_state]" style="width: 100px;">' + createOptions(posDict, torrent.pos_state) +'</select></label></li><li><label id="pos-expire">截止日期<input type="text" name="data[Torrent][pos_state_until]" id="posstateuntil" style="width: 120px;" value="' + pos_time + '"></label></li><li id="expand-pos" style="display: none; "></li>';
 	    html += '<li><input type="hidden" name="data[Torrent][oday]" value="no"><label><input type="checkbox" id="sel_oday" name="data[Torrent][oday]" value="yes"';
 	    if (torrent.oday === 'yes') {
 		html += ' checked="checked"';
@@ -606,6 +693,7 @@ var editTorrent = (function() {
 		},
 	    });
 	    editPr();
+	    editPos();
 	});
     }
 })();

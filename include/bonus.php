@@ -23,6 +23,8 @@ function bonusTextFromAction($do, $title='') {
     $msg =  $lang_mybonus['text_success_no_ad'];
   elseif ($do == "charity")
     $msg =  $lang_mybonus['text_success_charity'];
+  if ($do == "color")
+    $msg = $lang_mybonus['text_success_color'];
   else
     $msg = '';
   return $msg;
@@ -110,6 +112,14 @@ function bonusarray($option) {
       $bonus['description'] = $lang_mybonus['text_charity_giving_note'];
       break;
     }
+    case 10: {
+    	$bonus['points'] = 8000;
+    	$bonus['art'] = 'color';
+      $bonus['menge'] = 0;
+      $bonus['name'] = $lang_mybonus['text_change_color'];
+      $bonus['description'] = $lang_mybonus['text_change_color_note'];
+      break;
+    	}
     default: break;
     }
   return $bonus;
