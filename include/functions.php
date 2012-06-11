@@ -3418,14 +3418,7 @@ function get_username($id, $big = false, $link = true, $bold = true, $target = f
     return $usernameArray[$id];
   }
   $arr = get_user_row($id);
-  	?>
-	
-<style type="text/css">
-.Custom_Color_<?php print($id."{color:#".$arr["color"]); ?>}
-A.Custom_Color_<?php print($id.":link{color:#".$arr["color"]); ?>}
-A.Custom_Color_<?php print($id.":visited{color:#".$arr["color"]); ?>}
-</style>
-<?php
+
   if ($arr){
     if ($big) {
       $donorpic = "starbig";
@@ -3456,19 +3449,17 @@ A.Custom_Color_<?php print($id.":visited{color:#".$arr["color"]); ?>}
     if ($underline) {
       $name_style .= 'text-decoration:underline;';
     }
+    if($arr["color"]!="FFFFFF"){
+      $name_style .= 'color:#'.$arr['color'] . ';';
+    }
+
     if ($name_style) {
       $link_ext .= ' style="' . $name_style . '"';
     }
 
     if ($link) {
-    	if($arr["color"]!="FFFFFF"){
-    		$link_ext .= ' class="Custom_Color_'.$id.'"';
-      	$username = '<a ' . $link_ext . ' href="//' . $BASEURL . '/userdetails.php?id=' . $id . '">' . $username . '</a>';
-			}
-    elseif($arr["color"]=="FFFFFF"){
-     	$link_ext .= ' class="'. get_user_class_name($arr['class'],true) . '_Name"';
+      $link_ext .= ' class="'. get_user_class_name($arr['class'],true) . '_Name"';
       $username = '<a ' . $link_ext . ' href="//' . $BASEURL . '/userdetails.php?id=' . $id . '">' . $username . '</a>';
-    	}
     }
     $username .= $pics;
 

@@ -39,7 +39,7 @@ class TorrentsController extends AppController {
 		if (!$this->Torrent->exists()) {
 			throw new NotFoundException(__('Invalid torrent'));
 		}
-		$torrent = $this->Torrent->read(['id', 'name', 'promotion_time_type', 'promotion_until', 'sp_state', 'pos_state', 'picktype', 'oday'], $id);
+		$torrent = $this->Torrent->read(['id', 'name', 'promotion_time_type', 'promotion_until', 'sp_state', 'pos_state', 'picktype', 'oday', 'pos_state_until'], $id);
 #		echo h(json_encode($torrent));
 		$this->set('torrent', $torrent);
 		$this->set('_serialize', 'torrent');

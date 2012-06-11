@@ -32,7 +32,7 @@ function dependence($name) {
   /* if ($dep) { */
   /*   return $dep; */
   /* } */
-  return array();
+  return ['mybonus' => 'jscolor/jscolor'];
 }
 
 function load_file($name, $type, $fullpath=false, $minify = true, $basepath = '') {

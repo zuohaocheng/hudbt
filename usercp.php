@@ -549,8 +549,7 @@ echo '</dl>';
 				$updateset = array();
 				$ttlastpost = ($_POST["ttlastpost"] != "" ? "yes" : "no");
 				$signature = trim($_POST["signature"]);
-
-
+				$updateset[] = "signature = " . sqlesc($signature);
 
 				$query = "UPDATE LOW_PRIORITY users SET " . implode(",", $updateset) . " WHERE id =".sqlesc($CURUSER["id"]);
 				$result = sql_query($query);
