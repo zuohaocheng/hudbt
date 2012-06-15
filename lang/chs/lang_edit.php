@@ -45,6 +45,7 @@ $lang_edit = array
 	'select_classic' => "经典",
 	'select_recommended' => "推荐",
 	'select_sticky' => "置顶",
+	'select_random' => "随机",
 	'select_choose_if_sticky' => "选择种子是否在种子页面置顶",
 	'row_banned' => "禁止",
 	'checkbox_banned' => "禁止",

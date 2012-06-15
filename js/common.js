@@ -436,7 +436,7 @@ var editPos = function() {
     $pos_time = $('#posstateuntil');
 
     var validatePosTime = timeLimit(function() {
-	return ($pos_state.val() === 'sticky');
+	return ($pos_state.val() === 'sticky'||$pos_state.val() === 'random');
     }, $('#pos-expire'), $("#expand-pos"));
     validatePosTime();
 
@@ -574,8 +574,9 @@ var editTorrent = (function() {
     var untilDict = ['使用全局设置', '永久', '直到'];
     var posDict = {
 	normal : '普通',
-	sticky : '置顶'
-    }; 
+	sticky : '置顶',
+	random : '随机'
+   }; 
 
     return function(id, callback) {
 	var cake = hb.constant.url.cake;

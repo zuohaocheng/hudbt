@@ -15,13 +15,19 @@ if ($showextinfo['imdb'] == 'yes')
 // 时效性要求不高，默认为 true
 $torrent_count_cache = true;
 // 种子总数缓存时间
-define('TORRENT_COUNT_CACHE_TIME', 1800);
+define('TORRENT_COUNT_CACHE_TIME', 300);
 
 // 种子详细数据的缓存开关，true 为使用缓存
 // 负载高时使用 true，平时设为 false
 $torrents_list_cache = true;
-// 种子详情缓存时间
-define('TORRENT_DETAIL_CACHE_TIME', 5);
+// 普通种子缓存时间
+define('TORRENT_NORMAL_CACHE_TIME', 5);
+
+//置顶种子缓存时间
+define('TORRENT_STICKY_CACHE_TIME', 300);
+
+//固定置顶种子总数缓存时间
+define('STICKY_TORRENT_NUM_CACHE_TIME', 300);
 // -------------- 缓存配置 ------------|| END
 
 //check searchbox
@@ -82,18 +88,18 @@ if ($_GET['sort'] && $_GET['type']) {
 
   if($column == "owner")
     {
-      $orderby = "ORDER BY pos_state DESC, torrents.anonymous, users.username " . $ascdesc;
+      $orderby = "ORDER BY torrents.anonymous, users.username " . $ascdesc;
     }
   else
     {
-      $orderby = "ORDER BY pos_state DESC, torrents." . $column . " " . $ascdesc;
+      $orderby = "ORDER BY torrents." . $column . " " . $ascdesc;
     }
 
   $pagerlink = "sort=" . intval($_GET['sort']) . "&type=" . $linkascdesc . "&";
 
 } else {
 
-  $orderby = "ORDER BY pos_state DESC, torrents.id DESC";
+  $orderby = "ORDER BY torrents.id DESC";
   $pagerlink = "";
 
 }
@@ -758,54 +764,107 @@ if (isset($searchstr))
     if ($search_area == 4) {
       $searchstr = (int)parse_imdb_id($searchstr);
     }
-    $like_expression_array =array();
-    unset($like_expression_array);
 
-    switch ($search_mode)
-      {
+    unset($like_expression_array);
+    $matches = [];
+    $likes = [];
+    $exact = [];
+    $ANDOR = ($search_mode == 0 ? " AND " : " OR ");	// only affects mode 0 and mode 1
+    $canMatch = function($a) {
+      $len = strlen($a);
+      $allAlnum = true;
+      for ($i = 0; $i < $len; ++$i) {
+	$ch = $a[$i];
+	if (!ctype_alnum($ch)) {
+	  $allAlnum = false;
+	  break;
+	}
+      }
+      return $allAlnum;
+    };
+    
+    $addToken = function($token, $exact = false) use ($canMatch) {
+      global $matches, $likes, $exact;
+      if ($exact) {
+	$exatc[] = $token;
+      }
+      else if ($canMatch($token)) {
+	$matches[] = $token;
+      }
+      else {
+	$likes[] = $token;
+      }
+    };
+    
+    $generateMatchSql = function($fields, $canUseMatch) use ($matches, $likes, $ANDOR) {
+      global $matches, $likes, $exact;
+      $out = [];
+      if ($canUseMatch) {
+	if (count($matches)) {
+	  if ($ANDOR == ' AND ') {
+	    $matches = array_map(function($o) {return '+' . $o;}, $matches);
+	  }
+	  $out[] = 'MATCH(' . implode(',', $fields) . ') AGAINST ("' . implode(' ', $matches) . '" IN BOOLEAN MODE)';
+	}
+      }
+      else {
+	$likes = array_merge($matches, $likes);
+      }
+      $likes = array_map(function($o) {
+	  return 'LIKE "%' . $o . '%"';
+	}, $likes);
+      $exact = array_map(function($o) {
+	  return '= "' . $o . '"';
+	}, $exact);
+
+      $likes_sql = implode($ANDOR, array_map(function($o) use ($fields) {
+	    return '(' . implode(' OR ', array_map(function($field) use ($o) {
+		  return $field . ' ' . $o;
+		}, $fields)) . ')';
+	  }, array_merge($likes, $exact)));
+      if ($likes_sql) {
+	$out[] = $likes_sql;
+      }
+      return implode($ANDOR, $out);
+    };
+
+    
+    switch ($search_mode) {
       case 0:	// AND, OR
       case 1	:
 	{
 	  $searchstr = str_replace(".", " ", $searchstr);
 	  $searchstr_exploded = explode(" ", $searchstr);
 	  $searchstr_exploded_count= 0;
-	  foreach ($searchstr_exploded as $searchstr_element)
-	    {
+	  foreach ($searchstr_exploded as $searchstr_element) {
 	      $searchstr_element = trim($searchstr_element);	// furthur trim to ensure that multi space seperated words still work
 	      $searchstr_exploded_count++;
 	      if ($searchstr_exploded_count > 10)	// maximum 10 keywords
 		break;
-	      $like_expression_array[] = " LIKE '%" . $searchstr_element. "%'";
+	      $addToken($searchstr_element);
 	    }
 	  break;
 	}
-      case 2	: {	// exact
-	$like_expression_array[] = " LIKE '%" . $searchstr. "%'";
+      case 2	: {	// single match
+	$addToken($searchstr);
 	break;
       }
-      case 3 : {	// parsed
-	$like_expression_array[] = " = '" . $searchstr . "'";
+      case 3 : {	// exact
+	$addToken($searchstr, true);
 	break;
       }
-      }
-    $ANDOR = ($search_mode == 0 ? " AND " : " OR ");	// only affects mode 0 and mode 1
+    }
 
-    switch ($search_area)
-      {
-      case 0   :	// torrent name
-	{
-	  foreach ($like_expression_array as &$like_expression_array_element)
-	    $like_expression_array_element = "(torrents.name" . $like_expression_array_element." OR torrents.small_descr". $like_expression_array_element.")";
-	  $wherea[] =  implode($ANDOR, $like_expression_array);
-	  break;
-	}
-      case 1	:	// torrent description
-	{
-	  foreach ($like_expression_array as &$like_expression_array_element)
-	    $like_expression_array_element = "torrents.descr". $like_expression_array_element;
-	  $wherea[] =  implode($ANDOR,  $like_expression_array);
-	  break;
-	}
+
+    switch ($search_area) {
+    case 0 : {	// torrent name
+      $wherea[] =  $generateMatchSql(['torrents.name', 'torrents.small_descr'], true);
+      break;
+    }
+    case 1 : {	// torrent description
+      $wherea[] =  $generateMatchSql(['torrents.descr'], false);
+      break;
+    }
 	/*case 2	:	// torrent small description
 	  {
 	  foreach ($like_expression_array as &$like_expression_array_element)
@@ -814,11 +873,9 @@ if (isset($searchstr))
 	  break;
 	  }*/
       case 3 : {	// torrent uploader
-	foreach ($like_expression_array as &$like_expression_array_element) {
-	  $like_expression_array_element =  "users.username". $like_expression_array_element;
-	}
+	$basic =  $generateMatchSql(['users.username'], false);
 	//show all for manager
-	$w = '(' . implode($ANDOR, $like_expression_array);
+	$w = '(' . $basic;
 	if (!checkPrivilege(['Torrent', 'edit'])) {
 	  // show not anonymous torrents for all
 	  $w .= " AND torrents.anonymous = 'no') ";
@@ -834,159 +891,242 @@ if (isset($searchstr))
 	break;
       }
       case 4  :  //imdb url
-	foreach ($like_expression_array as &$like_expression_array_element)
-	  $like_expression_array_element = "torrents.url". $like_expression_array_element;
-	$wherea[] =  implode($ANDOR,  $like_expression_array);
+	$wherea[] =  $generateMatchSql(['torrents.url'], false);
 	break;
-      default :	// unkonwn
-	{
-	  $search_area = 0;
-	  $wherea[] =  "torrents.name LIKE '%" . $searchstr . "%'";
-#	  write_log("User " . $CURUSER["username"] . "," . $CURUSER["ip"] . " is hacking search_area field in" . $_SERVER['SCRIPT_NAME'], 'mod');
-	  break;
-	}
-      }
+    default : {	// unkonwn
+      $search_area = 0;
+      $wherea[] =  $generateMatchSql(['torrents.name'], true);
+      #	  write_log("User " . $CURUSER["username"] . "," . $CURUSER["ip"] . " is hacking search_area field in" . $_SERVER['SCRIPT_NAME'], 'mod');
+      break;
+    }
+    }
     $addparam .= "search_area=" . $search_area . "&";
     $addparam .= "search=" . rawurlencode($searchstr) . "&".$notnewword;
     $addparam .= "search_mode=".$search_mode."&";
   }
 
-$where = implode(" AND ", $wherea);
 
 if ($wherecatin)
-  $where .= ($where ? " AND " : "") . "category IN(" . $wherecatin . ")";
+  $wherea[] = "category IN(" . $wherecatin . ")";
 if ($showsubcat){
   if ($wheresourcein)
-    $where .= ($where ? " AND " : "") . "source IN(" . $wheresourcein . ")";
+    $wherea[] = "source IN(" . $wheresourcein . ")";
   if ($wheremediumin)
-    $where .= ($where ? " AND " : "") . "medium IN(" . $wheremediumin . ")";
+    $wherea[] = "medium IN(" . $wheremediumin . ")";
   if ($wherecodecin)
-    $where .= ($where ? " AND " : "") . "codec IN(" . $wherecodecin . ")";
+    $wherea[] = "codec IN(" . $wherecodecin . ")";
   if ($wherestandardin)
-    $where .= ($where ? " AND " : "") . "standard IN(" . $wherestandardin . ")";
+    $wherea[] = "standard IN(" . $wherestandardin . ")";
   if ($whereprocessingin)
-    $where .= ($where ? " AND " : "") . "processing IN(" . $whereprocessingin . ")";
+    $wherea[] = "processing IN(" . $whereprocessingin . ")";
   if ($whereteamin)
-    $where .= ($where ? " AND " : "") . "team IN(" . $whereteamin . ")";
+    $wherea[] = "team IN(" . $whereteamin . ")";
   if ($whereaudiocodecin)
-    $where .= ($where ? " AND " : "") . "audiocodec IN(" . $whereaudiocodecin . ")";
+    $wherea[] = "audiocodec IN(" . $whereaudiocodecin . ")";
 }
 
 
-if ($allsec == 1 || $enablespecial != 'yes')
-  {
-    if ($where != "")
-      $where = "WHERE $where ";
-    else $where = "";
-    $sql = "SELECT COUNT(1) FROM torrents " . ($search_area == 3 || $column == "owner" ? "LEFT JOIN users ON torrents.owner = users.id " : "") . $where;
+$joins = '';
+$group = '';
+
+if (!($allsec == 1 || $enablespecial != 'yes')) {
+  $wherea[] = "categories.mode = '$sectiontype'";
+  $joins .= 'LEFT JOIN categories ON category = categories.id ';
+#  $group .= 'GROUP BY categories.mode';
+}
+
+if ($search_area == 3 || $column == "owner") {
+  $joins .= 'LEFT JOIN users ON torrents.owner = users.id ';
+}
+
+function generateWhere($wherea) {
+  if ($wherea) {
+    return 'WHERE ' . implode(" AND ", $wherea);
   }
-else
-  {
-    if ($where != "")
-      $where = "WHERE $where AND categories.mode = '$sectiontype'";
-    else $where = "WHERE categories.mode = '$sectiontype'";
-    $sql = "SELECT COUNT(*), categories.mode FROM torrents LEFT JOIN categories ON category = categories.id " . ($search_area == 3 || $column == "owner" ? "LEFT JOIN users ON torrents.owner = users.id " : "") . $where." GROUP BY categories.mode";
+  else {
+    return '';
   }
+}
+$where = generateWhere($wherea);
+
+$sql_extra = $joins . $where;
+$sql_extra_md5 = MD5($sql_extra);
 
 if($torrent_count_cache) {
-	$timer_1_start = microtime(true);
-	
-	$sql_key = MD5($sql);
-	$count = $Cache->get_value($sql_key);
-//	var_dump($sql_key, $count);
-	if(empty($count)) {
-		$timer_2_start = microtime(true);
-		$res = sql_query($sql) or die(mysql_error());
-		$count = 0;
-		while($row = mysql_fetch_array($res))
-		  $count += $row[0];
-		$Cache->cache_value($sql_key, $count, TORRENT_COUNT_CACHE_TIME);
-	
-		$timer_2_end = microtime(true);
-	}
-	$timer_1_end = microtime(true);
-	$time_delta1 = $timer_1_end - $timer_1_start;
-	$time_delta2 = $timer_2_end - $timer_2_start;
-
-} else {
-	$res = sql_query('/* FILE: '.__FILE__.' LINE: '.__LINE__.'*/ '.$sql) or die(mysql_error());
-	$count = 0;
-	while($row = mysql_fetch_array($res))
-	  $count += $row[0];
+#  $timer_1_start = microtime(true);
+  $sql_key = 'torrent-count-' . $sql_extra_md5;
+  $count = $Cache->get_value($sql_key);
+#  var_dump($sql_key, $count);
+  if(empty($count)) {
+#    $timer_2_start = microtime(true);
+    $count = get_row_count('torrents', $sql_extra);
+    $Cache->cache_value($sql_key, $count, TORRENT_COUNT_CACHE_TIME);
+    
+#    $timer_2_end = microtime(true);
+  }
+#  $timer_1_end = microtime(true);
+#  $time_delta1 = $timer_1_end - $timer_1_start;
+#  $time_delta2 = $timer_2_end - $timer_2_start;
+}
+else {
+  $count = get_row_count('torrents', $sql_extra);
 }
 
-if ($torrentsperpage_main)
+if ($torrentsperpage_main) {
   $torrentsperpage = $torrentsperpage_main;
-else $torrentsperpage = 50;
-
-
+}
+else {
+  $torrentsperpage = 50;
+}
 
 #timer_3_start = microtime(true); // debug
 // var_dump($count); die(); //
-if ($count)
-{
-	if ($addparam != "")
-	  {
-		if ($pagerlink != "")
-		  {
-			if ($addparam{strlen($addparam)-1} != ";")
-			  { // & = &amp;
-			$addparam = $addparam . "&" . $pagerlink;
-			  }
-			else
-			  {
-			$addparam = $addparam . $pagerlink;
-			  }
-		  }
-	  }
-	else
-	  {
-	//stderr("in else","");
-	$addparam = $pagerlink;
-	  }
-	//stderr("addparam",$addparam);
-	//echo $addparam;
+if ($count) {
+  if ($addparam != "") {
+    if ($pagerlink != "") {
+      if ($addparam{strlen($addparam)-1} != ";") { // & = &amp;
+	$addparam = $addparam . "&" . $pagerlink;
+      }
+      else {
+	$addparam = $addparam . $pagerlink;
+      }
+    }
+  }
+  else {
+    //stderr("in else","");
+    $addparam = $pagerlink;
+  }
+  //stderr("addparam",$addparam);
+  //echo $addparam;
 
-	list($pagertop, $pagerbottom, $limit, $next_page_href) = pager($torrentsperpage, $count, "?" . $addparam);
+  list($pagertop, $pagerbottom, $limit, $next_page_href, $start) = pager($torrentsperpage, $count, "?" . $addparam);
 
-	if ($allsec == 1 || $enablespecial != 'yes'){
-	  //Modified by bluemonster 20111026 & by Eggsorer 20120517
-	  $query = "SELECT torrents.id, torrents.sp_state, torrents.promotion_time_type, torrents.promotion_until, torrents.banned, torrents.picktype, torrents.pos_state, torrents.category, torrents.source, torrents.medium, torrents.codec, torrents.standard, torrents.processing, torrents.team, torrents.audiocodec, torrents.leechers, torrents.seeders, torrents.name, torrents.small_descr, torrents.times_completed, torrents.size, torrents.added, torrents.comments,torrents.anonymous,torrents.owner,torrents.url,torrents.cache_stamp,torrents.oday, torrents.storing, torrents.pos_state_until FROM torrents ".($search_area == 3 || $column == "owner" ? "LEFT JOIN users ON torrents.owner = users.id " : "")." $where $orderby $limit";
+  $sql_extra_order_md5 = md5($sql_extra . $orderby . $start);
+  
+  $fields = 'torrents.id, torrents.sp_state, torrents.promotion_time_type, torrents.promotion_until, torrents.banned, torrents.picktype, torrents.pos_state, torrents.category, torrents.source, torrents.medium, torrents.codec, torrents.standard, torrents.processing, torrents.team, torrents.audiocodec, torrents.leechers, torrents.seeders, torrents.name, torrents.small_descr, torrents.times_completed, torrents.size, torrents.added, torrents.comments,torrents.anonymous,torrents.owner,torrents.url,torrents.cache_stamp,torrents.oday, torrents.storing, torrents.pos_state_until';
+
+    //Modified by bluemonster 20111026 & by Eggsorer 20120517
+  $extraByState = function($state, $eq = true) use ($joins, $wherea, $orderby) {
+    $wherea_sticky = $wherea;
+    if ($eq) {
+      $wherea_sticky[] = 'pos_state = "' . $state . '" ';
+    }
+    else {
+      $wherea_sticky[] = 'pos_state != "' . $state . '" ';
+    }
+    $where_sticky = generateWhere($wherea_sticky);
+
+    return $joins . $where_sticky . $orderby;
+  };
+
+  if ($start == 0) {
+    $stickyquery = "SELECT $fields FROM torrents " . $extraByState('sticky');
+    $randomquery = "SELECT $fields FROM torrents " . $extraByState('random') . " LIMIT 50";
+  
+    //固定置顶种子总数的缓存
+    $stickynum = false;
+    if ($torrents_list_cache) {
+      $cache_key = 'torrent-sticky-' . $sql_extra_md5;
+      $stickynum = $Cache->get_value($cache_key);
+    }
+
+    if ($stickynum === false) {
+      $wherea_sticky = $wherea;
+      $wherea_sticky[] = 'pos_state = "sticky"';
+      $where_sticky = generateWhere($wherea_sticky);
+      $stickynum = get_row_count('torrents', $joins . $where_sticky);
+      if ($torrents_list_cache) {
+	$Cache->cache_value($cache_key, $stickynum, STICKY_TORRENT_NUM_CACHE_TIME);
+      }
+    }
+
+
+    //置顶种子的缓存
+    // 缓存开关放在文件最顶部 BruceWolf 2012.03.21
+    //加入随机种子功能 Eggsorer 2012.06.13
+    if ($torrents_list_cache) { // 使用缓存
+      // 取缓存数据
+      $query_key = 'torrent-rows-sticky-' . $sql_extra_md5;
+      $ids_key = 'torrent-rows-sticky-id-' . $sql_extra_md5;
+      $stickyrows = $Cache->get_value($query_key);
+      $lucky_ids = $Cache->get_value($ids_key);
+    }
+    else {
+      $stickyrows = false;
+    }
+
+    // 缓存为空时从数据库获取数据
+    if($stickyrows === false) {
+      //查询固定置顶的种子
+      $res = sql_query($stickyquery) or sqlerr(__FILE__, __LINE__);
+      $stickyrows = [];
+      while ($row = mysql_fetch_assoc($res)) {
+	$stickyrows[] = $row;
+      }
+      //查询随机置顶的种子
+      $res = sql_query($randomquery) or sqlerr(__FILE__, __LINE__);
+      $randomrows = [];
+      while ($row = mysql_fetch_assoc($res)) {
+	$row['lucky'] = true;
+	$randomrows[] = $row;
+      }
+      //挑选随机种子置顶
+      $stickyremain = $stickylimit - $stickynum;//计算空位
+      $lucky_ids = [];
+
+      if ($stickyremain >= 0) {
+	shuffle($randomrows);//摇一摇！
+	$lucky = array_slice($randomrows, 0, $stickyremain);//分出被宠幸的随机种子
+
+	//将置顶种和选上的随机种合并
+	$stickyrows = array_merge($stickyrows, $lucky);
+
+	foreach ($lucky as $row) {
+	  $lucky_ids[$row['id']] = true;
 	}
-	else{
-	  //Modified by bluemonster 20111026 & by Eggsorer 20120517
-	  $query = "SELECT torrents.id, torrents.sp_state, torrents.promotion_time_type, torrents.promotion_until, torrents.banned, torrents.picktype, torrents.pos_state, torrents.category, torrents.source, torrents.medium, torrents.codec, torrents.standard, torrents.processing, torrents.team, torrents.audiocodec, torrents.leechers, torrents.seeders, torrents.name, torrents.small_descr, torrents.times_completed, torrents.size, torrents.added, torrents.comments,torrents.anonymous,torrents.owner,torrents.url,torrents.cache_stamp,torrents.oday, torrents.storing, torrents.pos_state_until FROM torrents ".($search_area == 3 || $column == "owner" ? "LEFT JOIN users ON torrents.owner = users.id " : "")." LEFT JOIN categories ON torrents.category=categories.id $where $orderby $limit";
-	}
+      }
+    
+      if ($torrents_list_cache) {
+	$Cache->cache_value($query_key, $stickyrows, TORRENT_STICKY_CACHE_TIME);
+	$Cache->cache_value($ids_key, $lucky_ids, TORRENT_STICKY_CACHE_TIME);
+      }
+    }
+  }
+  else {
+    $stickyrows = [];
+  }
+	
+  //非固定置顶种子的缓存
+  $normalrows = false;
+  if ($torrents_list_cache) {
+    $query_key = 'torrent-rows-normal-' . $sql_extra_order_md5;
+    $normalrows = $Cache->get_value($query_key);
+  }
 
-	// 缓存开关放在文件最顶部 BruceWolf 2012.03.21
-	if($torrents_list_cache) { // 使用缓存
-		// 取缓存数据
-		$query_key = MD5($query);
-		$rows = $Cache->get_value($query_key);
+  if($normalrows === false) {
+    $normalquery = "SELECT $fields FROM torrents " . $extraByState('sticky', false) . ' '. $limit;
+    $res = sql_query($normalquery) or sqlerr(__FILE__, __LINE__);
+    while ($row = mysql_fetch_assoc($res)) {//不保存已经被选上的随机种子
+      if (!isset($lucky_ids[$row['id']])) {
+	$normalrows[] = $row;
+      }
+    }
+    
+    if ($torrents_list_cache) {
+      $Cache->cache_value($query_key, $normalrows, TORRENT_NORMAL_CACHE_TIME);
+    }
+  }
 
-		// 缓存为空时从数据库获取数据
-		if(empty($rows)) {
-			$res = sql_query('/* FILE: '.__FILE__.' LINE: '.__LINE__.'*/ '.$query) or die(mysql_error());
-
-			while ($row = mysql_fetch_assoc($res)) {
-				$rows[] = $row;
-			}
-			$Cache->cache_value($query_key, $rows, TORRENT_DETAIL_CACHE_TIME);
-		}
-	} else { // 不使用缓存
-		$res = sql_query('/* FILE: '.__FILE__.' LINE: '.__LINE__.'*/ '.$query) or die(mysql_error());
-		while ($row = mysql_fetch_assoc($res)) {
-			$rows[] = $row;
-		}
-	}
+  //将置顶的种子和非置顶种子合并
+  $rows = array_merge($stickyrows, $normalrows);
 }
-else
+else {
   unset($rows);
+}
 
 #$timer_3_end = microtime(true); // debug
-
-
 #$timer_4_start = microtime(true); // debug
+
 if ($_GET['format'] == 'json') {
   include('include/torrents_json.php');
 }

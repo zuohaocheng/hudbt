@@ -133,14 +133,19 @@ if (checkPrivilege(['Torrent', 'pr'])) {
 	}
 }
 if (checkPrivilege(['Torrent', 'sticky'])) {
-	if((0 + $_POST["sel_posstate"]) == 0){
+	if(($_POST["sel_posstate"]) == 'normal'){
 		$updateset[] = "pos_state = 'normal'";
 		$updateset[] = "pos_state_until = '0000-00-00 00:00:00'";
 	}
 	else
 	{
 		if ($_POST["posstateuntil"] && strtotime($torrentAddedTimeString) <= strtotime($_POST["posstateuntil"])) {
-			$updateset[] = "pos_state = 'sticky'";
+			if(($_POST["sel_posstate"]) == 'sticky'){
+				$updateset[] = "pos_state = 'sticky'";
+			}
+			else{
+				$updateset[] = "pos_state = 'random'";
+				}
 			$updateset[] = "pos_state_until = ".sqlesc($_POST["posstateuntil"]);
 		} 
 		else {

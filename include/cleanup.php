@@ -280,7 +280,7 @@ function torrent_promotion_expire($days, $type = 2, $targettype = 1){
 	//End: expire torrent promotion
 	
 	//Start:expire sticky torrents
-		sql_query("UPDATE torrents SET pos_state = 'normal', pos_state_until='0000-00-00 00:00:00' WHERE pos_state = 'sticky' AND pos_state_until < ".sqlesc(date("Y-m-d H:i:s",TIMENOW))) or sqlerr(__FILE__, __LINE__);
+		sql_query("UPDATE torrents SET pos_state = 'normal', pos_state_until='0000-00-00 00:00:00' WHERE pos_state != 'normal' AND pos_state_until < ".sqlesc(date("Y-m-d H:i:s",TIMENOW))) or sqlerr(__FILE__, __LINE__);
 	//End: expire sticky torrents
 	
 	if ($printProgress) {

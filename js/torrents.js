@@ -351,7 +351,12 @@ $(function() {
 	    var position = torrent.position;
 	    if (position) {
 	    	var posexpire = position.expire;
-		mainTitle += '<img class="sticky" src="pic/trans.gif" alt="Sticky" title="' + lang.text_sticky + lang.text_until+posexpire+'">';
+	    	var sticky = position.sticky;
+	    	var randomsticky = position.randomsticky;
+	    	var lucky = position.lucky;
+	    	if(sticky||(randomsticky&&lucky)){
+					mainTitle += '<img class="sticky" src="pic/trans.gif" alt="Sticky" title="' + lang.text_sticky + lang.text_until+posexpire+'">';
+				}
 	    }
 	    mainTitle += '<h2 class="transparentbg"><a href="' + href + '" title="' + textMainTitle + '">' + textMainTitle + '</a></h2>';
 	    var desc;
@@ -705,6 +710,16 @@ $(function() {
 	    cats : catChecks
 	});
 	return catChecks;
+    });
+
+    //Use exact in imdb & username
+    $('[name="search_area"]').change(function() {
+	if (parseInt(this.value) >= 3) {  //Username or imdb
+	    $('[name="search_mode"]').val('3');
+	}
+	else {
+	    $('[name="search_mode"]').val('0');
+	}
     });
 
     //Auto complete

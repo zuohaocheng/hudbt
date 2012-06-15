@@ -45,6 +45,7 @@ $lang_edit = array
 	'select_classic' => "經典",
 	'select_recommended' => "推薦",
 	'select_sticky' => "置頂",
+	'select_random' => "隨機",
 	'select_choose_if_sticky' => "選擇種子是否在流覽頁面置頂",
 	'row_banned' => "禁止",
 	'checkbox_banned' => "禁止",
@@ -66,11 +67,11 @@ $lang_edit = array
 	'row_check' => "勾選",
 	'text_team' => "製作組",
 	'text_audio_codec' => "音頻編碼",
-	'row_content' => "內容"
+	'row_content' => "內容",
 	'oday'=> "0day資源",
 	'select_oday'=> "是",
 	'select_not_oday'=> "否",
 	'text_storing'=> "保種中",
 );
 
-?>
+

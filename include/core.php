@@ -1,6 +1,7 @@
 <?php
 if(!defined('IN_TRACKER'))
   die('Hacking attempt!');
+define('TIMENOWSTART',microtime(1));
 include_once($rootpath . 'include/config.php');
 error_reporting(E_ALL);
 ini_set('display_errors', 0);

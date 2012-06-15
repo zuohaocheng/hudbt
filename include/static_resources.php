@@ -24,15 +24,11 @@ function array_kronecker_product($arrays, $delimiter = '', $obj = ['' => []]) {
 }
 
 function dependence($name) {
-  /* $dependence = array( */
-  /* 		    'torrents' => array('jquery.json-2.3.min', 'jstorage.min'), */
-  /* 		    ); */
-
-  /* $dep = $dependence[$name]; */
-  /* if ($dep) { */
-  /*   return $dep; */
-  /* } */
-  return ['mybonus' => 'jscolor/jscolor'];
+  $dependence = ['mybonus' => ['jscolor/jscolor']];
+  $dep = $dependence[$name];
+  if ($dep) {
+    return $dep;
+  }
 }
 
 function load_file($name, $type, $fullpath=false, $minify = true, $basepath = '') {

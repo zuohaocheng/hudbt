@@ -61,7 +61,12 @@ if (file_exists($rootpath . 'config/allconfig.php')) {
 
 $SITENAME = $BASIC['SITENAME'];
 if (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] != '127.0.0.1') {
-  $BASEURL = $_SERVER['HTTP_HOST'] . $BASIC['BASEDIR'];
+  if ($_SERVER['HTTP_HOST'] == 'sp-pt.hust.edu.cn') {
+    $BASEURL = $_SERVER['HTTP_HOST'] . ':81' . $BASIC['BASEDIR'];
+  }
+  else {
+    $BASEURL = $_SERVER['HTTP_HOST'] . $BASIC['BASEDIR'];
+  }
 }
 else {
   $BASEURL = $BASIC['BASEURL'];
@@ -123,6 +128,7 @@ $showschool = $MAIN['enableschool'];
 $restrictemaildomain = $MAIN['restrictemail'];
 $showpolls_main = $MAIN['showpolls'];
 $showstats_main = $MAIN['showstats'];
+$stickylimit = (int)$MAIN['stickylimit'];
 //$showlastxforumposts_main = $MAIN['showlastxforumposts'];
 $showlastxtorrents_main = $MAIN['showlastxtorrents'];
 $showtrackerload = $MAIN['showtrackerload'];

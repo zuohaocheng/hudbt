@@ -1806,7 +1806,7 @@ function menu ($selected = "home") {
 }
     
 function get_css_id() {
-  global $CURUSER, $defcss, $Cache;
+  global $CURUSER, $defcss;
   $cssid = $CURUSER ? $CURUSER["stylesheet"] : $defcss;
   return $cssid;
 }
@@ -2237,6 +2237,7 @@ function stdfoot() {
   // Variables for End Time
   $tend = getmicrotime();
   $totaltime = ($tend - $tstart);
+  $alltotaltime=0+($tend-TIMENOWSTART);
   $year = substr($datefounded, 0, 4);
   $yearfounded = ($year ? $year : 2007);
   
@@ -2249,6 +2250,7 @@ function stdfoot() {
 		   'icplicense_main' => $icplicense_main,
 		   'yearfounded' => $yearfounded,
 		   'totaltime' => $totaltime,
+		   'alltotaltime' => $alltotaltime,
 		   'queries' => $query_name,
 		   'Cache' => $Cache,
 		   'details' => ($enablesqldebug_tweak == 'yes' && get_user_class() >= $sqldebug_tweak),
@@ -3160,6 +3162,7 @@ $counter = 0;
 if ($smalldescription_main == 'no')
   $displaysmalldescr = false;
 else $displaysmalldescr = true;
+GLOBAL $stickylimit;//置顶种子总数限制
 foreach($rows as $row)
 {
   if($row['banned'] == 'no' 
@@ -3206,9 +3209,9 @@ foreach($rows as $row)
 
     if($count_dispname > $max_length_of_torrent_name)
       $dispname=mb_substr($dispname, 0, $max_length_of_torrent_name-2,"UTF-8") . "..";
-
-    if ($row['pos_state'] == 'sticky'&&($row['pos_state_until']!="0000-00-00 00:00:00"))
+    if ($row['pos_state'] =='sticky' ||  (($row['pos_state']=='random')&&($row['lucky']=="true"))){
       $stickyicon = "<img class=\"sticky\" src=\"//$BASEURL/pic/trans.gif\" alt=\"Sticky\" title=\"".$lang_functions['title_sticky'].$lang_functions['text_until'].$row['pos_state_until']."\" />";
+    }
     else $stickyicon = "";
     
     if ($displaysmalldescr) {

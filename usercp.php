@@ -268,10 +268,16 @@ dl_item($lang_usercp['row_school'], "<select name=school>$schools</select>", 1);
 				$sitelanguage = $_POST["sitelanguage"];
 				$updateset[] = "notifs = " . sqlesc($notifs);
 
-				if (is_valid_id($stylesheet))
-				$updateset[] = "stylesheet = " . sqlesc($stylesheet);
-				if (is_valid_id($caticon))
-				$updateset[] = "caticon = " . sqlesc($caticon);
+				global $CURUSER;
+				$s = smarty();
+				if (is_valid_id($stylesheet)) {
+				  $updateset[] = "stylesheet = " . sqlesc($stylesheet);
+				  $s->clearCache('stdhead.tpl', $CURUSER['id']);
+				}
+				if (is_valid_id($caticon)) {
+				  $updateset[] = "caticon = " . sqlesc($caticon);
+				  $s->clearCache('stdhead.tpl', $CURUSER['id']);
+				}
 
 				if (is_valid_id($sitelanguage))
 				{
@@ -305,10 +311,11 @@ dl_item($lang_usercp['row_school'], "<select name=school>$schools</select>", 1);
 				}
 
 
-				$query = "UPDATE LOW_PRIORITY users SET " . implode(",", $updateset) . " WHERE id =".sqlesc($CURUSER["id"]);
+				$query = "UPDATE users SET " . implode(",", $updateset) . " WHERE id =".sqlesc($CURUSER["id"]);
 				//stderr("",$query);
 				$result = sql_query($query) or sqlerr(__FILE__,__LINE__);
-				header("Location: usercp.php?action=tracker&type=saved");
+#				header("Location: usercp.php?action=tracker&type=saved", true, 303);
+				header( "Refresh:0.2;url=usercp.php?action=tracker&type=saved" );die;
 			}
 			stdhead($lang_usercp['head_control_panel'].$lang_usercp['head_tracker_settings']);
 			if($CURUSER['id'] == GUEST_UID) {

@@ -109,5 +109,5 @@ $(function() {
 	    setTimeout(checkMsg, checkInt * 1000);
 	});
     };
-    checkMsg();
+    setTimeout(checkMsg, checkInt * 1000);
 });

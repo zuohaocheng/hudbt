@@ -22,14 +22,25 @@ function torrentInfoForRow($row) {
   $info['desc'] = $dissmall_descr;
 
   if ($row['pos_state'] == 'sticky') {
-  	if ($row["pos_state_until"]!=NULL) {
+  	if ($row['pos_state_until']!=NULL) {
 			$pos = array('sticky' => true);
-    	$expire = $row["pos_state_until"];
+    	$expire = $row['pos_state_until'];
     	$pos['expire'] = $expire;
     	$info['position'] = $pos;
   	}
   }
 
+  if ($row['pos_state'] == 'random') {
+  	if ($row['pos_state_until']!=NULL) {
+			$pos = array('randomsticky' => true);
+    	$expire = $row['pos_state_until'];
+    	$pos['expire'] = $expire;
+    	if($row['lucky']){
+    		$pos['lucky'] = $row['lucky'];
+    	}
+    	$info['position'] = $pos;
+  	}
+  }
   if ($row['picktype'] != 'normal'){
     $info['picktype'] = $row['picktype'];
   }
@@ -108,7 +119,6 @@ if($row['storing']==1) {
   if (get_is_torrent_bookmarked($CURUSER['id'], $id)) {
     $info['bookmarked'] = true;
   }
-
   return $info;
 }
 
@@ -165,9 +175,11 @@ function torrenttable_api($rows, $variant = "torrent", $swap_headings = false) {
   $torrents = array();
   if (!empty($rows)) {
     foreach ($rows as $row)  {
-      if($row['banned'] == 'no' || get_user_class() >= $seebanned_class || $CURUSER['id'] == $row['owner']) {
-	$torrents[] = torrentInfoForRow($row);
-      }
+    	if($row['id']!=NULL){
+      	if($row['banned'] == 'no' || get_user_class() >= $seebanned_class || $CURUSER['id'] == $row['owner']) {
+				$torrents[] = torrentInfoForRow($row);
+      	}
+    	}
     }
   }
   return $torrents;
