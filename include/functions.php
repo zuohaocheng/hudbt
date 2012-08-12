@@ -624,6 +624,12 @@ function write_log($text, $security = "normal") {
   sql_query("INSERT INTO sitelog (added, txt, security_level) VALUES($added, $text, $security)") or sqlerr(__FILE__, __LINE__);
 }
 
+function write_forum_log($text, $security = "normal") {
+  $text = sqlesc($text);
+  $added = sqlesc(date("Y-m-d H:i:s"));
+  $security = sqlesc($security);
+  sql_query("INSERT INTO forumlog (added, txt, security_level) VALUES($added, $text, $security)") or sqlerr(__FILE__, __LINE__);
+}
 
 function get_elapsed_time($ts,$shortunit = false) {
   global $lang_functions;
@@ -2846,6 +2852,27 @@ function get_forum_row($forumid = 0) {
   if (!$forumid)
     return $forums;
   else return $forums[$forumid];
+}
+
+function get_forum_id($query_id = 0,$query_type = "topic") {
+	switch($query_type){
+	case "post":
+		$query_res = sql_query("SELECT topicid FROM posts WHERE id = $query_id") or sqlerr(__FILE__, __LINE__);
+		$row = mysql_fetch_array($query_res);
+		if(!$row){
+			return -1;
+		}
+		$query_id = $row['topicid'];
+		//deliberately fall through
+	case "topic":
+		$query_res = sql_query("SELECT forumid FROM topics WHERE id = $query_id") or sqlerr(__FILE__, __LINE__);
+		$row = mysql_fetch_array($query_res);
+		if(!$row){
+			return -1;
+		}
+		$forum_id = $row['forumid'];
+		return $forum_id;	
+	}
 }
 
 function single_post($arr, $maypost, $maymodify, $locked, $highlight = '', $last = false, $floor = -1) {

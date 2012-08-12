@@ -422,7 +422,14 @@ elseif ($action == "post") {
 			permissiondenied();
 		permissiondenied();
 		}
+		$forum_row = get_forum_row($forumid);
+		if($forum_row["minclassread"]>=$confiforumlog_class)
+			$permi = "high";
+		else
+			$permi = "normal";
 		sql_query("UPDATE posts SET body=".sqlesc($body).", editdate=".sqlesc($date).", editedby=".sqlesc($CURUSER[id]).",editnotseen = ".$editnotseen." WHERE id=".sqlesc($id)) or sqlerr(__FILE__, __LINE__);
+		if(mysql_affected_rows())
+			write_forum_log("Post:$id in Topic:$topicid was edited by $CURUSER[username].", $permi);
 		$postid = $id;
 		$Cache->delete_value('post_'.$postid.'_content');
 	}
@@ -804,7 +811,7 @@ elseif ($action == "movetopic") {
 
 	// Make sure topic and forum is valid
 
-	$res = @sql_query("SELECT minclasswrite FROM forums WHERE id=$forumid") or sqlerr(__FILE__, __LINE__);
+	$res = @sql_query("SELECT minclasswrite,minclassread FROM forums WHERE id=$forumid") or sqlerr(__FILE__, __LINE__);
 
 	if (mysql_num_rows($res) != 1)
 	stderr($lang_forums['std_error'], $lang_forums['std_forum_not_found']);
@@ -813,13 +820,19 @@ elseif ($action == "movetopic") {
 
 	if (get_user_class() < $arr[0])
 		permissiondenied();
+	$des_mincread = $arr[1];
 
 	$res = @sql_query("SELECT forumid FROM topics WHERE id=$topicid") or sqlerr(__FILE__, __LINE__);
 	if (mysql_num_rows($res) != 1)
 		stderr($lang_forums['std_error'], $lang_forums['std_topic_not_found']);
 	$arr = mysql_fetch_row($res);
 	$old_forumid=$arr[0];
-
+	$old_forum_row = get_forum_row($old_forumid);
+	$old_mincread = $old_forum_row["minclassread"];
+	if($des_mincread>=$confiforumlog_class||$old_mincread>=$confiforumlog_class)
+		$permi = "high";
+	else
+		$permi = "normal";
 	// get posts count
 	$res = sql_query("SELECT COUNT(id) AS nb_posts FROM posts WHERE topicid=$topicid") or sqlerr(__FILE__, __LINE__);
 	if (mysql_num_rows($res) != 1)
@@ -838,6 +851,7 @@ elseif ($action == "movetopic") {
 		@sql_query("UPDATE forums SET topiccount=topiccount+1, postcount=postcount+$nb_posts WHERE id=$forumid") or sqlerr(__FILE__, __LINE__);
 		$Cache->delete_value('forum_'.$forumid.'_post_'.$today_date.'_count');
 		$Cache->delete_value('forum_'.$forumid.'_last_replied_topic_content');
+		write_forum_log("Topic:$topicid was moved to Forum:$forumid by $CURUSER[username].",$permi);
 	}
 
 	// Redirect to forum page
@@ -866,6 +880,11 @@ elseif ($action == "deletetopic") {
 		$forumid = $row1['forumid'];
 		$userid = $row1['userid'];
 	}
+	$forum_row = get_forum_row($forumid);
+	if($forum_row['minclassread']>=$confiforumlog_class)
+		$permi = "high";
+	else
+		$permi = "normal";
 	$ismod = is_forum_moderator($topicid,'topic');
 	if (!is_valid_id($topicid) || (get_user_class() < $postmanage_class && !$ismod))
 		permissiondenied();
@@ -887,7 +906,7 @@ elseif ($action == "deletetopic") {
 	$forum_last_replied_topic_row = $Cache->get_value('forum_'.$forumid.'_last_replied_topic_content');
 	if ($forum_last_replied_topic_row && $forum_last_replied_topic_row['id'] == $topicid)
 		$Cache->delete_value('forum_'.$forumid.'_last_replied_topic_content');
-
+	write_forum_log("Topic:$topicid was deleted by $CURUSER[username].",$permi);
 	//===remove karma
 	KPS("-",$starttopic_bonus,$userid);
 	//===end
@@ -941,9 +960,15 @@ elseif ($action == "deletepost") {
 	else{
 		sql_query("UPDATE forums SET postcount=postcount-1 WHERE id=".sqlesc($forumid));
 	}
+	$forum_row = get_forum_row($forumid);
+	if($forum_row["minclassread"]>=$confiforumlog_class)
+		$permi = "high";
+	else
+		$permi = "normal";
 	$forum_last_replied_topic_row = $Cache->get_value('forum_'.$forumid.'_last_replied_topic_content');
 	if ($forum_last_replied_topic_row && $forum_last_replied_topic_row['lastpost'] == $postid)
 		$Cache->delete_value('forum_'.$forumid.'_last_replied_topic_content');
+	write_forum_log("Post:$postid in Topic:$topicid was deleted by $CURUSER[username].",$permi);
 	//------- Update topic
 	update_topic_last_post($topicid);
 
@@ -961,10 +986,25 @@ elseif ($action == "setlocked") {
 	$ismod = is_forum_moderator($topicid,'topic');
 	if (!$topicid || (get_user_class() < $postmanage_class && !$ismod))
 		permissiondenied();
+	
+	$forum_id = get_forum_id($topicid, "topic");
+	if($forum_id==-1)
+		permissiondenied();
+	$forum_row = get_forum_row($forum_id);
+	if($forum_row['minclassread']>=$confiforumlog_class)
+		$permi = "high";
+	else
+		$permi = "normal";
 
-	$locked = sqlesc($_POST["locked"]);
+	$locked = $_POST["locked"];
+	 if ($locked != 'yes' && $locked != 'no') {
+    die;
+  }
+	$act = ($locked=='yes'?"locked":"unlocked");
+	$locked = sqlesc($locked);
 	sql_query("UPDATE topics SET locked=$locked WHERE id=$topicid") or sqlerr(__FILE__, __LINE__);
-
+	if(mysql_affected_rows())
+		write_forum_log("Topic:$topicid was $act by $CURUSER[username].",$permi);
 	header("Location: $_POST[returnto]");
 	die;
 }
@@ -975,9 +1015,20 @@ elseif ($action == 'hltopic') {
 	if (!$topicid || (get_user_class() < $postmanage_class && !$ismod))
 		permissiondenied();
 	$color = $_POST["color"];
+	$forum_id = get_forum_id($topicid, "topic");
+	$forum_row = get_forum_row($forum_id);
+	if($forum_row['minclassread']>=$confiforumlog_class)
+		$permi = "high";
+	else
+		$permi = "normal";
 	if ($color==0 || get_hl_color($color))
 		sql_query("UPDATE topics SET hlcolor=".sqlesc($color)." WHERE id=".sqlesc($topicid)) or sqlerr(__FILE__, __LINE__);
-
+	if(mysql_affected_rows()){
+		if($color!=0)
+			write_forum_log("Topic:$topicid was highlighted by $CURUSER[username].",$permi);
+		else
+			write_forum_log("Topic:$topicid was unhighlighted by $CURUSER[username].",$permi);
+	}
 	$forumid = get_single_value("topics","forumid","WHERE id=".sqlesc($topicid));
 	$forum_last_replied_topic_row = $Cache->get_value('forum_'.$forumid.'_last_replied_topic_content');
 	if ($forum_last_replied_topic_row && $forum_last_replied_topic_row['id'] == $topicid)
@@ -1003,14 +1054,27 @@ elseif ($action == "setsticky" || $action == 'setselected') {
   $ismod = is_forum_moderator($topicid,'topic');
   if (!$topicid || (get_user_class() < $postmanage_class && !$ismod))
     permissiondenied();
-
+    
+	$forumid = get_forum_id($topicid, "topic");
+	if($forumid==-1)
+		permissiondenied();
+	$forum_row = get_forum_row($forumid);
+	if($forum_row['minclassread']>=$confiforumlog_class)
+		$permi = "high";
+	else
+		$permi = "normal";
+	
   $value = $_REQUEST["value"];
+	$act = ($value=='yes'?'':"un").$key.($key=='sticky'?"ed":'');
+
   if ($value != 'yes' && $value != 'no') {
     die;
   }
   $value = sqlesc($value);
+   	
   sql_query("UPDATE topics SET $key=$value WHERE id=$topicid") or sqlerr(__FILE__, __LINE__);
-
+	if(mysql_affected_rows())
+		write_forum_log("Topic:$topicid was $act by $CURUSER[username].",$permi);
   header("Location: $_REQUEST[returnto]");
   die;
 }

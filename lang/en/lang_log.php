@@ -6,6 +6,7 @@ $lang_log = array
 	'std_permission_denied_only' => "Permission denied. Only ",
 	'std_or_above_can_view' => " or above could view LOG. <br /><br /> Please see the <a class=faqlink href=faq.php#id22><b>FAQ</b></a> for more information on different user classes and what they can do.<br /><br /><b></p>The " .$SITENAME." Staff</b>",
 	'head_site_log' => "Daily Log",
+	'head_forum_log' => "Forum Log",
 	'text_search_log' => "Search Daily Log",
 	'submit_search' => "Search",
 	'text_log_empty' => "<b>Log is empty</b><br />",
@@ -14,6 +15,7 @@ $lang_log = array
 	'col_event' => "Event",
 	'time_zone_note' => "<p>Times are in GMT +8:00.</p>",
 	'text_daily_log' => "Daily Log",
+	'text_forum_log' =>"Forum Log",
 	'text_chronicle' => "Chronicle",
 	'text_code_update' => "Code Update",
 	'text_funbox' => "&nbsp;Funbox&nbsp;",
@@ -61,6 +63,7 @@ $lang_log = array
 	'text_all' => "all",
 	'text_normal' => "normal",
 	'text_mod' => "mod",
+	'text_high' => "high",
 );
 
 ?>

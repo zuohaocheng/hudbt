@@ -207,6 +207,7 @@ $viewhistory_class = $AUTHORITY['viewhistory'];
 $topten_class = $AUTHORITY['topten'];
 $log_class = $AUTHORITY['log'];
 $confilog_class = $AUTHORITY['confilog'];
+$confiforumlog_class = $AUTHORITY['confiforumlog'];
 $userprofile_class = $AUTHORITY['userprofile'];
 $torrenthistory_class = $AUTHORITY['torrenthistory'];
 $prfmanage_class = $AUTHORITY['prfmanage'];

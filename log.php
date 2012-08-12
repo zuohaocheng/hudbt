@@ -18,6 +18,7 @@ function logmenu($selected = "dailylog") {
   begin_main_frame();
   print ("<div id=\"lognav\"><ul id=\"logmenu\" class=\"menu\">");
   print ("<li" . ($selected == "dailylog" ? " class=selected" : "") . "><a href=\"?action=dailylog\">".$lang_log['text_daily_log']."</a></li>");
+  print ("<li" . ($selected == "forumlog" ? " class=selected" : "") . "><a href=\"?action=forumlog\">".$lang_log['text_forum_log']."</a></li>");
   print ("<li" . ($selected == "chronicle" ? " class=selected" : "") . "><a href=\"?action=chronicle\">".$lang_log['text_chronicle']."</a></li>");
   if ($showfunbox_main == 'yes')
     print ("<li" . ($selected == "funbox" ? " class=selected" : "") . "><a href=\"?action=funbox\">".$lang_log['text_funbox']."</a></li>");
@@ -73,7 +74,7 @@ function edititem($title, $action, $id) {
 }
 
 $action = htmlspecialchars($_REQUEST['action']);
-$allowed_actions = array("dailylog","chronicle","funbox","news","poll");
+$allowed_actions = array("dailylog","forumlog","chronicle","funbox","news","poll");
 if (!$action)
   $action='dailylog';
 if (!in_array($action, $allowed_actions))
@@ -90,11 +91,11 @@ else {
     $wherea = "";
     if (get_user_class() >= $confilog_class){
       switch ($search)
-	{
-	case "mod": $wherea=" WHERE security_level = 'mod'"; break;
-	case "normal": $wherea=" WHERE security_level = 'normal'"; break;
-	case "all": break;
-	}
+			{
+			case "mod": $wherea=" WHERE security_level = 'mod'"; break;
+			case "normal": $wherea=" WHERE security_level = 'normal'"; break;
+			case "all": break;
+			}
       $addparam = ($wherea ? "search=".rawurlencode($search)."&" : "");
     }
     else{
@@ -148,6 +149,105 @@ else {
     stdfoot();
     die;
     break;
+ 
+  case "forumlog"://added on 2012 10th Aug. by Eggsorer
+
+    stdhead($lang_log['head_forum_log']);
+
+    $query = mysql_real_escape_string(trim($_GET["query"]));
+    $search = $_GET["search"];
+
+    $addparam = "";
+    $wherea = "";
+    if (get_user_class() >= $confiforumlog_class){//¸Ä
+      switch ($search)
+			{
+			case "high": $wherea=" WHERE security_level = 'high'"; break;
+			case "normal": $wherea=" WHERE security_level = 'normal'"; break;
+			case "all": break;
+			}
+      $addparam = ($wherea ? "search=".rawurlencode($search)."&" : "");
+    }
+    else{
+      $wherea=" WHERE security_level = 'normal'";
+    }
+
+    if($query){
+      $wherea .= ($wherea ? " AND " : " WHERE ")." txt LIKE '%$query%' ";
+      $addparam .= "query=".rawurlencode($query)."&";
+    }
+
+    logmenu('forumlog');
+    $opt = array (all => $lang_log['text_all'], normal => $lang_log['text_normal'], high => $lang_log['text_high']);
+    searchtable($lang_log['text_search_log'], 'forumlog',$opt);
+
+    $res = sql_query("SELECT COUNT(*) FROM forumlog".$wherea);
+    $row = mysql_fetch_array($res);
+    $count = $row[0];
+
+    $perpage = 50;
+
+    list($pagertop, $pagerbottom, $limit) = pager($perpage, $count, "log.php?action=forumlog&".$addparam);
+    $res = sql_query("SELECT added, txt FROM forumlog $wherea ORDER BY added DESC $limit") or sqlerr(__FILE__, __LINE__);
+    if (mysql_num_rows($res) == 0)
+      print($lang_log['text_log_empty']);
+    else
+      {
+
+	//echo $pagertop;
+
+	print("<table width=940 border=1 cellspacing=0 cellpadding=5>\n");
+	print("<tr><td class=colhead align=center><img class=\"time\" src=\"pic/trans.gif\" alt=\"time\" title=\"".$lang_log['title_time_added']."\" /></td><td class=colhead align=left>".$lang_log['col_event']."</td></tr>\n");
+	while ($arr = mysql_fetch_assoc($res))
+	  {
+	  	$txt_bb = $txt = $arr['txt'];
+	    $color = "";
+	    
+	    if (strpos($arr['txt'],'was deleted by')){
+	    		$color = "red";
+	    		if(strpos($txt,'Post:')!==false){
+	    			//replace topicid with proper bbcode
+	    			$topic_left = strstr($txt, "Topic:");
+	    			$topicid = substr($topic_left,6,strpos($topic_left,' ')-6);
+	    		}
+	    }
+	    else{
+	    	//give proper color
+	    	if (strpos($arr['txt'],'was highlighted by')) $color = "green";
+	    	if (strpos($arr['txt'],'was stickyed by')) $color = "sandybrown";
+	    	if (strpos($arr['txt'],'was moved to')) $color = "purple";
+	    	if (strpos($arr['txt'],'was selected by ')) $color = "orange";
+	    	if (strpos($arr['txt'],'was edited by')) $color = "blue";
+	    	if (strpos($arr['txt'],'was locked by')) $color = "darkred";
+	    	
+	    	if(strpos($txt,'Post')!==false){
+	    		$postid = substr($txt,5,strpos($txt," ")-5);
+	    		//replace postid with proper bbcode
+	    		$txt_bb = str_replace($postid, '[post='.$postid.']', $txt_bb);
+	    	}
+	    	
+	    	$topic_left = strstr($txt, "Topic:");
+	    	$topicid = substr($topic_left,6,strpos($topic_left,' ')-6);
+	    }
+	    //replace name, topicid with proper bbcode
+	    $txt_bb = str_replace($topicid, '[topic='.$topicid.']', $txt_bb);
+	    $name = substr($txt, strrpos($txt, ' ')+1, -1);
+	    $txt_bb = str_replace($name, '[name='.$name.']', $txt_bb);
+	    $txt_parsed = format_comment($txt_bb);
+	   // echo $txt_bb;
+	    print("<tr><td class=\"rowfollow nowrap\" align=center>".gettime($arr['added'],true,false)."</td><td class=rowfollow align=left><font color='".$color."'>".$txt_parsed."</font></td></tr>\n");
+	  }
+	print("</table>");
+	
+	echo $pagerbottom;
+      }
+
+    print($lang_log['time_zone_note']);
+
+    stdfoot();
+    die;
+    break;
+    
   case "chronicle":
     stdhead($lang_log['head_chronicle']);
     $query = mysql_real_escape_string(trim($_GET["query"]));

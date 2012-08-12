@@ -6,6 +6,7 @@ $lang_log = array
 	'std_permission_denied_only' => "你沒有該權限。只有",
 	'std_or_above_can_view' => "及以上等級的用戶才能查看日志。<br /><br />請查看<a class=faqlink href=faq.php#id22><b>常見問題</b></a>了解更多關于用戶等級和權限的信息。<br /><br /><b></p>" .$SITENAME."管理組</b>",
 	'head_site_log' => "常規日志",
+	'head_forum_log' => "論壇日誌",
 	'text_search_log' => "搜素常規日志",
 	'submit_search' => "給我搜",
 	'text_log_empty' => "<br /><b>沒有日志</b><br /><br />",
@@ -13,7 +14,8 @@ $lang_log = array
 	'col_date' => "日期",
 	'col_event' => "事件",
 	'time_zone_note' => "<p>時間為北京時間。</p>\n",
-	'text_daily_log' => "&nbsp;常&nbsp;規&nbsp;日&nbsp;志&nbsp;",
+	'text_daily_log' => "&nbsp;常&nbsp;規&nbsp;日&nbsp;誌&nbsp;",
+	'text_forum_log' =>"&nbsp;論&nbsp;壇&nbsp;日&nbsp;誌&nbsp;",
 	'text_chronicle' => "&nbsp;史&nbsp;&nbsp;冊&nbsp;",
 	'text_code_update' => "&nbsp;代&nbsp;碼&nbsp;更&nbsp;新&nbsp;",
 	'text_funbox' => "&nbsp;趣&nbsp;味&nbsp;盒&nbsp;",
@@ -61,6 +63,7 @@ $lang_log = array
 	'text_all' => "所有",
 	'text_normal' => "普通",
 	'text_mod' => "機密",
+	'text_high' => "高",
 );
 
 ?>
