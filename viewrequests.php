@@ -182,7 +182,7 @@ print("</form></div>");
 		<input type=hidden name=reqid  value=".$_GET["id"]." >
 		");
 		print("<table width=940 cellspacing=0 cellpadding=3><tr><td class=colhead align=center colspan=2>编辑求种</td></tr>");
-		tr("标题：","<input name=name value=\"".$arr["request"]."\" size=134 ><br/>", 1);
+		tr("标题：","<input name=request value=\"".$arr["request"]."\" size=134 ><br/>", 1);
 		print("<tr><td class=rowhead align=right valign=top><b>介绍：</b></td><td class=rowfollow align=left>");
 		textbbcode("edit","descr",$arr["descr"]);
 		print("</td></tr>");
