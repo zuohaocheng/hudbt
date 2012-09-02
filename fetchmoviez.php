@@ -6,18 +6,18 @@ ini_set("memory_limit", "200M");
 require_once("include/bittorrent.php");
 dbconn();
 
-$content = get_url("http://xtmhd.com/archiver/fid-150-page-1.html");//fid-150-page-1.html可修改为fid-150-page-2.html、fid-150-page-3.html等...每天采集则无需考虑
+$content = get_url("http://www.xtmhd.com/forum-150-1.html");//fid-150-page-1.html可修改为fid-150-page-2.html、fid-150-page-3.html等...每天采集则无需考虑
 $matches = array();
-preg_match_all("/<li><a href=\"(.*?)\">(.*?)<\\/a>/i", $content, $matches);
+preg_match_all("/0day<\/a>(?:.*?)<a href=\"(.*?)\"(?:.*?)>(.*?)<\/a>/i", $content, $matches);//只采集0day
 $arr_url = $matches[1];
 $arr_title = $matches[2];
 
 foreach ($arr_url as $key => $url)
-{
+{	
 	$title = $arr_title[$key];
 	$url = "http://xtmhd.com/" . $url;
 	$matches = array();
-	$tid = preg_match("/tid-(\\d+)\\.html/i", $url, $matches);
+	$tid = preg_match("/thread-(\\d+)-\d-\d\\.html/i", $url, $matches);
 	$tid = $matches[1];
 	if (check_fetched($tid))
 	{
@@ -26,40 +26,28 @@ foreach ($arr_url as $key => $url)
 	$content = get_url($url);
 	$content = str_replace("\n", "", $content);
 	$matches = array();
-	$match_times = preg_match("/<\\/h3>(.*?)<p class=\"author\">/i", $content, $matches);
-	if ($match_times == 1)
+	$match_times = preg_match("/<td class=\"t_f\"(?:.*?)>(.*?)<\/div>/i", $content, $matches);
+if ($match_times == 1)
 	{
 		$content = $matches[1];
 	}
-	else
-	{
-		$match_times = preg_match("/<\\/h3>(.*?)<div class=\"page\">/i", $content, $matches);
-		if ($match_times == 1)
-		{
-			$content = $matches[1];
-		}
-		else
-		{
-			$match_times = preg_match("/<\\/h3>(.*?)<div class=\"page\">/i", $content, $matches);
-			if ($match_times == 1)
-			{
-				$content = $matches[1];
-			}
-			else
-			{
-				$content = '';
-			}
-		}
-	}
+
 	if ($content != '')		
 	{
+		$content = preg_replace('/<div class="quote"><blockquote>(.*?)<\/blockquote>/i', '[quote]'.'\\1'.'[/quote]', $content);
 		$content = str_replace("<br />","\n",$content);
 		$content = str_replace("<br>","\n",$content);
 		$content = str_replace("<br/>","\n",$content);
 		$content = str_replace("&nbsp;"," ",$content);
 		$content = str_replace("&gt;",">",$content);
 		$content = str_replace("&lt;","<",$content);
+		$content = preg_replace('/<img id=(?:.*?)src="(.*?)"(?:.*?)>/i','[img]'.'\\1'.'[/img]',$content);
+		$content = preg_replace('/<a href="(.*?)"(?:.*?)<\/a>/i','[url='.'\\1'.']'.'\\1'.'[/url]',$content);
+		$content = preg_replace('/<font color="(.*?)">(.*?)<\/font>/i', '[color='.'\\1'.']'.'\\2'.'[/color]', $content);
+		//$content = preg_replace('/(<style type=(.*?)<\/style>)/i', ' ', $content);
+		$content = trim($content);
 		insert($title, $tid, $content);
+		write_log("Movie:$tid is fetched.","mod");
 	}
 	sleep(1);
 }
@@ -83,7 +71,7 @@ function check_fetched($tid)
 
 function sendto_forum()
 {
-	$forumid=22;
+	$forumid=29;
 
 	$sql  = "select * from moviez where sent=0";
 	$res = sql_query($sql);
@@ -96,7 +84,7 @@ function sendto_forum()
 		$row[content] = preg_replace("/'/","\'",$row[content]);
 
 		sql_query("set names utf8") or die("character error!");
-		$sql = "INSERT INTO topics (userid, forumid, subject) VALUES('43571', '22','$row[title]')";
+		$sql = "INSERT INTO topics (userid, forumid, subject) VALUES('1', '29','$row[title]')";
 		sql_query($sql) or die("Insert error!");
 		
 		$topicid = mysql_insert_id();
@@ -104,7 +92,7 @@ function sendto_forum()
 		$sql = "UPDATE forums SET topiccount=topiccount+1, postcount=postcount+1 WHERE id= ".$forumid;
 		sql_query($sql);
 		
-		$sql = "INSERT INTO posts (topicid, userid,added, editdate, body, ori_body ) VALUES ('$topicid', '43571',now(),now(), '$row[content]', '$row[content]')";
+		$sql = "INSERT INTO posts (topicid, userid,added, editdate, body, ori_body ) VALUES ('$topicid', '1',now(),now(), '$row[content]', '$row[content]')";
 		sql_query($sql) or die("TOPICID: ****".$topicid."*****");
 		
 		$postid = mysql_insert_id();
@@ -114,6 +102,7 @@ function sendto_forum()
 		
 		$sql = "update moviez set sent='1',newtid='$tid' where tid='$row[tid]'";//成功后改回原状，设置每日定时任务即可
 		sql_query($sql);
+		write_forum_log("Info of movie:$row[tid] is sent to Topic:$topicid.", "high");
 	}
 }
 

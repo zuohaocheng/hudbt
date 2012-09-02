@@ -137,6 +137,7 @@ else {
 	    if (strpos($arr['txt'],'was added to the Request section')) $color = "purple";
 	    if (strpos($arr['txt'],'was edited by')) $color = "blue";
 	    if (strpos($arr['txt'],'settings updated by')) $color = "darkred";
+	    if (strpos($arr['txt'],'is fetched')) $color = "lime";
 	    print("<tr><td class=\"rowfollow nowrap\" align=center>".gettime($arr['added'],true,false)."</td><td class=rowfollow align=left><font color='".$color."'>".htmlspecialchars($arr['txt'])."</font></td></tr>\n");
 	  }
 	print("</table>");
@@ -205,7 +206,7 @@ else {
 	    
 	    if (strpos($arr['txt'],'was deleted by')){
 	    		$color = "red";
-	    		if(strpos($txt,'Post:')!==false){
+	    		if(stripos($txt,'Post:')!==false){
 	    			//replace topicid with proper bbcode
 	    			$topic_left = strstr($txt, "Topic:");
 	    			$topicid = substr($topic_left,6,strpos($topic_left,' ')-6);
@@ -219,15 +220,17 @@ else {
 	    	if (strpos($arr['txt'],'was selected by ')) $color = "orange";
 	    	if (strpos($arr['txt'],'was edited by')) $color = "blue";
 	    	if (strpos($arr['txt'],'was locked by')) $color = "darkred";
+	    	if (strpos($arr['txt'],'Info of movie:')!==false) $color = "lime";	    	
 	    	
-	    	if(strpos($txt,'Post')!==false){
-	    		$postid = substr($txt,5,strpos($txt," ")-5);
+	    	
+	    	if(stripos($txt,'Post')!==false){
+	    		$postid = substr($txt,5,stripos($txt," ")-5);
 	    		//replace postid with proper bbcode
 	    		$txt_bb = str_replace($postid, '[post='.$postid.']', $txt_bb);
 	    	}
 	    	
 	    	$topic_left = strstr($txt, "Topic:");
-	    	$topicid = substr($topic_left,6,strpos($topic_left,' ')-6);
+	    	$topicid = substr($topic_left,6,(strpos($topic_left,' ')===false?strpos($topic_left,'.'):strpos($topic_left,' ')) -6);
 	    }
 	    //replace name, topicid with proper bbcode
 	    $txt_bb = str_replace($topicid, '[topic='.$topicid.']', $txt_bb);
