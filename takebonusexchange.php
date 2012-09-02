@@ -111,6 +111,9 @@ if($CURUSER['seedbonus'] >= $points) {
    elseif($art == "color") {
     //===custom title
     $color = $_POST["color"];
+    if(strlen($color)==7){
+  		$color = substr($color, 1, 6);
+  	}
     $color = sqlesc($color);
     $bonuscomment = date("Y-m-d") . " - " .$points. " Points for custom color. New color is $color\n " .htmlspecialchars($bonuscomment);
     sql_query("UPDATE LOW_PRIORITY users SET color = $color, seedbonus = seedbonus - $points, bonuscomment = ".sqlesc($bonuscomment)." WHERE id = ".sqlesc($userid)) or sqlerr(__FILE__, __LINE__);
