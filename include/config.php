@@ -244,7 +244,8 @@ $cssdate_tweak = $TWEAK['cssdate'];
 $enabletooltip_tweak = $TWEAK['enabletooltip'];
 $prolinkimg = $TWEAK['prolinkimg'];
 $analyticscode_tweak = $TWEAK['analyticscode'];
-
+$oday_bot_id = $TWEAK['oday_bot_id'];
+$oday_forum_id = $TWEAK['oday_forum_id'];
 $enableattach_attachment = $ATTACHMENT['enableattach'];
 $classone_attachment = $ATTACHMENT['classone'];
 $countone_attachment = $ATTACHMENT['countone'];

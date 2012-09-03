@@ -5,7 +5,7 @@ ini_set("memory_limit", "200M");
 
 require_once("include/bittorrent.php");
 dbconn();
-
+if(php_sapi_name() !=cli) permissiondenied();//block users from browsers, only allow cron 
 $content = get_url("http://www.xtmhd.com/forum-150-1.html");//fid-150-page-1.html可修改为fid-150-page-2.html、fid-150-page-3.html等...每天采集则无需考虑
 $matches = array();
 preg_match_all("/0day<\/a>(?:.*?)<a href=\"(.*?)\"(?:.*?)>(.*?)<\/a>/i", $content, $matches);//只采集0day
@@ -71,7 +71,7 @@ function check_fetched($tid)
 
 function sendto_forum()
 {
-	$forumid=29;
+	$forumid=$oday_forum_id;
 
 	$sql  = "select * from moviez where sent=0";
 	$res = sql_query($sql);
@@ -84,7 +84,7 @@ function sendto_forum()
 		$row[content] = preg_replace("/'/","\'",$row[content]);
 
 		sql_query("set names utf8") or die("character error!");
-		$sql = "INSERT INTO topics (userid, forumid, subject) VALUES('1', '29','$row[title]')";
+		$sql = "INSERT INTO topics (userid, forumid, subject) VALUES('$oday_bot_id', '$forumid','$row[title]')";
 		sql_query($sql) or die("Insert error!");
 		
 		$topicid = mysql_insert_id();
@@ -92,7 +92,7 @@ function sendto_forum()
 		$sql = "UPDATE forums SET topiccount=topiccount+1, postcount=postcount+1 WHERE id= ".$forumid;
 		sql_query($sql);
 		
-		$sql = "INSERT INTO posts (topicid, userid,added, editdate, body, ori_body ) VALUES ('$topicid', '1',now(),now(), '$row[content]', '$row[content]')";
+		$sql = "INSERT INTO posts (topicid, userid,added, editdate, body, ori_body ) VALUES ('$topicid', '$oday_bot_id',now(),now(), '$row[content]', '$row[content]')";
 		sql_query($sql) or die("TOPICID: ****".$topicid."*****");
 		
 		$postid = mysql_insert_id();
