@@ -222,6 +222,7 @@ $lang_details = array
 	'col_path' => "路径",
 	'text_startseed' => '已经有人做过种了',
 	'text_no_startseed' => '看，占坑党',
+	'report' => '举报',
 	'hint_placeholder_reply' => '你的好评是对发种者最大的鼓励',
 	'comment_warning' => '<a href="//' . $BASEURL . '/rules.php" title="网站规则">请勿发表类似“等xxx版本”、“等字幕”、“求免费”等评论，否则会得到一个警告。</a>',
 );

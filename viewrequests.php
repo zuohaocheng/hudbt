@@ -177,7 +177,7 @@ print("</form></div>");
 		{	
 		stdhead("编辑求种");	
 		print(
-		"<form id=edit method=post name=edit action=viewrequests.php >\n
+		"<form id=compose method=post name=edit action=viewrequests.php >\n
 		<input type=hidden name=action  value=takeedit >
 		<input type=hidden name=reqid  value=".$_GET["id"]." >
 		");
@@ -199,7 +199,7 @@ print("</form></div>");
 		{	
 		stdhead("新增求种");	
 		print(
-		"<form id=edit method=post name=edit action=viewrequests.php >\n<input type=hidden name=action  value=takeadded >\n");
+		"<form id=compose method=post name=edit action=viewrequests.php >\n<input type=hidden name=action  value=takeadded >\n");
 		print("<table width=940 cellspacing=0 cellpadding=3><tr><td class=colhead align=center colspan=2>新增求种</td></tr>\n");
 		tr("标题：","<input name=request size=134><br/>", 1);
 		tr("悬赏：","<input name=amount size=11 value=2000>赏金不得低于100魔力值，每次求种将扣去100魔力值作为手续费。<br/>", 1);

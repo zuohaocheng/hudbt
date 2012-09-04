@@ -218,6 +218,7 @@ $lang_details = array
 	'row_uploader_bandwidth' => "發布者頻寬",
 	'text_and_more' => "……（這裏只顯示最新記錄。共",
 	'text_users_in_total' => "個用戶表示了感謝）",
+		'report' => '舉報',
 );
 
 ?>
