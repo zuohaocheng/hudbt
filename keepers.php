@@ -78,7 +78,7 @@ else {
 		print("<td class=\"colfollow\">".($sizeTotal>=0 ? mksize($sizeTotal) : "0")."</td>");
 		print("<td class=\"colfollow\">".(($totalTime > 0 ?mkprettytime($totalTime) : 0)."</td>"));
 		print("<td class=\"colfollow\">".$storingInfo['num_total']."</td>");
-		print("<td class=\"colfollow\">".($sizeTotal*$ka_bonus + $totalTime*$kb_bonus)."</td>");
+		print("<td class=\"colfollow\">".ceil($sizeTotal*$ka_bonus + $totalTime*$kb_bonus/1e6)."</td>");
 		print("<td class=\"colfollow\">"."<a href=\"userdetails.php?id=".$userid."#pica5\">".$lang_keepers['txt_click_to_view']."</a>"."</td>");
 		print("</tr>");
 	}

@@ -57,16 +57,10 @@ $privilegeConfig = ['Maintenance'=>['staticResources' => UC_MODERATOR],
 				       'stats' => UC_MODERATOR,
 				       'testip' => UC_MODERATOR,
 				       'amountbonus' => UC_MODERATOR,
-				       'clearcache' => UC_MODERATOR,]
+				       'clearcache' => UC_MODERATOR,
+				       'hustip' => UC_MODERATOR]
 		    ];
 
-$permissionList = [
-'keeper_m' => [
-	''
-	],
-
-'helper' => []
-];
 function smarty($cachetime=300, $debug = false) {
   require_once('lib/Smarty/Smarty.class.php');
   static $smarty;
@@ -289,9 +283,6 @@ function checkSubPrivilege($obj, $opts) {
   }
 };
 
-/*******************New User Group System******************/
-/***********Added By Eggsorer@HUDBT in 2012-09-06**********/
-
 $permissionConfig = [
 "keeper" => [
 	"boss" =>["setstoring","edittorrent","viewkeepers"],
@@ -342,7 +333,6 @@ function get_user_group($userid){
 	}
 	return $user_groups;
 }
-/*******************New User Group System******************/
 
 function checkPrivilege($item, $opts = null) {
   global $privilegeConfig;
@@ -407,7 +397,7 @@ function stderr($heading, $text, $htmlstrip = true, $head = true, $foot = true, 
 }
 
 function sqlerr($file = '', $line = '', $stack = true) {
-  echo "<div style=\"background: blue;color:white;font-weight:bold;position:fixed;width:100%;height:100%;top: 0%;left: 0%;\"><h1>SQL Error</h1>";
+  echo "<div style=\"font-family: menlo, monaco, courier, monospace; background: blue;color:white;position:fixed;width:100%;height:100%;top: 0%;left: 0%;\"><h1>SQL Error</h1>";
   if ($stack) {
     debug_print_backtrace();
   }
@@ -631,10 +621,7 @@ function end_table() {
   print("</table>\n");
 }
 
-//-------- Inserts a smilies frame
-//         (move to globals)
-
-function insert_smilies_frame() {
+FUNCTION insert_smilies_frame() {
   global $lang_functions;
   begin_frame($lang_functions['text_smilies'], true);
   begin_table(false, 5);
@@ -729,7 +716,10 @@ function textbbcode($form,$text,$content="",$hastitle=false, $col_num = 130) {
 		   'smilies' => array(1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 13, 16, 17, 19, 20, 21, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 39, 40, 41),
 		   'content' => $content
 		   ));
+  echo '<script type="text/javascript" src="js/userAutoTips.js"></script>';
+  echo '<link rel="js/userAutoTips.css" href="url" type="text/css" media="screen" />';
   $s->display('bbcode.tpl', php_json_encode(array('form' => $form, 'text' => $text)));
+  echo '<script type="text/javascript">userAutoTips({id:"body"});</script>';
 }
 
 function begin_compose($title = "",$type="new", $body="", $hassubject=true, $subject="", $maxsubjectlength=100) {
@@ -1559,8 +1549,9 @@ function userlogin() {
   $oldip = $row['ip'];
   $row['ip'] = $ip;
   $usergroups = get_user_group($id);
-  if($usergroups !=NULL)
-  	$row['usergroups'] = $usergroups;
+  if ($usergroups !=NULL) {
+    $row['usergroups'] = $usergroups;
+  }
   $GLOBALS["CURUSER"] = $row;//initialize global $CURUSER which will be used frequently in other operations//noted by bluemonster 20111107
   if (array_key_exists('clearcache', $_GET) && $_GET['clearcache'] && get_user_class() >= UC_MODERATOR) {
     $Cache->setClearCache(1);
@@ -1822,9 +1813,7 @@ function menu ($selected = "home") {
     $selected = "upload";
   }elseif (preg_match("/subtitles/i", $script_name)) {
     $selected = "subtitles";
-  }//elseif (preg_match("/usercp/i", $script_name)) {
-    //$selected = "usercp";
-  elseif (preg_match("/topten/i", $script_name)) {
+  }elseif (preg_match("/topten/i", $script_name)) {
     $selected = "topten";
   }elseif (preg_match("/log/i", $script_name)) {
     $selected = "log";
@@ -2829,7 +2818,7 @@ function post_body_toolbox_href($postid, $type, $pid) {
   }
 }
 
-function post_body_toolbox($postid, $privilege, $type='', $pid = '') {
+function post_body_toolbox($postid, $privilege, $type='', $pid = '', $extra='') {
   global $lang_functions;
   global $BASEURL;
 
@@ -2852,12 +2841,12 @@ function post_body_toolbox($postid, $privilege, $type='', $pid = '') {
   }
 
   if ($toolbox_post) {
-    return '<div class="forum-post-toolbox minor-list horizon-compact"><ul>' . $toolbox_post . '</ul></div>';
+    return '<div class="forum-post-toolbox-container"><div class="forum-post-toolbox minor-list horizon-compact"><ul style="float:right">' . $toolbox_post . '</ul>' . $extra . '</div></div>';
   }
   return '';
 }
 
-function post_body_container($postid, $body, $highlight, $edit, $signature, $privilege, $type, $pid) {
+function post_body_container($postid, $body, $highlight, $edit, $signature, $privilege, $type, $pid, $extra = '') {
   global $CURUSER;
   
   $container = '<div class="forum-post-body-container">';
@@ -2871,14 +2860,13 @@ function post_body_container($postid, $body, $highlight, $edit, $signature, $pri
   }
   $container .= '</div>';
 
-  $container .= post_body_toolbox($postid, $privilege, $type, $pid);
-  $container .= '<div class="forum-post-footer"></div>';
+  $container .= post_body_toolbox($postid, $privilege, $type, $pid, $extra);
 
   $container .= '</div>';
   return $container;
 }
 
-function post_format($args, $privilege) {
+function post_format($args, $privilege, $extra = '') {
   $post = '<li class="forum-post td table">';
   if (array_key_exists('last', $args) && $args['last']) {
     $post .= '<a id="last"></a>';
@@ -2888,8 +2876,7 @@ function post_format($args, $privilege) {
   list($author_info, $signature) = post_format_author_info($args['posterid'], ($type =='post'));
   $post .= $author_info;
 
-  $post .= post_body_container($args['postid'], $args['body'], $args['highlight'], $args['edit'], $signature, $privilege, $args['type'], $args['topicid']);
-
+  $post .= post_body_container($args['postid'], $args['body'], $args['highlight'], $args['edit'], $signature, $privilege, $args['type'], $args['topicid'], $extra);
   $post .= '</li>';
   return $post;
 }
@@ -2940,7 +2927,7 @@ function get_forum_id($query_id = 0,$query_type = "topic") {
 	}
 }
 
-function single_post($arr, $maypost, $maymodify, $locked, $highlight = '', $last = false, $floor = -1) {
+function single_post($arr, $maypost, $maymodify, $locked, $highlight = '', $last = false, $floor = -1, $extra) {
   global $CURUSER;
   $editor = $arr['editedby'];
   if (!is_valid_id($editor)) {
@@ -2953,7 +2940,7 @@ function single_post($arr, $maypost, $maymodify, $locked, $highlight = '', $last
 
   $privilege = array($maypost, $maymodify, $maymodify || ($CURUSER["id"] == $posterid && !$locked));
   $post_f = array('type' => 'post', 'posterid' => $posterid, 'topicid' => $arr['topicid'], 'postid' => $arr['id'], 'added' => $arr['added'], 'floor' => $floor, 'body' => $arr['body'], 'highlight' => $highlight, 'edit' => $edit, 'last' => $last, 'postname' => $arr['postname']);
-  echo post_format($post_f, $privilege);
+  echo post_format($post_f, $privilege, $extra);
 }
 
 function single_comment($row, $parent_id, $type, $floor = -1) {
@@ -3006,7 +2993,7 @@ function commenttable($rows, $type, $parent_id, $review = false, $offset=0) {
 function dequote($s) {
 #  $MAX_LEN = 40;
   
-  $s = preg_replace('/\[quote(=[a-z0-9]+)?\].*\[\/quote\]/smi', '', $s);
+  $s = preg_replace('/\[quote(=[a-z0-9\'"\[\]=]+)?\].*\[\/quote\]/smi', '', $s);
 #  if (iconv_strlen($s, 'utf-8') > $MAX_LEN) {
 #    $s = iconv_substr($s, 0, $MAX_LEN, 'utf-8') . '...';
 #  }
@@ -3527,7 +3514,7 @@ function get_username($id, $big = false, $link = true, $bold = true, $target = f
       $leechwarnpic = "leechwarned";
       $warnedpic = "warned";
       $disabledpic = "disabled";
-      $style = "style='margin-left: 2pt'";
+      $style = 'style="margin-left: 2pt"';
     }
     $pics = $arr["donor"] == "yes" ? "<img class=\"".$donorpic."\" src=\"//$BASEURL/pic/trans.gif\" alt=\"Donor\" ".$style." />" : "";
 
@@ -3572,7 +3559,7 @@ function get_username($id, $big = false, $link = true, $bold = true, $target = f
   else {
     $username = $lang_functions['text_orphaned'];
   }
-  $username = "<span class=\"username nowrap user-" . $id . "\"><span class=\"user-id\">$id</span>" . ( $bracket == true ? "(" . $username . ")" : $username) . "</span>";
+  $username = "<span class=\"username nowrap\" userid=\"" . $id . "\">" . ( $bracket == true ? "(" . $username . ")" : $username) . "</span>";
   
   if (func_num_args() == 1) { //One argument=is default display of username, save it in static array
     $usernameArray[$id] = $username;
@@ -3929,6 +3916,7 @@ function classlist($selectname,$maxclass, $selected, $minClass = 0){
 
 function permissiondenied(){
   global $lang_functions;
+  header('HTTP/1.1 403 Forbidden');
   stderr($lang_functions['std_error'], $lang_functions['std_permission_denied']);
 }
 
@@ -4579,6 +4567,7 @@ function a_to_z_index($letter='', $query = '') {
 
 function checkHTTPMethod($method) {
   if (strtoupper($_SERVER['REQUEST_METHOD']) != strtoupper($method)) {
+    header('HTTP/1.1 405 Method Not Allowed');
     stderr('No hacking allowed!', 'This method allows ' . $method . ' request only.');
     die();
   }
@@ -4753,3 +4742,4 @@ function storing_keeper_list($torrentid){
 	}
 	return $list;
 }
+

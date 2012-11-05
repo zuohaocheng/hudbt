@@ -360,7 +360,7 @@ if ($showsubcat){
   if ($showaudiocodec) $audiocodec_get = 0 + $_GET["audiocodec"];
 }
 
-$mainCats = array('1' => array('401', '413', '414', '415'),
+$mainCats = array('1' => array('401', '413', '414', '415', '430'),
 		  '2' => array('402', '416', '417', '418'),
 		  '3' => array('405', '427', '428', '429'),
 		  '4' => array('410'),

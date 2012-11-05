@@ -173,7 +173,7 @@ elseif ($action == 'savesettings_authority') 	// save user authority
 elseif ($action == 'savesettings_tweak')	// save tweak
 {
 	stdhead($lang_settings['head_save_tweak_settings']);
-	$validConfig = array('where','iplog1','bonus','datefounded', 'enablelocation', 'titlekeywords', 'metakeywords', 'metadescription', 'enablesqldebug', 'sqldebug', 'cssdate', 'enabletooltip', 'prolinkimg', 'analyticscode');
+	$validConfig = array('where','iplog1','bonus','datefounded', 'enablelocation', 'titlekeywords', 'metakeywords', 'metadescription', 'enablesqldebug', 'sqldebug', 'cssdate', 'enabletooltip', 'prolinkimg', 'analyticscode', 'oday_forum_id', 'oday_bot_id');
 	GetVar($validConfig);
 	foreach($validConfig as $config) {
 		$TWEAK[$config] = $$config;
@@ -225,8 +225,8 @@ elseif ($action == 'tweaksettings')		// tweak settings
 	tr($lang_settings['row_promotion_link_example_image'],"<input type='text' style=\"width: 300px\" name='prolinkimg' value='".($TWEAK["prolinkimg"] ? $TWEAK["prolinkimg"] : 'pic/prolink.png')."' /> <br />".$lang_settings['text_promotion_link_example_note'], 1);
 	tr($lang_settings['row_meta_keywords'],"<input type='text' style=\"width: 300px\" name='metakeywords' value='".($TWEAK["metakeywords"] ? $TWEAK["metakeywords"] : '')."' /> <br />".$lang_settings['text_meta_keywords_note'], 1);
 	tr($lang_settings['row_meta_description'],"<textarea cols=\"100\" style=\"width: 450px;\" rows=\"5\" name='metadescription'>".($TWEAK["metadescription"] ? $TWEAK["metadescription"] : '')."</textarea> <br />".$lang_settings['text_meta_description_note'], 1);
-	tr($lang_settings['row_oday_bot_id'],"<input type='text' style=\"width: 300px\" name='metakeywords' value='".($TWEAK["oday_bot_id"] ? $TWEAK["oday_bot_id"] : '')."' /> <br />".$lang_settings['text_oday_bot_id'], 1);
-	tr($lang_settings['row_oday_forum_id'],"<input type='text' style=\"width: 300px\" name='metakeywords' value='".($TWEAK["oday_forum_id"] ? $TWEAK["oday_forum_id"] : '')."' /> <br />".$lang_settings['text_oday_forum_id'], 1);
+	tr($lang_settings['row_oday_bot_id'],"<input type='text' style=\"width: 300px\" name='oday_bot_id' value='".($TWEAK["oday_bot_id"] ? $TWEAK["oday_bot_id"] : '')."' /> <br />".$lang_settings['text_oday_bot_id'], 1);
+	tr($lang_settings['row_oday_forum_id'],"<input type='text' style=\"width: 300px\" name='oday_forum_id' value='".($TWEAK["oday_forum_id"] ? $TWEAK["oday_forum_id"] : '')."' /> <br />".$lang_settings['text_oday_forum_id'], 1);
 	tr($lang_settings['row_web_analytics_code'],"<textarea cols=\"100\" style=\"width: 450px;\" rows=\"5\" name='analyticscode'>".($TWEAK["analyticscode"] ? $TWEAK["analyticscode"] : '')."</textarea> <br />".$lang_settings['text_web_analytics_code_note'], 1);
 	tr($lang_settings['row_see_sql_debug'], "<input type='checkbox' name='enablesqldebug' value='yes'".($TWEAK['enablesqldebug'] == 'yes' ? " checked='checked'" : "")." />".$lang_settings['text_allow'].classlist('sqldebug',UC_STAFFLEADER,$TWEAK['sqldebug'], UC_MODERATOR).$lang_settings['text_see_sql_list'].get_user_class_name(UC_SYSOP,false,true,true),1);
 	tr($lang_settings['row_tracker_founded_date'],"<input type='text' style=\"width: 300px\" name=datefounded value='".($TWEAK["datefounded"] ? $TWEAK["datefounded"] : '2007-12-24')."'> <br />".$lang_settings['text_tracker_founded_date_note'], 1);
