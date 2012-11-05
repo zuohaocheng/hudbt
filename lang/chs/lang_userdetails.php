@@ -142,5 +142,10 @@ $lang_userdetails = array
 	'row_show_ad' => "显示广告",
 	'row_no_ad_until' => "不显示广告直到",
 	'text_no_ad_until_note' => "时间格式为'年年年年-月月-日日 时时:分分:秒秒'。无广告待遇结束的时间。",
+	'row_groups' => "用户组",
+	'text_keeper' => "<strong>保种组</strong><br />",
+	'text_keeper_boss' => "保种组组长",
+	'text_keeper_member' => "保种组组员",
+	'row_storing_torrents' => "保种中种子",
 );
 ?>

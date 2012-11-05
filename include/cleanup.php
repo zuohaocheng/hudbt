@@ -619,7 +619,25 @@ function user_to_peasant($down_floor_gb, $minratio){
 	if ($printProgress) {
 		printProgress("delete torrents that have been dead for a long time");
 	}
-
+	
+//Cleanup storing records
+$updateList_res = sql_query("SELECT keeper_id, torrent_id, date_format(in_date,'%m') as month FROM storing_records WHERE checkout = 0") or sqlerr(__FILE__,__LINE__);
+while($updateList = mysql_fetch_assoc($updateList_res)){
+	$seedTime_res = sql_query("SELECT seedtime FROM snatched WHERE torrentid = $updateList[torrent_id] AND userid = $updateList[keeper_id]") or sqlerr(__FILE__,__LINE__);	
+	$seedTime = mysql_fetch_assoc($seedTime_res);
+	if($seedTime['seedtime']){
+		$curMonth = date('n') + 0;
+		if($updateList['month']==$curMonth){
+			sql_query("UPDATE storing_records SET out_seedtime = $seedTime[seedtime] WHERE torrent_id = $updateList[torrent_id] AND keeper_id = $updateList[keeper_id] AND checkout = 0") or sqlerr(__FILE__,__LINE__);	
+		}
+		elseif($updateList['month']==$curMonth - 1){
+			sql_query("UPDATE storing_records SET out_seedtime = $seedTime[seedtime], out_date = NOW(), checkout = 1 WHERE torrent_id = $updateList[torrent_id] AND keeper_id = $updateList[keeper_id] AND checkout = 0") or sqlerr(__FILE__,__LINE__);				
+		}
+	}
+}
+	if ($printProgress) {
+		printProgress("update storing records");
+	}
 //Priority Class 5: cleanup every 15 days
 	$res = sql_query("SELECT value_u FROM avps WHERE arg = 'lastcleantime5'");
 	$row = mysql_fetch_array($res);

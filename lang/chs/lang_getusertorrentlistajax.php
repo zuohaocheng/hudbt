@@ -16,5 +16,6 @@ $lang_getusertorrentlistajax = array
 	'col_le_time' => "下载时间",
 	'text_record' => "条记录",
 	'text_no_record' => "没有记录",
+	'col_time_storing' => "保种时间",
 );
 ?>

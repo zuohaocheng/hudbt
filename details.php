@@ -10,10 +10,12 @@ loggedinorreturn();
 $id = 0 + $_GET["id"];
 
 int_check($id);
+$storingKeeperList = storing_keeper_list($id);
+
 if (!isset($id) || !$id)
   die();
 
-$res = sql_query("SELECT torrents.cache_stamp, torrents.sp_state, torrents.url, torrents.small_descr, torrents.seeders, torrents.banned, torrents.leechers, torrents.info_hash, torrents.filename, nfo, LENGTH(torrents.nfo) AS nfosz, torrents.last_action, torrents.name, torrents.owner, torrents.save_as, torrents.descr, torrents.visible, torrents.size, torrents.added, torrents.promotion_time_type, torrents.promotion_until, torrents.views, torrents.hits, torrents.times_completed, torrents.id, torrents.type, torrents.numfiles, torrents.anonymous, torrents.startseed, categories.name AS cat_name, sources.name AS source_name, media.name AS medium_name, codecs.name AS codec_name, standards.name AS standard_name, processings.name AS processing_name, teams.name AS team_name, audiocodecs.name AS audiocodec_name FROM torrents LEFT JOIN categories ON torrents.category = categories.id LEFT JOIN sources ON torrents.source = sources.id LEFT JOIN media ON torrents.medium = media.id LEFT JOIN codecs ON torrents.codec = codecs.id LEFT JOIN standards ON torrents.standard = standards.id LEFT JOIN processings ON torrents.processing = processings.id LEFT JOIN teams ON torrents.team = teams.id LEFT JOIN audiocodecs ON torrents.audiocodec = audiocodecs.id WHERE torrents.id = $id LIMIT 1")
+$res = sql_query("SELECT torrents.cache_stamp, torrents.storing, torrents.sp_state, torrents.url, torrents.small_descr, torrents.seeders, torrents.banned, torrents.leechers, torrents.info_hash, torrents.filename, nfo, LENGTH(torrents.nfo) AS nfosz, torrents.last_action, torrents.name, torrents.owner, torrents.save_as, torrents.descr, torrents.visible, torrents.size, torrents.added, torrents.promotion_time_type, torrents.promotion_until, torrents.views, torrents.hits, torrents.times_completed, torrents.id, torrents.type, torrents.numfiles, torrents.anonymous, torrents.startseed, categories.name AS cat_name, sources.name AS source_name, media.name AS medium_name, codecs.name AS codec_name, standards.name AS standard_name, processings.name AS processing_name, teams.name AS team_name, audiocodecs.name AS audiocodec_name FROM torrents LEFT JOIN categories ON torrents.category = categories.id LEFT JOIN sources ON torrents.source = sources.id LEFT JOIN media ON torrents.medium = media.id LEFT JOIN codecs ON torrents.codec = codecs.id LEFT JOIN standards ON torrents.standard = standards.id LEFT JOIN processings ON torrents.processing = processings.id LEFT JOIN teams ON torrents.team = teams.id LEFT JOIN audiocodecs ON torrents.audiocodec = audiocodecs.id WHERE torrents.id = $id LIMIT 1")
   or sqlerr();
 $row = mysql_fetch_array($res);
 
@@ -57,6 +59,8 @@ else {
       }
       echo '</li>';
     }
+    if($row['storing']==1)
+    	echo "<li><img alt= \"$lang_details[text_storing]\" title=\"$lang_details[text_storing]\" src=\"//$BASEURL/pic/ico_storing.png\"/></li>";
     if ($row['banned'] == 'yes') {
       echo "<li>(<span class=\"striking\">".$lang_functions['text_banned']."</span>)</li>";
     }
@@ -128,8 +132,7 @@ else {
     if ($CURUSER["downloadpos"] != "no") {
       $actions .= "<li><a title=\"".$lang_details['title_download_torrent']."\" href=\"download.php?id=".$id."\"><img class=\"dt_download\" src=\"pic/trans.gif\" alt=\"download\" />&nbsp;<span class=\"small\">".$lang_details['text_download_torrent']."</span></a></li>";
     }
-
-    if (checkPrivilege(['Torrent', 'edit']) || $CURUSER["id"] == $row["owner"]) {
+    if (checkPrivilege(['Torrent', 'edit']) || $CURUSER["id"] == $row["owner"]||permissionAuth("edittorrent",$CURUSER['usergroups'],$CURUSER['class'])) {
       $actions .= "<li><$editlink><img class=\"dt_edit\" src=\"pic/trans.gif\" alt=\"edit\" />&nbsp;<span class=\"small\">".$lang_details['text_edit_torrent'] . "</span></a></li>";
     }
     if (checkPrivilege(['Torrent', 'delete'], $id)) {
@@ -145,6 +148,16 @@ else {
     if (checkPrivilege(['Torrent', 'sticky'])) {
       $actions .= '<li><' . $prlink . '>设定优惠</a></li>';
     }
+		if(permissionAuth("storing",$CURUSER['usergroups'],$CURUSER['class'])){
+			if(in_array($CURUSER['id'], $storingKeeperList)){
+				$actions .= "<li><a href=\"storing.php?action=checkout&torrentid=$id&userid=$CURUSER[id]\">$lang_details[text_check_out]</a></li>";	
+			}
+			else{
+				if($row['storing']==1){
+					$actions .= "<li><a href=\"storing.php?action=checkin&torrentid=$id&userid=$CURUSER[id]\">$lang_details[text_check_in]</a></li>";	
+				}
+			}
+		}
 
     $actions .= '</ul></div>';
 
@@ -538,7 +551,21 @@ else {
 
     dl_item($lang_details['row_peers'] . '<br /><a class="sublink" id="showpeer" href="viewpeerlist.php?id='. $id . '">' . $lang_details['text_see_full_list'] . '</a><a class="sublink" id="hidepeer" style="display: none;" href="#">' . $lang_details['text_hide_list'] . '</a>',
        '<div id="peercount" class="minor-list list-seperator"><ul><li><span class="seeders">' . $row['seeders'] . '</span>' . $lang_details['text_seeders'] . add_s($row['seeders']) . '</li><li><span class="leechers">' . $row['leechers'] . '</span>' . $lang_details['text_leechers'] . add_s($row['leechers']) . "</li>" . $startseed . '</ul></div><div id="peerlist" style="display:none;"></div>' , true);
-
+/**************************Keepers*************************/
+	if($row['storing']==1){
+		echo "<dt>$lang_details[text_storing_keepers]</dt><dd>";
+		/*$kid_res = sql_query("SELECT keeper_id FROM storing_records WHERE torrent_id = ".sqlesc($id)." AND checkout = 0") or sqlerr(__FILE__,__LINE__);
+		if(mysql_num_rows($kid_res)===0)
+			echo $lang_details['text_no_storing'];
+		while($kid = mysql_fetch_assoc($kid_res)){
+			echo get_username($kid['keeper_id']);
+		}*/
+		foreach($storingKeeperList as $keeper_id){
+			echo get_username($keeper_id),' ';	
+		}
+		echo "</dd>";
+	}
+/**************************Keepers*************************/		
     /**
      * Added by BruceWolf.
      * Show the donate bonus box.

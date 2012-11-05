@@ -219,6 +219,11 @@ $lang_details = array
 	'text_and_more' => " and more (thanks from ",
 	'text_users_in_total' => " users in total)",
 	'report' => 'Report',
+	'text_storing_keepers' => "Keepers",
+	'text_no_storing' => "This torrent is not kept by anybody",
+	'text_storing' => "Storing",
+	'text_check_in' => "Register for Storing",
+	'text_check_out' => "Check Out From Storing",
 );
 
 ?>

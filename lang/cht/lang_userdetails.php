@@ -141,5 +141,9 @@ $lang_userdetails = array
 	'row_show_ad' => "察看廣告",
 	'row_no_ad_until' => "不顯示廣告直到",
 	'text_no_ad_until_note' => "時間格式為'年年年年-月月-日日 時時:分分:秒秒'。無廣告待遇結束的時間。",
+	'row_groups' => "用戶組",
+	'text_keeper' => "<strong>保種組</strong><br />",
+	'text_keeper_boss' => "保種組組長",
+	'text_keeper_member' => "保種組組員",
 );
 ?>

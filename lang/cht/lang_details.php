@@ -218,7 +218,12 @@ $lang_details = array
 	'row_uploader_bandwidth' => "發布者頻寬",
 	'text_and_more' => "……（這裏只顯示最新記錄。共",
 	'text_users_in_total' => "個用戶表示了感謝）",
-		'report' => '舉報',
+	'report' => '舉報',
+	'text_storing_keepers' => "保種人",
+	'text_no_storing' => "沒有人在保種！",
+	'text_storing' => "保種中",
+	'text_check_in' => "認領種子",
+	'text_check_out' => "結束認領種子",
 );
 
 ?>

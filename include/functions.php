@@ -60,6 +60,13 @@ $privilegeConfig = ['Maintenance'=>['staticResources' => UC_MODERATOR],
 				       'clearcache' => UC_MODERATOR,]
 		    ];
 
+$permissionList = [
+'keeper_m' => [
+	''
+	],
+
+'helper' => []
+];
 function smarty($cachetime=300, $debug = false) {
   require_once('lib/Smarty/Smarty.class.php');
   static $smarty;
@@ -281,6 +288,61 @@ function checkSubPrivilege($obj, $opts) {
     return (get_user_class() >= $obj);
   }
 };
+
+/*******************New User Group System******************/
+/***********Added By Eggsorer@HUDBT in 2012-09-06**********/
+
+$permissionConfig = [
+"keeper" => [
+	"boss" =>["setstoring","edittorrent","viewkeepers"],
+	"member" => ["storing","viewkeepers"]
+	],
+"helper" =>[],
+"former" =>[
+	UC_MODERATOR => ["edittorrent","viewstaffpanel"],
+	UC_ADMINISTRATOR => ["setstoring","viewkeepers"],
+	UC_SYSOP => ["viewsetting","storing"]
+	]
+];
+
+function permissionAuth($needle,$usergroups,$userclass){
+	global $permissionConfig;
+	
+	if(isset($usergroups)){
+		foreach ($usergroups as $groupname => $value) {
+			$userrole = $usergroups[$groupname]['role'];
+			$removed = $usergroups[$groupname]['removed'];
+			if(in_array($needle,$permissionConfig[$groupname][$userrole]) && $removed==NULL)
+				return true;
+		}
+	}
+	
+	//to cope with linear permission system, i.e. override
+	$formerPermission = $permissionConfig['former'];
+	foreach($formerPermission as $class => $value){
+		if(in_array($needle,$formerPermission[$class])){
+			if($userclass>=$class)
+				return true;
+			else
+				return false;
+		}
+	}
+	return false;
+}
+
+function get_user_group($userid){
+	$user_groups_r = sql_query("SELECT gp.group_name,u_gp.role,u_gp.removed_by,u_gp.removed_date FROM users_usergroups AS u_gp JOIN usergroups AS gp ON u_gp.usergroup_id = gp.group_id WHERE u_gp.user_id =".sqlesc($userid)) or sqlerr(__FILE__, __LINE__);
+	while($row = mysql_fetch_assoc($user_groups_r)){
+		if($row['removed_by']==NULL){
+			$user_groups[$row['group_name']] = array('role' => $row['role']);
+		}
+		else{
+			$user_groups[$row['group_name']] = array('role' => $row['role'],'removed' => array('removed_by' => $row['removed_by'], 'removed_date' => $row['removed_date'] ));
+		}
+	}
+	return $user_groups;
+}
+/*******************New User Group System******************/
 
 function checkPrivilege($item, $opts = null) {
   global $privilegeConfig;
@@ -1496,6 +1558,9 @@ function userlogin() {
 
   $oldip = $row['ip'];
   $row['ip'] = $ip;
+  $usergroups = get_user_group($id);
+  if($usergroups !=NULL)
+  	$row['usergroups'] = $usergroups;
   $GLOBALS["CURUSER"] = $row;//initialize global $CURUSER which will be used frequently in other operations//noted by bluemonster 20111107
   if (array_key_exists('clearcache', $_GET) && $_GET['clearcache'] && get_user_class() >= UC_MODERATOR) {
     $Cache->setClearCache(1);
@@ -1757,9 +1822,9 @@ function menu ($selected = "home") {
     $selected = "upload";
   }elseif (preg_match("/subtitles/i", $script_name)) {
     $selected = "subtitles";
-  }elseif (preg_match("/usercp/i", $script_name)) {
-    $selected = "usercp";
-  }elseif (preg_match("/topten/i", $script_name)) {
+  }//elseif (preg_match("/usercp/i", $script_name)) {
+    //$selected = "usercp";
+  elseif (preg_match("/topten/i", $script_name)) {
     $selected = "topten";
   }elseif (preg_match("/log/i", $script_name)) {
     $selected = "log";
@@ -4679,3 +4744,12 @@ function get_fun($id = 0, $pager_count = null) {
   return $content . $funcomment;
 }
 
+function storing_keeper_list($torrentid){
+	$list_res = sql_query("SELECT keeper_id FROM storing_records WHERE checkout = 0 AND torrent_id = $torrentid") or sqlerr(__FILE__, __LINE__);
+	if(mysql_num_rows($list_res)!=0){
+		while($keeperid = mysql_fetch_assoc($list_res)){
+			$list[] = $keeperid['keeper_id'];
+		}
+	}
+	return $list;
+}

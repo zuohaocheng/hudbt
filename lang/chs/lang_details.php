@@ -225,6 +225,11 @@ $lang_details = array
 	'report' => '举报',
 	'hint_placeholder_reply' => '你的好评是对发种者最大的鼓励',
 	'comment_warning' => '<a href="//' . $BASEURL . '/rules.php" title="网站规则">请勿发表类似“等xxx版本”、“等字幕”、“求免费”等评论，否则会得到一个警告。</a>',
+	'text_storing_keepers' => "保种人",
+	'text_no_storing' => "没有人在保种！",
+	'text_storing' => "保种中",
+	'text_check_in' => "认领种子",
+	'text_check_out' => "结束认领种子",
 );
 
 

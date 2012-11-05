@@ -95,6 +95,8 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 	if ($id != $CURUSER['id']){
 		$r = sql_query("SELECT * FROM users WHERE id=".sqlesc($id)) or sqlerr(__FILE__, __LINE__);
 		$user = mysql_fetch_array($r) or bark($lang_userdetails['std_no_such_user']);
+		$groups = get_user_group($id);
+		$user['usergroups'] = $groups;
 	}
 	else
 	{
@@ -357,6 +359,10 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 
 
 	tr_small($lang_userdetails['row_incomplete_torrents'], "<a href=\"javascript: getusertorrentlistajax('".$user['id']."', 'incomplete', 'ka4');\"><img class=\"plus\" src=\"pic/trans.gif\" id=\"pica4\" alt=\"Show/Hide\" title=\"".$lang_userdetails['title_show_or_hide']."\" />   <u>".$lang_userdetails['text_show_or_hide']."</u></a><div id=\"ka4\" style=\"display: none;\"></div>", 1);
+	
+
+	if(permissionAuth("storing",get_user_group($id),get_user_class($id)))
+		tr_small($lang_userdetails['row_storing_torrents'], "<a href=\"javascript: getusertorrentlistajax('".$user['id']."', 'storing', 'ka5');\"><img class=\"plus\" src=\"pic/trans.gif\" id=\"pica5\" alt=\"Show/Hide\" title=\"".$lang_userdetails['title_show_or_hide']."\" />   <u>".$lang_userdetails['text_show_or_hide']."</u></a><div id=\"ka5\" style=\"display: none;\"></div>", 1);
 	}
 	if ($user["info"])
 		print("<tr><td align=\"left\" colspan=\"2\" class=\"text\">" . format_comment($user["info"],false) . "</td></tr>\n");
@@ -425,6 +431,10 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 			$maxclass = get_user_class() - 1;
 		$classselect=classlist('class', $maxclass, $user["class"]);
 		tr($lang_userdetails['row_class'], $classselect, 1);
+		$group_input = $lang_userdetails['text_keeper'].'<select name="keeper_role"><option value="none"'.(($user['usergroups']['keeper']['role']==NULL || $user['usergroups']['keeper']['removed']!=NULL)?' selected="selected"':' ').'></option>';
+		$group_input .= '<option value="member"'.(($user['usergroups']['keeper']['role']=="member" && $user['usergroups']['keeper']['removed']==NULL)?' selected="selected"':' ').'>'.$lang_userdetails['text_keeper_member'].'</option>';
+		$group_input .= '<option value="boss"'.(($user['usergroups']['keeper']['role']=="boss" && $user['usergroups']['keeper']['removed']==NULL)?' selected="selected"':' ').'>'.$lang_userdetails['text_keeper_boss']."</option></select>";
+		tr($lang_userdetails['row_groups'],$group_input,1);
 		tr($lang_userdetails['row_vip_by_bonus'], "<input type=\"radio\" name=\"vip_added\" value=\"yes\"" .($user["vip_added"] == "yes" ? " checked=\"checked\"" : "")." />".$lang_userdetails['radio_yes']." <input type=\"radio\" name=\"vip_added\" value=\"no\"" .($user["vip_added"] == "no" ? " checked=\"checked\"" : "")." />".$lang_userdetails['radio_no']."<br />".$lang_userdetails['text_vip_by_bonus_note'], 1);
 		tr($lang_userdetails['row_vip_until'], "<input type=\"text\" name=\"vip_until\" value=\"".htmlspecialchars($user["vip_until"])."\" /> ".$lang_userdetails['text_vip_until_note'], 1);
 		$supportlang = htmlspecialchars($user["supportlang"]);

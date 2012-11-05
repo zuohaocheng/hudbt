@@ -39,7 +39,7 @@ $showaudiocodec = (get_searchbox_value($sectionmode, 'showaudiocodec') || ($allo
 
 stdhead($lang_edit['head_edit_torrent'] . "\"". $row["name"] . "\"");
 
-if (!isset($CURUSER) || ($CURUSER["id"] != $row["owner"] && get_user_class() < $torrentmanage_class)) {
+if (!isset($CURUSER) || ($CURUSER["id"] != $row["owner"] &&  get_user_class() < $torrentmanage_class )) {
 	print("<h1 align=\"center\">".$lang_edit['text_cannot_edit_torrent']."</h1>");
 	print("<p>".$lang_edit['text_cannot_edit_torrent_note']."</p>");
 }
@@ -167,11 +167,11 @@ else {
 		  $pickcontent.=$odaycheckbox;
 		}
 		//Added by Eggsorer 20120328
-		if (checkPrivilege(['Torrent', 'setstoring'])) {
+		if (permissionAuth("setstoring",$CURUSER['usergroups'],$CURUSER['class'])) {
 		  if($row['storing']=='1')	
 		    $storingcheckbox = "<input type=\"checkbox\" id=sel_storing name=\"sel_storing\" checked=\"yes\" value=\"storing\"/>".$lang_edit['text_storing'];
 		  elseif($row['storing']=='0')
-		    $storingcheckbox = "<input type=\"checkbox\" id=sel_storing name=\"sel_storing\" value=\"oday\"/>".$lang_edit['text_storing'];
+		    $storingcheckbox = "<input type=\"checkbox\" id=sel_storing name=\"sel_storing\" value=\"storing\"/>".$lang_edit['text_storing'];
 		  $pickcontent.=$storingcheckbox;
 		}
 		if (get_user_class()>=$torrentmanage_class && $CURUSER["picker"] == 'yes') {

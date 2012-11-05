@@ -48,7 +48,7 @@ $lang_functions = array
 	'text_log' => "&nbsp;日&nbsp;&nbsp;志&nbsp;",
 	'text_rules' => "&nbsp;规&nbsp;&nbsp;则&nbsp;",
 	'text_faq' => "&nbsp;常见问题&nbsp;",
-	'text_staff' => "管&nbsp;理&nbsp;组",
+	'text_staff' => "工作人员",
 	'std_site_down_for_maintenance' => "蝴蝶娘还没有睡醒，请稍后再来...谢谢",
 	'text_click_view_full_image' => "点击这里查看完整图像",
 	'text_image_resized' => "图像被缩小，点击这里查看完整图像",
@@ -304,6 +304,7 @@ $lang_functions = array
 	'text_posts' => "帖子：",
 	'text_poll_votes' => "投票数：",
 	'text_until' => "至",
+	'text_keepers' => "保种组",
 );
 
 ?>

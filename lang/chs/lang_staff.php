@@ -27,7 +27,12 @@ $lang_staff = array
 	'text_apply_for_it' => "申请加入",
 	'text_forum_moderators' => "论坛版主",
 	'text_forum_moderators_note' => "论坛版主负责论坛的日常管理。",
-	'text_forums' => "版块"
+	'text_forums' => "版块",
+	'text_keepers' => "保种组",
+	'text_keepers_note' => "保种组是负责保存优质或稀有种子的人员。",
+	'text_role' => "职务",
+	'text_boss' => "<strong>组长</strong>",
+	'text_member' => "<strong>组员</strong>",
 );
 
 ?>

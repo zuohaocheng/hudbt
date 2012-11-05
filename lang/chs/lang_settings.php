@@ -454,7 +454,7 @@ $lang_settings = array
 	'text_priority_three' => "优先级3：",
 	'text_priority_three_note' => "更新种子做种数、下载数、评论数；更新论坛帖子/主题数；删除过期的候选；种子促销到期；自动挑选热门种子。默认'3600'，即60分钟。",
 	'text_priority_four' => "优先级4：",
-	'text_priority_four_note' => "删除未通过验证的账号，过期的登录尝试记录，过期的邀请码和图片验证码；清理用户账号（删除不活跃账号，账号升级、降级、禁用）；发送上传的图片；更新用户总做种和下载时间。默认'43200'，即24小时。",
+	'text_priority_four_note' => "删除未通过验证的账号，过期的登录尝试记录，过期的邀请码和图片验证码；清理用户账号（删除不活跃账号，账号升级、降级、禁用）；发送上传的图片；更新用户总做种和下载时间；统计保种员的保种工作。默认'43200'，即24小时。",
 	'text_priority_five' => "优先级5：",
 	'text_priority_five_note' => "删除种子文件不存在的种子；锁定论坛的古老主题；删除古老的举报信息。默认'648000'，即15天。",
 	'text_cleanup_interval_note_two' => "<b>注意</b>：<font class=striking><b>不要</b></font>改变时间递增的排序。",
@@ -685,6 +685,11 @@ $lang_settings = array
 	'text_email_notification_note' => "是否允许用户在收取新短讯、评论等时候收到邮件提示。",
 	'text_users_get' => "首次升级至此等级的用户将获得",
 	'text_invitations_default' => "个邀请名额。默认",
+	'text_keepers_bonus' => "保种组魔力值",
+	'row_keepers_bonus_fomula' => "保种组魔力值公式",
+	'text_what_those_coefficient_mean' => "其中Ka是总保种体积s的系数，Kb是总保种时间t的系数。",
+	'text_ka_is' => "Ka的值是：",
+	'text_kb_is' => "，Kb的值是：",
 );
 
 ?>

@@ -449,7 +449,7 @@ $lang_settings = array
 	'text_priority_three' => "Priority 3: ",
 	'text_priority_three_note' => "Update count of seeders, leechers, comments for torrents; Update forum post/topic count; Delete offers that are timeout; Expire torrent promotion; Automatically pick hot torrents. Default '3600', i.e. 60 mins.",
 	'text_priority_four' => "Priority 4: ",
-	'text_priority_four_note' => "Delete unconfirmed accounts, old login attempts, invite codes and regimage codes; Clean up user accounts (delete inactive ones, do account promotion and demotion, banning, etc.); Post uploaded image; Update total seeding and leeching time of users. Default '43200', i.e. 24 hours.",
+	'text_priority_four_note' => "Delete unconfirmed accounts, old login attempts, invite codes and regimage codes; Clean up user accounts (delete inactive ones, do account promotion and demotion, banning, etc.); Post uploaded image; Update total seeding and leeching time of users; Add up the storing time of keepers. Default '43200', i.e. 24 hours.",
 	'text_priority_five' => "Priority 5: ",
 	'text_priority_five_note' => "Delete torrents that doesn't exist any more; Lock very old forum topics; Delete very old report items. Default '648000', i.e. 15 days.",
 	'text_cleanup_interval_note_two' => "<b>NOTE</b>: Do <b>NOT</b> change the ascendant order of the times!",
@@ -680,6 +680,11 @@ $lang_settings = array
 	'text_email_notification_note' => "Allow users to receive email notification when he gets new pm, comment, etc.",
 	'text_users_get' => "Users would get ",
 	'text_invitations_default' => " invitations the first time he is promoted to this class. Default ",
+	'text_keepers_bonus' => "Bonus for Keepers",
+	'row_keepers_bonus_fomula' => "Bonus Formula for Keepers",
+	'text_what_those_coefficient_mean' => "where Ka is coefficient for total storing size s, and Kb is coefficient for total storing time t.",
+	'text_ka_is' => "Ka is: ",
+	'text_kb_is' => ", Kb is: ",
 );
 
 ?>

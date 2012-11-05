@@ -27,7 +27,12 @@ $lang_staff = array
 	'text_apply_for_it' => "Apply to join",
 	'text_forum_moderators' => "Forum Moderators",
 	'text_forum_moderators_note' => "Forum moderators are responsible for daily management of forums.",
-	'text_forums' => "Forums"
+	'text_forums' => "Forums",
+	'text_keepers' => "Keepers",
+	'text_keepers_note' => "Keepers are those who keep seeding selected or uncommon torrents.",
+	'text_role' => "Role",
+	'text_boss' => "<strong>Boss</strong>",
+	'text_member' => "<strong>Member</strong>",
 );
 
 ?>

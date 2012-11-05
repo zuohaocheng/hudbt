@@ -455,7 +455,7 @@ $lang_settings = array
 	'text_priority_three' => "優先級3：",
 	'text_priority_three_note' => "更新種子做種數、下載數、評論數；更新論壇帖子/主題數；移除過期的候選；種子促銷到期；自動挑揀熱門種子。預設'3600'，即60分鐘。",
 	'text_priority_four' => "優先級4：",
-	'text_priority_four_note' => "移除未通過驗證的賬號，過期的登入嘗試記錄，過期的邀請碼和圖片驗證碼；清理用戶賬號（移除不活躍賬號，賬號升級、降級、禁用）；傳送上傳的圖片；更新用戶總做種和下載時間。預設'43200'，即24小時。",
+	'text_priority_four_note' => "移除未通過驗證的賬號，過期的登入嘗試記錄，過期的邀請碼和圖片驗證碼；清理用戶賬號（移除不活躍賬號，賬號升級、降級、禁用）；傳送上傳的圖片；更新用戶總做種和下載時間；統計保種員的保種工作。預設'43200'，即24小時。",
 	'text_priority_five' => "優先級5：",
 	'text_priority_five_note' => "移除種子檔案不存在的種子；鎖定論壇的古老主題；移除古老的舉報資訊。預設'648000'，即15天。",
 	'text_cleanup_interval_note_two' => "<b>注意</b>：<font class=striking><b>不要</b></font>改變時間遞增的排序。",
@@ -685,6 +685,11 @@ $lang_settings = array
 	'text_email_notification_note' => "是否允許用戶在收取新短訊、評論等時候收到郵件輔助說明。",
 	'text_users_get' => "首次升級至此等級的用戶將獲得",
 	'text_invitations_default' => "個邀請名額。預設",
+	'text_keepers_bonus' => "保種組魔力值",
+	'row_keepers_bonus_fomula' => "保種組魔力值公式",
+	'text_what_those_coefficient_mean' => "其中Ka是总保种體積s的系数，Kb是总保种時間t的系数。",
+	'text_ka_is' => "Ka的值是：",
+	'text_kb_is' => "，Kb的值是：",
 );
 
 ?>

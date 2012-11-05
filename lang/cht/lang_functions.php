@@ -48,7 +48,7 @@ $lang_functions = array
 	'text_log' => "&nbsp;日&nbsp;&nbsp;志&nbsp;",
 	'text_rules' => "&nbsp;規&nbsp;&nbsp;則&nbsp;",
 	'text_faq' => "&nbsp;常見問題&nbsp;",
-	'text_staff' => "管&nbsp;理&nbsp;組",
+	'text_staff' => "職&nbsp;員",
 	'std_site_down_for_maintenance' => "站點關閉維護中，請稍後再訪問...謝謝",
 	'text_click_view_full_image' => "點擊這裏查看完整圖像",
 	'text_image_resized' => "圖像被縮小，點擊這裏查看完整圖像",
@@ -292,6 +292,7 @@ $lang_functions = array
 	'text_inactive_account_be_deleted' => "內做些下載。沒有流量的用戶會被移除賬號。",
 	'text_no_startseed' => '你發佈的%d個種子尚未開始做種，不要忘記了~',
 	'text_until' => "至",
+	'text_keepers' => "保種組",
 );
 
 ?>

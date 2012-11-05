@@ -27,6 +27,7 @@ if ($action == "edituser")
 {
 	$userid = $_POST["userid"];
 	$class = 0 + $_POST["class"];
+	$keeper_role = $_POST['keeper_role'];
 	$vip_added = ($_POST["vip_added"] == 'yes' ? 'yes' : 'no');
 	$vip_until = ($_POST["vip_until"] ? $_POST["vip_until"] : '0000-00-00 00:00:00');
 	
@@ -68,6 +69,7 @@ if ($action == "edituser")
 	$curdownloadpos = $arr["downloadpos"];
 	$curforumpost = $arr["forumpost"];
 	$curclass = $arr["class"];
+	$curgroups = get_user_group($userid);
 	$curwarned = $arr["warned"];
 	
 	$updateset[] = "stafffor = " . sqlesc($stafffor);
@@ -101,6 +103,49 @@ if ($action == "edituser")
 		$ori_bonus = $_POST["ori_bonus"];
 		$invites = $_POST["invites"];
 		$added = sqlesc(date("Y-m-d H:i:s"));
+		if($keeper_role!=$curgroups['keeper']['role'] && $curgroups['keeper']['removed']==NULL||$curgroups['keeper']['removed']!=NULL){
+			switch($keeper_role){
+				case 'none':
+					$modcomment = date("Y-m-d") . " - Keeper role was removed by $CURUSER[username].\n". $modcomment;
+					$keeperRoleUpdate = "UPDATE users_usergroups SET removed_by = $CURUSER[id],removed_date = NOW() WHERE user_id = $userid AND usergroup_id = 1";
+					$subject = sqlesc($lang_modtask_target[get_user_lang($userid)]['msg_usergroup_change']);
+					$msg = sqlesc($lang_modtask_target[get_user_lang($userid)]['msg_your_keeper_role'].$lang_modtask_target[get_user_lang($userid)]['keeper_'.$curgroups['keeper']['role']] . $lang_modtask_target[get_user_lang($userid)]['msg_was_removed'] .$lang_modtask_target[get_user_lang($userid)]['msg_by'].$CURUSER[username]);break;
+				
+				case 'member':
+					if($curgroups['keeper']['role']=='boss'&&$curgroups['keeper']['removed']==NULL){
+						$keeperRoleUpdate = "UPDATE users_usergroups SET role = 'member',added_date = NOW(),added_by = $CURUSER[id] WHERE user_id = $userid AND usergroup_id = 1";
+						$modcomment = date("Y-m-d") . " - Demoted to Keeper Member from Keeper Boss by $CURUSER[username].\n". $modcomment;
+						$msg = sqlesc($lang_modtask_target[get_user_lang($userid)]['msg_you_were_deomoted_to'].$lang_modtask_target[get_user_lang($userid)]['keeper_member'] .$lang_modtask_target[get_user_lang($userid)]['msg_by'].$CURUSER[username]);
+					}
+					else{
+						if($curgroups['keeper']['removed']!=NULL)
+							$keeperRoleUpdate = "UPDATE users_usergroups SET role = 'member',added_date = NOW(),added_by = $CURUSER[id],removed_by = NULL,removed_date = NULL  WHERE user_id = $userid AND usergroup_id = 1";
+						else
+							$keeperRoleUpdate = "INSERT INTO users_usergroups (user_id,usergroup_id,role,added_by,added_date) VALUES($userid,1,'member',$CURUSER[id],NOW())";
+						$modcomment = date("Y-m-d") . " - Promoted to Keeper Member by $CURUSER[username].\n". $modcomment;
+						$msg = sqlesc($lang_modtask_target[get_user_lang($userid)]['msg_you_were_promoted_to'].$lang_modtask_target[get_user_lang($userid)]['keeper_member'] .$lang_modtask_target[get_user_lang($userid)]['msg_by'].$CURUSER[username]);
+					}break;				
+				
+				case 'boss':
+					if($curgroups['keeper']['role']=='member'&&$curgroups['keeper']['removed']==NULL){
+						$keeperRoleUpdate = "UPDATE users_usergroups SET role = 'boss',added_date = NOW(),added_by = $CURUSER[id] WHERE user_id = $userid AND usergroup_id = 1";
+						$modcomment = date("Y-m-d") . " - Promoted to Keeper Boss from Keeper Member by $CURUSER[username].\n". $modcomment;
+					}
+					else{
+						if($curgroups['keeper']['removed']!=NULL)
+							$keeperRoleUpdate = "UPDATE users_usergroups SET role = 'boss',added_date = NOW(),added_by = $CURUSER[id],removed_by = NULL,removed_date = NULL WHERE user_id = $userid AND usergroup_id = 1";
+						else
+							$keeperRoleUpdate = "INSERT INTO users_usergroups (user_id,usergroup_id,role,added_by,added_date) VALUES($userid,1,'boss',$CURUSER[id],NOW())";
+						$modcomment = date("Y-m-d") . " - Promoted to Keeper Boss by $CURUSER[username].\n". $modcomment;
+					}
+					$subject = sqlesc($lang_modtask_target[get_user_lang($userid)]['msg_usergroup_change']);
+					$msg = sqlesc($lang_modtask_target[get_user_lang($userid)]['msg_you_were_promoted_to'].$lang_modtask_target[get_user_lang($userid)]['keeper_boss'] .$lang_modtask_target[get_user_lang($userid)]['msg_by'].$CURUSER[username]);break;
+			}
+			$subject = sqlesc($lang_modtask_target[get_user_lang($userid)]['msg_usergroup_change']);
+			sql_query("INSERT INTO messages (sender, receiver, subject, msg, added) VALUES(0, $userid, $subject, $msg, $added)") or sqlerr(__FILE__, __LINE__);
+			sql_query($keeperRoleUpdate) or sqlerr(__FILE__, __LINE__);
+			
+		}
 		if ($arr['email'] != $email){
 			$updateset[] = "email = " . sqlesc($email);
 			$modcomment = date("Y-m-d") . " - Email changed from $arr[email] to $email by $CURUSER[username].\n". $modcomment;
@@ -333,7 +378,6 @@ if ($action == "edituser")
 	$updateset[] = "modcomment = " . sqlesc($modcomment);
 	
 	sql_query("UPDATE LOW_PRIORITY users SET  " . implode(", ", $updateset) . " WHERE id=$userid") or sqlerr(__FILE__, __LINE__);
-
 	$returnto = htmlspecialchars($_POST["returnto"]);
 	header("Location: " . get_protocol_prefix() . "$BASEURL/$returnto");
 	die;
