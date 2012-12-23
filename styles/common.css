@@ -2,9 +2,12 @@
     display: none;
 }
 
+header {
+    height:94px;
+}
+
 #logo-img {
     height: 95px;
-    width: 275px;
 }
 
 #donation-img {
@@ -25,3 +28,34 @@
 .bbcode {
     position:relative;
 }
+
+#funcomment dd div {
+    max-height:2em;
+    overflow:hidden;
+}
+
+#donating {
+	text-align: right;
+	font-weight: bold;
+}
+#to_donate a {
+	width: 42px;
+}
+.donate {
+	display: inline-block;
+	height: 22px;
+	margin: 6px;
+	padding: 0 6px;
+	line-height: 22px;
+	text-align: center;
+	border: 1px solid #AAA;
+	border-radius:3px;
+	zoom: 1;
+}
+
+.donate-0 {background-color: #FFFF99;}
+.donate-1 {background-color: #CCFF99;}
+.donate-2 {background-color: #99FFFF;}
+.donate-3 {background-color: #99CCFF;}
+.donate-4 {background-color: #FF9999;}
+.donate_note {margin: 0;}

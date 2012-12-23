@@ -47,6 +47,7 @@ $privilegeConfig = ['Maintenance'=>['staticResources' => UC_MODERATOR],
 				       'warned' => UC_MODERATOR,
 				       'freeleech' => UC_ADMINISTRATOR,
 				       'faqmanage' => UC_MODERATOR,
+				       'faqactions' => UC_MODERATOR,
 				       'modrules' => UC_ADMINISTRATOR,
 				       'catmanage' => UC_ADMINISTRATOR,
 				       'cheaters' => UC_MODERATOR,
@@ -58,7 +59,8 @@ $privilegeConfig = ['Maintenance'=>['staticResources' => UC_MODERATOR],
 				       'testip' => UC_MODERATOR,
 				       'amountbonus' => UC_MODERATOR,
 				       'clearcache' => UC_MODERATOR,
-				       'hustip' => UC_MODERATOR]
+				       'hustip' => UC_MODERATOR,
+				       'ssh' => UC_SYSOP,]
 		    ];
 
 function smarty($cachetime=300, $debug = false) {

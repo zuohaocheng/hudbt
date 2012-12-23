@@ -192,14 +192,14 @@ function insert_compose_frame($id, $type = 'new')
 			$topicid=get_single_value("posts","topicid","WHERE id=".sqlesc($id));
 			$topicname = get_single_value("topics","subject","WHERE id=".sqlesc($topicid));
 			$title = $lang_forums['text_reply_to_topic']." <a href=\"".htmlspecialchars("?action=viewtopic&topicid=".$topicid)."\">".htmlspecialchars($topicname)."</a> ";
-			$res = sql_query("SELECT posts.body, users.username FROM posts LEFT JOIN users ON posts.userid = users.id WHERE posts.id=$id") or sqlerr(__FILE__, __LINE__);
+			$res = sql_query("SELECT posts.body, userid FROM posts WHERE posts.id=$id") or sqlerr(__FILE__, __LINE__);
 			if (mysql_num_rows($res) != 1) {
 			  stderr($lang_forums['std_error'], $lang_forums['std_no_post_id']);
 			}
 
 			echo '<input type="hidden" name="quote" value="' . $id . '" />';
 			$arr = mysql_fetch_assoc($res);
-			$body = "[quote=".htmlspecialchars($arr["username"])."]".htmlspecialchars(dequote(unesc($arr["body"])))."[/quote]";
+			$body = "[quote='[user=".htmlspecialchars($arr["userid"])."]']".htmlspecialchars(dequote(unesc($arr["body"])))."[/quote]";
 			$id = $topicid;
 			$type = 'reply';
 
@@ -355,7 +355,7 @@ elseif ($action == "post") {
 			  if (mysql_num_rows($res) != 1) {
 			    $quote = 'NULL';
 			  }
-			  $quoteduser = mysql_fetch_array($res);
+			  $quoteduser = mysql_fetch_array($res)[0];
 			}
 
 			break;
@@ -468,6 +468,12 @@ elseif ($action == "post") {
 		$Cache->delete_value('forum_'.$forumid.'_last_replied_topic_content');
 		$Cache->delete_value('topic_'.$topicid.'_post_count');
 		$Cache->delete_value('user_'.$userid.'_post_count');
+
+		if ($quote != 'NULL') {
+		  $content = '你的帖子 [post=' . $quote . '] 被[user=' . $CURUSER['id'] . ']引用了，[post=' . $postid . ']。';
+		  send_pm($CURUSER['id'], $quoteduser, '帖子被引用', $content);
+		}
+
 
 		if ($type == 'new') {
 			// update the first post of topic
@@ -679,7 +685,22 @@ SELECT id, rownum FROM (SELECT @x:=@x+1 AS rownum, id, userid FROM (SELECT @x:=0
 	  	$arr['body']=$arr['ori_body'];
 	  	$arr['editedby']="";
 	  }
-	  single_post($arr, $maypost, $maymodify, $locked, $highlight, ($pn == $pc), $floor);
+
+		/**
+		 * Added by BruceWolf. 2012.06.25
+		 * Show the donate bonus box.
+		 */
+	  if ($floor == 1 && !$locked) {
+	    ob_start();
+	    define('DONATE_BONUS', true);
+	    include('./topicDonateBonusBox.php');
+	    $extra = ob_get_clean();
+	  }
+	  else {
+	    $extra = '';
+	  }
+	  // End Add.
+	  single_post($arr, $maypost, $maymodify, $locked, $highlight, ($pn == $pc), $floor, $extra);
 	}
 	echo '</ol></div>';
 
@@ -794,6 +815,7 @@ SELECT id, rownum FROM (SELECT @x:=@x+1 AS rownum, id, userid FROM (SELECT @x:=0
 	else print($lang_forums['text_unpermitted_posting_here']);
 
 	print(key_shortcut($page,$pages-1));
+	echo '<script type="text/javascript">hb.topic=' . json_encode(['id' => $topicid]) . ';</script>';
 	stdfoot();
 	die;
 }
@@ -986,7 +1008,7 @@ elseif ($action == "setlocked") {
 	$ismod = is_forum_moderator($topicid,'topic');
 	if (!$topicid || (get_user_class() < $postmanage_class && !$ismod))
 		permissiondenied();
-	
+
 	$forum_id = get_forum_id($topicid, "topic");
 	if($forum_id==-1)
 		permissiondenied();
@@ -1054,7 +1076,7 @@ elseif ($action == "setsticky" || $action == 'setselected') {
   $ismod = is_forum_moderator($topicid,'topic');
   if (!$topicid || (get_user_class() < $postmanage_class && !$ismod))
     permissiondenied();
-    
+
 	$forumid = get_forum_id($topicid, "topic");
 	if($forumid==-1)
 		permissiondenied();

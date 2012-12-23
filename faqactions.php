@@ -23,10 +23,7 @@
 require "include/bittorrent.php";
 dbconn();
 loggedinorreturn();
-
-if (get_user_class() < UC_UC_MODERATOR) {
-	stderr("Error","Only Administrators and above can modify the FAQ, sorry.");
-}
+checkPrivilegePanel();
 
 //stdhead("FAQ Management");
 
