@@ -114,27 +114,6 @@ function get_user_lang($user_id) {
   return $lang['site_lang_folder'];
 }
 
-function get_user_static_resources($type, $id) {
-  if ($type == 'js') {
-    $key = 'js';
-  }
-  else {
-    $key = 'css';
-  }
-
-  App::uses('User', 'Model');
-  $User = new User;
-  $User->id = $id;
-  $result = $User->read('Property.' . $key, $User->id);
-  if ($result) {
-    $value = $result['Property'][$key];
-  }
-  else {
-    $value = '';
-  }
-  return $value;
-}
-
 function get_load_uri($type, $script_name ="", $absolute = true) {
   global $CURUSER, $BASEURL;
   $name = ($script_name == "" ? substr(strrchr($_SERVER['SCRIPT_NAME'],'/'),1) : $script_name);

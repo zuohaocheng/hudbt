@@ -4,9 +4,16 @@ if(!defined('IN_TRACKER'))
 die('Hacking attempt!');
 
 function printProgress($msg) {
-	echo $msg.'...done<br />';
-	ob_flush();
-	flush();
+  $web = (php_sapi_name() != 'cli');
+  echo $msg.'...done';
+  if ($web) {
+    echo '<br />';
+  }
+  else {
+    echo "\n";
+  }
+  ob_flush();
+  flush();
 }
 function docleanup($forceAll = 0, $printProgress = false) {
 	//require_once(get_langfile_path("cleanup.php",true));
@@ -121,7 +128,6 @@ function docleanup($forceAll = 0, $printProgress = false) {
 	while ($row = mysql_fetch_assoc($res)) {
 		$torrents[$row["torrent"]]["comments"] = $row["c"];
 	}
-
 	$fields = explode(":", "comments:leechers:seeders");
 	$res = sql_query("SELECT id, seeders, leechers, comments FROM torrents") or sqlerr(__FILE__, __LINE__);
 	while ($row = mysql_fetch_assoc($res)) {

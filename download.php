@@ -101,13 +101,46 @@ require_once "include/benc.php";
 
 if (strlen($CURUSER['passkey']) != 32) {
 	$CURUSER['passkey'] = md5($CURUSER['username'].date("Y-m-d H:i:s").$CURUSER['passhash']);
-	sql_query("UPDATE LOW_PRIORITY users SET passkey=".sqlesc($CURUSER[passkey])." WHERE id=".sqlesc($CURUSER[id]));
+	sql_query("UPDATE LOW_PRIORITY users SET passkey=".sqlesc($CURUSER['passkey'])." WHERE id=".sqlesc($CURUSER['id']));
 }
 
-$dict = bdec_file($fn, $max_torrent_size);
-$dict['value']['announce']['value'] = $ssl_torrent . $base_announce_url . "?passkey=$CURUSER[passkey]";
-$dict['value']['announce']['string'] = strlen($dict['value']['announce']['value']).":".$dict['value']['announce']['value'];
-$dict['value']['announce']['strlen'] = strlen($dict['value']['announce']['string']);
+/*
+*/
+$tracker = $ssl_torrent . $base_announce_url . "?passkey=$CURUSER[passkey]";
+$trackerlen = strlen($tracker);
+
+$torrent = file_get_contents($fn);
+
+$announce_header = '8:announce';
+$ap = strpos($torrent, $announce_header);
+if ($ap === false) {
+  $ap += strlen($announce_header);
+  $otorrent = substr($torrent, 0, $ap);
+
+  $slen = '';
+  while (true) {
+    $ch = $torrent[$ap];
+    $ap += 1;
+    $slen .= $ch;
+    if (!is_numeric($ch)) {
+      break;
+    }
+  }
+  $len = 0 + $slen;
+  $ap += $len;
+
+  $otorrent .= $trackerlen . ':' . $tracker;
+  $otorrent .= substr($torrent, $ap);
+}
+else { // old way, slow for big torrent
+  $dict = bdec_file($fn, $max_torrent_size);
+  $dict['value']['announce']['value'] = $tracker;
+  $dict['value']['announce']['string'] = strlen($dict['value']['announce']['value']).":".$dict['value']['announce']['value'];
+  $dict['value']['announce']['strlen'] = strlen($dict['value']['announce']['string']);
+
+  $otorrent = benc($dict);
+}
+
 /*if ($announce_urls[1] != "") // add multi-tracker
 {
 	$dict['value']['announce-list']['type'] = "list";
@@ -165,5 +198,6 @@ else
 
 //header ("Content-Disposition: attachment; filename=".$row["filename"]."");
 //ob_implicit_flush(true);
-print(benc($dict));
-?>
+#print(benc($dict));
+print($otorrent);
+

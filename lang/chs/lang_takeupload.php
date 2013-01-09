@@ -15,7 +15,7 @@ $lang_takeupload = array
 	'std_empty_file' => "空文件！",
 	'std_not_bencoded_file' => "你在搞什么鬼？你上传的不是Bencode文件！",
 	'std_not_a_dictionary' => "不是目录",
-	'std_dictionary_is_missing_key' => "目录缺少值",
+	'std_dictionary_is_missing_key' => "目录缺少值(是不是忘了填tracker?)",
 	'std_invalid_entry_in_dictionary' => "无效的目录项",
 	'std_invalid_dictionary_entry_type' => "无效的目录项类型",
 	'std_invalid_pieces' => "无效的文件块",
@@ -34,4 +34,4 @@ $lang_takeupload = array
 // For transfer torrent from CGBT
 $lang_takupload['std_missging_cgbt_tid'] = '没有指定  CGBT 的原始种子 ID。'; 
 
-?>
+
