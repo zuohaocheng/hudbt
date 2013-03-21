@@ -7,11 +7,11 @@
 /torrents
 /subs
 /imdb/images
+/imdb/cache
 /test-*.php
 /test.php
 *.orig
 *.rej
-/imdb/cache
 /include/loadRevision.php
 .DS_Store
 ._*

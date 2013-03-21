@@ -129,11 +129,13 @@ $lang_offers = array
 	'std_cannot_vote_youself' => "你不能给自己提交的候选投票。",
 	'text_rules' => "规则：",
 	'text_rules_p' => array(
-			 '%s及以上等级的用户可直接发布种子，无需经过候选。%s或以上等级的用户可以添加候选。',
+				'请按照<a href="http://www.kmgtp.org/forums.php?action=viewtopic&forumid=2&topicid=5211">蝴蝶-HUDBT 发种规则</a>添加候选。',
+			 '<span class="important">%s</span>及以上等级的用户可直接发布种子，无需经过候选。<span class="important">%s</span>或以上等级的用户可以添加候选。',
 			 '当候选的支持票比反对票多%d票时，候选被通过。',
 			 "如候选在添加%d小时后未被通过，它将被删除。",
 			 '如在候选通过后%d小时内用户没有发布种子，通过的候选将被删除。',
 			 '请不要随便投反对票，反对票是用在那些不适于发布在蝴蝶的资源(政治敏感问题或大尺度)或者违反了发布规则的资源(如劣质资源) ，无差别投反对票将给予警告处理。',
+				'冻结的候选修改好之后在<a href="forums.php?action=viewtopic&forumid=31&topicid=22755">候选解冻申请专贴</a>申请解冻。'
 			      ),
 );
 

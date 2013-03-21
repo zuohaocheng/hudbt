@@ -731,19 +731,18 @@ print('<h1>' . $lang_offers['text_offers_section'] . '</h1>');
 print('<div class="table td" style="margin-bottom:2em;padding:10px;">');
 print("<h2>".$lang_offers['text_rules']."</h2>\n");
 print("<div align=\"left\"><ul>");
-$rule_args = array(
+$rule_args = array([], 
 		   array(get_user_class_name($upload_class, false, true, true), get_user_class_name($addoffer_class, false, true, true)),
-		   array($minoffervotes),
+		   array($minoffervotes),[],[],[],[]
 		   );
 
 
 if ($offervotetimeout_main) {
-  $rule_args[2] = array($offervotetimeout_main / 3600);
+  $rule_args[3] = array($offervotetimeout_main / 3600);
 }
 if ($offeruptimeout_main) {
-  $rule_args[3] = array($offeruptimeout_main / 3600);
+  $rule_args[4] = array($offeruptimeout_main / 3600);
 }
-$rule_args[] = array();
 
 foreach ($rule_args as $k => $v) {
   array_unshift($v, $lang_offers['text_rules_p'][$k]);
