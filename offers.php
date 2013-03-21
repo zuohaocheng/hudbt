@@ -142,18 +142,20 @@ if ($_GET["off_details"]){
 	$s = $num["name"];
 
 	stdhead($lang_offers['head_offer_detail_for']." \"".$s."\"");
-	print("<h1 align=\"center\" id=\"top\">".htmlspecialchars($s)."</h1>");
+	print("<h1 id=\"top\">".htmlspecialchars($s)."</h1>");
 
 	print("<table width=\"940\" cellspacing=\"0\" cellpadding=\"5\">");
 	$offertime = gettime($num['added'],true,false);
 		$offertime = $lang_offers['text_at'].$offertime;
 	tr($lang_offers['row_info'], $lang_offers['text_offered_by'].get_username($num['userid']).$offertime, 1);
 	if ($num["allowed"] == "pending")
-	$status="<font color=\"red\">".$lang_offers['text_pending']."</font>";
+	$status="<span color=\"offer-pending\">".$lang_offers['text_pending']."</span>";
 	elseif ($num["allowed"] == "allowed")
-	$status="<font color=\"green\">".$lang_offers['text_allowed']."</font>";
+	$status="<span class=\"offer-allowed\">".$lang_offers['text_allowed']."</span>";
+	elseif ($num["allowed"] == "frozen")
+	$status='<span class="offer-frozen">冻结</span>';
 	else
-	$status="<font color=\"red\">".$lang_offers['text_denied']."</font>";
+	$status="<span class=\"offer-denied\">".$lang_offers['text_denied']."</span>";
 	tr($lang_offers['row_status'], $status, 1);
 //=== if you want to have a pending thing for uploaders use this next bit
 	if (get_user_class() >= $offermanage_class && $num["allowed"] == "pending")
@@ -170,7 +172,7 @@ if ($_GET["off_details"]){
 	//=== in the following section, there is a line to report comment... either remove the link or change it to work with your report script :)
 
 	//if pending
-	if ($num["allowed"] == "pending"){
+	if ($num["allowed"] == "pending" && $CURUSER['id'] != $num['userid']){
 		tr($lang_offers['row_vote'],'<form class="a" action="offers.php" method="post"><input type="submit" name="votebutton "value="'.$lang_offers['text_for'].'"/><input type="hidden" name="vote" value="yeah"/><input type="hidden" name="id" value="'.$id.'"/></form>'.
 		(get_user_class() >= $againstoffer_class ?'<form class="a" action="offers.php" method="post"><input type="submit" name="votebutton "value="'.$lang_offers['text_against'].'"/><input type="hidden" name="vote" value="against"/><input type="hidden" name="id" value="'.$id.'"/>':'').'</form>',1);
 		tr($lang_offers['row_vote_results'], 
@@ -183,12 +185,22 @@ if ($_GET["off_details"]){
 		tr($lang_offers['row_offer_allowed'],
 		$lang_offers['text_urge_upload_offer_note'], 1);
 	}
-	if ($CURUSER[id] == $num[userid] || get_user_class() >= $offermanage_class){
+	if ($CURUSER['id'] == $num['userid'] || get_user_class() >= $offermanage_class){
 		$edit = "<a href=\"?id=".$id."&amp;edit_offer=1\"><img class=\"dt_edit\" src=\"pic/trans.gif\" alt=\"edit\" />&nbsp;<b><font class=\"small\">".$lang_offers['text_edit_offer'] . "</font></b></a>&nbsp;|&nbsp;";
 		$delete = "<a href=\"?id=".$id."&amp;del_offer=1&amp;sure=0\"><img class=\"dt_delete\" src=\"pic/trans.gif\" alt=\"delete\" />&nbsp;<b><font class=\"small\">".$lang_offers['text_delete_offer']."</font></b></a>&nbsp;|&nbsp;";
 	}
+
+	if (get_user_class() >= $offermanage_class) {
+	  if ($num['allowed'] == 'pending') {
+	    $freeze = ' | <form class="a" action="offers.php?id=' . $id.'" method="post"><input class="a" type="submit" value="冻结"/><input type="hidden" name="freeze" value="1"/>';
+	  }
+	  else if ($num['allowed'] == 'frozen') {
+	    $freeze = ' | <form class="a" action="offers.php?id=' . $id.'" method="post"><input class="a" type="submit" value="解冻"/><input type="hidden" name="freeze" value="0"/>';
+	  }
+	}
+	
 	$report = "<a href=\"report.php?reportofferid=".$id."\"><img class=\"dt_report\" src=\"pic/trans.gif\" alt=\"report\" />&nbsp;<b><font class=\"small\">".$lang_offers['report_offer']."</font></b></a>";
-	tr($lang_offers['row_action'], $edit . $delete .$report, 1);
+	tr($lang_offers['row_action'], $edit . $delete .$report . $freeze, 1);
 	if ($num["descr"]){
 		$off_bb = format_comment($num["descr"]);
 		tr($lang_offers['row_description'], $off_bb, 1);
@@ -437,9 +449,9 @@ if ($_GET["offer_vote"]){
 
 		while ($arr = mysql_fetch_assoc($res))
 		{
-			if ($arr[vote] == 'yeah')
+			if ($arr['vote'] == 'yeah')
 				$vote = "<b><font color=green>".$lang_offers['text_for']."</font></b>";
-			elseif ($arr[vote] == 'against')
+			elseif ($arr['vote'] == 'against')
 				$vote = "<b><font color=red>".$lang_offers['text_against']."</font></b>";
 			else $vote = "unknown";
 
@@ -455,7 +467,7 @@ if ($_GET["offer_vote"]){
 //=== end offer votes list
 
 //=== offer votes
-if ($_POST["vote"]){
+if ($_POST["vote"] && $arr['allowed'] == 'pending') {
 	$offerid = 0 + htmlspecialchars($_POST["id"]);
 	$vote = htmlspecialchars($_POST["vote"]);
 	if ($vote == 'against' && get_user_class() < $againstoffer_class)
@@ -529,7 +541,6 @@ if ($_POST["vote"]){
 
 //=== delete offer
 if ($_GET["del_offer"]){
-
 	$del_offer = 0 + $_GET["del_offer"];
 	if($del_offer != '1')
 	stderr($lang_offers['std_error'], $lang_offers['std_smell_rat']);
@@ -562,7 +573,9 @@ if ($_GET["del_offer"]){
 	stderr($lang_offers['std_delete_offer'], $lang_offers['std_delete_offer_note']."<br /><form method=post action=offers.php?id=$offer&del_offer=1&sure=1>".$lang_offers['text_reason_is']."<input type=text style=\"width: 200px\" name=reason><input type=submit value=\"".$lang_offers['submit_confirm']."\"></form>",false);
 	elseif ($sure == 1)
 	{
-		$reason = $_POST["reason"];
+	    checkHTTPMethod('post');
+
+		$reason = $_REQUEST["reason"];
 		sql_query("DELETE FROM offers WHERE id=$offer");
 		sql_query("DELETE FROM offervotes WHERE offerid=$offer");
 		sql_query("DELETE FROM comments WHERE offer=$offer");
@@ -586,6 +599,27 @@ if ($_GET["del_offer"]){
 	stderr($lang_offers['std_error'], $lang_offers['std_smell_rat']);
 }
 //== end  delete offer
+
+if (isset($_REQUEST['freeze'])) {
+  checkHTTPMethod('post');
+  $offerid = $_REQUEST['id'];
+  $res = sql_query("SELECT allowed, name FROM offers WHERE id = $offerid") or sqlerr(__FILE__,__LINE__);
+  $num = mysql_fetch_array($res);
+  if (get_user_class() >= $offermanage_class && ($num['allowed'] == 'frozen' || $num['allowed'] = 'pending')) {
+    if ($_REQUEST['freeze']) {
+      $allowed = 'frozen';
+      $log = 'frozen';
+    }
+    else {
+      $allowed = 'pending';
+      $log = 'unfrozen';
+    }
+    sql_query("UPDATE offers SET allowed='$allowed' WHERE id=".sqlesc($id)) or sqlerr(__FILE__,__LINE__);
+    write_log("Offer: $offerid ($num[name]) was $log by $CURUSER[username]".($reason != "" ? " (".$reason.")" : ""),'normal');
+    header("Refresh: 0; url=offers.php?id=$id&off_details=1");
+    die;
+  }
+}
 
 //=== prolly not needed, but what the hell... basically stopping the page getting screwed up
 if ($_GET["sort"])
@@ -785,11 +819,13 @@ print("<td class=\"colhead\">".$lang_offers['col_offered_by']."</td>".
 
 	//==== if you want allow deny for offers use this next bit
 	if ($arr["allowed"] == 'allowed')
-	$allowed = "&nbsp;<b>[<font color=\"green\">".$lang_offers['text_allowed']."</font>]</b>";
+	  $allowed = "&nbsp;[<span class=\"offer-allowed\">".$lang_offers['text_allowed']."</span>]";
 	elseif ($arr["allowed"] == 'denied')
-	$allowed = "&nbsp;<b>[<font color=\"red\">".$lang_offers['text_denied']."</font>]</b>";
+	  $allowed = "&nbsp;[<span class=\"offer-denied\">".$lang_offers['text_denied']."</span>]</b>";
+	elseif ($arr["allowed"] == 'frozen')
+	  $allowed = "&nbsp;[<span class=\"offer-frozen\">".$lang_offers['text_denied']."</span>]</b>";
 	else
-	$allowed = "&nbsp;<b>[<font color=\"orange\">".$lang_offers['text_pending']."</font>]</b>";
+	  $allowed = "&nbsp;[<span class=\"offer-pending\">".$lang_offers['text_pending']."</span>]";
 	//===end
 
 	if ($arr["yeah"] == 0)

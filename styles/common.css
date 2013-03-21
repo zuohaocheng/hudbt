@@ -59,3 +59,8 @@ header {
 .donate-3 {background-color: #99CCFF;}
 .donate-4 {background-color: #FF9999;}
 .donate_note {margin: 0;}
+
+.offer-frozen {color: darkblue}
+.offer-denied {color: red}
+.offer-allowed {color: green}
+.offer-pending {color: orange}
