@@ -3,6 +3,7 @@
 #include <string>
 #include <iterator>
 #include <cctype>
+#include <ctime>
 
 using namespace std;
 
@@ -21,7 +22,8 @@ int main(int argc, char *argv[]) {
 
   string file;
   string line;
-  fstream f("/etc/hosts.allow", ios::in | std::ios::out);
+  //TODO: check privilege & file existion
+  fstream f("/etc/hosts.allow", ios::in | ios::out);
   bool found_sshd = false;
   bool add_ip = true;
   while (!f.eof()) {
@@ -39,6 +41,10 @@ int main(int argc, char *argv[]) {
     file += line + "\n";
   }
 
+  if (!file.empty()) {
+    file.erase(file.size() - 1);
+  }
+
   if (!found_sshd) {
     file += "sshd:" + ip + ":allow";
   }
@@ -48,11 +54,21 @@ int main(int argc, char *argv[]) {
     f.seekp(0);
     f << file;
     cout << (ip + " added to hosts.allow") << endl;
+    f.close();
+    
+    ofstream log("ssh.log", ios::app);
+    time_t t;
+    struct tm * timeinfo;
+    time(&t);
+    timeinfo = localtime(&t);
+    char buf[100];
+    strftime(buf,100,"%c: ", timeinfo);
+    log << buf << ip << endl;
+    log.close();
   }
   else {
     cout << (ip + " already in hosts.allow") << endl;
   }
-
   return 0;
 }
 

@@ -25,6 +25,21 @@ $privilegeConfig = ['Maintenance'=>['staticResources' => UC_MODERATOR],
 	return (($CURUSER["id"] == $data["Torrent"]['owner']) && ((TIMENOW - strtotime($data['Torrent']['added'])) < $self_deletion_before_torrent));
       }
 					      ], 'startseed' => UC_VIP, 'pr' => $torrentonpromotion_class,'sticky' => $torrentsticky_class,'oday' => UC_VIP,'setstoring'=>UC_MODERATOR],
+		    'Subs' => ['delete' => [$submanage_class,
+					    function($id) {
+	global $delownsub_class, $CURUSER;
+	if (is_null($id)) {
+	  return true;
+	}
+	if (get_user_class() < $delownsub_class) {
+	  return false;
+	}
+	App::uses('Sub', 'Model');
+	$Sub = new Sub;
+	$Sub->id = $id;
+	$data = $Sub->read(['uppedby'], $id);
+	return ($data['Sub']['uppedby'] == $CURUSER['id']);
+      }]],
 		    'Posts'=>['editnotseen'=>UC_MODERATOR,'seeeditnotseen'=>UC_UPLOADER,],
 		    'Misc' => ['fun' => $funmanage_class],
 		    'ManagePanels' => ['deletedisabled' => UC_SYSOP,
@@ -57,7 +72,7 @@ $privilegeConfig = ['Maintenance'=>['staticResources' => UC_MODERATOR],
 				       'uploaders' => UC_UPLOADER,
 				       'stats' => UC_MODERATOR,
 				       'testip' => UC_MODERATOR,
-				       'amountbonus' => UC_MODERATOR,
+				       'amountbonus' => UC_ADMINISTRATOR,
 				       'clearcache' => UC_MODERATOR,
 				       'hustip' => UC_MODERATOR,
 				       'ssh' => UC_SYSOP,]
@@ -227,7 +242,7 @@ function get_row_sum($table, $field, $suffix = "") {
 
 function get_single_value($table, $field, $suffix = "") {
   $r = sql_query("SELECT $field FROM $table $suffix LIMIT 1") or sqlerr(__FILE__, __LINE__);
-  $a = mysql_fetch_row($r) or die(mysql_error());
+  $a = mysql_fetch_row($r);
   if ($a) {
     return $a[0];
   } else {
@@ -697,10 +712,10 @@ function textbbcode($form,$text,$content="",$hastitle=false, $col_num = 130) {
 		   'smilies' => array(1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 13, 16, 17, 19, 20, 21, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 39, 40, 41),
 		   'content' => $content
 		   ));
-  echo '<script type="text/javascript" src="js/userAutoTips.js"></script>';
-  echo '<link rel="js/userAutoTips.css" href="url" type="text/css" media="screen" />';
+#  echo '<script type="text/javascript" src="js/userAutoTips.js"></script>';
+#  echo '<link rel="js/userAutoTips.css" href="url" type="text/css" media="screen" />';
   $s->display('bbcode.tpl', php_json_encode(array('form' => $form, 'text' => $text)));
-  echo '<script type="text/javascript">userAutoTips({id:"body"});</script>';
+#  echo '<script type="text/javascript">userAutoTips({id:"body"});</script>';
 }
 
 function begin_compose($title = "",$type="new", $body="", $hassubject=true, $subject="", $maxsubjectlength=100) {

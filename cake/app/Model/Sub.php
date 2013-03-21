@@ -29,6 +29,13 @@ class Sub extends AppModel {
 			'fields' => '',
 			'order' => ''
 		),
+		'User' => array(
+			'className' => 'User',
+			'foreignKey' => 'uppedby',
+			'conditions' => '',
+			'fields' => '',
+			'order' => ''
+		)
 		/* 'Lang' => array( */
 		/* 	'className' => 'Lang', */
 		/* 	'foreignKey' => 'lang_id', */
@@ -37,4 +44,11 @@ class Sub extends AppModel {
 		/* 	'order' => '' */
 		/* ) */
 	);
+	
+	public function beforeDelete() {
+	  global $SUBSPATH;
+	  $data = $this->read(['ext', 'torrent_id'], $this->id);
+	  unlink($SUBSPATH.'/'.$data['Sub']['torrent_id'].'/'.$this->id.'.'.$data['Sub']['ext']);
+	  var_dump($SUBSPATH.'/'.$data['Sub']['torrent_id'].'/'.$this->id.'.'.$data['Sub']['ext']);
+	}
 }

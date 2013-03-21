@@ -7,7 +7,7 @@ $lang_upload = array
 	'std_unauthorized_to_upload' => "你没有发布种子的权限。请阅读(<a class=\"faqlink\" href=\"messages.php\">收件箱</a>)",
 	'std_please_offer' => "你没有发布种子的权限。如果你是普通会员，请到<a class=\"faqlink\" href=\"offers.php\">候选区</a>提交你的发布请求（请查看常见问题中的<a class=\"faqlink\" href=\"faq.php#id36\"><b>“发布”</b></a>）部分<br />",
 	'text_red_star_required' => "红星号(<font color=\"red\">*</font>)标记的区域必须填写",
-	'text_tracker_url' => "<font color=\"red\">请注意：Tracker地址必填！</font>，本站的Tracker服务器的URL是",
+	'text_tracker_url' => "<span class='important'>发种请务必遵守<a href=\"forums.php?action=viewtopic&forumid=2&topicid=5211\"><span class='red'>发种规范</span></a>，不遵守发种规范会导致资源被禁止。</span><br /><span class=\"red\">请注意：Tracker地址必填！</span>，本站的Tracker服务器的URL是",
 	'row_torrent_file' => "种子文件",
 	'row_torrent_name' => "主标题",
 	'text_torrent_name_note' => "(<b>主标题填英文名，不要带点</b>，若不填将使用种子文件名，例如：Blade Runner 1982 Final Cut 720p HDDVD DTS x264-ESiR)\n",
@@ -28,11 +28,11 @@ $lang_upload = array
 	'text_please_select_offer' => "&nbsp;&nbsp; 如果发布的是通过候选的资源，请选择该候选项目。投票用户会收到通知。",
 	'row_show_uploader' => "匿名发布",
 	'checkbox_hide_uploader_note' => "不要在发布者项目中显示我的用户名",
-	'text_read_rules' => "发种请务必遵守<a  href=\"forums.php?action=viewtopic&forumid=2&topicid=5211\"><font color=red>“发种规范”</font></a>，不遵守发种规范会导致资源被禁止。",
+	'text_read_rules' => "发种请务必遵守<a href=\"forums.php?action=viewtopic&forumid=2&topicid=5211\"><span class='red'>发种规范</span></a>，不遵守发种规范会导致资源被禁止。",
 	'submit_upload' => "发布",
 	'text_to_browse_section' => "发布至<b>种子</b>区 ",
 	'text_to_special_section' => "或<b>音乐</b>区 ",
-	'text_type_note' => "&nbsp;&nbsp; <font class=\"small\"><b>只选</b>两者之一</font>",
+	'text_type_note' => "&nbsp;&nbsp; <span class=\"small\"><b>只选</b>两者之一</span>",
 	'text_medium' => "媒介:",
 	'text_team' => "制作组:",
 	'text_audio_codec' => "音频编码:",
@@ -42,4 +42,4 @@ $lang_upload = array
 	'text_titles_note' => "(如果英文名不存在，使用拼音或不填写)",
 );
 
-?>
+

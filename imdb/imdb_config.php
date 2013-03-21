@@ -14,11 +14,11 @@
 // the proxy to use for connections to imdb.
 // leave it empty for no proxy.
 // this is only supported with PEAR. 
-// define ('PROXY', "");
-// define ('PROXY_PORT', "");
+define ('PROXY', "");
+define ('PROXY_PORT', "");
 
-define ('PROXY', "icassi.us");
-define ('PROXY_PORT', "23333");
+//define ('PROXY', "icassi.us");
+//define ('PROXY_PORT', "23333");
 /** Configuration part of the IMDB classes
  * @package Api
  * @class imdb_config

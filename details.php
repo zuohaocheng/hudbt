@@ -186,12 +186,18 @@ else {
     
     print("<table border=\"0\" cellspacing=\"0\"><tr>");
 
+    print("<td class=\"embedded\"><form method=\"get\" action=\"http://shooter.cn/sub/\" target=\"_blank\"><input type=\"search\" name=\"searchword\" id=\"keyword\" style=\"width: 250px\" value=\"".$moviename."\" /><input type=\"submit\" value=\"".$lang_details['submit_search_at_shooter']."\" /><input type=\"submit\" formaction=\"http://www.opensubtitles.org/en/search2/\" value=\"" . $lang_details['submit_search_at_opensubtitles'] . "\" /></form></td>\n");
+    print("</tr></table>");
+    echo '</dd>';
+
+    // ---------------- end subtitle block -------------------//
+
     $moviename = "";
     $imdb_id = parse_imdb_id($row["url"]);
-    if ($imdb_id && $showextinfo['imdb'] == 'yes')
-      {
-	$thenumbers = $imdb_id;
-	if (!$moviename = $Cache->get_value('imdb_id_'.$thenumbers.'_movie_name')){
+    if ($imdb_id && $showextinfo['imdb'] == 'yes') {
+	$thenumbers = $imdb_id;	
+
+	if (!$moviename = $Cache->get_value('imdb_id_'.$thenumbers.'_movie_name')) {
 	  $movie = new imdb ($thenumbers);
 	  $target = array('Title');
 	  switch ($movie->cachestate($target)){
@@ -203,11 +209,6 @@ else {
 	  }
 	}
       }
-    print("<td class=\"embedded\"><form method=\"get\" action=\"http://shooter.cn/sub/\" target=\"_blank\"><input type=\"search\" name=\"searchword\" id=\"keyword\" style=\"width: 250px\" value=\"".$moviename."\" /><input type=\"submit\" value=\"".$lang_details['submit_search_at_shooter']."\" /><input type=\"submit\" formaction=\"http://www.opensubtitles.org/en/search2/\" value=\"" . $lang_details['submit_search_at_opensubtitles'] . "\" /></form></td>\n");
-    print("</tr></table>");
-    echo '</dd>';
-
-    // ---------------- end subtitle block -------------------//
 
     if (!empty($row["descr"])){
       $torrentdetailad=$Advertisement->get_ad('torrentdetail');
@@ -408,7 +409,7 @@ else {
 
     if ($imdb_id) {
 	$where_area = " url = " . sqlesc((int)$imdb_id) ." AND torrents.id != ".sqlesc($id);
-	$copies_res = sql_query("SELECT torrents.id, torrents.name, torrents.sp_state, torrents.size, torrents.added, torrents.seeders, torrents.leechers, categories.id AS catid, categories.name AS catname, categories.image AS catimage, sources.name AS source_name, media.name AS medium_name, codecs.name AS codec_name, standards.name AS standard_name, processings.name AS processing_name FROM torrents LEFT JOIN categories ON torrents.category=categories.id LEFT JOIN sources ON torrents.source = sources.id LEFT JOIN media ON torrents.medium = media.id  LEFT JOIN codecs ON torrents.codec = codecs.id LEFT JOIN standards ON torrents.standard = standards.id LEFT JOIN processings ON torrents.processing = processings.id WHERE " . $where_area . " ORDER BY torrents.id DESC") or sqlerr(__FILE__, __LINE__);
+	$copies_res = sql_query("SELECT torrents.id, torrents.name, torrents.sp_state, torrents.size, torrents.added, torrents.seeders, torrents.leechers, categories.id AS catid, categories.name AS catname, sources.name AS source_name, media.name AS medium_name, codecs.name AS codec_name, standards.name AS standard_name, processings.name AS processing_name FROM torrents LEFT JOIN categories ON torrents.category=categories.id LEFT JOIN sources ON torrents.source = sources.id LEFT JOIN media ON torrents.medium = media.id  LEFT JOIN codecs ON torrents.codec = codecs.id LEFT JOIN standards ON torrents.standard = standards.id LEFT JOIN processings ON torrents.processing = processings.id WHERE " . $where_area . " ORDER BY torrents.id DESC") or sqlerr(__FILE__, __LINE__);
 
 	$copies_count = mysql_num_rows($copies_res);
 	if($copies_count > 0) {

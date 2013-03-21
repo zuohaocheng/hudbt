@@ -49,7 +49,7 @@ class Torrent extends AppModel {
 		'Sub' => array(
 			'className' => 'Sub',
 			'foreignKey' => 'torrent_id',
-			'dependent' => false,
+			'dependent' => true,
 			'conditions' => '',
 			'fields' => '',
 			'order' => '',
@@ -62,7 +62,7 @@ class Torrent extends AppModel {
 		'Snatched' => [
 			       'className' => 'Snatched',
 			       'foreignKey' => 'torrentid',
-			       'dependent' => false,
+			       'dependent' => true,
 			       'conditions' => '',
 			       'fields' => '',
 			       'order' => '',
@@ -75,7 +75,7 @@ class Torrent extends AppModel {
 		'Peer' => [
 			       'className' => 'Peer',
 			       'foreignKey' => 'torrent',
-			       'dependent' => false,
+			       'dependent' => true,
 			       'conditions' => '',
 			       'fields' => '',
 			       'order' => '',
@@ -88,7 +88,7 @@ class Torrent extends AppModel {
 		'File' => [
 			       'className' => 'File',
 			       'foreignKey' => 'torrent',
-			       'dependent' => false,
+			       'dependent' => true,
 			       'conditions' => '',
 			       'fields' => '',
 			       'order' => '',
@@ -98,19 +98,19 @@ class Torrent extends AppModel {
 			       'finderQuery' => '',
 			       'counterQuery' => ''
 			   ],
-		'File' => [
-			       'className' => 'Comment',
-			       'foreignKey' => 'torrent',
-			       'dependent' => false,
-			       'conditions' => '',
-			       'fields' => '',
-			       'order' => '',
-			       'limit' => '',
-			       'offset' => '',
-			       'exclusive' => '',
-			       'finderQuery' => '',
-			       'counterQuery' => ''
-			   ],		
+		/* 'File' => [ */
+		/* 	       'className' => 'Comment', */
+		/* 	       'foreignKey' => 'torrent', */
+		/* 	       'dependent' => false, */
+		/* 	       'conditions' => '', */
+		/* 	       'fields' => '', */
+		/* 	       'order' => '', */
+		/* 	       'limit' => '', */
+		/* 	       'offset' => '', */
+		/* 	       'exclusive' => '', */
+		/* 	       'finderQuery' => '', */
+		/* 	       'counterQuery' => '' */
+		/* 	   ],	 */	
 	);
 
 	public $belongsTo = array(
@@ -153,8 +153,27 @@ class Torrent extends AppModel {
 	  }
 
 	  $this->data = $this->read(['name', 'id', 'owner', 'added', 'anonymous'], $this->id); //performance prob?
+
+	  function getUseridFor($type) {
+	    return function($v) use ($type) {
+	      return $v[$type]['userid'];
+	    };
+	  };
+	  $users_s = $this->Snatched->find('all',
+					  ['conditions' => ['Snatched.torrentid' => $this->id,
+							    'Snatched.finished' => 'no',
+							    'Snatched.userid !=' => $data['Torrent']['owner'],
+							    'User.accepttdpms' => 'yes'],
+					   'fields' => ['Snatched.userid']]);
+	  $users_p = $this->Peer->find('all',
+				       ['conditions' => ['Peer.torrent' => $this->id,
+							 'Peer.seeder' => 'yes',
+							 'Peer.userid !=' => $data['Torrent']['owner'],
+							 'User.accepttdpms' => 'yes',],
+					'fields' => ['Peer.userid']]);
+	  $this->users = array_unique(array_merge(array_map(getUseridFor('Snatched'), $users_s),  array_map(getUseridFor('Peer'), $users_p)));
+
 	  global $CURUSER;
-	  
 	}
 
 	public function afterDelete() {
@@ -172,26 +191,8 @@ class Torrent extends AppModel {
 	  $Message = new Message();
 
 	  //send pm to downloaders & seeders
-	  $users_s = $this->Snatched->find('all',
-					 ['conditions' => ['Snatched.torrentid' => $this->id,
-							   'Snatched.finished' => 'no',
-							   'Snatched.userid !=' => $data['Torrent']['owner'],
-							   'User.accepttdpms' => 'yes'],
-					  'fields' => ['Snatched.userid']]);
 
-	  $users_p = $this->Peer->find('all',
-				     ['conditions' => ['Peer.torrent' => $this->id,
-						       'Peer.seeder' => 'yes',
-						       'Peer.userid !=' => $data['Torrent']['owner'],
-						       'User.accepttdpms' => 'yes',],
-				      'fields' => ['Peer.userid']]);
-	  
-	  function getUseridFor($type) {
-	    return function($v) use ($type) {
-	      return $v[$type]['userid'];
-	    };
-	  };
-	  $users = array_unique(array_merge(array_map(getUseridFor('Snatched'), $users_s),  array_map(getUseridFor('Peer'), $users_p)));
+	  $users = $this->users;
 	  foreach ($users as $uid) {
 	    $lang = get_user_lang($uid);
 	    $subject = $lang_delete_target[$lang]['msg_torrent_deleted'];
