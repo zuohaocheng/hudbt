@@ -6,6 +6,7 @@
 /templates_c
 /torrents
 /subs
+/imdb/images
 /test-*.php
 /test.php
 *.orig
@@ -16,4 +17,5 @@
 ._*
 *.bak
 ssh
+ssh.log
 *.o

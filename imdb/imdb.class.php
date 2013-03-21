@@ -468,9 +468,9 @@ $responseBody = $response->getBody();
     if ($this->page["Title"] == "") {
 	$this->openpage ("Title");
     }
-$rate_s = strpos($this->page["Title"], 'rating-rating') + 15;
+$rate_s = strpos($this->page["Title"], 'ratingValue') + 13;
 $this->main_rating = substr($this->page["Title"], $rate_s, 12);
-$this->main_rating = str_replace('<span>', '', $this->main_rating);
+$this->main_rating = preg_replace('/[^.0-9]/', '', $this->main_rating);
 return $this->main_rating;
 
 
@@ -515,13 +515,13 @@ return $this->main_rating;
   function votes () {
    if ($this->main_votes == "") {
     if ($this->page["Title"] == "") $this->openpage ("Title");
-    $vote_s = strpos ($this->page["Title"], "User Rating:");
-    if ( $vote_s == 0) return false;
+#    $vote_s = strpos ($this->page["Title"], "User Rating:");
+#    if ( $vote_s == 0) return false;
     if (strpos ($this->page["Title"], "awaiting 5 votes")) return false;
 //    $vote_s = strpos ($this->page["Title"], "<a", $vote_s);
 //    $vote_e = strpos ($this->page["Title"], "votes", $vote_s);
 //    $this->main_votes = substr ($this->page["Title"], $vote_s, $vote_e - $vote_s);
-    preg_match('/href=\"ratings\".*>([0-9,][0-9,]*)/', $this->page["Title"], $matches);
+    preg_match('/\"ratingCount\".*>([0-9][0-9,]*)/', $this->page["Title"], $matches);
     $this->main_votes = $matches[1];
     $this->main_votes = "<a href=\"http://".$this->imdbsite."/title/tt".$this->imdbID."/ratings\">" . $this->main_votes . "</a>";
    }
@@ -955,7 +955,7 @@ return $this->main_rating;
    if ($this->main_photo == "") {
     if ($this->page["Title"] == "") $this->openpage ("Title");
 #    $tag_s = strpos ($this->page["Title"], "<img border=\"0\" alt=\"cover\"");
-    $tag_s = strpos ($this->page["Title"], "<a name=\"poster\"");
+    $tag_s = strpos ($this->page["Title"], "class=\"image\"");
     if ($tag_s == 0) return FALSE;
 #    $tag_s = strpos ($this->page["Title"], "http://ia.imdb.com/media",$tag_s);
     $tag_s = strpos ($this->page["Title"], "http://",$tag_s);
