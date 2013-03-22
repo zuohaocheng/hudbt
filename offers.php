@@ -163,16 +163,13 @@ if ($_GET["off_details"]){
 	"<input class=\"btn\" type=\"submit\" value=\"".$lang_offers['submit_allow']."\" />&nbsp;&nbsp;</form></td><td class=\"embedded\"><form method=\"post\" action=\"?id=".$id."&amp;finish_offer=1\">".
 	"<input type=\"hidden\" value=\"".$id."\" name=\"finish\" /><input class=\"btn\" type=\"submit\" value=\"".$lang_offers['submit_let_votes_decide']."\" /></form></td></tr></table>", 1);
 
-	$zres = sql_query("SELECT COUNT(*) from offervotes where vote='yeah' and offerid=$id");
-	$arr = mysql_fetch_row($zres);
-	$za = $arr[0];
-	$pres = sql_query("SELECT COUNT(*) from offervotes where vote='against' and offerid=$id");
-	$arr2 = mysql_fetch_row($pres);
-	$protiv = $arr2[0];
+	$za = get_row_count('offervotes', "where vote='yeah' and offerid=$id");
+	$protiv = get_row_count('offervotes', "where vote='against' and offerid=$id");
 	//=== in the following section, there is a line to report comment... either remove the link or change it to work with your report script :)
 
 	//if pending
-	if ($num["allowed"] == "pending" && $CURUSER['id'] != $num['userid']){
+	$voted = get_row_count('offervotes', "WHERE offerid=".sqlesc($id)." AND userid=".sqlesc($CURUSER["id"]));
+	if ($num["allowed"] == "pending" && $CURUSER['id'] != $num['userid'] && !$voted){
 		tr($lang_offers['row_vote'],'<form class="a" action="offers.php" method="post"><input type="submit" name="votebutton "value="'.$lang_offers['text_for'].'"/><input type="hidden" name="vote" value="yeah"/><input type="hidden" name="id" value="'.$id.'"/></form>'.
 		(get_user_class() >= $againstoffer_class ?'<form class="a" action="offers.php" method="post"><input type="submit" name="votebutton "value="'.$lang_offers['text_against'].'"/><input type="hidden" name="vote" value="against"/><input type="hidden" name="id" value="'.$id.'"/>':'').'</form>',1);
 		tr($lang_offers['row_vote_results'], 
@@ -192,10 +189,10 @@ if ($_GET["off_details"]){
 
 	if (get_user_class() >= $offermanage_class) {
 	  if ($num['allowed'] == 'pending') {
-	    $freeze = ' | <form class="a" action="offers.php?id=' . $id.'" method="post"><input class="a" type="submit" value="冻结"/><input type="hidden" name="freeze" value="1"/>';
+	    $freeze = ' | <form class="a" action="offers.php?id=' . $id.'" method="post"><input class="a" type="submit" value="冻结"/><input type="hidden" name="freeze" value="1"/></form>';
 	  }
 	  else if ($num['allowed'] == 'frozen') {
-	    $freeze = ' | <form class="a" action="offers.php?id=' . $id.'" method="post"><input class="a" type="submit" value="解冻"/><input type="hidden" name="freeze" value="0"/>';
+	    $freeze = ' | <form class="a" action="offers.php?id=' . $id.'" method="post"><input class="a" type="submit" value="解冻"/><input type="hidden" name="freeze" value="0"/></form>';
 	  }
 	}
 	
@@ -230,12 +227,11 @@ if ($_GET["off_details"]){
 		commenttable($allrows,"offer",$id, false, $offset);		
 		print($pagerbottom);
 	}
-	print("<table style='border:1px solid #000000;'><tr>".
-"<td class=\"text\" align=\"center\"><b>".$lang_offers['text_quick_comment']."</b><br /><br />".
+	print('<div class="table td" id="forum-reply-post"><h2>'.$lang_offers['text_quick_comment']."</h2>".
 "<form id=\"compose\" name=\"comment\" method=\"post\" action=\"comment.php?action=add&amp;type=offer\" onsubmit=\"return postvalid(this);\">".
 "<input type=\"hidden\" name=\"pid\" value=\"".$id."\" /><br />");
 	quickreply('comment', 'body',$lang_offers['submit_add_comment']);
-	print("</form></td></tr></table>");
+	print("</form></div>");
 	print($commentbar);
 	stdfoot();
 	die;
@@ -467,7 +463,7 @@ if ($_GET["offer_vote"]){
 //=== end offer votes list
 
 //=== offer votes
-if ($_POST["vote"] && $arr['allowed'] == 'pending') {
+if ($_POST["vote"]) {
 	$offerid = 0 + htmlspecialchars($_POST["id"]);
 	$vote = htmlspecialchars($_POST["vote"]);
 	if ($vote == 'against' && get_user_class() < $againstoffer_class)
@@ -475,9 +471,11 @@ if ($_POST["vote"] && $arr['allowed'] == 'pending') {
 	if ($vote =='yeah' || $vote =='against')
 	{
 		$userid = 0+$CURUSER["id"];
-		$res = sql_query("SELECT * FROM offervotes WHERE offerid=".sqlesc($offerid)." AND userid=".sqlesc($userid)) or sqlerr(__FILE__,__LINE__);
-		$arr = mysql_fetch_assoc($res);
-		$voted = $arr;
+		$voted = get_row_count('offervotes', "WHERE offerid=".sqlesc($offerid)." AND userid=".sqlesc($userid));
+		if (get_single_value('offers', 'allowed', 'WHERE id='.$offerid) != 'pending') {
+		  stderr('不能给不在候选状态的投票', $lang_offers['std_cannot_vote_youself']);
+		}
+
 		$offer_userid = get_single_value("offers", "userid", "WHERE id=".sqlesc($offerid));
 		if ($offer_userid == $CURUSER['id'])
 		{
@@ -526,11 +524,7 @@ if ($_POST["vote"] && $arr['allowed'] == 'pending') {
 
 			sql_query("INSERT INTO offervotes (offerid, userid, vote) VALUES($offerid, $userid, ".sqlesc($vote).")") or sqlerr(__FILE__,__LINE__);
 			KPS("+",$offervote_bonus,$CURUSER["id"]);
-			stdhead($lang_offers['head_vote_for_offer']);
-			print("<h1 align=center>".$lang_offers['std_vote_accepted']."</h1>");
-			print($lang_offers['std_vote_accepted_note']."<a  href=offers.php>".$lang_offers['std_back_to_offer_detail']);
-			stdfoot();
-         Header("Location:offers.php");
+			Header("Location:offers.php?off_details=1&id=" . $offerid);
 			die;
 		}
 	}

@@ -1162,6 +1162,10 @@ input.text {
     min-height: 30px;
 }
 
+.forum-post:first-child .forum-post-postfix {
+    margin-bottom: 80px;
+}
+
 #forum-header {
     position: relative;
     zoom: 1;
@@ -1251,15 +1255,17 @@ input.text {
     text-align:center;
 }
 
-.forum-post-toolbox {
-    position: absolute;
-    padding: 0;
-    bottom: 0;
-    right: 0;
+.forum-post-toolbox-container {
+    clear: both;
+    position: relative;
+    zoom: 1;
 }
 
-.forum-post-footer {
-    clear:both;
+.forum-post-toolbox {
+    padding: 0;
+    width:100%;
+    position:absolute;
+    bottom:0;
 }
 
 #forum-toolbox {
@@ -1376,32 +1382,6 @@ input.text {
     zoom: 1;
     right:0.5em;
 }
-
-#donating {
-	text-align: right;
-	font-weight: bold;
-}
-#to_donate a {
-	width: 42px;
-}
-.donate {
-	display: inline-block;
-	height: 22px;
-	margin: 6px;
-	padding: 0 6px;
-	line-height: 22px;
-	text-align: center;
-	border: 1px solid #AAA;
-	border-radius:3px;
-	zoom: 1;
-}
-
-.donate64 {background-color: #FFFF99;}
-.donate128 {background-color: #CCFF99;}
-.donate256 {background-color: #99FFFF;}
-.donate512 {background-color: #99CCFF;}
-.donate1024 {background-color: #FF9999;}
-.donate_note {margin: 0;}
 
 .required-field {
     color: red;
