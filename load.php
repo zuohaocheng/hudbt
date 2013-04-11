@@ -125,10 +125,24 @@ function load_files_cache($name, $type, $debug, $purge) {
 
   if ($type == 'js') {
     if (!$name) {
-      global $js_files;
-      $out .= load_files($js_files, $type, $debug, $purge);
-      $out .= ";/* constants */";
-      $out .= load_constant();
+      if ($_REQUEST['user']) {
+	App::uses('User', 'Model');
+	$User = new User;
+	$User->id = $_REQUEST['user'];
+	$js = $User->read('Property.js', $User->id);
+	if ($js) {
+	  $out = $js['Property']['js'];
+	}
+	else {
+	  $out = '';
+	}
+      }
+      else {
+	global $js_files;
+	$out .= load_files($js_files, $type, $debug, $purge);
+	$out .= ";/* constants */";
+	$out .= load_constant();
+      }
     }
     else {
       $out .= load_files(dependence($name), $type, $debug, $purge);
@@ -147,7 +161,8 @@ function load_files_cache($name, $type, $debug, $purge) {
     global $theme, $caticon;
     $css_uri = get_css_uri('', $theme);
     global $css_files;
-    $files = array_merge($css_files, array(get_forum_pic_folder().'/forumsprites.css', $css_uri."theme.css", $css_uri."DomTT.css", 'pic/' . get_cat_folder(401, $caticon) . "sprite.css", 'styles/jqui/' . jqui_css_name($theme) . '/jquery-ui-1.8.18.custom.css'));   
+    $jqui = 'styles/jqui/' . jqui_css_name($theme);
+    $files = array_merge($css_files, array(get_forum_pic_folder().'/forumsprites.css', $css_uri."theme.css", $css_uri."DomTT.css", 'pic/' . get_cat_folder(401, $caticon) . "sprite.css",  $jqui . '/jquery-ui.min.css', $jqui . '/jquery.ui.theme.css'));   
     $out .= load_files($files, $type, $debug, $purge, true);
 
     if ($CURUSER){

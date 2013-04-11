@@ -12,8 +12,8 @@
     {js_hb_config()}
     //]]>
   </script>
-  {get_load_uri('css', '')}
   {nocache}
+  {get_load_uri('css', '')}
   {get_load_uri('js', '')}
   {/nocache}
   <!--[if lt IE 9]>

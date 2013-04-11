@@ -64,3 +64,25 @@ header {
 .offer-denied {color: red}
 .offer-allowed {color: green}
 .offer-pending {color: orange}
+
+.faq-status-img {
+    display:inline-block;
+    text-indent: -9999999px;
+}
+
+.faq-status-img.editing {
+    text-indent: 0;
+}
+
+.faq-hidden {color:gray}
+
+.faq-status {
+    position: absolute;
+    right: 2em;
+}
+.faq-item-remove {
+    position: absolute;
+    right: 0.5em;
+}
+
+.action {cursor:pointer}

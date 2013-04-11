@@ -29,9 +29,18 @@ checkPrivilegePanel();
 
 // ACTION: reorder - reorder sections and items
 if ($_GET[action] == "reorder") {
-	foreach($_POST[order] as $id => $position) sql_query("UPDATE `faq` SET `order`=".sqlesc($position)." WHERE id=".sqlesc($id)) or sqlerr();
-	header("Location: " . get_protocol_prefix() . "$BASEURL/faqmanage.php");
-	die;
+  foreach($_POST[order] as $id => $position) {
+    sql_query("UPDATE `faq` SET `order`=".sqlesc($position)." WHERE id=".sqlesc($id)) or sqlerr();
+  }
+  
+  if ($_REQUEST['format'] == 'json') {
+    echo json_encode(['success' => true]);
+  }
+  else {
+    header("Location: " . get_protocol_prefix() . "$BASEURL/faqmanage.php");
+  }
+  
+  die;
 }
 
 // ACTION: edit - edit a section or item
@@ -86,25 +95,50 @@ elseif ($_GET[action] == "edit" && isset($_GET[id])) {
 }
 
 // subACTION: edititem - edit an item
-elseif ($_GET[action] == "edititem" && $_POST[id] != NULL && $_POST[question] != NULL && $_POST[answer] != NULL && $_POST[flag] != NULL && $_POST[categ] != NULL) {
-	$question = $_POST[question];
-	$answer = $_POST[answer];
-	sql_query("UPDATE `faq` SET `question`=".sqlesc($question).", `answer`=".sqlesc($answer).", `flag`=".sqlesc($_POST[flag]).", `categ`=".sqlesc($_POST[categ])." WHERE id=".sqlesc($_POST[id])) or sqlerr();
-	header("Location: " . get_protocol_prefix() . "$BASEURL/faqmanage.php");
-	die;
+elseif ($_GET[action] == "edititem" && $_POST[id] != NULL && (isset($_POST[question]) || isset($_POST[answer]) || isset($_POST[flag]) || isset($_POST[categ]))) {
+  $fields = ['question', 'answer', 'flag', 'categ'];
+  $ret = '';
+  $a = [];
+  foreach ($fields as $field) {
+    if (isset($_REQUEST[$field])) {
+      $a[] = $field . '=' . sqlesc($_REQUEST[$field]);
+      $ret = $_REQUEST[$field];
+    }
+  }
+  $sql = "UPDATE `faq` SET " . implode($a, ', ') . " WHERE id=".sqlesc($_POST['id']);
+  
+  sql_query($sql) or sqlerr();
+  if ($_REQUEST['format'] == 'json') {
+    echo $ret;
+  }
+  else {
+    header("Location: " . get_protocol_prefix() . "$BASEURL/faqmanage.php");
+  }
+  die;
 }
 
 // subACTION: editsect - edit a section
-elseif ($_GET[action] == "editsect" && $_POST[id] != NULL && $_POST[title] != NULL && $_POST[flag] != NULL) {
+elseif ($_GET[action] == "editsect" && $_POST[id] != NULL && $_POST[title] != NULL) {
 	$title = $_POST[title];
-	sql_query("UPDATE `faq` SET `question`=".sqlesc($title).", `answer`='', `flag`=".sqlesc($_POST[flag]).", `categ`='0' WHERE id=".sqlesc($_POST[id])) or sqlerr();
-	header("Location: " . get_protocol_prefix() . "$BASEURL/faqmanage.php");
+	$sql = "UPDATE `faq` SET `question`=".sqlesc($title).", `answer`=''";
+	if (isset($_REQUEST['flag'])) {
+	  $sql .=  ', `flag`=' . (0 + $_REQUEST['flag']);
+	}
+	$sql .= ", `categ`='0' WHERE id=".sqlesc($_POST[id]);
+	sql_query($sql) or sqlerr();
+	if ($_REQUEST['format'] == 'json') {
+	  echo $title;
+	}
+	else {
+	  header("Location: " . get_protocol_prefix() . "$BASEURL/faqmanage.php");
+	}
 	die;
 }
 
 // ACTION: delete - delete a section or item
 elseif ($_GET[action] == "delete" && isset($_GET[id])) {
-	if ($_GET[confirm] == "yes") {
+	if ($_REQUEST[confirm] == "yes") {
+	  checkHTTPMethod('POST');
 		sql_query("DELETE FROM `faq` WHERE `id`=".sqlesc(0+$_GET[id])." LIMIT 1") or sqlerr();
 		header("Location: " . get_protocol_prefix() . "$BASEURL/faqmanage.php");
 		die;
@@ -113,7 +147,7 @@ elseif ($_GET[action] == "delete" && isset($_GET[id])) {
 		stdhead("FAQ Management");
 		begin_main_frame();
 		print("<h1 align=\"center\">Confirmation required</h1>");
-		print("<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\" align=\"center\" width=\"95%\">\n<tr><td align=\"center\">Please click <a href=\"faqactions.php?action=delete&id=$_GET[id]&confirm=yes\">here</a> to confirm.</td></tr>\n</table>\n");
+		print("<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\" align=\"center\" width=\"95%\">\n<tr><td align=\"center\">Please click <form action=\"faqactions.php?action=delete&id=$_GET[id]&confirm=yes\" method=\"post\" class=\"a\"><input type=\"submit\" value=\"here\" class=\"a\" /></form> to confirm.</td></tr>\n</table>\n");
 		end_main_frame();
 		stdfoot();
 	}

@@ -3,7 +3,7 @@ require_once('lib/jsminplus.php');
 require_once('lib/CSSMin.php');
 
 //Mind the sequence of loading
-$js_files = ['jquery-1.7.1.min', 'jquery.json-2.3.min', 'jstorage.min', 'jquery-ui-1.8.18.custom.min', 'jquery.tablesorter', 'ajaxbasic', 'common', 'domLib', 'domTT', 'domTT_drag', 'fadomatic', 'pm', 'pager'];
+$js_files = ['jquery-1.9.1.min', 'jquery.json-2.3.min', 'jstorage.min', 'jquery-ui.min', 'jquery.tablesorter', 'ajaxbasic', 'common', 'domLib', 'domTT', 'domTT_drag', 'fadomatic', /* 'pm', */ 'pager'];
 $css_files = ['styles/sprites.css', 'styles/common.css', 'styles/jquery.tablesorter/jquery.tablesorter.css', 'styles/font.css'];
 
 function array_kronecker_product($arrays, $delimiter = '', $obj = ['' => []]) {
@@ -24,7 +24,8 @@ function array_kronecker_product($arrays, $delimiter = '', $obj = ['' => []]) {
 }
 
 function dependence($name) {
-  $dependence = ['mybonus' => ['jscolor/jscolor']];
+  $dependence = ['mybonus' => ['jscolor/jscolor'],
+		 'faqmanage' => ['jquery.jeditable']];
   $dep = $dependence[$name];
   if ($dep) {
     return $dep;

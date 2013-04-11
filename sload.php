@@ -30,7 +30,8 @@ function css() {
   $themes = [];
   foreach (get_css_rows() as $obj) {
     $uri = get_css_uri('', $obj['id']);
-    $themes['theme' . $obj['id']] = [$uri . 'theme.css', $uri . 'DomTT.css', 'styles/jqui/' . $obj['jqui'] . '/jquery-ui-1.8.18.custom.css'];
+    $jqui = 'styles/jqui/' . $obj['jqui'];
+    $themes['theme' . $obj['id']] = [$uri . 'theme.css', $uri . 'DomTT.css', $jqui . '/jquery-ui.min.css', $jqui . '/jquery.ui.theme.css'];
   }
 
   $caticons = [];

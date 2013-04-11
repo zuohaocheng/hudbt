@@ -300,17 +300,17 @@ width:14px;
 height:14px;
 background:url(icons.gif) -42px -68px;
 }
-img.faq_new
+.faq_new
 {
 width:40px;
 height:11px;
 background:url(icons.gif) 0 -82px;
 }
-img.faq_updated
+.faq_updated
 {
 width:40px;
 height:11px;
-background:url(icons.gif) -11px -82px;
+background:url(icons.gif) -40px -82px;
 }
 img.staff_edit
 {

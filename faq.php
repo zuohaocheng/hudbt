@@ -40,16 +40,16 @@ if (isset($faq_categ)) {
   begin_frame("<span id=\"top\">".$lang_faq['text_contents'] . "</span>", '', '', '', '', true);
 	foreach ($faq_categ as $id => $temp)
 	{
-		if ($faq_categ[$id][flag] == "1")
+		if ($temp[flag] == "1")
 		{
-			print("<ul><li><a href=\"#id". $faq_categ[$id][link_id] ."\"><b>". $faq_categ[$id][title] ."</b></a><ul>\n");
-   			if (array_key_exists("items", $faq_categ[$id])) 
+			print("<ul><li><a href=\"#id". $id ."\"><b>". $temp[title] ."</b></a><ul>\n");
+   			if (array_key_exists("items", $temp)) 
 			{
-    				foreach ($faq_categ[$id][items] as $id2 => $temp)
+    				foreach ($temp[items] as $id2 => $temp2)
 				{
-	 				if ($faq_categ[$id][items][$id2][flag] == "1") print("<li><a href=\"#id". $faq_categ[$id][items][$id2][link_id] ."\" class=\"faqlink\">". $faq_categ[$id][items][$id2][question] ."</a></li>\n");
-	 				elseif ($faq_categ[$id][items][$id2][flag] == "2") print("<li><a href=\"#id". $faq_categ[$id][items][$id2][link_id] ."\" class=\"faqlink\">". $faq_categ[$id][items][$id2][question] ."</a> <img class=\"faq_updated\" src=\"pic/trans.gif\" alt=\"Updated\" /></li>\n");
-	 				elseif ($faq_categ[$id][items][$id2][flag] == "3") print("<li><a href=\"#id". $faq_categ[$id][items][$id2][link_id] ."\" class=\"faqlink\">". $faq_categ[$id][items][$id2][question] ."</a> <img class=\"faq_new\" src=\"pic/trans.gif\" alt=\"New\" /></li>\n");
+	 				if ($temp2[flag] == "1") print("<li><a href=\"#id". $id2 ."\" class=\"faqlink\">". $temp2[question] ."</a></li>\n");
+	 				elseif ($temp2[flag] == "2") print("<li><a href=\"#id". $id2 ."\" class=\"faqlink\">". $temp2[question] ."</a> <img class=\"faq_updated\" src=\"pic/trans.gif\" alt=\"Updated\" /></li>\n");
+	 				elseif ($temp2[flag] == "3") print("<li><a href=\"#id". $id2 ."\" class=\"faqlink\">". $temp2[question] ."</a> <img class=\"faq_new\" src=\"pic/trans.gif\" alt=\"New\" /></li>\n");
     				}
 			}
 			print("</ul></li></ul><br />");
@@ -58,19 +58,19 @@ if (isset($faq_categ)) {
 	end_frame();
 
 	foreach ($faq_categ as $id => $temp) {
-		if ($faq_categ[$id][flag] == "1")
+		if ($temp[flag] == "1")
 		{
-			$frame = $faq_categ[$id][title] ." - <a href=\"#top\"><img class=\"top\" src=\"pic/trans.gif\" alt=\"Top\" title=\"Top\" /></a>";
+			$frame = $temp[title] ." - <a href=\"#top\"><img class=\"top\" src=\"pic/trans.gif\" alt=\"Top\" title=\"Top\" /></a>";
 			begin_frame($frame, '', '', '', '', true);
-			print("<span id=\"id". $faq_categ[$id][link_id] ."\"></span>");
-			if (array_key_exists("items", $faq_categ[$id]))
+			print("<span id=\"id". $id ."\"></span>");
+			if (array_key_exists("items", $temp))
 			{
-				foreach ($faq_categ[$id][items] as $id2 => $temp)
+				foreach ($temp[items] as $id2 => $temp2)
 				{
-					if ($faq_categ[$id][items][$id2][flag] != "0")
+					if ($temp2[flag] != "0")
 					{
-						print("<br /><span id=\"id".$faq_categ[$id][items][$id2][link_id]."\"><b>". $faq_categ[$id][items][$id2][question] ."</b></span><br />\n");
-						print("<br />". $faq_categ[$id][items][$id2][answer] ."\n<br /><br />\n");
+						print("<br /><span id=\"id".$id2."\"><b>". $temp2[question] ."</b></span><br />\n");
+						print("<br />". $temp2[answer] ."\n<br /><br />\n");
 					}
 				}
 			}
@@ -85,4 +85,4 @@ end_main_frame();
 echo $Cache->next_row();
 //cache_save ('faq');
 stdfoot();
-?>
+
