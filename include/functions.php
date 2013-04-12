@@ -3109,7 +3109,7 @@ function torrentTableCake($torrents) {
   torrenttable($rows);
 }
 
-function torrenttable($rows, $variant = "torrent", $swap_headings = false, $onlyhead=false) {
+function torrenttable($rows, $variant = "torrent", $swap_headings = false, $onlyhead=false, $counter = 0, $header = true, $splitcomment = false) {
   global $Cache;
   global $lang_functions;
   global $CURUSER, $waitsystem;
@@ -3152,6 +3152,7 @@ function torrenttable($rows, $variant = "torrent", $swap_headings = false, $only
     }
     else $wait = 0;
   }
+  if ($header) {
 ?>
 <table id="torrents" class="torrents" cellspacing="0" cellpadding="5" width="100%" <?php echo ($onlyhead ? 'style="display:none;"':'') ?>>
 <thead><tr>
@@ -3228,12 +3229,14 @@ if (isset($wait) && $wait)
 </thead>
 <tbody>
 <?php
-if (!$onlyhead) {
+  }
+
+  if (!$onlyhead) {
 $caticonrow = get_category_icon_row($CURUSER['caticon']);
 if ($caticonrow['secondicon'] == 'yes')
 $has_secondicon = true;
 else $has_secondicon = false;
-$counter = 0;
+
 if ($smalldescription_main == 'no')
   $displaysmalldescr = false;
 else $displaysmalldescr = true;
@@ -3248,7 +3251,7 @@ foreach($rows as $row)
 #    $sphighlight = get_torrent_bg_color($row['sp_state']);
 #    print("<tr" . $sphighlight . ">\n");
 
-    print('<td class="rowfollow nowrap category-icon">');
+    print('<tr><td class="rowfollow nowrap category-icon">');
     if (isset($row["category"])) {
       print(return_category_image($row["category"], "//$BASEURL/torrents.php?"));
       if ($has_secondicon){
@@ -3268,11 +3271,11 @@ foreach($rows as $row)
 
     if (!$has_tooltip)
       $short_torrent_name_alt = "title=\"".htmlspecialchars($dispname)."\"";
-    else{
-    $torrent_tooltip[$counter]['id'] = "torrent_" . $counter;
-    $torrent_tooltip[$counter]['content'] = "";
-    $mouseovertorrent = "onmouseover=\"get_ext_info_ajax('".$torrent_tooltip[$counter]['id']."','".$url."','".$cache."','".$type."'); domTT_activate(this, event, 'content', document.getElementById('" . $torrent_tooltip[$counter]['id'] . "'), 'trail', false, 'delay',600,'lifetime',6000,'fade','both','styleClass','niceTitle', 'fadeMax',87, 'maxWidth', 500);\"";
-    }
+    /* else{ */
+    /* $torrent_tooltip[$counter]['id'] = "torrent_" . $counter; */
+    /* $torrent_tooltip[$counter]['content'] = ""; */
+    /* $mouseovertorrent = "onmouseover=\"get_ext_info_ajax('".$torrent_tooltip[$counter]['id']."','".$url."','".$cache."','".$type."'); domTT_activate(this, event, 'content', document.getElementById('" . $torrent_tooltip[$counter]['id'] . "'), 'trail', false, 'delay',600,'lifetime',6000,'fade','both','styleClass','niceTitle', 'fadeMax',87, 'maxWidth', 500);\""; */
+    /* } */
     $count_dispname=mb_strlen($dispname,"UTF-8");
     if (!$displaysmalldescr || $row["small_descr"] == "")// maximum length of torrent name
       $max_length_of_torrent_name = 120;
@@ -3323,7 +3326,7 @@ foreach($rows as $row)
     {
       if ($forcemode == "" || $forcemode == 'icon'){  
       //$picked_torrent = " <b>[<font class='recommended'>".$lang_functions['text_oday']."</font>]</b>";
-      $sp_torrent.="<li><img src=\"pic/ico_0day.gif\" border=0 alt=\"0day\" title=\"".$lang_functions['text_oday']."\" /></li>";
+      $sp_torrent.="<li><img class=\"oday\" src=\"pic/trans.gif\" border=0 alt=\"0day\" title=\"".$lang_functions['text_oday']."\" /></li>";
       }
       else if ($forcemode == 'word'){
 -     $sp_torrent.= "<li>[<span class='oday' ".$onmouseover.">".$lang_functions['text_oday']."</span>]</li>";
@@ -3333,10 +3336,10 @@ foreach($rows as $row)
     if($row['storing']==1)
     {
       if ( $forcemode == "" || $forcemode == 'icon'){  
-      $sp_torrent.="<li><img src=\"pic/ico_storing.png\" border=0 alt=\"0day\" title=\"".$lang_functions['text_storing']."\" /></li>";
+      $sp_torrent.="<li><img class=\"storing\" src=\"pic/trans.gif\" alt=\"storing\" title=\"".$lang_functions['text_storing']."\" /></li>";
       }
       else if ($forcemode == 'word'){
--     $sp_torrent.= "<li>[<span class='oday' ".$onmouseover.">".$lang_functions['text_storing']."</span>]</li>";
+-     $sp_torrent.= "<li>[<span class='storing' ".$onmouseover.">".$lang_functions['text_storing']."</span>]</li>";
 			}
     }
     
@@ -3460,11 +3463,21 @@ foreach($rows as $row)
   }
 }
 }
-print("</tbody></table>");
 
-if($enabletooltip_tweak == 'yes')
-create_tooltip_container($lastcom_tooltip, 400);
-create_tooltip_container($torrent_tooltip, 500);
+if ($header) {
+  echo '</tbody></table>';
+}
+
+if($enabletooltip_tweak == 'yes') {
+  if ($splitcomment) {
+    ob_start();
+  }
+  create_tooltip_container($lastcom_tooltip, 400);
+  #create_tooltip_container($torrent_tooltip, 500);
+  if ($splitcomment) {
+    return ob_get_clean();
+  }
+}
 }
 
 function get_user_prop($id) {

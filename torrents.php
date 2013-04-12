@@ -1127,8 +1127,13 @@ else {
 #$timer_3_end = microtime(true); // debug
 #$timer_4_start = microtime(true); // debug
 
-if ($_GET['format'] == 'json') {
+if ($_REQUEST['format'] == 'json') {
   include('include/torrents_json.php');
+}
+else if ($_REQUEST['format'] == 'xhr' ||
+	 (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')) { 
+  
+  include('include/torrents_xhr.php');
 }
 else {
   include('include/torrents_html.php');

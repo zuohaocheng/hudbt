@@ -60,7 +60,7 @@ else {
       echo '</li>';
     }
     if($row['storing']==1)
-    	echo "<li><img alt= \"$lang_details[text_storing]\" title=\"$lang_details[text_storing]\" src=\"//$BASEURL/pic/ico_storing.png\"/></li>";
+    	echo "<li><img alt= \"$lang_details[text_storing]\" title=\"$lang_details[text_storing]\" src=\"//$BASEURL/pic/trans.gif\" class=\"storing\" /></li>";
     if ($row['banned'] == 'yes') {
       echo "<li>(<span class=\"striking\">".$lang_functions['text_banned']."</span>)</li>";
     }

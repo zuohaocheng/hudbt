@@ -126,6 +126,16 @@ width:36px;
 height:11px;
 background:url(icons.gif) -180px 0;
 }
+.storing {
+width:35px;
+height:12px;
+background:url(icons.gif) -81px -82px;
+}
+.oday {
+width:35px;
+height:12px;
+background:url(icons.gif) -118px -82px;
+}
 img.cheaterbox
 {
 width:14px;
