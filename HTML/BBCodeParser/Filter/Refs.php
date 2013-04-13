@@ -3,12 +3,28 @@ require_once 'HTML/BBCodeParser/Filter.php';
 
 class HTML_BBCodeParser_Filter_Refs extends HTML_BBCodeParser_Filter {
   function _preparse() {
+
     $options = PEAR::getStaticProperty('HTML_BBCodeParser','_options');
     $o  = $options['open'];
     $c  = $options['close'];
     $oe = $options['open_esc'];
     $ce = $options['close_esc'];
     $this->_preparsed = $this->_text;
+
+    global $BASEURL;
+    $possibleUrls = [$BASEURL, 'kmgtp.org', 'sp-pt.hust.edu.cn(?:\:81)?'];
+    $regpre = '!(^|[^="])https?://(?:' . implode('|', $possibleUrls) . ')/';
+    foreach (['user' => 'userdetails.php\?id=([0-9]+)[&;=%0-9a-z#]*',
+	      'torrent' => 'details.php\?id=([0-9]+)[&;=%0-9a-z#]*',
+	      'post' => 'forums.php\?[&;=%a-z0-9]*?page=p([0-9]+)[&;=%0-9a-z#]*',
+	      'topic' => 'forums.php\?[&;=%a-z0-9]*?topicid=([0-9]+)[&;=%0-9a-z#]*'] as $k=>$p) {
+      $regex = $regpre . $p . '!i';
+      $this->_preparsed =
+	preg_replace_callback($regex, function($keys) use ($k, $o, $c) {
+	    return $keys[1] . $o . $k . '=' . $keys[2] . $c;
+	  }, $this->_preparsed);
+    }
+
     foreach (['torrent', 'user', 'topic', 'post','name'] as $item) {
       if($item=='name'){
       	$this->_preparsed =

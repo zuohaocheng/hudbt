@@ -35,7 +35,7 @@ function donationsForKey($key, $userid) {
 
   list($pagertop, $pagerbottom, $limit) = pager($itemsperpage, $count, $nextpre);
 
-  $query = 'SELECT donate_bonus.' . $queryid . ', donate_bonus.amount, donate_bonus.action_date, donate_bonus.object_id, torrents.name FROM donate_bonus LEFT JOIN torrents ON donate_bonus.object_id = torrents.id ' . $where . ' ORDER BY action_date DESC ' . $limit;
+  $query = 'SELECT donate_bonus.' . $queryid . ', donate_bonus.amount, donate_bonus.action_date, donate_bonus.object_id, donate_bonus.type, torrents.name, topics.subject FROM donate_bonus LEFT JOIN torrents ON donate_bonus.object_id = torrents.id LEFT JOIN topics ON donate_bonus.object_id = topics.id ' . $where . ' ORDER BY action_date DESC ' . $limit;
 
   $res = sql_query($query) or die(mysql_error());
   
@@ -49,11 +49,21 @@ function donationsTableFromResult($res, $queryid) {
   $count = 0;
   while ($row = mysql_fetch_assoc($res)) {
     $count++;
-    if ($row['name'] == '') {
-      $torrent = $lang_donations['text_no_torrent'];
+    if ($row['type'] == 'torrent') {
+      if ($row['name'] == '') {
+	$torrent = $lang_donations['text_no_torrent'];
+      }
+      else {
+	$torrent = '<a href="details.php?id=' . $row['object_id'] . '" title="' . $row['name'] . '">' . $row['name'] . '</a>';
+      }
     }
-    else {
-      $torrent = '<a href="details.php?id=' . $row['object_id'] . '" title="' . $row['name'] . '">' . $row['name'] . '</a>';
+    else if ($row['type'] == 'topic') {
+      if ($row['subject'] == '') {
+	$torrent = $lang_donations['text_no_torrent'];
+      }
+      else {
+	$torrent = '<a href="forums.php?action=viewtopic&topicid=' . $row['object_id'] . '" title="' . $row['subject'] . '">' . $row['subject'] . '</a>';
+      }      
     }
     $out .= '<tr><td>' . $row['action_date'] . '</td><td>' . $torrent . '</td><td>' . get_username($row[$queryid]) . '</td><td>' . $row['amount'] . '</td></tr>';
   }

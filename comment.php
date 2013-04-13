@@ -159,7 +159,7 @@ if ($action == "add") {
 		$commentid = 0 + $_GET["cid"];
 		int_check($commentid,true);
 
-		$res2 = sql_query("SELECT comments.text, users.username FROM comments JOIN users ON comments.user = users.id WHERE comments.id=$commentid") or sqlerr(__FILE__, __LINE__);
+		$res2 = sql_query("SELECT comments.text, user FROM comments WHERE comments.id=$commentid") or sqlerr(__FILE__, __LINE__);
 
 		if (mysql_num_rows($res2) != 1)
 			stderr($lang_forums['std_error'], $lang_forums['std_no_comment_id']);
@@ -192,7 +192,7 @@ if ($action == "add") {
 	if ($sub == "quote") {
 	  echo $quote_input;
 	}
-	begin_compose($title, ($sub == "quote" ? "quote" : "reply"), ($sub == "quote" ? htmlspecialchars("[quote=".htmlspecialchars($arr2["username"])."]".dequote(unesc($arr2["text"]))."[/quote]") : ""), false);
+	begin_compose($title, ($sub == "quote" ? "quote" : "reply"), ($sub == "quote" ? htmlspecialchars("[quote='[user=".htmlspecialchars($arr2["user"])."]']".dequote(unesc($arr2["text"]))."[/quote]") : ""), false);
 	end_compose();
 	print("</form>");
 	end_main_frame();

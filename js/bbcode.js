@@ -38,25 +38,7 @@ $(function() {
 	delete thearray[arraysize - 1];
 	return theval;
     }
-    function closeall() {
-	if (bbtags[0]) {
-	    while (bbtags[0]) {
-		tagRemove = popstack(bbtags)
-		if ( (tagRemove != 'color') ) {
-		    doInsert("[/"+tagRemove+"]", "", false);
-		    document[hb.bbcode.form][tagRemove].value = tagRemove;
-		    opentags[tagRemove] = 0;
-		} else {
-		    doInsert("[/"+tagRemove+"]", "", false);
-		}
-		cstat();
-		return;
-	    }
-	}
-	btnClose.val("Close last, Open 0");
-	bbtags = new Array();
-	document[hb.bbcode.form][hb.bbcode.text].focus();
-    }
+
     function add_code(NewCode) {
 	document[hb.bbcode.form][hb.bbcode.text].value += NewCode;
 	document[hb.bbcode.form][hb.bbcode.text].focus();
@@ -274,7 +256,99 @@ $(function() {
 	    type : 'button',
 	    value : 'List'
 	}).click(function() {
-	    tag_list(lang.js_prompt_enter_item, lang.js_prompt_error);
+	    var input_list = $('<ul></ul>');
+	    var last_input;
+	    var linput = function() {
+		var ret = $('<input />', {
+		    style : 'width: 90%'
+		});
+		input_list.append($('<li></li>').append(ret));
+		ret.keypress(function(event) {
+		    if (event.keyCode === 13) {
+			if (this === last_input && ret.val() !== '') {
+			    linput();
+			}
+			else {
+			    ret.parent().next().find('input').focus();
+			}
+		    }
+		}).blur(function() {
+		    if (this === last_input && ret.val() !== '') {
+			linput();
+		    }
+		});
+		last_input = ret[0];
+		setTimeout(function() {
+		    ret.focus();
+		}, 10);
+	    };
+	    linput();
+
+	    var styles = {
+		ul : {
+		    circle : '空心圆',
+		    none : '无标记',
+		    disc : '实心圆',
+		    square : '实心方块'
+		},
+		ol : {
+		    decimal : '数字',
+		    'lower-roman' : 'i, ii, iii',
+		    'upper-roman' : 'I, II, III',
+		    'lower-greek' : 'αβγ',
+		    'lower-latin' : 'abc',
+		    'upper-latin' : 'ABC',
+		    'cjk-ideographic' : '一二三',
+		    hiragana : 'あいう',
+		    katakana : 'アイウ',
+		    'hiragana-iroha' : 'いろは',
+		    'katakana-iroha' : 'イロハ'
+		}
+	    };
+
+	    var list_type_change = function() {
+		list_mark_type.html(createOptions(styles[this.value]));
+		list_mark_type_change.call(list_mark_type[0]);
+	    };
+	    var list_mark_type_change = function() {
+		input_list.css('list-style-type', this.value);
+	    };
+	    var list_mark_type = $('<select></select>').change(list_mark_type_change);
+	    var list_type = $('<select></select>', {
+		html : '<option value="ul" selected="selected">无序列表</option><option value="ol">有序列表</option>'
+	    }).change(list_type_change);
+	    list_type_change.call(list_type[0]);
+
+	    var dialog = $('<div></div>', {
+		title : '编辑列表，按Tab或Enter可以直接产生新项目'
+	    }).append(list_type).append(list_mark_type).append(input_list);
+	    var close = function() {
+		dialog.dialog('close');
+	    };
+	    dialog.dialog({
+		width : '35em',
+		modal : true,
+		autoOpen : true,
+		buttons : {
+		    OK : function() {
+			var str = '[' + list_type.val() + '=' + list_mark_type.val() + "]\n";
+			input_list.find('input').each(function() {
+			    var val = this.value.trim();
+			    if (val !== '') {
+				str += '[li]' + val + "[/li]\n";
+			    }
+			});
+			str += '[/' + list_type.val() + "]\n";
+			doInsert(str, '', false);
+			close();
+		    },
+		    Cancel : close
+		},
+		'close' : function() {
+		    dialog.remove();
+		}
+	    });
+//	    tag_list(lang.js_prompt_enter_item, lang.js_prompt_error);
 	}),
 	$('<input />', {
 	    'class' : 'codebuttons',
@@ -284,12 +358,6 @@ $(function() {
 	}).click(function() {
 	    simpletag('quote');
 	})];
-    var btnClose = $('<input />', {
-	'class' : 'codebuttons',
-	type : 'button',
-	value : '关闭标签'
-    }).click(closeall);
-    buttons.push(btnClose);
 
     var selections = function(name, header, opts) {
 	var sel = $('<select></select>', {

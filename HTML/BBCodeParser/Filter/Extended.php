@@ -95,13 +95,14 @@ class HTML_BBCodeParser_Filter_Extended extends HTML_BBCodeParser_Filter
 				'hr' => array('htmlopen' => 'hr',
 					      'htmlclose' => '',
 					      'allowed' => 'none',
+					      'notext' => true,
 					      'attributes'=> array()),
     );
 
 
     static function quoteCallback($tag) {
       $out = 'fieldset>';
-      if ($tag['attributes']['quote']) {
+      if (isset($tag['attributes']['quote'])) {
 	global $lang_functions;
 	$out .= '<legend>' . $lang_functions['text_quote'] . ': ' . $tag['attributes']['quote'] . '</legend>';
       }
@@ -120,10 +121,6 @@ class HTML_BBCodeParser_Filter_Extended extends HTML_BBCodeParser_Filter
 					 "!".$oe."pre".$ce."(.*)".$oe."/pre".$ce."!Ui",
 					 array($this, 'removeBr'),
 					 $this->_text);
-	$this->_preparsed = preg_replace(
-					 "!".$oe."hr".$ce."!Ui",
-					 $o."hr".$c.$o."/hr".$c,
-					 $this->_preparsed);
    }
 
    function removeBr($s) {

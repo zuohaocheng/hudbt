@@ -16,9 +16,9 @@ else {
 if ($_SERVER["REQUEST_METHOD"] != "POST")
 	stderr($lang_takemessage['std_error'], $lang_takemessage['std_permission_denied']);
 
-	$origmsg = 0+$_POST["origmsg"];
-	$msg = trim($_POST["body"]);
-	if ($_POST['forward'] == 1) //this is forwarding
+	$origmsg = 0+$_REQUEST["origmsg"];
+	$msg = trim($_REQUEST["body"]);
+	if ($_REQUEST['forward'] == 1) //this is forwarding
 	{
 		if (!$origmsg)
 			stderr($lang_takemessage['std_error'], $lang_takemessage['std_invalid_id']);
@@ -26,9 +26,9 @@ if ($_SERVER["REQUEST_METHOD"] != "POST")
 		$origmsgrow = mysql_fetch_assoc($res);
 		if (!$origmsgrow)
 			stderr($lang_takemessage['std_error'], $lang_takemessage['std_no_permission_forwarding']);
-		if(!$_POST['to'])
+		if(!$_REQUEST['to'])
 			stderr($lang_takemessage['std_error'], $lang_takemessage['std_must_enter_username']);
-		$receiver = get_user_id_from_name(trim($_POST['to']));
+		$receiver = get_user_id_from_name(trim($_REQUEST['to']));
 		if ($origmsgrow['sender'] == 0)
 		{
 			$origfrom = $lang_takemessage_target[get_user_lang($receiver)]['msg_system'];
@@ -43,15 +43,15 @@ if ($_SERVER["REQUEST_METHOD"] != "POST")
 	}
 	else
 	{
-		$receiver = 0+$_POST["receiver"];
+		$receiver = 0+$_REQUEST["receiver"];
 		if (!is_valid_id($receiver) || ($origmsg && !is_valid_id($origmsg)))
 			stderr($lang_takemessage['std_error'],$lang_takemessage['std_invalid_id']);
 		$bodyadd = "";
 		if (!$msg)
 			stderr($lang_takemessage['std_error'],$lang_takemessage['std_please_enter_something']);
 	}
-	$save = $_POST["save"];
-	$returnto = $_POST["returnto"];
+	$save = $_REQUEST["save"];
+	$returnto = $_REQUEST["returnto"];
 
 	// Anti Flood Code
 	// This code ensures that a member can only send one PM every 10 seconds.
@@ -93,7 +93,7 @@ if ($_SERVER["REQUEST_METHOD"] != "POST")
 		stderr($lang_takemessage['std_refused'], $lang_takemessage['std_user_blocks_all_pms']);
 	}
 
-	$subject = trim($_POST['subject']);
+	$subject = trim($_REQUEST['subject']);
 	sql_query("INSERT INTO messages (sender, receiver, added, msg, subject, saved, location) VALUES(" . sqlesc($CURUSER["id"]) . ", ".sqlesc($receiver).", '" . date("Y-m-d H:i:s") . "', " . sqlesc($msg) . ", " . sqlesc($subject) . ", " . sqlesc($save) . ", 1)") or sqlerr(__FILE__, __LINE__);
 	$Cache->delete_value('user_'.$receiver.'_unread_message_count');
 	$Cache->delete_value('user_'.$receiver.'_inbox_count');
@@ -142,7 +142,7 @@ EOD;
 
 	}
 }
-	$delete = $_POST["delete"];
+	$delete = $_REQUEST["delete"];
 
 	if ($origmsg)
 	{

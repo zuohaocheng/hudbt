@@ -96,7 +96,7 @@ else {
 	  $uploadtime = $lang_details['text_at'].$row['added'];
 	
 	$dt= $lang_details['row_download'];
-	$dd = ("<a class=\"index\" href=\"download.php?id=$id\">" . htmlspecialchars($torrentnameprefix ."." .$row["save_as"]) . ".torrent</a>&nbsp;&nbsp;<a id=\"bookmark" . $row['id'] . "\" href=\"javascript: bookmark(".$row['id'].",0);\">".get_torrent_bookmark_state($CURUSER['id'], $row['id'], false)."</a><br />".$lang_details['row_upped_by']."&nbsp;".$uprow.$uploadtime);
+	$dd = ("<a class=\"index\" href=\"download.php?id=$id\">" . htmlspecialchars($torrentnameprefix ."." .$row["save_as"]) . ".torrent</a>&nbsp;&nbsp;<a class=\"bookmark\" torrent=\"" . $row['id'] . "\" href=\"#\">".get_torrent_bookmark_state($CURUSER['id'], $row['id'], false)."</a><br />".$lang_details['row_upped_by']."&nbsp;".$uprow.$uploadtime);
 	dl_item($dt, $dd, true);
 
       }

@@ -13,6 +13,38 @@ if (get_user_class() < $topten_class){
 	stderr($lang_topten['std_sorry'],$lang_topten['std_permission_denied_only'].get_user_class_name($topten_class,false,true,true).$lang_topten['std_or_above_can_view'],false);
 }
 
+function general_table($sql, $limit, $type, $subtype, $title, $frame_caption, $pre_process = null) {
+  global $lang_topten;
+  $res = sql_query($sql . ' LIMIT ' . $limit) or sqlerr();
+  if ($limit == 10) {
+    $frame_caption .= " <span class=\"small\"> - [<a class=\"altlink\" href=\"topten.php?type=$type&amp;lim=100&amp;subtype=$subtype\">".$lang_topten['text_one_hundred']."</a>] - [<a class=\"altlink\" href=\"topten.php?type=$type&amp;lim=250&amp;subtype=$subtype\">".$lang_topten['text_top_250']."</a>]</span>";
+  }
+  begin_frame($frame_caption, true);
+  echo '<table cellspacing="0" cellpadding="5" class="main no-vertical-line"><thead class="center"><tr><th>' . $lang_topten['col_rank'] . '</th>';
+  foreach($title as $th) {
+    echo '<th>' . $th . '</th>';
+  }
+  echo '</tr></thead><tbody>';
+  $num = 0;
+  while ($a = mysql_fetch_assoc($res)) {
+    if (is_callable($pre_process)) {
+      $a = call_user_func($pre_process, $a);
+    }
+
+    if ($a) {
+      ++$num;
+      echo '<tr>';
+      echo '<td>' . $num . '</td>';
+      foreach ($title as $k => $v) {
+	echo '<td>' . $a[$k] . '</td>';
+      }
+      echo '</tr>';
+    }
+  }
+  echo '</tbody></table>';
+  end_frame();
+}
+
 function usershare_table($res, $frame_caption) {
 	global $lang_topten;
 	global $CURUSER;
@@ -524,8 +556,9 @@ if ($type == 1)
 		$r = sql_query($mainquery . $extrawhere . " ORDER BY $order " . " LIMIT $limit") or sqlerr();
 		usershare_table($r, $lang_topten['text_top']."$limit ".$lang_topten['text_worst_sharers'] .$lang_topten['text_sharers_note'] . ($limit == 10 ? " <font class=\"small\"> - [<a class=\"altlink\" href=\"topten.php?type=$type&amp;lim=100&amp;subtype=wsh\">".$lang_topten['text_one_hundred']."</a>] - [<a class=\"altlink\" href=\"topten.php?type=$type&amp;lim=250&amp;subtype=wsh\">".$lang_topten['text_top_250']."</a>]</font>" : ""));
 	}
-/*
-	if ($limit == 10 || $subtype == "sp")
+
+	// Disabled for performance, really slow SQL
+	/*	if ($limit == 10 || $subtype == "sp")
 	{
 		$r = sql_query( "SELECT users_torrents.userid, users_torrents.supplied, users_torrents.uploaded, users_torrents.downloaded, users_torrents.added, COUNT(snatched.id) as snatched FROM (SELECT users.id as userid, COUNT(torrents.id) as supplied, users.uploaded, users.downloaded, users.added from users LEFT JOIN torrents ON torrents.owner = users.id GROUP BY userid) as users_torrents LEFT JOIN snatched ON snatched.userid = users_torrents.userid where snatched.finished='yes' AND snatched.torrentid IN(SELECT id FROM torrents where torrents.owner != users_torrents.userid) GROUP BY users_torrents.userid ORDER BY users_torrents.supplied DESC LIMIT $limit") or sqlerr();
 		supply_snatchtable($r, $lang_topten['text_top']."$limit ".$lang_topten['text_most_supplied'] . ($limit == 10 ? " <font class=\"small\"> - [<a class=\"altlink\" href=\"topten.php?type=$type&amp;lim=100&amp;subtype=sp\">".$lang_topten['text_one_hundred']."</a>] - [<a class=\"altlink\" href=\"topten.php?type=$type&amp;lim=250&amp;subtype=sp\">".$lang_topten['text_top_250']."</a>]</font>" : ""));
@@ -535,8 +568,33 @@ if ($type == 1)
 	{
 		$r = sql_query( "SELECT users_torrents.userid, users_torrents.supplied, users_torrents.uploaded, users_torrents.downloaded, users_torrents.added, COUNT(snatched.id) as snatched FROM (SELECT users.id as userid, COUNT(torrents.id) as supplied, users.uploaded, users.downloaded, users.added from users LEFT JOIN torrents ON torrents.owner = users.id GROUP BY userid) as users_torrents LEFT JOIN snatched ON snatched.userid = users_torrents.userid where snatched.finished='yes' AND snatched.torrentid IN(SELECT id FROM torrents where torrents.owner != users_torrents.userid) GROUP BY users_torrents.userid ORDER BY snatched DESC LIMIT $limit") or sqlerr();
 		supply_snatchtable($r, $lang_topten['text_top']."$limit ".$lang_topten['text_most_snatched'] . ($limit == 10 ? " <font class=\"small\"> - [<a class=\"altlink\" href=\"topten.php?type=$type&amp;lim=100&amp;subtype=sn\">".$lang_topten['text_one_hundred']."</a>] - [<a class=\"altlink\" href=\"topten.php?type=$type&amp;lim=250&amp;subtype=sn\">".$lang_topten['text_top_250']."</a>]</font>" : ""));
+	}*/
+
+	if ($limit == 10 || $subtype == 'seedingcount') {
+	  $subtype = 'seedingcount';
+	  general_table('select count(1) as c, userid from peers where seeder = "yes" group by userid order by c desc', $limit, $type, $subtype,
+			[
+			 'username' => '用户名',
+			 'c' => '做种数',
+			 ], '当前最多做种用户', function($row) {
+			  $row['username'] = get_username($row['userid']);
+			  return $row;
+			});
 	}
-	*/
+
+	if ($limit == 10 || $subtype == 'seedingsize') {
+	  $subtype = 'seedingsize';
+	  general_table('select sum(torrents.size) as s, count(1) as c, userid from peers inner join torrents on peers.torrent = torrents.id where seeder = "yes" group by userid order by s desc', $limit, $type, $subtype,
+			[
+			 'username' => '用户名',
+			 'c' => '做种数',
+			 's' => '做种体积'
+			 ], '当前做种体积最大用户', function($row) {
+			  $row['username'] = get_username($row['userid']);
+			  $row['s'] = mksize($row['s']);
+			  return $row;
+			});
+	}
 }
 elseif ($type == 2)
 {

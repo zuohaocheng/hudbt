@@ -22,6 +22,7 @@ function get_user_prop_msg($id) {
 function msg_json_pre($message) {
   $message['receiver'] = get_user_prop_msg($message['receiver']);
   $message['sender'] = get_user_prop_msg($message['sender']);
+  $message['msg_bbcode'] = $message['msg'];
   $message['msg'] = format_comment($message['msg']);
   return $message;
 }

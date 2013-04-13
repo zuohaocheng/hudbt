@@ -7,10 +7,8 @@ parked();
 echo '<div class="minor-list"><ul>';
 $count = 0;
 for($i=1; $i<192; $i++) {
-     print("<li><a href=\"javascript: SmileIT('[em$i]','".$_GET["form"]."','".$_GET["text"]."')\"><img src=\"pic/smilies/$i.gif\" alt=\"\" ></a></li>");
+     print("<li><a href=\"#\" class=\"smileit\" smile=\"$i\" form=\"".$_GET["form"]."\"><img src=\"pic/smilies/$i.gif\" alt=\"\" ></a></li>");
      $count++;
 }
 
 echo '</ul></div>';
-
-?>

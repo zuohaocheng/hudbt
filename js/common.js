@@ -39,20 +39,15 @@ function confirm_delete(id, note, addon) {
 }
 
 // smileit.js
-
 $(function() {
-    $('.smileit').click(function(e) {
+    $(document).on('click', '.smileit', function(e) {
 	e.preventDefault();
-	var $this = $(this);
-	SmileIT('[em' + $this.attr('smile') + ']', $this.attr('form'));
+	var $this = $(this),
+	form = document.forms[$this.attr('form')];
+	doInsert('[em' + $this.attr('smile') + ']', '', false, $(form).find('textarea')[0]);
     });
 });
 
-function SmileIT(smile,form,text){
-    doInsert(smile, '', false, $(document.forms[form]).find('textarea')[0]);
-}
-
-var is_ie = $.browser.msie;
 function doInsert(ibTag, ibClsTag, isSingle, obj_ta) {
     var isClose = false;
     obj_ta = obj_ta || document[hb.bbcode.form][hb.bbcode.text];
@@ -64,7 +59,7 @@ function doInsert(ibTag, ibClsTag, isSingle, obj_ta) {
 	obj_ta.selectionStart = startPos + ibTag.length;
 	obj_ta.selectionEnd = ibTag.length + endPos;
     }
-    else if (is_ie && obj_ta.isTextEdit) {
+    else if ($.browser.msie && obj_ta.isTextEdit) {
 	obj_ta.focus();
 	var sel = document.selection;
 	var rng = sel.createRange();
@@ -204,34 +199,34 @@ function ctrlenter(event,formname,submitname){
 // bookmark.js
 function bookmark(torrentid) {
     $.getJSON('bookmark.php', {torrentid : torrentid}, function(result) {
-	var status = result.status;
-	bmicon(status, torrentid);
+	var status = result.status,
+	html;
+	if (status=="added") {
+	    html = "<img class=\"bookmark\" src=\"pic/trans.gif\" alt=\"Bookmarked\" />";
+	}
+	else {
+	    html = "<img class=\"delbookmark\" src=\"pic/trans.gif\" alt=\"Unbookmarked\" />";
+	}
+	document.getElementById("bookmark"+torrentid).innerHTML = html;
     });
 }
 
-function bmicon(status,torrentid) {
-    if (status=="added") {
-	document.getElementById("bookmark"+torrentid).innerHTML="<img class=\"bookmark\" src=\"pic/trans.gif\" alt=\"Bookmarked\" />";
-    }
-    else if (status=="deleted") {
-	document.getElementById("bookmark"+torrentid).innerHTML="<img class=\"delbookmark\" src=\"pic/trans.gif\" src=\"pic/trans.gif\" alt=\"Unbookmarked\" />";
-    }
-}
-
 // check.js
-var checkflag = "false";
-function check(field,checkall_name,uncheckall_name) {
-    if (checkflag == "false") {
-	for (i = 0; i < field.length; i++) {
-	    field[i].checked = true;}
-	checkflag = "true";
-	return uncheckall_name; }
-    else {
-	for (i = 0; i < field.length; i++) {
-	    field[i].checked = false; }
-	checkflag = "false";
-	return checkall_name; }
-}
+var check = (function() {
+    var checkflag = "false";
+    return function (field,checkall_name,uncheckall_name) {
+	if (checkflag == "false") {
+	    for (i = 0; i < field.length; i++) {
+		field[i].checked = true;}
+	    checkflag = "true";
+	    return uncheckall_name; }
+	else {
+	    for (i = 0; i < field.length; i++) {
+		field[i].checked = false; }
+	    checkflag = "false";
+	    return checkall_name; }
+    }
+})();
 
 // in functions.php
 function get_ext_info_ajax(blockid,url,cache,type)
@@ -268,27 +263,50 @@ var scrollToPosition = (function() {
     };
 })();
 
+//Back to top
 $(function() {
-    var $top = $('#top');
-    if ($top.length === 0) {
-	return;
-    }
-    var top = $top.offset().top;
-    var $document = $(document);
-    $('a[href="#top"]').click(function(e) {
+    var $top = $('#top'),
+    backtotop = $('#back-to-top'),
+    $document = $(document);
+    backtotop.click(function(e) {
 	e.preventDefault();
-	scrollToPosition(top);
+	scrollToPosition(0);
     });
-});
+
+    $(window).scroll(function() {
+	$document.scrollTop() > 200 ? backtotop.show() : backtotop.hide();
+    });
+
+    if ($top.length !== 0) {
+	$('a[href="#top"]').click(function(e) {
+	    e.preventDefault();
+	    scrollToPosition($top.offset().top);
+	});
+    }
+
+    $(document).on('click', '.bookmark', function(e) {
+	e.preventDefault();
+	var self = this;
+	$.getJSON('bookmark.php', {torrentid : this.getAttribute('torrent')}, function(result) {
+	    var status = result.status,
+	    html;
+	    if (status=="added") {
+		html = "<img class=\"bookmark\" src=\"pic/trans.gif\" alt=\"Bookmarked\" />";
+	    }
+	    else {
+		html = "<img class=\"delbookmark\" src=\"pic/trans.gif\" alt=\"Unbookmarked\" />";
+	    }
+	    self.innerHTML = html;
+	});
+    });
 
 //curtain_imageresizer.js
-$(function() {
     if (navigator.appName=="Netscape") {
 	$('body').css('overflow-y', 'scroll');
     }
-    var ie6 = $.browser.msie && $.browser.version < 7;
-    var lightbox = $('#lightbox');
-    var curtain = $('#curtain');
+    var ie6 = $.browser.msie && $.browser.version < 7,
+    lightbox = $('#lightbox');
+    curtain = $('#curtain');
 
     lightbox.click(function () {
 	lightbox.hide();
@@ -307,31 +325,6 @@ $(function() {
     });
 });
 
-function findPosition( oElement ) {
-    if( typeof( oElement.offsetParent ) != 'undefined' ) {
-	for( var posX = 0, posY = 0; oElement; oElement = oElement.offsetParent ) {
-	    posX += oElement.offsetLeft;
-	    posY += oElement.offsetTop;
-	}
-	return [ posX, posY ];
-    } else {
-	return [ oElement.x, oElement.y ];
-    }
-}
-
-$(function() {    //Back to top
-    var backtotop = $('#back-to-top');
-    var $document = $(document);
-    backtotop.click(function(e) {
-	e.preventDefault();
-	scrollToPosition(0);
-    });
-
-    window.onscroll=function() {
-	$document.scrollTop() > 200 ? backtotop.css('display', "") : backtotop.css('display', 'none');
-    };
-});
-
 var argsFromUri = function(uri) {
     var args = new Object();
     var query = uri.split('?');
@@ -348,21 +341,14 @@ var argsFromUri = function(uri) {
 
 // Used in index.php & fun.php
 $(function() {
-    $('#funcomment dt .username').each(function() {
-	var user = $(this);
-	user.after($('<a />', {
-	    href : '#',
-	    text : '回复',
-	    'class' : 'funcomment-reply'
-	}).click(function(e) {
-	    e.preventDefault();
-	    var target = $('#fun_text');
+    $('#funcomment dt .username').after($('<a href="#" class="funcomment-reply">回复</a>').click(function(e) {
+	e.preventDefault();
+	var target = $('#fun_text'),
 
-	    var id = user.find('.user-id').text();
-	    var val = target.val().replace(/^@\[user=[0-9]+\] */ig, '');
-	    target.val('@[user=' + id + '] ' + val).focus();
-	}));
-    });
+	id = $(this).parent().find('.username').attr('userid'),
+	val = target.val().replace(/^@\[user=[0-9]+\] */ig, '');
+	target.val('@[user=' + id + '] ' + val).focus();
+    }));
 });
 
 var TimeLimit = function(check, target) {

@@ -3358,8 +3358,7 @@ foreach($rows as $row)
       $act = "";
       if ($CURUSER["downloadpos"] != "no")
       $act .= "<li><a href=\"//$BASEURL/download.php?id=".$id."\"><img class=\"download\" src=\"//$BASEURL/pic/trans.gif\" style='padding-bottom: 2px;' alt=\"download\" title=\"".$lang_functions['title_download_torrent']."\" /></a></li>" ;
-        $bookmark = " href=\"javascript: bookmark(".$id.");\"";
-        $act .= "<li><a id=\"bookmark".$id."\" ".$bookmark." >".get_torrent_bookmark_state($CURUSER['id'], $id)."</a></li>";
+        $act .= "<li><a class=\"bookmark\" torrent=\"$id\" href=\"#\">".get_torrent_bookmark_state($CURUSER['id'], $id)."</a></li>";
       
 
     print('<div class="torrent-utilty-icons minor-list-vertical"><ul>'.$act."</ul></div>\n");

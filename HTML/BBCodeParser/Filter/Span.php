@@ -11,11 +11,19 @@ class HTML_BBCodeParser_Filter_Span extends HTML_BBCodeParser_Filter {
     * @var      array
     */
   var $_definedTags = [
-		       'span' => ['htmlopen' => 'span',
+		       'span' => ['htmlopencallback' => ['HTML_BBCodeParser_Filter_Span', 'spanCallback'],
 				  'htmlclose' => 'span',
 				  'allowed' => 'all',
-				  'attributes' => ['style' =>'style=%2$s%1$s%2$s']],
+				  'attributes' => ['style' =>'']],
 		       ];
+
+  static function spanCallback($tag) {
+    $out = 'span';
+    if (!stristr($tag['attributes']['style'], 'fixed')) {
+      $out .= ' style="' . $tag['attributes']['style'] . '"';
+    }
+    return $out;
+  }
 
 }
 

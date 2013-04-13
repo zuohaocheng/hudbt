@@ -400,7 +400,14 @@ class HTML_BBCodeParser
                 array_pop($this->_tagArray);
             }
 
-            $this->_tagArray[] = $tag;
+	    if (isset($tag['text'])) { //Check whether returned multiply tags
+	      $this->_tagArray[] = $tag;
+	    }
+	    else {
+	      foreach ($tag as $t) {
+		$this->_tagArray[] = $t;
+	      }
+	    }
             $prev = $tag;
             $strPos = $newPos;
         }
@@ -436,44 +443,144 @@ class HTML_BBCodeParser
         } else {                                // opening tag
 
             $tag['type'] = 1;
-            if (strpos($str, ' ') && (strpos($str, '=') === false)) {
-                return false;                   // nope, it's not valid
-            }
+            /* if (strpos($str, ' ') && (strpos($str, '=') === false)) { */
+            /*     return false;                   // nope, it's not valid */
+            /* } */
 
             // tnx to Onno for the regex
             // split the tag with arguments and all
             $oe = $this->_options['open_esc'];
             $ce = $this->_options['close_esc'];
             $tagArray = array();
-            if (preg_match("!$oe([a-z0-9]+)[^$ce]*$ce!i", $str, $tagArray) == 0) {
+            if (preg_match("!$oe(([a-z0-9]+)[^$ce]*?)( +/ *)?$ce!i", $str, $tagArray) == 0) {
                 return false;
             }
-            $tag['tag'] = strtolower($tagArray[1]);
-            if (!in_array($tag['tag'], array_keys($this->_definedTags))) {
+
+            $tag['tag'] = strtolower($tagArray[2]);
+            if (!isset($this->_definedTags[$tag['tag']])) {
                 return false;                   // nope, it's not valid
             }
 
-            // tnx to Onno for the regex
             // validate the arguments
-            $attributeArray = array();
-            $regex = "![\s$oe]([a-z0-9]+)=(\"[^\s$ce]+\"|[^\s$ce";
-            if ($tag['tag'] != 'url') {
-                $regex .= "=";
-            }
-            $regex .= "]+)(?=[\s$ce])!i";
-            preg_match_all($regex, $str, $attributeArray, PREG_SET_ORDER);
-            foreach ($attributeArray as $attribute) {
-                $attNam = strtolower($attribute[1]);
-                if (in_array($attNam, array_keys($this->_definedTags[$tag['tag']]['attributes']))) {
-                    if ($attribute[2][0] == '"' && $attribute[2][strlen($attribute[2])-1] == '"') {
-                        $tag['attributes'][$attNam] = substr($attribute[2], 1, -1);
-                    } else {
-                        $tag['attributes'][$attNam] = $attribute[2];
-                    }
+            foreach ($this->_parseAttributes($tagArray[1]) as $attNam => $att) {
+                if (isset($this->_definedTags[$tag['tag']]['attributes'][$attNam])) {
+		  $tag['attributes'][$attNam] = $att;
                 }
             }
+
+	    if (isset($this->_definedTags[$tag['tag']]['notext']) || $tagArray[3]) {
+	      $tag = [$tag, $this->_buildTag('[/' . $tag['tag'] . ']')];
+	    }
             return $tag;
         }
+    }
+
+    static function _parseAttributes($sargs) {
+      $args = [];
+      $k_buf = '';
+      $v_buf = '';
+      $status = 0;
+      $len = strlen($sargs) + 2;
+
+      try {
+	for ($i = 0; $i < $len; ++$i) {
+	  $ch = $sargs[$i];
+	  switch ($status) {
+	  case 0: // Waiting for key
+	    if ($k_buf != '') {
+	      $args[strtolower($k_buf)] = $v_buf;
+	      $k_buf = '';
+	      $v_buf = '';
+	    }
+	    
+	    if ($ch == '_' || ctype_alpha($ch)) {
+	      $k_buf = $ch;
+	      $status = 10;
+	    }
+	    elseif ($ch != ' ') {
+	      throw new Exception("Invalid char in key");
+	    }
+	    break;
+	  case 10: // Reading key
+	    if ($ch == '=') {
+	      $status = 20;
+	    }
+	    elseif ($ch == '_' || ctype_alnum($ch)) {
+	      $k_buf .= $ch;
+	    }
+	    elseif ($ch == ' ') {
+	      $status = 15;
+	    }
+	    else {
+	      #throw new Exception("Invalid char in key");
+	      $k_buf = ''; 
+	      $status = 0;
+	      --$i;
+	    }
+	    break;
+	  case 15: // Waiting for key-value dlm
+	    if ($ch == '=') {
+	      $status = 20;
+	    }
+	    elseif ($ch != ' ') {
+	      $k_buf = ''; 
+	      $status = 0;
+	      --$i;
+#	      throw new Exception("Invalid char in key");
+	    }
+	    break;
+	  case 20: //Waiting for value
+	    if ($ch == '"') {
+	      $status = 31;
+	    }
+	    elseif ($ch == "'") {
+	      $status = 32;
+	    }
+	    elseif ($ch != ' ') {
+	      $status = 33;
+	      $v_buf = $ch;
+	    }
+	    break;
+	  case 31: //Reading value in ""
+	    if ($ch == '"') {
+	      $status = 0;
+	    }
+	    elseif ($ch =="\\") {
+	      $status = 36;
+	    }
+	    else {
+	      $v_buf .= $ch;
+	    }
+	    break;
+	  case 36: //Escaping in ""
+	    $v_buf .= $ch;
+	    $status = 31;
+	    break;
+	  case 32: //Reading value in ''
+	    if ($ch == "'") {
+	      $status = 0;
+	    }
+	    else {
+	      $v_buf .= $ch;
+	    }
+	    break;
+	  case 33: //Reading value without ""
+	    if ($ch != '' && $ch != ' ') {
+	      $v_buf .= $ch;
+	    }
+	    else {
+	      $status = 0;
+	    }
+	    break;
+	  default:
+	    throw new Exception("Invalid status");
+	    break;
+	  }
+	}
+      } catch (Exception $e) {
+#	var_dump($e);
+      }
+      return $args;
     }
 
     /**
@@ -509,7 +616,7 @@ class HTML_BBCodeParser
                      */
                     $child !== true )
                 {
-                    if (trim($tag['text']) == '') {
+                    if (trim($tag['text']) == '' || trim($tag['text']) == '<br />') {
                         //just an empty indentation or newline without value?
                         continue;
                     }
@@ -745,6 +852,9 @@ class HTML_BBCodeParser
                 if ($this->_options['quotestyle'] == 'single') $q = "'";
                 if ($this->_options['quotestyle'] == 'double') $q = '"';
                 foreach ($tag['attributes'] as $a => $v) {
+		  if (!$this->_definedTags[$tag['tag']]['attributes'][$a]) {
+		    continue;
+		  }
                     //prevent XSS attacks. IMHO this is not enough, though...
                     //@see http://pear.php.net/bugs/bug.php?id=5609
                     $v = preg_replace('#(script|about|applet|activex|chrome):#is', "\\1&#058;", $v);

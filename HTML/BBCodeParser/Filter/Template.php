@@ -3,25 +3,22 @@ require_once 'HTML/BBCodeParser/Filter.php';
 
 class HTML_BBCodeParser_Filter_Template extends HTML_BBCodeParser_Filter {
   function _preparse() {
-    $this->_preparsed = $this->parseTemplate($this->_text);
-  }
-
-  function parseTemplate($text, $parsed = []) {
     $options = PEAR::getStaticProperty('HTML_BBCodeParser','_options');
     $o  = $options['open'];
     $c  = $options['close'];
     $oe = $options['open_esc'];
     $ce = $options['close_esc'];
 
-    return preg_replace_callback(
+    $this->_preparsed =
+	preg_replace_callback(
 			      "!".$oe. 'template' ."=([0-9]+)( [^$ce]*)?".$ce."!Ui",
-			      function($keys) use ($parsed) {
-    $key = 0 + $keys[1];
-    if (isset($parsed[$key])) {
-      return '{{警告: 循环包含模版' . $keys[1] . '}} ';
-    }
-    $parsed[$key] = true;
-    $query = 'SELECT body FROM posts WHERE id=' . $key . ' LIMIT 1';
+			      array($this, 'templateCallback'),
+			      $this->_text);
+  }
+
+  function templateCallback($keys) {
+    $key = $keys[1];
+    $query = 'SELECT body FROM posts WHERE id=' . (0+$key) . ' LIMIT 1';
     $r = sql_query($query) or sqlerr(__FILE__, __LINE__);
     $a = mysql_fetch_row($r);
     if ($a) {
@@ -137,16 +134,11 @@ class HTML_BBCodeParser_Filter_Template extends HTML_BBCodeParser_Filter {
       $body = htmlspecialchars($body, ENT_HTML401 | ENT_NOQUOTES);
       $body = str_replace("\r", "", $body);
       $body = str_replace("\n", " <br />", $body);
-      $body = $this->parseTemplate($body, $parsed);
 
       return $body;
     }
     else {
       return '{{无此帖子}}';
     }
-  },
-			      $text);
   }
-
-
 }
