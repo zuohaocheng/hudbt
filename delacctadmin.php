@@ -1,15 +1,25 @@
 <?php
 require "include/bittorrent.php";
 dbconn();
-if (get_user_class() < UC_ADMINISTRATOR)
-stderr("Error", "Permission denied.");
+if (get_user_class() >= $cruprfmanage_class) {
+  $manager = true;
+}
 
-if ($_SERVER["REQUEST_METHOD"] == "POST")
-{
-$userid = trim($_POST["userid"]);
+$userid = 0 + trim($_POST["userid"]);
 
-if (!$userid)
+if ($userid == $CURUSER['id']) {
+  $self = true;
+}
+
+if (!$manager && !$self) {
+  stderr("Error", "Permission denied.");
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+if (!$userid) {
   stderr("Error", "Please fill out the form correctly.");
+}
 
 $res = sql_query("SELECT * FROM users WHERE id=" . sqlesc($userid)) or sqlerr();
 if (mysql_num_rows($res) != 1)
@@ -18,7 +28,13 @@ $arr = mysql_fetch_assoc($res);
 
 $id = $arr['id'];
 $name = $arr['username'];
-$res = sql_query("DELETE FROM users WHERE id=$id") or sqlerr();
+if ($self) {
+  $modcomment = date("Y-m-d") . " - 自挂东南枝.\n". $CURUSER['modcomment'];
+  sql_query("UPDATE users SET enabled = 'no', modcomment = " . sqlesc($modcomment) . " WHERE id=$id") or sqlerr();
+}
+else if ($manager) {
+  sql_query("DELETE FROM users WHERE id=$id") or sqlerr();
+}
 if (mysql_affected_rows() != 1)
   stderr("Error", "Unable to delete the account.");
 stderr("Success", "The account <b>".htmlspecialchars($name)."</b> was deleted.",false);

@@ -495,19 +495,21 @@ var jqui_dialog = function(title, html, timeout, callback) {
     }
 };
 
-var jqui_confirm = function(title, html, onOK) {
+var jqui_confirm = function(title, html, onOK, onCancel) {
     var dialog = $('<div />', {
 	title : title,
 	html : html
-    });
-    var close = function() {
+    }),
+    close = function() {
 	dialog.dialog('close');
-    };
+    },
+    ok = false;
     dialog.dialog({
 	modal : true,
 	autoOpen : true,
 	buttons : {
 	    OK : function() {
+		ok = true;
 		if (onOK()) {
 		    close();
 		}
@@ -516,6 +518,9 @@ var jqui_confirm = function(title, html, onOK) {
 	},
 	'close' : function() {
 	    dialog.remove();
+	    if (!ok && onCancel) {
+		onCancel();
+	    }
 	}
     });
 };

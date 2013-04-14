@@ -920,12 +920,6 @@ td.category-icon {
     vertical-align: middle;
 }
 
-#delete-user {
-    position:absolute;
-    top: 0;
-    right:0;
-}
-
 #back-to-top {
     height: 50px;
     width: 50px;

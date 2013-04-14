@@ -1,5 +1,6 @@
-function getusertorrentlistajax(userid, type, blockid) {
-    var target= $('#' + blockid);
+function getusertorrentlistajax(type, blockid) {
+    var target= $('#' + blockid),
+    userid = hb.user.id;
     if (target.html()==""){
 	$.get('getusertorrentlistajax.php?userid='+userid+'&type='+type, function(result) {
 	    target.html(result);
@@ -12,16 +13,23 @@ function getusertorrentlistajax(userid, type, blockid) {
     }
 }
 
-function enabledel(msg){
-    document.deluser.submit.disabled=document.deluser.submit.checked;
-    alert (msg);
-}
-
-function disabledel(){
-    document.deluser.submit.disabled=!document.deluser.submit.checked;
-}
-
 $(function() {
+    $('#delenable').click(function() {
+	var self = this,
+	submit = $('#del-user :submit')[0];
+	if (this.checked) {
+	    jqui_confirm('人死不能复生', hb.constant.pagelang.js_delete_user_note, function() {
+		submit.disabled = false;
+		return true;
+	    }, function() {
+		self.checked = false;
+	    });
+	}
+	else {
+	    submit.disabled = true;
+	}
+    });
+
     $('#send-bonus').click(function(e) {
 	e.preventDefault();
 	var form = $('<form></form>', {

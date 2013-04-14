@@ -346,23 +346,23 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 
 	if ($user["ip"] && (get_user_class() >= $torrenthistory_class || $user["id"] == $CURUSER["id"])){
 
-	tr_small($lang_userdetails['row_uploaded_torrents'], "<a href=\"javascript: getusertorrentlistajax('".$user['id']."', 'uploaded', 'ka');\"><img class=\"plus\" src=\"pic/trans.gif\" id=\"pica\" alt=\"Show/Hide\" title=\"".$lang_userdetails['title_show_or_hide'] ."\" />   <u>".$lang_userdetails['text_show_or_hide']."</u></a><div id=\"ka\" style=\"display: none;\"></div>", 1);
+	tr_small($lang_userdetails['row_uploaded_torrents'], "<a href=\"javascript: getusertorrentlistajax('uploaded', 'ka');\"><img class=\"plus\" src=\"pic/trans.gif\" id=\"pica\" alt=\"Show/Hide\" title=\"".$lang_userdetails['title_show_or_hide'] ."\" />   <u>".$lang_userdetails['text_show_or_hide']."</u></a><div id=\"ka\" style=\"display: none;\"></div>", 1);
 
 
-	tr_small($lang_userdetails['row_current_seeding'], "<a href=\"javascript: getusertorrentlistajax('".$user['id']."', 'seeding', 'ka1');\"><img class=\"plus\" src=\"pic/trans.gif\" id=\"pica1\" alt=\"Show/Hide\" title=\"".$lang_userdetails['title_show_or_hide']."\" />   <u>".$lang_userdetails['text_show_or_hide']."</u></a><div id=\"ka1\" style=\"display: none;\"></div>", 1);
+	tr_small($lang_userdetails['row_current_seeding'], "<a href=\"javascript: getusertorrentlistajax('seeding', 'ka1');\"><img class=\"plus\" src=\"pic/trans.gif\" id=\"pica1\" alt=\"Show/Hide\" title=\"".$lang_userdetails['title_show_or_hide']."\" />   <u>".$lang_userdetails['text_show_or_hide']."</u></a><div id=\"ka1\" style=\"display: none;\"></div>", 1);
 
 
-	tr_small($lang_userdetails['row_current_leeching'], "<a href=\"javascript: getusertorrentlistajax('".$user['id']."', 'leeching', 'ka2');\"><img class=\"plus\" src=\"pic/trans.gif\" id=\"pica2\" alt=\"Show/Hide\" title=\"".$lang_userdetails['title_show_or_hide']."\" />   <u>".$lang_userdetails['text_show_or_hide']."</u></a><div id=\"ka2\" style=\"display: none;\"></div>", 1);
+	tr_small($lang_userdetails['row_current_leeching'], "<a href=\"javascript: getusertorrentlistajax('leeching', 'ka2');\"><img class=\"plus\" src=\"pic/trans.gif\" id=\"pica2\" alt=\"Show/Hide\" title=\"".$lang_userdetails['title_show_or_hide']."\" />   <u>".$lang_userdetails['text_show_or_hide']."</u></a><div id=\"ka2\" style=\"display: none;\"></div>", 1);
 
 
-	tr_small($lang_userdetails['row_completed_torrents'], "<a href=\"javascript: getusertorrentlistajax('".$user['id']."', 'completed', 'ka3');\"><img class=\"plus\" src=\"pic/trans.gif\" id=\"pica3\" alt=\"Show/Hide\" title=\"".$lang_userdetails['title_show_or_hide']."\" />   <u>".$lang_userdetails['text_show_or_hide']."</u></a><div id=\"ka3\" style=\"display: none;\"></div>", 1);
+	tr_small($lang_userdetails['row_completed_torrents'], "<a href=\"javascript: getusertorrentlistajax('completed', 'ka3');\"><img class=\"plus\" src=\"pic/trans.gif\" id=\"pica3\" alt=\"Show/Hide\" title=\"".$lang_userdetails['title_show_or_hide']."\" />   <u>".$lang_userdetails['text_show_or_hide']."</u></a><div id=\"ka3\" style=\"display: none;\"></div>", 1);
 
 
-	tr_small($lang_userdetails['row_incomplete_torrents'], "<a href=\"javascript: getusertorrentlistajax('".$user['id']."', 'incomplete', 'ka4');\"><img class=\"plus\" src=\"pic/trans.gif\" id=\"pica4\" alt=\"Show/Hide\" title=\"".$lang_userdetails['title_show_or_hide']."\" />   <u>".$lang_userdetails['text_show_or_hide']."</u></a><div id=\"ka4\" style=\"display: none;\"></div>", 1);
+	tr_small($lang_userdetails['row_incomplete_torrents'], "<a href=\"javascript: getusertorrentlistajax('incomplete', 'ka4');\"><img class=\"plus\" src=\"pic/trans.gif\" id=\"pica4\" alt=\"Show/Hide\" title=\"".$lang_userdetails['title_show_or_hide']."\" />   <u>".$lang_userdetails['text_show_or_hide']."</u></a><div id=\"ka4\" style=\"display: none;\"></div>", 1);
 	
 
 	if(permissionAuth("storing",get_user_group($id),get_user_class($id)))
-		tr_small($lang_userdetails['row_storing_torrents'], "<a href=\"javascript: getusertorrentlistajax('".$user['id']."', 'storing', 'ka5');\"><img class=\"plus\" src=\"pic/trans.gif\" id=\"pica5\" alt=\"Show/Hide\" title=\"".$lang_userdetails['title_show_or_hide']."\" />   <u>".$lang_userdetails['text_show_or_hide']."</u></a><div id=\"ka5\" style=\"display: none;\"></div>", 1);
+		tr_small($lang_userdetails['row_storing_torrents'], "<a href=\"javascript: getusertorrentlistajax('storing', 'ka5');\"><img class=\"plus\" src=\"pic/trans.gif\" id=\"pica5\" alt=\"Show/Hide\" title=\"".$lang_userdetails['title_show_or_hide']."\" />   <u>".$lang_userdetails['text_show_or_hide']."</u></a><div id=\"ka5\" style=\"display: none;\"></div>", 1);
 	}
 	if ($user["info"])
 		print("<tr><td align=\"left\" colspan=\"2\" class=\"text\">" . format_comment($user["info"],false) . "</td></tr>\n");
@@ -394,19 +394,8 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 	}
 	print("</table>\n");
 
-	if (get_user_class() >= $prfmanage_class && $user["class"] < get_user_class())
-	{
+	if (get_user_class() >= $prfmanage_class && $user["class"] < get_user_class()) {
 		begin_frame($lang_userdetails['text_edit_user'], true);
-		if (get_user_class() >= $cruprfmanage_class)
-		{
-		  print('<div id="delete-user">');
-		#	begin_frame($lang_userdetails['text_delete_user'], true);
-			print("<form method=\"post\" action=\"delacctadmin.php\" name=\"deluser\">
-			<input name=\"userid\" size=\"10\" type=\"hidden\" value=\"". $user["id"] ."\" />".
-			"<input name=\"delenable\" type=\"checkbox\" onclick=\"if (this.checked) {enabledel('".$lang_userdetails['js_delete_user_note']."');}else{disabledel();}\" />". $lang_userdetails['text_delete_user'] ."<input name=\"submit\" type=\"submit\" value=\"".$lang_userdetails['submit_delete']."\" disabled=\"disabled\" /></form>");
-			  print('</div>');
-		}
-
 		print("<form method=\"post\" action=\"modtask.php\">");
 		print("<input type=\"hidden\" name=\"action\" value=\"edituser\" />");
 		print("<input type=\"hidden\" name=\"userid\" value=\"".$id."\" />");
@@ -554,6 +543,16 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 		print("</table>\n");
 		print("</form>\n");
 		end_frame();
+	}
+
+	if ((get_user_class() >= $cruprfmanage_class && $user["class"] < get_user_class()) || $user['id'] == $CURUSER['id']) {
+	  begin_frame($lang_userdetails['text_delete_user'], true);
+	  print('<div class="table td text center">');
+	  print("<form id=\"del-user\" method=\"post\" action=\"delacctadmin.php\">
+			<input name=\"userid\" size=\"10\" type=\"hidden\" value=\"". $user["id"] ."\" />".
+		"<label><input id=\"delenable\" type=\"checkbox\" />". $lang_userdetails['text_delete_user'] ."</label><input name=\"submit\" type=\"submit\" value=\"".$lang_userdetails['submit_delete']."\" disabled=\"disabled\" /></form>");
+	  print('</div>');
+	  end_frame();
 	}
 	end_main_frame();
 }
