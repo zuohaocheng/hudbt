@@ -86,3 +86,11 @@ header {
 }
 
 .action {cursor:pointer}
+
+.bbcode-menu {
+    position: absolute;
+    width: 120px; 
+    z-index: 999;
+    max-height: 500px;
+    overflow: scroll;
+}

@@ -1,4 +1,5 @@
 $(function() {
+    "use strict";
     var opentags = {
 	b : 0,
 	i : 0,
@@ -7,51 +8,50 @@ $(function() {
 	list : 0,
 	quote : 0,
 	html : 0
-    };
-    var bbtags = [];
-    function cstat() {
+    },
+    bbtags = [],
+    cstat = function() {
 	var c = stacksize(bbtags);
 	if ( (c < 1) || (c == null) ) {c = 0;}
 	if ( ! bbtags[0] ) {
 	    c = 0;
 	}
-	btnClose.val("Close last, Open "+c);
-    }
-    function stacksize(thearray) {
+    },
+    stacksize = function(thearray) {
 	for (i = 0; i < thearray.length; i++ ) {
 	    if ( (thearray[i] == "") || (thearray[i] == null) || (thearray == 'undefined') ) {return i;}
 	}
 	return thearray.length;
-    }
-    function pushstack(thearray, newval) {
+    },
+    pushstack = function(thearray, newval) {
 	arraysize = stacksize(thearray);
 	thearray[arraysize] = newval;
-    }
-    function popstackd(thearray) {
+    },
+    popstackd = function(thearray) {
 	arraysize = stacksize(thearray);
 	theval = thearray[arraysize - 1];
 	return theval;
-    }
-    function popstack(thearray) {
+    },
+    popstack = function(thearray) {
 	arraysize = stacksize(thearray);
 	theval = thearray[arraysize - 1];
 	delete thearray[arraysize - 1];
 	return theval;
-    }
+    },
 
-    function add_code(NewCode) {
+    add_code = function(NewCode) {
 	document[hb.bbcode.form][hb.bbcode.text].value += NewCode;
 	document[hb.bbcode.form][hb.bbcode.text].focus();
-    }
-    function alterfont(theval, thetag) {
+    },
+    alterfont = function(theval, thetag) {
 	if (theval == 0) return;
 	if(doInsert("[" + thetag + "=" + theval + "]", "[/" + thetag + "]", true)) pushstack(bbtags, thetag);
 	cstat();
-    }
+    },
 
-    var url_inited = false;
-    var dialog_type = '';
-    function url_form(t) {
+    url_inited = false,
+    dialog_type = '',
+    url_form = function(t) {
 	dialog_type = t;
 	if (!url_inited) {
 	    url_inited = true;
@@ -63,24 +63,24 @@ $(function() {
 	    $('#bbcode-toolbar').append(dialog);
 	    dialog.html('<ul><div id="validateTips"></div><li><label for="tag-url">' + lang.js_prompt_enter_url + '</label><input type="url" id="tag-url" class="text ui-widget-content ui-corner-all" /></li><li><label for="tag-url-title">' + lang.js_prompt_enter_title + '</label><input type="text" id="tag-url-title" class="text ui-widget-content ui-corner-all" /></li></ul>');
 	    var urlfield = $('#tag-url');
-	    var titlefield = $('#tag-url-title');
-	    var allFields = $( [] ).add( urlfield ).add( titlefield );
+	    titlefield = $('#tag-url-title'),
+	    allFields = $( [] ).add( urlfield ).add( titlefield ),
 	    
-	    function updateTips( t ) {
+	    updateTips = function( t ) {
 		var tips = $('#validateTips');
 		tips.text( t )
 		    .addClass( "ui-state-highlight" );
 		setTimeout(function() {
 		    tips.removeClass( "ui-state-highlight", 1500 );
 		}, 500 );
-	    }
+	    },
 
-	    function isUrl(s) {
+	    isUrl = function(s) {
 		var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
 		    return regexp.test(s);
-	    }
+	    },
 
-	    function checkLength( o, n ) {
+	    checkLength = function( o, n ) {
 		if (!isUrl(o.val())) {
 		    o.addClass( "ui-state-error" );
 		    updateTips( n + "无效。" );
@@ -88,9 +88,9 @@ $(function() {
 		} else {
 		    return true;
 		}
-	    }
+	    },
 
-	    var onok = function() {
+	    onok = function() {
 		allFields.removeClass( "ui-state-error" );
 		var valid = true;
 		valid = valid && checkLength(urlfield, "URL");
@@ -135,34 +135,34 @@ $(function() {
 	$('#tag-url-title').parent().toggle(dialog_type === 'url');
 	$('#tag-url').val('http://').select();
 	$('#url-form').dialog('open');
-    }
+    },
 
-    function tag_url() {
+    tag_url = function() {
 	url_form('url');
-    }
+    },
 
-    function tag_list(PromptEnterItem, PromptError) {
+    tag_list = function(PromptEnterItem, PromptError) {
 	var FoundErrors = '';
 	var enterTITLE = prompt(PromptEnterItem, "");
 	if (!enterTITLE) {FoundErrors += " " + PromptEnterItem;}
 	if (FoundErrors) {alert(PromptError+FoundErrors);return;}
 	doInsert("[*]"+enterTITLE+"", "", false);
-    }
+    },
 
-    function tag_image() {
+    tag_image = function() {
 	url_form('image');
-    }
+    },
 
-    function tag_email(PromptEmail, PromptError) {
+    tag_email = function(PromptEmail, PromptError) {
 	var emailAddress = prompt(PromptEmail, "");
 	if (!emailAddress) {
 	    alert(PromptError+PromptEmail);
 	    return;
 	}
 	doInsert("[email]"+emailAddress+"[/email]", "", false);
-    }
+    },
 
-    var inited = false;
+    inited = false;
     $('#showmoresmilies').click(function (e) {
 	e.preventDefault();
 	if (inited) {
@@ -180,7 +180,7 @@ $(function() {
 	}
     });
 
-    function simpletag(thetag) {
+    var simpletag = function(thetag) {
 	var tagOpen = opentags[thetag];
 	if (tagOpen == 0) {
 	    if(doInsert("[" + thetag + "]", "[/" + thetag + "]", true)) {
@@ -208,10 +208,10 @@ $(function() {
 	    }
 	    cstat();
 	}
-    }
+    },
 
-    var lang = hb.constant.lang;
-    var buttons = [
+    lang = hb.constant.lang,
+    buttons = [$('<span/>').append(
 	$('<input />', {
 	    'class' : 'codebuttons',
 	    style : "font-weight: bold;",
@@ -309,20 +309,20 @@ $(function() {
 	    var list_type_change = function() {
 		list_mark_type.html(createOptions(styles[this.value]));
 		list_mark_type_change.call(list_mark_type[0]);
-	    };
-	    var list_mark_type_change = function() {
+	    },
+	    list_mark_type_change = function() {
 		input_list.css('list-style-type', this.value);
-	    };
-	    var list_mark_type = $('<select></select>').change(list_mark_type_change);
-	    var list_type = $('<select></select>', {
+	    },
+	    list_mark_type = $('<select></select>').change(list_mark_type_change),
+	    list_type = $('<select></select>', {
 		html : '<option value="ul" selected="selected">无序列表</option><option value="ol">有序列表</option>'
 	    }).change(list_type_change);
 	    list_type_change.call(list_type[0]);
 
 	    var dialog = $('<div></div>', {
 		title : '编辑列表，按Tab或Enter可以直接产生新项目'
-	    }).append(list_type).append(list_mark_type).append(input_list);
-	    var close = function() {
+	    }).append(list_type).append(list_mark_type).append(input_list),
+	    close = function() {
 		dialog.dialog('close');
 	    };
 	    dialog.dialog({
@@ -357,50 +357,90 @@ $(function() {
 	    value : 'QUOTE'
 	}).click(function() {
 	    simpletag('quote');
-	})];
+	})).find('input').button().end().buttonset()],
 
-    var selections = function(name, header, opts) {
-	var sel = $('<select></select>', {
-	    'class' : "med codebuttons no-validate",
-	    name : name
-	});
-	sel.append('<option value="0">' + header + '</option>');
-	return sel.append($.map(opts, function(item, idx) {
-	    return '<option value="' + item.val + '"' + item.attrs + '>' + item.title + '</option>';
-	}).join());
-    };
+    selections = function(header, opts, callback, css) {
+	var currentLi,
+	openMenu = function(e) {
+	    menuitems.show().position({
+		my: "left top",
+		at: "left bottom",
+		of: menu
+            });
+	    var counter = 2,
+	    handler = function() {
+		counter -= 1;
+		if (counter === 0) {
+	    	    menuitems.hide();
+		    $(document).unbind('click', handler);
+		}
+            };
+            $( document ).click(handler);
+	    e.preventDefault();
+	},
+	btn = $('<button>' + header + '</button>').button().click(function(e) {
+	    if (currentLi === undefined) {
+		openMenu(e);
+	    }
+	    else {
+		e.preventDefault();
+		currentLi.click();
+	    }
+	}),
+	menuitems = $('<ul class="bbcode-menu">' + $.map(opts, function(item, idx) {
+	    var attrs = item.attrs || '';
+	    if (css) {
+		attrs += ' style="' + css + ':' + item.val + '"';
+	    }
+	    return '<li val="' + item.val + '"><a href="#"' + attrs + '>' + item.title + '</a></li>';
+	}).join('') + '</ul>').hide().menu().on('click', 'li', function(e) {
+	    e.preventDefault();
+	    currentLi = this;
+	    btn.button('option', 'label', this.innerText);
+	    if (callback) {
+		callback.call(this);
+	    }
+	}),
+	menu = $('<button>' + header + '</button>').button({
+	    text: false,
+	    icons: {
+		primary: "ui-icon-triangle-1-s"
+            }
+	}).click(openMenu),
+	btnset = $('<span/>').append(btn).append(menu).buttonset(),
+	wrapper = $('<span/>').append(btnset).append(menuitems);
+	return wrapper;
+    },
 
-    var colorOpts = [{"title":"Black","val":"Black","attrs":" style=\"background-color: black;\""},{"title":"Sienna","val":"Sienna","attrs":" style=\"background-color: sienna;\""},{"title":"Dark Olive Green","val":"DarkOliveGreen","attrs":" style=\"background-color: darkolivegreen;\""},{"title":"Dark Green","val":"DarkGreen","attrs":" style=\"background-color: darkgreen;\""},{"title":"Dark Slate Blue","val":"DarkSlateBlue","attrs":" style=\"background-color: darkslateblue;\""},{"title":"Navy","val":"Navy","attrs":" style=\"background-color: navy;\""},{"title":"Indigo","val":"Indigo","attrs":" style=\"background-color: indigo;\""},{"title":"Dark Slate Gray","val":"DarkSlateGray","attrs":" style=\"background-color: darkslategray;\""},{"title":"Dark Red","val":"DarkRed","attrs":" style=\"background-color: darkred;\""},{"title":"Dark Orange","val":"DarkOrange","attrs":" style=\"background-color: darkorange;\""},{"title":"Olive","val":"Olive","attrs":" style=\"background-color: olive;\""},{"title":"Green","val":"Green","attrs":" style=\"background-color: green;\""},{"title":"Teal","val":"Teal","attrs":" style=\"background-color: teal;\""},{"title":"Blue","val":"Blue","attrs":" style=\"background-color: blue;\""},{"title":"Slate Gray","val":"SlateGray","attrs":" style=\"background-color: slategray;\""},{"title":"Dim Gray","val":"DimGray","attrs":" style=\"background-color: dimgray;\""},{"title":"Red","val":"Red","attrs":" style=\"background-color: red;\""},{"title":"Sandy Brown","val":"SandyBrown","attrs":" style=\"background-color: sandybrown;\""},{"title":"Yellow Green","val":"YellowGreen","attrs":" style=\"background-color: yellowgreen;\""},{"title":"Sea Green","val":"SeaGreen","attrs":" style=\"background-color: seagreen;\""},{"title":"Medium Turquoise","val":"MediumTurquoise","attrs":" style=\"background-color: mediumturquoise;\""},{"title":"Royal Blue","val":"RoyalBlue","attrs":" style=\"background-color: royalblue;\""},{"title":"Purple","val":"Purple","attrs":" style=\"background-color: purple;\""},{"title":"Gray","val":"Gray","attrs":" style=\"background-color: gray;\""},{"title":"Magenta","val":"Magenta","attrs":" style=\"background-color: magenta;\""},{"title":"Orange","val":"Orange","attrs":" style=\"background-color: orange;\""},{"title":"Yellow","val":"Yellow","attrs":" style=\"background-color: yellow;\""},{"title":"Lime","val":"Lime","attrs":" style=\"background-color: lime;\""},{"title":"Cyan","val":"Cyan","attrs":" style=\"background-color: cyan;\""},{"title":"Deep Sky Blue","val":"DeepSkyBlue","attrs":" style=\"background-color: deepskyblue;\""},{"title":"Dark Orchid","val":"DarkOrchid","attrs":" style=\"background-color: darkorchid;\""},{"title":"Silver","val":"Silver","attrs":" style=\"background-color: silver;\""},{"title":"Pink","val":"Pink","attrs":" style=\"background-color: pink;\""},{"title":"Wheat","val":"Wheat","attrs":" style=\"background-color: wheat;\""},{"title":"Lemon Chiffon","val":"LemonChiffon","attrs":" style=\"background-color: lemonchiffon;\""},{"title":"Pale Green","val":"PaleGreen","attrs":" style=\"background-color: palegreen;\""},{"title":"Pale Turquoise","val":"PaleTurquoise","attrs":" style=\"background-color: paleturquoise;\""},{"title":"Light Blue","val":"LightBlue","attrs":" style=\"background-color: lightblue;\""},{"title":"Plum","val":"Plum","attrs":" style=\"background-color: plum;\""},{"title":"White","val":"White","attrs":" style=\"background-color: white;\""}];
-    var fontOpts = [{"title":"Arial","val":"Arial"},{"title":"Arial Black","val":"Arial Black"},{"title":"Arial Narrow","val":"Arial Narrow"},{"title":"Book Antiqua","val":"Book Antiqua"},{"title":"Century Gothic","val":"Century Gothic"},{"title":"Comic Sans MS","val":"Comic Sans MS"},{"title":"Courier New","val":"Courier New"},{"title":"Fixedsys","val":"Fixedsys"},{"title":"Garamond","val":"Garamond"},{"title":"Georgia","val":"Georgia"},{"title":"Impact","val":"Impact"},{"title":"Lucida Console","val":"Lucida Console"},{"title":"Lucida Sans Unicode","val":"Lucida Sans Unicode"},{"title":"Microsoft Sans Serif","val":"Microsoft Sans Serif"},{"title":"Palatino Linotype","val":"Palatino Linotype"},{"title":"System","val":"System"},{"title":"Tahoma","val":"Tahoma"},{"title":"Times New Roman","val":"Times New Roman"},{"title":"Trebuchet MS","val":"Trebuchet MS"},{"title":"Verdana","val":"Verdana"}];
-    var sizeOpts = [{"title":"1","val":"1"},{"title":"2","val":"2"},{"title":"3","val":"3"},{"title":"4","val":"4"},{"title":"5","val":"5"},{"title":"6","val":"6"},{"title":"7","val":"7"}];
+    colorOpts = [{"title":"Black","val":"Black"},{"title":"Sienna","val":"Sienna"},{"title":"Dark Olive Green","val":"DarkOliveGreen"},{"title":"Dark Green","val":"DarkGreen"},{"title":"Dark Slate Blue","val":"DarkSlateBlue"},{"title":"Navy","val":"Navy"},{"title":"Indigo","val":"Indigo"},{"title":"Dark Slate Gray","val":"DarkSlateGray"},{"title":"Dark Red","val":"DarkRed"},{"title":"Dark Orange","val":"DarkOrange"},{"title":"Olive","val":"Olive"},{"title":"Green","val":"Green"},{"title":"Teal","val":"Teal"},{"title":"Blue","val":"Blue"},{"title":"Slate Gray","val":"SlateGray"},{"title":"Dim Gray","val":"DimGray"},{"title":"Red","val":"Red"},{"title":"Sandy Brown","val":"SandyBrown"},{"title":"Yellow Green","val":"YellowGreen"},{"title":"Sea Green","val":"SeaGreen"},{"title":"Medium Turquoise","val":"MediumTurquoise"},{"title":"Royal Blue","val":"RoyalBlue"},{"title":"Purple","val":"Purple"},{"title":"Gray","val":"Gray"},{"title":"Magenta","val":"Magenta"},{"title":"Orange","val":"Orange"},{"title":"Yellow","val":"Yellow"},{"title":"Lime","val":"Lime"},{"title":"Cyan","val":"Cyan"},{"title":"Deep Sky Blue","val":"DeepSkyBlue"},{"title":"Dark Orchid","val":"DarkOrchid"},{"title":"Silver","val":"Silver"},{"title":"Pink","val":"Pink"},{"title":"Wheat","val":"Wheat"},{"title":"Lemon Chiffon","val":"LemonChiffon"},{"title":"Pale Green","val":"PaleGreen"},{"title":"Pale Turquoise","val":"PaleTurquoise"},{"title":"Light Blue","val":"LightBlue"},{"title":"Plum","val":"Plum"},{"title":"White","val":"White"}],
+    fontOpts = [{"title":"Arial","val":"Arial"},{"title":"Arial Black","val":"Arial Black"},{"title":"Arial Narrow","val":"Arial Narrow"},{"title":"Book Antiqua","val":"Book Antiqua"},{"title":"Century Gothic","val":"Century Gothic"},{"title":"Comic Sans MS","val":"Comic Sans MS"},{"title":"Courier New","val":"Courier New"},{"title":"Fixedsys","val":"Fixedsys"},{"title":"Garamond","val":"Garamond"},{"title":"Georgia","val":"Georgia"},{"title":"Impact","val":"Impact"},{"title":"Lucida Console","val":"Lucida Console"},{"title":"Lucida Sans Unicode","val":"Lucida Sans Unicode"},{"title":"Microsoft Sans Serif","val":"Microsoft Sans Serif"},{"title":"Palatino Linotype","val":"Palatino Linotype"},{"title":"System","val":"System"},{"title":"Tahoma","val":"Tahoma"},{"title":"Times New Roman","val":"Times New Roman"},{"title":"Trebuchet MS","val":"Trebuchet MS"},{"title":"Verdana","val":"Verdana"}],
+    sizeOpts = [{"title":"1","val":"1", "attrs":"style=\"font-size:x-small\""},{"title":"2","val":"2", "attrs":"style=\"font-size:small\""},{"title":"3","val":"3", "attrs":"style=\"font-size:medium\""},{"title":"4","val":"4", "attrs":"style=\"font-size:large\""},{"title":"5","val":"5", "attrs":"style=\"font-size:x-large\""},{"title":"6","val":"6", "attrs":"style=\"font-size:xx-large\""},{"title":"7","val":"7", "attrs":"style=\"font-size:48px\""}];
 
-    buttons.push(selections('color', lang.select_color, colorOpts).change(function() {
-	alterfont(this.options[this.selectedIndex].value, 'color');
-	this.selectedIndex = 0;
-    }));
-    buttons.push(selections('font', lang.select_font, fontOpts).change(function() {
-	alterfont(this.options[this.selectedIndex].value, 'font');
-	this.selectedIndex = 0;
-    }));    
-    buttons.push(selections('size', lang.select_size, sizeOpts).change(function() {
-	alterfont(this.options[this.selectedIndex].value, 'size');
-	this.selectedIndex = 0;
-    }));    
+    buttons.push(selections(lang.select_color, colorOpts, function() {
+	alterfont(this.getAttribute('val'), 'color');
+    }, 'color'));
+    buttons.push(selections(lang.select_font, fontOpts, function() {
+    	alterfont(this.getAttribute('val'), 'font');
+    }, 'font-family'));    
+    buttons.push(selections(lang.select_size, sizeOpts, function() {
+    	alterfont(this.getAttribute('val'), 'size');
+    })); 
+  
 
     var toolbar = $('#bbcode-toolbar');
     $.each(buttons, function(idx,itm) {
-    	toolbar.append(itm.wrap('<li></li>'));
+    	toolbar.append(itm);
     })
 });
 
 // preview.js
 $(function() {
-    var $tar = $('#commit-btn');
-    var $previewouter = $('#previewouter');
-    var $editorouter = $('#editorouter');
-    var previewing = false;
+    var $tar = $('#commit-btn'),
+    $previewouter = $('#previewouter'),
+    $editorouter = $('#editorouter'),
+    previewing = false,
 
-    var $preview = $('<input />', {
+    $preview = $('<input />', {
 	type : 'button',
 	'class' : 'btn2',
 	id : 'previewbutton',
@@ -408,20 +448,20 @@ $(function() {
     }).click(function() {
 	if (!previewing) {
 	    $.post('preview.php', {body : $('#body').val()}, function(res) {
-		$preview.attr('value', hb.constant.lang.submit_edit);
+		$preview.val(hb.constant.lang.submit_edit);
 		$previewouter.html(res).slideDown();
 		$editorouter.slideUp();
 		previewing = true;
 	    }, 'html');
 	}
 	else {
-	    $preview.attr('value', hb.constant.lang.submit_preview);
+	    $preview.val(hb.constant.lang.submit_preview);
 	    $previewouter.html('').slideUp();
 	    $editorouter.slideDown();
 	    previewing = false;
 	}
     }).appendTo($tar);
-    $('#commit-btn input').button().parent().buttonset();
+    $tar.find('input').button().parent().buttonset();
 });
 
 var allowedtypes = (function() {

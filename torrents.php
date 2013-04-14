@@ -1130,9 +1130,7 @@ else {
 if ($_REQUEST['format'] == 'json') {
   include('include/torrents_json.php');
 }
-else if ($_REQUEST['format'] == 'xhr' ||
-	 (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')) { 
-  
+else if ($_REQUEST['format'] == 'xhr') { 
   include('include/torrents_xhr.php');
 }
 else {

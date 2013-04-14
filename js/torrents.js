@@ -4,7 +4,7 @@ $(function() {
     target = $('#torrents>tbody'),
     tooltip = $('#tooltipPool'),
     targetH = target.height(),
-    surfix = '',
+    surfix = '&format=xhr',
     isManager = (parseInt(hb.config.user['class']) >= hb.constant.torrentmanage_class),
     $document = $(document),
     $window = $(window),
@@ -336,7 +336,7 @@ $(function() {
 	tooltip.children().remove();
 	table.hide();
 	$('#stderr').remove();
-	$.getJSON('?' + $.param(uri), function(result) {
+	$.getJSON('?' + $.param(uri) + surfix, function(result) {
 	    var targ = $('#outer');
 	    if (result.torrents.length) {
 		table.before(result.pager.top);
