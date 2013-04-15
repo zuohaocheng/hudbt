@@ -197,9 +197,19 @@ if (get_user_class() >= $delownsub_class) {
 	  $res = sql_query("SELECT lang_name from language WHERE sub_lang=1 AND id = " . sqlesc($a["lang_id"])) or sqlerr(__FILE__, __LINE__);
 	  $arr = mysql_fetch_assoc($res);
 	  write_log("$arr[lang_name] Subtitle $delete ($a[title]) was deleted by ". (($a["anonymous"] == 'yes' && $a["uppedby"] == $CURUSER["id"]) ? "Anonymous" : $CURUSER['username']). ($a["uppedby"] != $CURUSER["id"] ? ", Mod Delete":"").($reason != "" ? " (".$reason.")" : ""));
+
+	  if ($_REQUEST['returnto']) {
+	    redirect($_REQUEST['returnto']);
+	  }
 	}
 	else {
-	  stdmsg($lang_subtitles['std_delete_subtitle'], $lang_subtitles['std_delete_subtitle_note']."<br /><form method=post action=subtitles.php?delete=$delete&sure=1>".$lang_subtitles['text_reason_is']."<input type=text style=\"width: 200px\" name=reason><input type=submit value=\"".$lang_subtitles['submit_confirm']."\"></form>");
+	  if (isset($_REQUEST['returnto'])) {
+	    $returnto = $_REQUEST['returnto'];
+	  }
+	  else {
+	    $returnto = $_SERVER['HTTP_REFERER'];
+	  }
+	  stdmsg($lang_subtitles['std_delete_subtitle'], $lang_subtitles['std_delete_subtitle_note']."<br /><form method=post action=\"subtitles.php?delete=$delete&sure=1\">".$lang_subtitles['text_reason_is']."<input type=\"hidden\" name=\"returnto\" value=\"" . htmlspecialchars($returnto) ."\"/><input type=text style=\"width: 200px\" name=reason><input type=submit value=\"".$lang_subtitles['submit_confirm']."\"></form>");
 	  stdfoot();
 	  die;
 	}
