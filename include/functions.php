@@ -2343,11 +2343,11 @@ function httperr($code = 404) {
 
 function logincookie($id, $passhash, $updatedb = 1, $expires = 0x7fffffff, $securelogin=false, $ssl=false, $trackerssl=false)
 {
-  if ($expires != 0x7fffffff)
+  if ($expires != 0x7fffffff && $expires != 0)
   $expires = time()+$expires;
 
-  setcookie("c_secure_uid", base64($id), $expires, "/");
-  setcookie("c_secure_pass", $passhash, $expires, "/");
+  setcookie("c_secure_uid", base64($id), $expires, "/", NULL, NULL, true);
+  setcookie("c_secure_pass", $passhash, $expires, "/", NULL, NULL, true);
   if($ssl)
   setcookie("c_secure_ssl", base64("yeah"), $expires, "/");
   else
@@ -2942,8 +2942,6 @@ function single_post($arr, $maypost, $maymodify, $locked, $highlight = '', $last
 function single_comment($row, $parent_id, $type, $floor = -1) {
   global $commanage_class, $CURUSER;
 
-  $userRow = get_user_row($row['user']);
-
   if ($row["editedby"]) {
     $edit = array('editor' => $row["editedby"], 'date' => $row['editdate'],'editnotseen' => $row['editnotseen']);
   }
@@ -3109,7 +3107,7 @@ function torrentTableCake($torrents) {
   torrenttable($rows);
 }
 
-function torrenttable($rows, $variant = "torrent", $swap_headings = false, $onlyhead=false, $counter = 0, $header = true, $splitcomment = false) {
+function torrenttable($rows, $var) {
   global $Cache;
   global $lang_functions;
   global $CURUSER, $waitsystem;
@@ -3120,6 +3118,15 @@ function torrenttable($rows, $variant = "torrent", $swap_headings = false, $only
   // Filter banned torrents
   global $seebanned_class;
   global $torrent_tooltip, $BASEURL;
+
+  $variant = "torrent";
+  $swap_headings = false;
+  $onlyhead=false;
+  $counter = 0;
+  $header = true;
+  $splitcomment = false;
+  $progress = [];
+  extract($var);
   
   if ($variant == "torrent"){
     $last_browse = $CURUSER['last_browse'];
@@ -3307,7 +3314,71 @@ foreach($rows as $row)
        $dissmall_descr = $buf;
     }
     }
-    print('<td class="torrent"><div><div class="limit-width minor-list"><div class="torrent-title">'.$stickyicon."<h2 class='transparentbg'><a $short_torrent_name_alt $mouseovertorrent href=\"//$BASEURL/details.php?id=".$id."&amp;hit=1\">".htmlspecialchars($dispname).'</a></h2><ul class="prs">');
+    echo '<td class="torrent"><div>';
+
+    $color = '';
+    $title = '';
+    if ($row['owner'] == $CURUSER['id']) {
+      $color = 'uploaded';
+      $width = 200;
+      $title = '由我上传';
+      if (isset($progress[$row['id']])) {
+	$p = $progress[$row['id']];
+	if ($p['peer_id'] && $p['to_go'] == 0) {
+	  $color .= ' seeding';
+	  $title .= ', 正在做种';
+	}
+      }
+    }
+    else if (isset($progress[$row['id']])) {
+      $p = $progress[$row['id']];
+      if ($p['finished'] == 'yes') {
+	$width = 200;
+	if ($p['peer_id']) {
+	  $color = 'seeding';
+	  $title = '正在做种';
+	}
+	else {
+	  $color = 'finished';
+	  $title = '已完成';
+	}
+      }
+      else if ($p['to_go'] == 0) {
+	// 未下载，只做种
+	$width = 200;
+	if ($p['peer_id']) {
+	  $color = 'seeding';
+	  $title = '正在做种';
+	}
+	else {
+	  $color = 'seeded';
+	  $title = '曾做种';
+	}
+      }
+      else {
+	if ($p['peer_id']) {
+	  $color = 'downloading';
+	  $title = '正在下载';
+	}
+	else {
+	  $color = 'downloaded';
+	  $title = '已下载';
+	}
+	$percentage = round($p['to_go'] * 100 / $row['size']);
+	$title .= ', 进度约为' . (100 - $percentage) . '%';
+	$width = 95 - $percentage;
+      }
+    }
+
+    if ($title) {
+      echo '<div class="progress '.$color.'" title="' . $title . '" style="width:' . $width . '%"></div>';
+    }
+    
+    echo '<div class="limit-width minor-list"';
+    if ($title) {
+      echo ' title="' . $title . '"';
+    }
+    echo '><div class="torrent-title">'.$stickyicon."<h2 class='transparentbg'><a $short_torrent_name_alt $mouseovertorrent href=\"//$BASEURL/details.php?id=".$id."&amp;hit=1\">".htmlspecialchars($dispname).'</a></h2><ul class="prs">';
     $sp_torrent = get_torrent_promotion_append($row['sp_state'],"",true,$row["added"], $row['promotion_time_type'], $row['promotion_until']);
     if ($sp_torrent != '') {
       $sp_torrent = '<li>' . $sp_torrent . '</li>';
@@ -3405,7 +3476,7 @@ foreach($rows as $row)
         $hasnewcom = false;
         $onmouseover = "";
       }
-      print("<b><a href=\"//$BASEURL/details.php?id=".$id."&amp;hit=1&amp;cmtpage=1#startcomments\" ".$onmouseover.">". ($hasnewcom ? "<font class='new'>" : ""). $row["comments"] .($hasnewcom ? "</font>" : ""). "</a></b>");
+      print("<b><a href=\"//$BASEURL/details.php?id=".$id."&amp;hit=1&amp;cmtpage=1#startcomments\" ".$onmouseover.">". ($hasnewcom ? "<span class='new'>" : ""). $row["comments"] .($hasnewcom ? "</span>" : ""). "</a></b>");
     }
 
     print("</td>");
@@ -3421,8 +3492,7 @@ foreach($rows as $row)
     if ($row["seeders"]) {
         $ratio = ($row["leechers"] ? ($row["seeders"] / $row["leechers"]) : 1);
         $ratiocolor = get_slr_color($ratio);
-        print("<td class=\"rowfollow\" align=\"center\"><b><a href=\"//$BASEURL/details.php?id=".$id."&amp;hit=1&amp;dllist=1#seeders\">".($ratiocolor ? "<font color=\"" .
-        $ratiocolor . "\">" . number_format($row["seeders"]) . "</font>" : number_format($row["seeders"]))."</a></b></td>\n");
+        print("<td class=\"rowfollow\" align=\"center\"><b><a href=\"//$BASEURL/details.php?id=".$id."&amp;hit=1&amp;dllist=1#seeders\"".($ratiocolor ? " style=\"color:" . $ratiocolor . "\">" : '>') . number_format($row["seeders"])."</a></b></td>\n");
     }
     else
       print("<td class=\"rowfollow\"><span class=\"" . linkcolor($row["seeders"]) . "\">" . number_format($row["seeders"]) . "</span></td>\n");

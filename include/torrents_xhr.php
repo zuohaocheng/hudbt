@@ -9,7 +9,11 @@ if (isset($_REQUEST['counter'])) {
 else {
   $counter = 0;
 }
-$tooltips = torrenttable($rows, "torrents", $swap_headings, false, $counter, false, true);
+$tooltips = torrenttable($rows, ['swap_headings' => $swap_headings,
+				 'counter' => $counter,
+				 'header' => false,
+				 'splitcomment' =>true,
+				 'progress' => $progress]);
 $out = array('torrents' => ob_get_clean(),
 	     'tooltips' => $tooltips);
 
@@ -19,5 +23,5 @@ if ($next_page_href != '') {
 
 $out['pager'] = array('top' => $pagertop, 'bottom' => $pagerbottom);
 
-print(php_json_encode($out));
+print(json_encode($out));
 

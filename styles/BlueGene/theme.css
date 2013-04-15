@@ -859,7 +859,7 @@ dl dd.first-child, dl dd:first-of-type {
     white-space: nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
-    width: 495px;
+    max-width: 495px;
 }
 
 #torrents h3{
@@ -889,7 +889,7 @@ td.torrent>div, .torrent-title {
 .torrent-utilty-icons {
     position: absolute;
     top: 0;
-    right: 0;
+    right: 5px;
 }
 
 ul.prs {
@@ -897,7 +897,6 @@ ul.prs {
     position:absolute;
     right:0;
     padding-top: 2px;
-    background-color: #bccad6;
     display:inline !ie;
 }
 

@@ -116,3 +116,23 @@ dl.minor-list dd {
 dl.minor-list.properties dt:after {
     content: ':';
 }
+
+td.torrent {
+    overflow:hidden;
+    padding:0
+}
+
+.progress {
+    position:absolute;
+    height: 200%;
+    top: -30%;
+}
+
+
+.progress.seeding {background-color: #f9f}
+.progress.seeded {background-color: #fcf}
+.progress.finished {background-color: silver}
+.progress.downloading {background-color: lightgreen}
+.progress.downloaded {background-color: lightyellow}
+.progress.uploaded.seeding {background-color: sandybrown}
+.progress.uploaded {background-color: #FAD7B7}

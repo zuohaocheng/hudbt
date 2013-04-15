@@ -173,10 +173,8 @@ if ($count) {
     print($pagertop);
   }
 
-  $swap_headings = $_GET["swaph"];
-
   if ($sectiontype == $browsecatmode)
-    torrenttable($rows, "torrents", $swap_headings);
+    torrenttable($rows, compact('swap_headings', 'progress'));
 //  elseif ($sectiontype == $specialcatmode) die('Error, Contact SYSOP');
 //    torrenttable($res, "music", $swap_headings);
 //  else die('') die('Error, Contact SYSOP');
@@ -195,7 +193,7 @@ else {
     stdmsg($lang_torrents['std_nothing_found'],$lang_torrents['std_no_active_torrents']);
   }
 
-  torrenttable('', '', '',true);
+  torrenttable(null, ['onlyhead' => true]);
 }
 ?>
 <div id="loader" style="display: none; "></div>
