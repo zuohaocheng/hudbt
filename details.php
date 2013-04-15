@@ -15,7 +15,7 @@ $storingKeeperList = storing_keeper_list($id);
 if (!isset($id) || !$id)
   die();
 
-$res = sql_query("SELECT torrents.cache_stamp, torrents.storing, torrents.sp_state, torrents.url, torrents.small_descr, torrents.seeders, torrents.banned, torrents.leechers, torrents.info_hash, torrents.filename, nfo, LENGTH(torrents.nfo) AS nfosz, torrents.last_action, torrents.name, torrents.owner, torrents.save_as, torrents.descr, torrents.visible, torrents.size, torrents.added, torrents.promotion_time_type, torrents.promotion_until, torrents.views, torrents.hits, torrents.times_completed, torrents.id, torrents.type, torrents.numfiles, torrents.anonymous, torrents.startseed, categories.name AS cat_name, sources.name AS source_name, media.name AS medium_name, codecs.name AS codec_name, standards.name AS standard_name, processings.name AS processing_name, teams.name AS team_name, audiocodecs.name AS audiocodec_name FROM torrents LEFT JOIN categories ON torrents.category = categories.id LEFT JOIN sources ON torrents.source = sources.id LEFT JOIN media ON torrents.medium = media.id LEFT JOIN codecs ON torrents.codec = codecs.id LEFT JOIN standards ON torrents.standard = standards.id LEFT JOIN processings ON torrents.processing = processings.id LEFT JOIN teams ON torrents.team = teams.id LEFT JOIN audiocodecs ON torrents.audiocodec = audiocodecs.id WHERE torrents.id = $id LIMIT 1")
+$res = sql_query("SELECT torrents.cache_stamp, torrents.storing, torrents.sp_state, torrents.url, torrents.small_descr, torrents.seeders, torrents.banned, torrents.leechers, torrents.info_hash, torrents.filename, nfo, LENGTH(torrents.nfo) AS nfosz, torrents.last_action, torrents.name, torrents.owner, torrents.save_as, torrents.descr, torrents.visible, torrents.size, torrents.added, torrents.promotion_time_type, torrents.promotion_until, torrents.views, torrents.hits, torrents.times_completed, torrents.id, torrents.type, torrents.numfiles, torrents.anonymous, torrents.startseed, torrents.category, categories.name AS cat_name, sources.name AS source_name, medium, media.name AS medium_name, codec, codecs.name AS codec_name, standard, standards.name AS standard_name, processings.name AS processing_name, team, teams.name AS team_name, audiocodecs.name AS audiocodec_name FROM torrents LEFT JOIN categories ON torrents.category = categories.id LEFT JOIN sources ON torrents.source = sources.id LEFT JOIN media ON torrents.medium = media.id LEFT JOIN codecs ON torrents.codec = codecs.id LEFT JOIN standards ON torrents.standard = standards.id LEFT JOIN processings ON torrents.processing = processings.id LEFT JOIN teams ON torrents.team = teams.id LEFT JOIN audiocodecs ON torrents.audiocodec = audiocodecs.id WHERE torrents.id = $id LIMIT 1")
   or sqlerr();
 $row = mysql_fetch_array($res);
 
@@ -109,24 +109,25 @@ else {
       dl_item($lang_details['row_small_description'], htmlspecialchars($row['small_descr']),true);
     }
 
-    $size_info =  "<b>".$lang_details['text_size']."</b>" . mksize($row["size"]);
-    $type_info = "&nbsp;&nbsp;&nbsp;<b>".$lang_details['row_type'].":</b>&nbsp;".$row["cat_name"];
+    $infos = [];
+    $infos[] =  "<dt>".$lang_details['text_size']."</dt><dd>" . mksize($row["size"]);
+    $infos[] = "<dt>".$lang_details['row_type']."</dt><dd><a href=\"torrents.php?cat=" . $row['category'] . "\">".$row["cat_name"].'</a></dd>';
     if (isset($row["source_name"]))
-      $source_info = "&nbsp;&nbsp;&nbsp;<b>".$lang_details['text_source']."&nbsp;</b>".$row['source_name'];
+      $infos[] = "<dt>".$lang_details['text_source']."</dt><dd>".$row['source_name'].'</dd>';
     if (isset($row["medium_name"]))
-      $medium_info = "&nbsp;&nbsp;&nbsp;<b>".$lang_details['text_medium']."&nbsp;</b>".$row['medium_name'];
+      $infos[] = "<dt>".$lang_details['text_medium']."</dt><dd><a href=\"torrents.php?medium=" . $row['medium'] ."\">".$row['medium_name'].'</a></dd>';
     if (isset($row["codec_name"]))
-      $codec_info = "&nbsp;&nbsp;&nbsp;<b>".$lang_details['text_codec']."&nbsp;</b>".$row['codec_name'];
+      $infos[] = "<dt>".$lang_details['text_codec']."</dt><dd><a href=\"torrents.php?codec=" . $row['codec'] ."\">".$row['codec_name'].'</a></dd>';
     if (isset($row["standard_name"]))
-      $standard_info = "&nbsp;&nbsp;&nbsp;<b>".$lang_details['text_stardard']."&nbsp;</b>".$row['standard_name'];
+      $infos[] = "<dt>".$lang_details['text_stardard']."</dt><dd><a href=\"torrents.php?standard=" . $row['standard'] ."\">".$row['standard_name'].'</dd>';
     if (isset($row["processing_name"]))
-      $processing_info = "&nbsp;&nbsp;&nbsp;<b>".$lang_details['text_processing']."&nbsp;</b>".$row['processing_name'];
+      $infos[] = "<dt>".$lang_details['text_processing']."</dt><dd>".$row['processing_name'].'</dd>';
     if (isset($row["team_name"]))
-      $team_info = "&nbsp;&nbsp;&nbsp;<b>".$lang_details['text_team']."&nbsp;</b>".$row['team_name'];
+      $infos[] = "<dt>".$lang_details['text_team']."</dt><dd><a href=\"torrents.php?team=" . $row['team'] ."\">".$row['team_name'].'</a></dd>';
     if (isset($row["audiocodec_name"]))
-      $audiocodec_info = "&nbsp;&nbsp;&nbsp;<b>".$lang_details['text_audio_codec']."&nbsp;</b>".$row['audiocodec_name'];
+      $infos[] = "<dt>".$lang_details['text_audio_codec']."</dt><dd>".$row['audiocodec_name'].'</dd>';
 
-    dl_item($lang_details['row_basic_info'], $size_info.$type_info.$source_info . $medium_info. $codec_info . $audiocodec_info. $standard_info . $processing_info . $team_info, 1);
+    dl_item($lang_details['row_basic_info'], '<dl class="minor-list properties">'. implode($infos) . '</dl>', 1);
 
     $actions = '<div class="minor-list list-seperator"><ul>';
     if ($CURUSER["downloadpos"] != "no") {
@@ -175,7 +176,7 @@ else {
       print("<table border=\"0\" cellspacing=\"0\">");
 	while($a = mysql_fetch_assoc($r)) {
 	    $lang = "<tr><td class=\"embedded\"><img border=\"0\" src=\"pic/flag/". $a["flagpic"] . "\" alt=\"" . $a["lang_name"] . "\" title=\"" . $a["lang_name"] . "\" style=\"padding-bottom: 4px\" /></td>";
-	    $lang .= "<td class=\"embedded\">&nbsp;&nbsp;<a href=\"downloadsubs.php?torrentid=".$a[torrent_id]."&subid=".$a[id]."\"><u>". $a["title"]. "</u></a>".(get_user_class() >= $submanage_class || (get_user_class() >= $delownsub_class && $a["uppedby"] == $CURUSER["id"]) ? " <font class=\"small\"><a href=\"subtitles.php?delete=".$a[id]."\">[".$lang_details['text_delete']."]</a></font>" : ""). "<a href=\"report.php?subtitle=$a[id]\">[$lang_details[report]]</a>"."</td><td class=\"embedded\">&nbsp;&nbsp;".($a["anonymous"] == 'yes' ? $lang_details['text_anonymous'] . (get_user_class() >= $viewanonymous_class ? get_username($a['uppedby'],false,true,true,false,true) : "") : get_username($a['uppedby'])).'</dd>';
+	    $lang .= "<td class=\"embedded\">&nbsp;&nbsp;<a href=\"downloadsubs.php?torrentid=".$a[torrent_id]."&subid=".$a[id]."\">". $a["title"]. "</a>".(get_user_class() >= $submanage_class || (get_user_class() >= $delownsub_class && $a["uppedby"] == $CURUSER["id"]) ? " <font class=\"small\"><a href=\"subtitles.php?delete=".$a[id]."\">[".$lang_details['text_delete']."]</a></font>" : ""). "<a href=\"report.php?subtitle=$a[id]\">[$lang_details[report]]</a>"."</td><td class=\"embedded\">&nbsp;&nbsp;".($a["anonymous"] == 'yes' ? $lang_details['text_anonymous'] . (get_user_class() >= $viewanonymous_class ? get_username($a['uppedby'],false,true,true,false,true) : "") : get_username($a['uppedby'])).'</dd>';
 	    print($lang);
 	}
 	print("</table>");
@@ -644,7 +645,7 @@ else {
       $buttonvalue = " value=\"".$lang_details['submit_you_said_thanks']."\" disabled=\"disabled\"";
       $thanksby = get_username($CURUSER['id'])." ".$thanksby;
     }
-    $thanksbutton = "<input class=\"btn\" type=\"button\" id=\"saythanks\"  onclick=\"saythanks(".$torrentid.");\" ".$buttonvalue." />";
+    $thanksbutton = "<input class=\"btn\" type=\"button\" id=\"saythanks\"".$buttonvalue." />";
     dl_item($lang_details['row_thanks_by'],"<span id=\"thanksadded\" style=\"display: none;\"><input class=\"btn\" type=\"button\" value=\"".$lang_details['text_thanks_added']."\" disabled=\"disabled\" /></span><span id=\"curuser\" style=\"display: none;\">".get_username($CURUSER['id'])." </span><span id=\"thanksbutton\">".$thanksbutton."</span>&nbsp;&nbsp;<span id=\"nothanks\">".$nothanks."</span><span id=\"addcuruser\"></span>".$thanksby.($thanks_all < $thanksCount ? $lang_details['text_and_more'].$thanksCount.$lang_details['text_users_in_total'] : ""),1);
     // ------------- end thanked-by block--------------//
 

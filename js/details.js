@@ -1,19 +1,19 @@
 $(function() {
     $('#kfilelist table').tablesorter();
     $('#saythanks:enabled').click(function() {
-	var torrentid = hb.torrent.id;
-	var list=$.post('thanks.php', { id : torrentid});
+	var torrentid = hb.torrent.id,
+	list=$.post('thanks.php', { id : torrentid});
 	document.getElementById("thanksbutton").innerHTML = document.getElementById("thanksadded").innerHTML;
 	document.getElementById("nothanks").innerHTML = "";
 	document.getElementById("addcuruser").innerHTML = document.getElementById("curuser").innerHTML;
     });
 
-    var showpeer = $('#showpeer');
-    var hidepeer = $('#hidepeer');
-    var peercount = $('#peercount');
-    var peerlist = $('#peerlist');
+    var showpeer = $('#showpeer'),
+    hidepeer = $('#hidepeer'),
+    peercount = $('#peercount'),
+    peerlist = $('#peerlist'),
 
-    var showpeerlist = function(href, scrollToTable) {
+    showpeerlist = function(href, scrollToTable) {
 	$.get(href, function(res) {
 	    peerlist.html(res);
 	    peerlist.slideDown();
@@ -54,14 +54,14 @@ $(function() {
 $(function() {
     $('#to_donate a').click(function(e) {
 	e.preventDefault();
-	var torrent_id = hb.torrent.id;
-	var bonus      = parseInt(hb.config.user.bonus);
-	var to_donate = parseInt($(this).html());
+	var torrent_id = hb.torrent.id,
+	bonus      = parseInt(hb.config.user.bonus),
+	to_donate = parseInt($(this).html());
 	if(bonus < to_donate) {
 	    alert('你的魔力值不足，谢谢你的好心，继续努力吧~');
 	} else if(confirm('确认向种子发布者捐赠 ' + to_donate +' 魔力值吗？')) {
-	    var url = 'donateBonus.php';
-	    var data = {amount: to_donate, torrent_id : torrent_id, type: 'torrent'};
+	    var url = 'donateBonus.php',
+	    data = {amount: to_donate, torrent_id : torrent_id, type: 'torrent'};
 	    $.post(url, data, function(data) {
 		if(data.status == 9) {
 		    var newDonate = '<div class="donate'+ data.amount +' donate" id="donated_successfully" title="' + data.message + '\n[' + data.amount + ' 魔力值] ' + data.date + '">' + data.donater + '</div>';
