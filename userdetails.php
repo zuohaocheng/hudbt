@@ -548,9 +548,14 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 	if ((get_user_class() >= $cruprfmanage_class && $user["class"] < get_user_class()) || $user['id'] == $CURUSER['id']) {
 	  begin_frame($lang_userdetails['text_delete_user'], true);
 	  print('<div class="table td text center">');
-	  print("<form id=\"del-user\" method=\"post\" action=\"delacctadmin.php\">
-			<input name=\"userid\" size=\"10\" type=\"hidden\" value=\"". $user["id"] ."\" />".
-		"<label><input id=\"delenable\" type=\"checkbox\" />". $lang_userdetails['text_delete_user'] ."</label><input name=\"submit\" type=\"submit\" value=\"".$lang_userdetails['submit_delete']."\" disabled=\"disabled\" /></form>");
+	  print("<form id=\"del-user\" method=\"post\" action=\"delacctadmin.php\"><input name=\"userid\" size=\"10\" type=\"hidden\" value=\"". $user["id"] ."\" />");
+	  if ($user['id'] == $CURUSER['id']) {
+	    echo '<label>用户密码<input type="password" name="password" /></label>';
+	  }
+	  else {
+	    echo "<label><input id=\"delenable\" type=\"checkbox\" />". $lang_userdetails['text_delete_user'] ."</label>";
+	  }
+	  echo "<input type=\"submit\" value=\"".$lang_userdetails['submit_delete']."\" /></form>";
 	  print('</div>');
 	  end_frame();
 	}

@@ -9,7 +9,6 @@ $(function() {
     $document = $(document),
     $window = $(window),
     ie = $.browser.msie,
-    ie8 = ie && $.browser.version < 9,
 
     History = !ie,
 
@@ -290,14 +289,14 @@ $(function() {
 	    var uri = cont + surfix,
 
 	    targetH = target.height();
-	    $document.scroll(function() {
+	    $window.on('scroll.autopage', function() {
 		var loc = $document.scrollTop() + $window.height();
 		if(loc > targetH && loader(true)) {
 		    args = argsFromUri(uri);
 		    $.getJSON(uri, {
 			counter: target.children().length
 		    }, get_func);
-		    $document.unbind('scroll');
+		    $window.off('scroll.autopage');
 		}
 	    });
 	}
@@ -311,7 +310,7 @@ $(function() {
 
     //Auto scroll
     if (hb.nextpage !== '' && !disableAutoPaging) {
-	$document.scroll(function(){
+	$window.on('scroll.autopage', function(){
 	    var loc = $document.scrollTop() + $(window).height();
 	    if(loc > targetH && loader(true)) {
 		var uri = hb.nextpage + surfix;
@@ -322,7 +321,7 @@ $(function() {
 		    $('#pagerbottom').remove();
 		    get_func.call(this, res);
 		});
-		$document.unbind('scroll');
+		$window.off('scroll.autopage');
     	    }
 	});
     }
@@ -349,7 +348,7 @@ $(function() {
 		    getFromUriWithHistory(uri);
 		});
 
-		$document.unbind('scroll');
+		$window.off('scroll.autopage');
 		get_func.call(this, result);
 	    }
 	    else {

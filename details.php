@@ -78,7 +78,7 @@ else {
 
     // ------------- start upped by block ------------------//
     if($row['anonymous'] == 'yes') {
-      if (get_user_class() < $viewanonymous_class)
+      if (get_user_class() < $viewanonymous_class && $row['owner'] != $CURUSER['id'])
 	$uprow = "<i>".$lang_details['text_anonymous']."</i>";
       else
 	$uprow = "<i>".$lang_details['text_anonymous']."</i> (" . get_username($row['owner'], false, true, true, false, false, true) . ")";

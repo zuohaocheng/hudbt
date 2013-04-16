@@ -305,7 +305,7 @@ $(function() {
 	$('body').css('overflow-y', 'scroll');
     }
     var ie6 = $.browser.msie && $.browser.version < 7,
-    lightbox = $('#lightbox');
+    lightbox = $('#lightbox'),
     curtain = $('#curtain');
 
     lightbox.click(function () {
@@ -538,7 +538,7 @@ var jqui_form = function(form, title, callback, buttons, width) {
 	var valid = true;
 	form.find('.required, input[required]').each(function() {
 	    var $this = $(this);
-	    if ($this.val().trim().length === 0) {
+	    if ($.trim($this.val()).length === 0) {
 		$this.addClass('invalid');
 		valid = false;
 	    }
@@ -653,7 +653,7 @@ var editTorrent = (function() {
 	    }, {
 		'打开完整编辑' : function() {
 		    location.href = '//' + hb.constant.url.base + '/edit.php?id=' + id;
-		},
+		}
 	    }, '500');
 	    editPr();
 	    editPos();

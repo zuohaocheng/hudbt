@@ -19,8 +19,8 @@ $lang_login = array
 	'text_auto_logout' => "自动登出：",
 	'text_restrict_ip' => "限制IP：",
 	'text_ssl' => "SSL (HTTPS)：",
-	'checkbox_auto_logout' => " 15分钟后自动登出",
-	'checkbox_restrict_ip' => " 限制只能使用本IP登录",
+	'checkbox_auto_logout' => " 关闭浏览器后自动登出",
+	'checkbox_restrict_ip' => " <span title=\"若IP变更，则需重新登陆\">限制只能使用本IP登录</span>",
 	'checkbox_ssl' => " 使用SSL数据加密协议浏览网站(浏览器)",
 	'hint_http_ssl' => '蝴蝶娘交不起保护费，所以浏览器菌们默认不信任蝴蝶娘..资助蝴蝶娘请猛击右上角的捐赠~蝴蝶娘谢谢大家啦~',
 	'checkbox_ssl_tracker' => " 使用SSL数据加密协议连接Tracker(BT客户端)",
@@ -33,4 +33,4 @@ $lang_login = array
 	'text_select_lang' => "Select Site Language: ",
 	'head_login' => "登录",
 );
-?>
+

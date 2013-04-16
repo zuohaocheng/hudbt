@@ -14,21 +14,17 @@ function getusertorrentlistajax(type, blockid) {
 }
 
 $(function() {
-    $('#delenable').click(function() {
-	var self = this,
-	submit = $('#del-user :submit')[0];
-	if (this.checked) {
-	    jqui_confirm('人死不能复生', hb.constant.pagelang.js_delete_user_note, function() {
-		submit.disabled = false;
-		return true;
-	    }, function() {
-		self.checked = false;
-	    });
-	}
-	else {
-	    submit.disabled = true;
-	}
-    });
+    $('#del-user').submit(function(e) {
+	e.preventDefault();
+	var self = this;
+	jqui_confirm('人死不能复生', hb.constant.pagelang.js_delete_user_note, function() {
+	    self.submit();
+	});
+    }).find(':password').on('input', function() {
+	$('#del-user :submit')[0].disabled = !this.value;
+    }).trigger('input').end().find(':checkbox').change(function() {
+	$('#del-user :submit')[0].disabled = !this.checked;
+    }).trigger('change');
 
     $('#send-bonus').click(function(e) {
 	e.preventDefault();

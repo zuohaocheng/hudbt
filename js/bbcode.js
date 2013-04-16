@@ -60,9 +60,9 @@ $(function() {
 		'class' : 'minor-list-vertical',
 		id : 'url-form'
 	    });
-	    $('#bbcode-toolbar').append(dialog);
+	    $(document.body).append(dialog);
 	    dialog.html('<ul><div id="validateTips"></div><li><label for="tag-url">' + lang.js_prompt_enter_url + '</label><input type="url" id="tag-url" class="text ui-widget-content ui-corner-all" /></li><li><label for="tag-url-title">' + lang.js_prompt_enter_title + '</label><input type="text" id="tag-url-title" class="text ui-widget-content ui-corner-all" /></li></ul>');
-	    var urlfield = $('#tag-url');
+	    var urlfield = $('#tag-url'),
 	    titlefield = $('#tag-url-title'),
 	    allFields = $( [] ).add( urlfield ).add( titlefield ),
 	    

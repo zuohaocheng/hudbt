@@ -86,7 +86,7 @@ if ($action == "edituser")
 	$updateset[] = "supportfor = " . sqlesc($supportfor);
 	$updateset[] = "supportlang = ".sqlesc($supportlang);
 	
-	if(get_user_class<=$cruprfmanage_class)
+	if(get_user_class()<=$cruprfmanage_class)
 	{
 		$modcomment = $arr["modcomment"];
 	}
@@ -103,7 +103,7 @@ if ($action == "edituser")
 		$ori_bonus = $_POST["ori_bonus"];
 		$invites = $_POST["invites"];
 		$added = sqlesc(date("Y-m-d H:i:s"));
-		if($keeper_role!=$curgroups['keeper']['role'] && $curgroups['keeper']['removed']==NULL||$curgroups['keeper']['removed']!=NULL){
+		if (($keeper_role!='none' && !isset($curgroups['keeper'])) || ($keeper_role != $curgroups['keeper']['role']) && isset($curgroups['keeper'])) {
 			switch($keeper_role){
 				case 'none':
 					$modcomment = date("Y-m-d") . " - Keeper role was removed by $CURUSER[username].\n". $modcomment;

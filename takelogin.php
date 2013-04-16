@@ -58,7 +58,7 @@ else
 	$trackerssl = false;
 }
 if (isset($_POST["logout"]) && $_POST["logout"] == "yes") {
-	logincookie($row["id"], $passh,1,900,$securelogin_indentity_cookie, $ssl, $trackerssl);
+	logincookie($row["id"], $passh,1,0,$securelogin_indentity_cookie, $ssl, $trackerssl);
 	//sessioncookie($row["id"], $passh,true);
 }
 else {
