@@ -26,9 +26,11 @@ function array_kronecker_product($arrays, $delimiter = '', $obj = ['' => []]) {
 function dependence($name) {
   $dependence = ['mybonus' => ['jscolor/jscolor'],
 		 'faqmanage' => ['jquery.jeditable']];
-  $dep = $dependence[$name];
-  if ($dep) {
-    return $dep;
+  if (isset($dependence[$name])) {
+    return $dependence[$name];
+  }
+  else {
+    return [];
   }
 }
 

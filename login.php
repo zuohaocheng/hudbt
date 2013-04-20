@@ -49,7 +49,11 @@ else {
 <?php
 echo '<div id="sns" class="minor-list text center"><ul>';
 foreach ($sns as $s) {
-  echo '<li><a href="' . $s['url'] . '">' . $s['text'] . '</a></li>';
+  echo '<li><a target="_blank" href="' . $s['url'] . '"';
+  if (isset($s['title'])) {
+    echo ' title="', $s['title'], '"';
+  }
+  echo '>' . $s['text'] . '</a></li>';
 }
 echo '</ul></div>';
 ?>

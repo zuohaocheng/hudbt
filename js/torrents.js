@@ -438,77 +438,41 @@ $(function() {
     var mainCheckClicked = false,
     dictChecks = [],
 
-    check = function(item) {
-	item.attr('checked', 'checked');
+    mainChecked = function() {
+	this.cats.prop('checked', this.main.checked);
     },
-    uncheck = function(item) {
-	item.removeAttr('checked');
-    },
-    mainChecked = function(mainCheck, catChecks) {
-	var setCheck;
-	if (mainCheck.attr('checked')) {
-	    setCheck = check;
+    mainCatClicked = function(self) {
+	if (!mainCheckClicked) {
+	    mainCheckClicked = true;
+	    $.each(dictChecks, mainChecked);
 	}
 	else {
-	    setCheck = uncheck;
-	}
-
-	$.each(catChecks, function(idx, item) {
-	    setCheck(item);
-	});
-    },
-    catClicked = function (isMain, mainCheck, catChecks) {
-	if (isMain) {
-	    if (!mainCheckClicked) {
-		mainCheckClicked = true;
-		$.each(dictChecks, function(idx, item) {
-		    var main = item.main,
-		    cats = item.cats;
-		    mainChecked(main, cats);
-		});
-	    }
-	    else {
-		mainChecked(mainCheck, catChecks);
-	    }
-	}
-	else {
-	    mainCheckClicked = false;
-
-	    var alltrue = true;
-	    $.each(catChecks, function(idx, item) {
-		alltrue = item.attr('checked') && alltrue;
-	    });
-	    
-	    if (alltrue) {
-		check(mainCheck);
-	    }
-	    else {
-		uncheck(mainCheck);
-	    }
+	    mainChecked.call(self);
 	}
     },
+    catClicked = function (self) {
+	mainCheckClicked = false;
+	self.main.checked = (self.cats.filter(':not(:checked)').length === 0);
+    };
 
-    allCatChecks = $.map(hb.constant.maincats, function(item, idx) {
+    $.each(hb.constant.maincats, function(idx) {
 	var mainCheck = $('#cat' + idx),
-	catChecks = $.map(item, function(cat) {
-	    return $('#cat' + cat);
-	});
+	catChecks = $($.map(this, function(cat) {
+	    return '#cat' + cat;
+	}).join(', ')),
+
+	i = dictChecks.push({
+	    main : mainCheck[0],
+	    cats : catChecks
+	}) - 1;
 
 	mainCheck.click(function() {
-	    catClicked(true, mainCheck, catChecks);
+	    mainCatClicked(dictChecks[i]);
 	});
 
-	$.each(catChecks, function(idx, item) {
-	    item.click(function() {
-		catClicked(false, mainCheck, catChecks);
-	    });
+	catChecks.click(function() {
+	    catClicked(dictChecks[i]);
 	});
-
-	dictChecks.push({
-	    main :mainCheck,
-	    cats : catChecks
-	});
-	return catChecks;
     });
 
     //Use exact in imdb & username

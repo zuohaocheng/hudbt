@@ -133,7 +133,7 @@ else {
     if ($CURUSER["downloadpos"] != "no") {
       $actions .= "<li><a title=\"".$lang_details['title_download_torrent']."\" href=\"download.php?id=".$id."\"><img class=\"dt_download\" src=\"pic/trans.gif\" alt=\"download\" />&nbsp;<span class=\"small\">".$lang_details['text_download_torrent']."</span></a></li>";
     }
-    if (checkPrivilege(['Torrent', 'edit']) || $CURUSER["id"] == $row["owner"]||permissionAuth("edittorrent",$CURUSER['usergroups'],$CURUSER['class'])) {
+    if (checkPrivilege(['Torrent', 'edit']) || $CURUSER["id"] == $row["owner"]) {
       $actions .= "<li><$editlink><img class=\"dt_edit\" src=\"pic/trans.gif\" alt=\"edit\" />&nbsp;<span class=\"small\">".$lang_details['text_edit_torrent'] . "</span></a></li>";
     }
     if (checkPrivilege(['Torrent', 'delete'], $id)) {
@@ -219,7 +219,7 @@ else {
       dl_item("<a href=\"javascript: klappe_news('descr')\"><span class=\"nowrap\"><img class=\"minus\" src=\"pic/trans.gif\" alt=\"Show/Hide\" id=\"picdescr\" title=\"".$lang_detail['title_show_or_hide']."\" /> ".$lang_details['row_description']."</span></a>", "<div id='kdescr'>".format_comment($row["descr"])."</div>", 1);
     }
 
-    if (get_user_class() >= $viewnfo_class && $CURUSER['shownfo'] != 'no' && $row["nfosz"] > 0){
+    if (get_user_class() >= $viewnfo_class && $row["nfosz"] > 0){
       $nfo = $Cache->get_value('nfo_block_torrent_id_'.$id);
       if (!$nfo) {
 	$nfo = code($row["nfo"], $view == "magic");

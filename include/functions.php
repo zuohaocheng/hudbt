@@ -75,7 +75,9 @@ $privilegeConfig = ['Maintenance'=>['staticResources' => UC_MODERATOR],
 				       'amountbonus' => UC_ADMINISTRATOR,
 				       'clearcache' => UC_MODERATOR,
 				       'hustip' => UC_MODERATOR,
-				       'ssh' => UC_SYSOP,]
+				       'ssh' => UC_SYSOP,
+				       'staffPanel' => UC_UPLOADER,
+				       'settings' => UC_SYSOP,]
 		    ];
 
 function smarty($cachetime=300, $debug = false) {
@@ -279,6 +281,7 @@ function checkSubPrivilege($obj, $opts) {
   }
 };
 
+// deprecated
 $permissionConfig = [
 "keeper" => [
 	"boss" =>["setstoring","edittorrent","viewkeepers"],
@@ -292,6 +295,7 @@ $permissionConfig = [
 	]
 ];
 
+// deprecated
 function permissionAuth($needle,$usergroups,$userclass){
 	global $permissionConfig;
 	
@@ -3161,7 +3165,7 @@ function torrenttable($rows, $var) {
   }
   if ($header) {
 ?>
-<table id="torrents" class="torrents" cellspacing="0" cellpadding="5" width="100%" <?php echo ($onlyhead ? 'style="display:none;"':'') ?>>
+<table id="torrents" class="torrents no-vertical-line" cellspacing="0" cellpadding="5" width="100%" <?php echo ($onlyhead ? 'style="display:none;"':'') ?>>
 <thead><tr>
 <?php
 $count_get = 0;
@@ -3522,10 +3526,18 @@ foreach($rows as $row)
         print("<td class=\"rowfollow\">" . (isset($row["owner"]) ? get_username($row["owner"]) : "<i>".$lang_functions['text_orphaned']."</i>") . "</td>\n");
       }
 
-    if (get_user_class() >= $torrentmanage_class)
-    {
+    if (get_user_class() >= $torrentmanage_class) {
+      if (isset($_REQUEST['format'])) {
+	$returnto = $_REQUEST;
+	unset($returnto['format']);
+	unset($returnto['counter']);
+	$returnto = $_SERVER['SCRIPT_NAME'] . '?' . http_build_query($returnto);
+      }
+      else {
+	$returnto = $_SERVER["REQUEST_URI"];
+      }
       print('<td class="rowfollow"><div class="minor-list-vertical"><ul><li><a class="staff-quick-delete" href="'.htmlspecialchars('//' . $BASEURL . '/edit.php?id='.$row['id']).'#delete"><img class="staff_delete" src="//' . $BASEURL . '/pic/trans.gif" alt="D" title="'.$lang_functions['text_delete'].'" /></a></li>');
-      print("<li><a class=\"staff-quick-edit\" href=\"//$BASEURL/edit.php?returnto=" . rawurlencode($_SERVER["REQUEST_URI"]) . "&amp;id=" . $row["id"] . "\"><img class=\"staff_edit\" src=\"//$BASEURL/pic/trans.gif\" alt=\"E\" title=\"".$lang_functions['text_edit']."\" /></a></li></ul></div></td>\n");
+      print("<li><a class=\"staff-quick-edit\" href=\"//$BASEURL/edit.php?returnto=" . rawurlencode($returnto) . "&amp;id=" . $row["id"] . "\"><img class=\"staff_edit\" src=\"//$BASEURL/pic/trans.gif\" alt=\"E\" title=\"".$lang_functions['text_edit']."\" /></a></li></ul></div></td>\n");
     }
     print("</tr>\n");
     $counter++;

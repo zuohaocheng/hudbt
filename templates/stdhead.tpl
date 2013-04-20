@@ -45,7 +45,21 @@
       {menu()}
       {/nocache}
       <div id="header-info" class="table td">
-	<div id="header-icons" class="medium">{$lang['text_the_time_is_now']}{$smarty.now|date_format:"%H:%M"}
+	<div id="header-icons" class="medium">
+	<div class="minor-list list-seperator compact">
+	    <ul>
+	      {if checkPrivilege(['ManagePanels', 'staffPanel']) }
+	      <li><a href="//{$BASEURL}/staffpanel.php">{$lang['text_staff_panel']}</a></li>
+	      {/if} 
+	      {if checkPrivilege(['ManagePanels', 'settings'])}
+	      <li><a href="//{$BASEURL}/settings.php">{$lang['text_site_settings']}</a></li>
+	      {/if}
+	      <li><a href="//{$BASEURL}/torrents.php?inclbookmarked=1">{$lang['text_bookmarks']}</a></li>
+	      <li><a href="//{$BASEURL}/usercp.php?id={$id}" title="{$lang['text_user_cp']}">{$lang['text_user_cp']}</a></li>	   
+	      <li><a href="//{$BASEURL}/users.php" title="{$lang['text_users']}">{$lang['text_users']}</a></li>
+	      	<li><a href="//{$BASEURL}/friends.php">{$lang['title_buddylist']}</a></li>
+	    </ul>
+	  </div>
 	  <div class="minor-list horizon-compact"><ul>
 	{if get_user_class() >= $staffmem_class}
 	<li><a href="//{$BASEURL}/cheaterbox.php" title="{$lang['title_cheaterbox']}"><img class="cheaterbox" alt="cheaterbox"src="//{$BASEURL}/pic/trans.gif" /> {$totalcheaters}</a></li>
@@ -60,30 +74,16 @@
 	</a></li>
 
 	<li><a href="//{$BASEURL}/messages.php?action=viewmailbox&amp;box=-1"><img class="sentbox" alt="sentbox" title="{$lang['title_sentbox']}" src="//{$BASEURL}/pic/trans.gif" /> {if $outmessages}{$outmessages}{else}0{/if}</a></li>
-	<li><a href="//{$BASEURL}/friends.php"><img class="buddylist" alt="Buddylist" title="{$lang['title_buddylist']}" src="//{$BASEURL}/pic/trans.gif" /></a></li>
-	<li><a href="//{$BASEURL}/getrss.php"><img class="rss" alt="RSS" title="{$lang['title_get_rss']}" src="//{$BASEURL}/pic/trans.gif" /></a></li>
 	 </ul></div>
 	</div>
 
 	<div id="header-userinfo">
-	  <div class="minor-list list-seperator compact">
+	  <div class="minor-list compact list-seperator">
 	    <ul>
 	      <li>{$lang['text_welcome_back']}, {get_username($id)}</li>
 	      <li><form action="//{$BASEURL}/logout.php" method="post"><input type="submit" class="a" value="{$lang['text_logout']}" /></form></li>
-	      {if permissionAuth('viewstaffpanel',$CURUSER['usergroups'],$CURUSER['class'])}
-	      <li><a href="//{$BASEURL}/staffpanel.php">{$lang['text_staff_panel']}</a></li>
-	      {/if} 
-	      {if permissionAuth('viewsetting',$CURUSER['usergroups'],$CURUSER['class'])}
-	      <li><a href="//{$BASEURL}/settings.php">{$lang['text_site_settings']}</a></li>
-	      {/if}
-	      <li><a href="//{$BASEURL}/torrents.php?inclbookmarked=1&amp;allsec=1&amp;incldead=0">{$lang['text_bookmarks']}</a></li>
 	      <li><a href="//{$BASEURL}/mybonus.php" title="{$lang['text_use']}"><span class = 'color_bonus'>{$lang['text_bonus']}</span>: <span id="bonus">{number_format($CURUSER['seedbonus'], 1)}</span></a></li>
 	      <li><a href="//{$BASEURL}/invite.php?id={$id}" title="{$lang['text_send']}"><span class = "color_invite">{$lang['text_invite']}</span>: <span id="invites">{$CURUSER['invites']}</span></a></li>
-	      {if permissionAuth('viewkeepers',$CURUSER['usergroups'],$CURUSER['class'])}
-	      <li><a href="//{$BASEURL}/keepers.php" title="{$lang['text_user_cp']}">{$lang['text_keepers']}</a></li>
-	      {/if}
-	      <li><a href="//{$BASEURL}/usercp.php?id={$id}" title="{$lang['text_user_cp']}">{$lang['text_user_cp']}</a></li>	   
-	      <li><a href="//{$BASEURL}/users.php" title="{$lang['text_users']}">{$lang['text_users']}</a></li>	    	       
 	    </ul>
 	  </div>
 

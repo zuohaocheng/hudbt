@@ -363,7 +363,7 @@ if ($showsubcat){
 $mainCats = array('1' => array('401', '413', '414', '415', '430'),
 		  '2' => array('402', '416', '417', '418'),
 		  '3' => array('405', '427', '428', '429'),
-		  '4' => array('410'),
+		  '4' => array('410', '431'),
 		  '5' => array('403', '419', '420', '421'),
 		  '6' => array('412', '409'),
 		  '7' => array('407'),
@@ -1129,16 +1129,18 @@ else {
 
 $swap_headings = !!$_GET["swaph"];
 
-$progress = [];
-$ids = array_map(function($r) {
-    return $r['id'];
-  }, $rows);
-if (!empty($ids)) {
-  $sql = 'SELECT torrentid, snatched.to_go, finished, peers.id AS peer_id FROM snatched LEFT JOIN peers ON peers.torrent = snatched.torrentid AND peers.userid = snatched.userid WHERE torrentid IN (' . implode(',', $ids) . ') AND snatched.userid=' . $CURUSER['id'];
-  $res = sql_query($sql) or sqlerr(__FILE__, __LINE__);
+if (isset($rows)) {
+  $progress = [];
+  $ids = array_map(function($r) {
+      return $r['id'];
+    }, $rows);
+  if (!empty($ids)) {
+    $sql = 'SELECT torrentid, snatched.to_go, finished, peers.id AS peer_id FROM snatched LEFT JOIN peers ON peers.torrent = snatched.torrentid AND peers.userid = snatched.userid WHERE torrentid IN (' . implode(',', $ids) . ') AND snatched.userid=' . $CURUSER['id'];
+    $res = sql_query($sql) or sqlerr(__FILE__, __LINE__);
 
-  while ($row = mysql_fetch_assoc($res)) {
-    $progress[$row['torrentid']] = $row;
+    while ($row = mysql_fetch_assoc($res)) {
+      $progress[$row['torrentid']] = $row;
+    }
   }
 }
 

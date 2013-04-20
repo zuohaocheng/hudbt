@@ -136,3 +136,5 @@ td.torrent {
 .progress.downloaded {background-color: lightyellow}
 .progress.uploaded.seeding {background-color: sandybrown}
 .progress.uploaded {background-color: #FAD7B7}
+
+img.game_video{background: url(game_video.png) no-repeat top left; width: 46px; height: 46px; } 
