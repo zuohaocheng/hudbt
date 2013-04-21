@@ -1,13 +1,13 @@
-*.sql
+/config/allconfig.php
 /cache
 /attachments
 /bitbucket
-/config/allconfig.php
 /templates_c
 /torrents
 /subs
 /imdb/images
 /imdb/cache
+/log
 /test-*.php
 /test.php
 *.orig
@@ -15,6 +15,7 @@
 /include/loadRevision.php
 .DS_Store
 ._*
+*.sql
 *.bak
 ssh
 ssh.log
