@@ -4,14 +4,15 @@
  *
  * PHP 5
  *
- * CakePHP(tm) Tests <http://book.cakephp.org/view/1196/Testing>
- * Copyright 2005-2011, Cake Software Foundation, Inc. (http://cakefoundation.org)
+ * CakePHP(tm) Tests <http://book.cakephp.org/2.0/en/development/testing.html>
+ * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
  * Licensed under The MIT License
+ * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice
  *
- * @copyright     Copyright 2005-2011, Cake Software Foundation, Inc. (http://cakefoundation.org)
- * @link          http://book.cakephp.org/view/1196/Testing CakePHP(tm) Tests
+ * @copyright     Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
+ * @link          http://book.cakephp.org/2.0/en/development/testing.html CakePHP(tm) Tests
  * @package       Cake.Test.Case.Cache.Engine
  * @since         CakePHP(tm) v 1.2.0.5434
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -53,6 +54,9 @@ class FileEngineTest extends CakeTestCase {
 		parent::tearDown();
 		Cache::clear(false, 'file_test');
 		Cache::drop('file_test');
+		Cache::drop('file_groups');
+		Cache::drop('file_groups2');
+		Cache::drop('file_groups3');
 	}
 
 /**
@@ -62,11 +66,11 @@ class FileEngineTest extends CakeTestCase {
  */
 	public function testCacheDirChange() {
 		$result = Cache::config('sessions', array('engine' => 'File', 'path' => TMP . 'sessions'));
-		$this->assertEquals($result['settings'], Cache::settings('sessions'));
+		$this->assertEquals(Cache::settings('sessions'), $result['settings']);
 
 		$result = Cache::config('sessions', array('engine' => 'File', 'path' => TMP . 'tests'));
-		$this->assertEquals($result['settings'], Cache::settings('sessions'));
-		$this->assertNotEquals($result['settings'], Cache::settings('default'));
+		$this->assertEquals(Cache::settings('sessions'), $result['settings']);
+		$this->assertNotEquals(Cache::settings('default'), $result['settings']);
 	}
 
 /**
@@ -84,7 +88,7 @@ class FileEngineTest extends CakeTestCase {
 
 		$result = Cache::read('test', 'file_test');
 		$expecting = '';
-		$this->assertEquals($result, $expecting);
+		$this->assertEquals($expecting, $result);
 
 		$data = 'this is a test of the emergency broadcasting system';
 		$result = Cache::write('test', $data, 'file_test');
@@ -92,14 +96,14 @@ class FileEngineTest extends CakeTestCase {
 
 		$result = Cache::read('test', 'file_test');
 		$expecting = $data;
-		$this->assertEquals($result, $expecting);
+		$this->assertEquals($expecting, $result);
 
 		Cache::delete('test', 'file_test');
 	}
 
 /**
  * Test read/write on the same cache key. Ensures file handles are re-wound.
- * 
+ *
  * @return void
  */
 	public function testConsecutiveReadWrite() {
@@ -107,11 +111,11 @@ class FileEngineTest extends CakeTestCase {
 		$result = Cache::read('rw', 'file_test');
 
 		Cache::write('rw', 'second write', 'file_test');
-		$result2 = Cache::read('rw', 'file_test');
+		$resultB = Cache::read('rw', 'file_test');
 
 		Cache::delete('rw', 'file_test');
 		$this->assertEquals('first write', $result);
-		$this->assertEquals('second write', $result2);
+		$this->assertEquals('second write', $resultB);
 	}
 
 /**
@@ -133,7 +137,7 @@ class FileEngineTest extends CakeTestCase {
 		$result = Cache::read('other_test', 'file_test');
 		$this->assertFalse($result);
 
-		Cache::set(array('duration' =>  "+1 second"), 'file_test');
+		Cache::set(array('duration' => "+1 second"), 'file_test');
 
 		$data = 'this is a test of the emergency broadcasting system';
 		$result = Cache::write('other_test', $data, 'file_test');
@@ -178,7 +182,7 @@ class FileEngineTest extends CakeTestCase {
 
 		$newread = Cache::read('serialize_test', 'file_test');
 
-		$delete = Cache::delete('serialize_test', 'file_test');
+		Cache::delete('serialize_test', 'file_test');
 
 		$this->assertSame($read, serialize($data));
 
@@ -239,15 +243,15 @@ class FileEngineTest extends CakeTestCase {
 			'duration' => DAY
 		));
 
-		$data1 = $data2 = $expected = 'content to cache';
-		$FileOne->write('prefix_one_key_one', $data1, DAY);
-		$FileTwo->write('prefix_two_key_two', $data2, DAY);
+		$dataOne = $dataTwo = $expected = 'content to cache';
+		$FileOne->write('prefix_one_key_one', $dataOne, DAY);
+		$FileTwo->write('prefix_two_key_two', $dataTwo, DAY);
 
-		$this->assertEquals($FileOne->read('prefix_one_key_one'), $expected);
-		$this->assertEquals($FileTwo->read('prefix_two_key_two'), $expected);
+		$this->assertEquals($expected, $FileOne->read('prefix_one_key_one'));
+		$this->assertEquals($expected, $FileTwo->read('prefix_two_key_two'));
 
 		$FileOne->clear(false);
-		$this->assertEquals($FileTwo->read('prefix_two_key_two'), $expected, 'secondary config was cleared by accident.');
+		$this->assertEquals($expected, $FileTwo->read('prefix_two_key_two'), 'secondary config was cleared by accident.');
 		$FileTwo->clear(false);
 	}
 
@@ -262,7 +266,7 @@ class FileEngineTest extends CakeTestCase {
 		$this->assertTrue(file_exists(CACHE . 'cake_views_countries_something'));
 
 		$result = Cache::read('views.countries.something', 'file_test');
-		$this->assertEquals($result, 'here');
+		$this->assertEquals('here', $result);
 
 		$result = Cache::clear(false, 'file_test');
 		$this->assertTrue($result);
@@ -362,7 +366,7 @@ class FileEngineTest extends CakeTestCase {
 		Cache::config('mask_test', array('engine' => 'File', 'path' => TMP . 'tests'));
 		$data = 'This is some test content';
 		$write = Cache::write('masking_test', $data, 'mask_test');
-		$result = substr(sprintf('%o',fileperms(TMP . 'tests' . DS .'cake_masking_test')), -4);
+		$result = substr(sprintf('%o',fileperms(TMP . 'tests' . DS . 'cake_masking_test')), -4);
 		$expected = '0664';
 		$this->assertEquals($expected, $result);
 		Cache::delete('masking_test', 'mask_test');
@@ -370,7 +374,7 @@ class FileEngineTest extends CakeTestCase {
 
 		Cache::config('mask_test', array('engine' => 'File', 'mask' => 0666, 'path' => TMP . 'tests'));
 		$write = Cache::write('masking_test', $data, 'mask_test');
-		$result = substr(sprintf('%o',fileperms(TMP . 'tests' . DS .'cake_masking_test')), -4);
+		$result = substr(sprintf('%o',fileperms(TMP . 'tests' . DS . 'cake_masking_test')), -4);
 		$expected = '0666';
 		$this->assertEquals($expected, $result);
 		Cache::delete('masking_test', 'mask_test');
@@ -378,7 +382,7 @@ class FileEngineTest extends CakeTestCase {
 
 		Cache::config('mask_test', array('engine' => 'File', 'mask' => 0644, 'path' => TMP . 'tests'));
 		$write = Cache::write('masking_test', $data, 'mask_test');
-		$result = substr(sprintf('%o',fileperms(TMP . 'tests' . DS .'cake_masking_test')), -4);
+		$result = substr(sprintf('%o',fileperms(TMP . 'tests' . DS . 'cake_masking_test')), -4);
 		$expected = '0644';
 		$this->assertEquals($expected, $result);
 		Cache::delete('masking_test', 'mask_test');
@@ -386,10 +390,67 @@ class FileEngineTest extends CakeTestCase {
 
 		Cache::config('mask_test', array('engine' => 'File', 'mask' => 0640, 'path' => TMP . 'tests'));
 		$write = Cache::write('masking_test', $data, 'mask_test');
-		$result = substr(sprintf('%o',fileperms(TMP . 'tests' . DS .'cake_masking_test')), -4);
+		$result = substr(sprintf('%o',fileperms(TMP . 'tests' . DS . 'cake_masking_test')), -4);
 		$expected = '0640';
 		$this->assertEquals($expected, $result);
 		Cache::delete('masking_test', 'mask_test');
 		Cache::drop('mask_test');
+	}
+
+/**
+ * Tests that configuring groups for stored keys return the correct values when read/written
+ *
+ * @return void
+ */
+	public function testGroupsReadWrite() {
+		Cache::config('file_groups', array('engine' => 'File', 'duration' => 3600, 'groups' => array('group_a', 'group_b')));
+		$this->assertTrue(Cache::write('test_groups', 'value', 'file_groups'));
+		$this->assertEquals('value', Cache::read('test_groups', 'file_groups'));
+
+		$this->assertTrue(Cache::write('test_groups2', 'value2', 'file_groups'));
+		$this->assertTrue(Cache::write('test_groups3', 'value3', 'file_groups'));
+	}
+
+/**
+ * Tests that deleting from a groups-enabled config is possible
+ *
+ * @return void
+ */
+	public function testGroupDelete() {
+		Cache::config('file_groups', array('engine' => 'File', 'duration' => 3600, 'groups' => array('group_a', 'group_b')));
+		$this->assertTrue(Cache::write('test_groups', 'value', 'file_groups'));
+		$this->assertEquals('value', Cache::read('test_groups', 'file_groups'));
+		$this->assertTrue(Cache::delete('test_groups', 'file_groups'));
+
+		$this->assertFalse(Cache::read('test_groups', 'file_groups'));
+	}
+
+/**
+ * Test clearing a cache group
+ *
+ * @return void
+ */
+	public function testGroupClear() {
+		Cache::config('file_groups', array('engine' => 'File', 'duration' => 3600, 'groups' => array('group_a', 'group_b')));
+		Cache::config('file_groups2', array('engine' => 'File', 'duration' => 3600, 'groups' => array('group_b')));
+		Cache::config('file_groups3', array('engine' => 'File', 'duration' => 3600, 'groups' => array('group_a')));
+
+		$this->assertTrue(Cache::write('test_groups', 'value', 'file_groups'));
+		$this->assertTrue(Cache::write('test_groups2', 'value', 'file_groups2'));
+		$this->assertTrue(Cache::write('test_groups3', 'value', 'file_groups3'));
+
+		$this->assertTrue(Cache::clearGroup('group_a', 'file_groups'));
+		$this->assertFalse(Cache::read('test_groups', 'file_groups'));
+		$this->assertEquals('value', Cache::read('test_groups2', 'file_groups2'));
+		$this->assertFalse(Cache::read('test_groups3', 'file_groups3'));
+
+		$this->assertTrue(Cache::write('test_groups4', 'value', 'file_groups'));
+		$this->assertTrue(Cache::write('test_groups5', 'value', 'file_groups2'));
+		$this->assertTrue(Cache::write('test_groups6', 'value', 'file_groups3'));
+
+		$this->assertTrue(Cache::clearGroup('group_b', 'file_groups'));
+		$this->assertFalse(Cache::read('test_groups4', 'file_groups'));
+		$this->assertFalse(Cache::read('test_groups5', 'file_groups2'));
+		$this->assertEquals('value', Cache::read('test_groups6', 'file_groups3'));
 	}
 }

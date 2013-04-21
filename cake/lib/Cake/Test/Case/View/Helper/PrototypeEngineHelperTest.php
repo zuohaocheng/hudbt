@@ -5,12 +5,13 @@
  * PHP 5
  *
  * CakePHP(tm) : Rapid Development Framework (http://cakephp.org)
- * Copyright 2005-2011, Cake Software Foundation, Inc. (http://cakefoundation.org)
+ * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
  * Licensed under The MIT License
+ * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright       Copyright 2005-2011, Cake Software Foundation, Inc.
+ * @copyright       Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
  * @link            http://cakephp.org CakePHP Project
  * @package       Cake.Test.Case.View.Helper
  * @license         MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -22,6 +23,7 @@ App::uses('JsHelper', 'View/Helper');
 App::uses('PrototypeEngineHelper', 'View/Helper');
 
 class PrototypeEngineHelperTest extends CakeTestCase {
+
 /**
  * setUp
  *
@@ -51,27 +53,27 @@ class PrototypeEngineHelperTest extends CakeTestCase {
  */
 	public function testSelector() {
 		$result = $this->Proto->get('#content');
-		$this->assertEquals($result, $this->Proto);
+		$this->assertEquals($this->Proto, $result);
 		$this->assertEquals($this->Proto->selection, '$("content")');
 
 		$result = $this->Proto->get('a .remove');
-		$this->assertEquals($result, $this->Proto);
+		$this->assertEquals($this->Proto, $result);
 		$this->assertEquals($this->Proto->selection, '$$("a .remove")');
 
 		$result = $this->Proto->get('document');
-		$this->assertEquals($result, $this->Proto);
+		$this->assertEquals($this->Proto, $result);
 		$this->assertEquals($this->Proto->selection, "$(document)");
 
 		$result = $this->Proto->get('window');
-		$this->assertEquals($result, $this->Proto);
+		$this->assertEquals($this->Proto, $result);
 		$this->assertEquals($this->Proto->selection, "$(window)");
 
 		$result = $this->Proto->get('ul');
-		$this->assertEquals($result, $this->Proto);
+		$this->assertEquals($this->Proto, $result);
 		$this->assertEquals($this->Proto->selection, '$$("ul")');
 
 		$result = $this->Proto->get('#some_long-id.class');
-		$this->assertEquals($result, $this->Proto);
+		$this->assertEquals($this->Proto, $result);
 		$this->assertEquals($this->Proto->selection, '$$("#some_long-id.class")');
 	}
 
@@ -282,8 +284,8 @@ class PrototypeEngineHelperTest extends CakeTestCase {
 	}
 
 /**
- * test drag() method.  Scriptaculous lacks the ability to take an Array of Elements
- * in new Drag() when selection is a multiple type.  Iterate over the array.
+ * test drag() method. Scriptaculous lacks the ability to take an Array of Elements
+ * in new Drag() when selection is a multiple type. Iterate over the array.
  *
  * @return void
  */

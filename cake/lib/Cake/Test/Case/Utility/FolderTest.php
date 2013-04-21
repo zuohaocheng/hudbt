@@ -4,14 +4,15 @@
  *
  * PHP 5
  *
- * CakePHP(tm) Tests <http://book.cakephp.org/view/1196/Testing>
- * Copyright 2005-2011, Cake Software Foundation, Inc. (http://cakefoundation.org)
+ * CakePHP(tm) Tests <http://book.cakephp.org/2.0/en/development/testing.html>
+ * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
  * Licensed under The MIT License
+ * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice
  *
- * @copyright     Copyright 2005-2011, Cake Software Foundation, Inc. (http://cakefoundation.org)
- * @link          http://book.cakephp.org/view/1196/Testing CakePHP(tm) Tests
+ * @copyright     Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
+ * @link          http://book.cakephp.org/2.0/en/development/testing.html CakePHP(tm) Tests
  * @package       Cake.Test.Case.Utility
  * @since         CakePHP(tm) v 1.2.0.4206
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -29,11 +30,16 @@ class FolderTest extends CakeTestCase {
 	protected static $_tmp = array();
 
 /**
- * Save the directory names in TMP
+ * Save the directory names in TMP and make sure default directories exist
  *
  * @return void
  */
 	public static function setUpBeforeClass() {
+		$dirs = array('cache', 'logs', 'sessions', 'tests');
+		foreach ($dirs as $dir) {
+			new Folder(TMP . $dir, true);
+		}
+
 		foreach (scandir(TMP) as $file) {
 			if (is_dir(TMP . $file) && !in_array($file, array('.', '..'))) {
 				self::$_tmp[] = $file;
@@ -83,7 +89,7 @@ class FolderTest extends CakeTestCase {
 		$Folder = new Folder($path);
 
 		$result = $Folder->pwd();
-		$this->assertEquals($result, $path);
+		$this->assertEquals($path, $result);
 
 		$result = Folder::addPathElement($path, 'test');
 		$expected = $path . DS . 'test';
@@ -109,19 +115,22 @@ class FolderTest extends CakeTestCase {
 		$Folder = new Folder($path);
 
 		$result = $Folder->pwd();
-		$this->assertEquals($result, $path);
+		$this->assertEquals($path, $result);
 
 		$result = Folder::isSlashTerm($inside);
 		$this->assertTrue($result);
 
 		$result = $Folder->realpath('Test/');
-		$this->assertEquals($result, $path . DS .'Test' . DS);
+		$this->assertEquals($path . DS . 'Test' . DS, $result);
 
 		$result = $Folder->inPath('Test' . DS);
 		$this->assertTrue($result);
 
 		$result = $Folder->inPath(DS . 'non-existing' . $inside);
 		$this->assertFalse($result);
+
+		$result = $Folder->inPath($path . DS . 'Model', true);
+		$this->assertTrue($result);
 	}
 
 /**
@@ -239,7 +248,7 @@ class FolderTest extends CakeTestCase {
 
 		$expected = $new . ' is a file';
 		$result = $Folder->errors();
-		$this->assertEquals($result[0], $expected);
+		$this->assertEquals($expected, $result[0]);
 
 		$new = TMP . 'test_folder_new';
 		$result = $Folder->create($new);
@@ -264,7 +273,7 @@ class FolderTest extends CakeTestCase {
 	public function testChmod() {
 		$this->skipIf(DIRECTORY_SEPARATOR === '\\', 'Folder permissions tests not supported on Windows.');
 
-		$path = CAKE . 'Console' . DS . 'Templates' . DS . 'skel';
+		$path = TMP;
 		$Folder = new Folder($path);
 
 		$subdir = 'test_folder_new';
@@ -283,19 +292,16 @@ class FolderTest extends CakeTestCase {
 		$this->assertTrue($File->create());
 
 		$this->assertTrue($Folder->chmod($new, 0755, true));
-		$this->assertTrue($Folder->chmod($new, 0777, true, array('skip_me.php', 'test2')));
+		$perms = substr(sprintf('%o', fileperms($new . DS . 'test2')), -4);
+		$this->assertEquals('0755', $perms);
 
-		$perms = substr(sprintf('%o', fileperms($new . DS . 'test1')), -4);
-		$this->assertEquals($perms, '0777');
+		$this->assertTrue($Folder->chmod($new, 0744, true, array('skip_me.php', 'test2')));
 
 		$perms = substr(sprintf('%o', fileperms($new . DS . 'test2')), -4);
-		$this->assertEquals($perms, '0755');
+		$this->assertEquals('0755', $perms);
 
-		$perms = substr(sprintf('%o', fileperms($new . DS . 'test1.php')), -4);
-		$this->assertEquals($perms, '0777');
-
-		$perms = substr(sprintf('%o', fileperms($new . DS . 'skip_me.php')), -4);
-		$this->assertEquals($perms, '0755');
+		$perms = substr(sprintf('%o', fileperms($new . DS . 'test1')), -4);
+		$this->assertEquals('0744', $perms);
 
 		$Folder->delete($new);
 	}
@@ -339,10 +345,10 @@ class FolderTest extends CakeTestCase {
  */
 	public function testAddPathElement() {
 		$result = Folder::addPathElement(DS . 'some' . DS . 'dir', 'another_path');
-		$this->assertEquals($result, DS . 'some' . DS . 'dir' . DS . 'another_path');
+		$this->assertEquals(DS . 'some' . DS . 'dir' . DS . 'another_path', $result);
 
 		$result = Folder::addPathElement(DS . 'some' . DS . 'dir' . DS, 'another_path');
-		$this->assertEquals($result, DS . 'some' . DS . 'dir' . DS . 'another_path');
+		$this->assertEquals(DS . 'some' . DS . 'dir' . DS . 'another_path', $result);
 	}
 
 /**
@@ -355,7 +361,7 @@ class FolderTest extends CakeTestCase {
 
 		$expected = array('cache', 'logs', 'sessions', 'tests');
 		$result = $Folder->read(true, true);
-		$this->assertEquals($result[0], $expected);
+		$this->assertEquals($expected, $result[0]);
 
 		$Folder->path = TMP . 'non-existent';
 		$expected = array(array(), array());
@@ -369,7 +375,7 @@ class FolderTest extends CakeTestCase {
  * @return void
  */
 	public function testFolderReadWithHiddenFiles() {
-		$this->skipIf(!is_writeable(TMP), 'Cant test Folder::read with hidden files unless the tmp folder is writable.');
+		$this->skipIf(!is_writable(TMP), 'Cant test Folder::read with hidden files unless the tmp folder is writable.');
 
 		$Folder = new Folder(TMP . 'folder_tree_hidden', true, 0777);
 		mkdir($Folder->path . DS . '.svn');
@@ -409,41 +415,41 @@ class FolderTest extends CakeTestCase {
 			array(
 				CAKE . 'Config',
 				CAKE . 'Config' . DS . 'unicode',
-				CAKE . 'Config' . DS . 'unicode' .  DS . 'casefolding'
+				CAKE . 'Config' . DS . 'unicode' . DS . 'casefolding'
 			),
 			array(
 				CAKE . 'Config' . DS . 'config.php',
-				CAKE . 'Config' . DS . 'unicode' .  DS . 'casefolding' . DS . '0080_00ff.php',
-				CAKE . 'Config' . DS . 'unicode' .  DS . 'casefolding' . DS . '0100_017f.php',
-				CAKE . 'Config' . DS . 'unicode' .  DS . 'casefolding' . DS . '0180_024F.php',
-				CAKE . 'Config' . DS . 'unicode' .  DS . 'casefolding' . DS . '0250_02af.php',
-				CAKE . 'Config' . DS . 'unicode' .  DS . 'casefolding' . DS . '0370_03ff.php',
-				CAKE . 'Config' . DS . 'unicode' .  DS . 'casefolding' . DS . '0400_04ff.php',
-				CAKE . 'Config' . DS . 'unicode' .  DS . 'casefolding' . DS . '0500_052f.php',
-				CAKE . 'Config' . DS . 'unicode' .  DS . 'casefolding' . DS . '0530_058f.php',
-				CAKE . 'Config' . DS . 'unicode' .  DS . 'casefolding' . DS . '1e00_1eff.php',
-				CAKE . 'Config' . DS . 'unicode' .  DS . 'casefolding' . DS . '1f00_1fff.php',
-				CAKE . 'Config' . DS . 'unicode' .  DS . 'casefolding' . DS . '2100_214f.php',
-				CAKE . 'Config' . DS . 'unicode' .  DS . 'casefolding' . DS . '2150_218f.php',
-				CAKE . 'Config' . DS . 'unicode' .  DS . 'casefolding' . DS . '2460_24ff.php',
-				CAKE . 'Config' . DS . 'unicode' .  DS . 'casefolding' . DS . '2c00_2c5f.php',
-				CAKE . 'Config' . DS . 'unicode' .  DS . 'casefolding' . DS . '2c60_2c7f.php',
-				CAKE . 'Config' . DS . 'unicode' .  DS . 'casefolding' . DS . '2c80_2cff.php',
-				CAKE . 'Config' . DS . 'unicode' .  DS . 'casefolding' . DS . 'ff00_ffef.php'
+				CAKE . 'Config' . DS . 'unicode' . DS . 'casefolding' . DS . '0080_00ff.php',
+				CAKE . 'Config' . DS . 'unicode' . DS . 'casefolding' . DS . '0100_017f.php',
+				CAKE . 'Config' . DS . 'unicode' . DS . 'casefolding' . DS . '0180_024F.php',
+				CAKE . 'Config' . DS . 'unicode' . DS . 'casefolding' . DS . '0250_02af.php',
+				CAKE . 'Config' . DS . 'unicode' . DS . 'casefolding' . DS . '0370_03ff.php',
+				CAKE . 'Config' . DS . 'unicode' . DS . 'casefolding' . DS . '0400_04ff.php',
+				CAKE . 'Config' . DS . 'unicode' . DS . 'casefolding' . DS . '0500_052f.php',
+				CAKE . 'Config' . DS . 'unicode' . DS . 'casefolding' . DS . '0530_058f.php',
+				CAKE . 'Config' . DS . 'unicode' . DS . 'casefolding' . DS . '1e00_1eff.php',
+				CAKE . 'Config' . DS . 'unicode' . DS . 'casefolding' . DS . '1f00_1fff.php',
+				CAKE . 'Config' . DS . 'unicode' . DS . 'casefolding' . DS . '2100_214f.php',
+				CAKE . 'Config' . DS . 'unicode' . DS . 'casefolding' . DS . '2150_218f.php',
+				CAKE . 'Config' . DS . 'unicode' . DS . 'casefolding' . DS . '2460_24ff.php',
+				CAKE . 'Config' . DS . 'unicode' . DS . 'casefolding' . DS . '2c00_2c5f.php',
+				CAKE . 'Config' . DS . 'unicode' . DS . 'casefolding' . DS . '2c60_2c7f.php',
+				CAKE . 'Config' . DS . 'unicode' . DS . 'casefolding' . DS . '2c80_2cff.php',
+				CAKE . 'Config' . DS . 'unicode' . DS . 'casefolding' . DS . 'ff00_ffef.php'
 			)
 		);
 
 		$result = $Folder->tree(CAKE . 'Config', false);
-		$this->assertSame(array_diff($expected[0], $result[0]), array());
-		$this->assertSame(array_diff($result[0], $expected[0]), array());
+		$this->assertSame(array(), array_diff($expected[0], $result[0]));
+		$this->assertSame(array(), array_diff($result[0], $expected[0]));
 
 		$result = $Folder->tree(CAKE . 'Config', false, 'dir');
-		$this->assertSame(array_diff($expected[0], $result), array());
-		$this->assertSame(array_diff($expected[0], $result), array());
+		$this->assertSame(array(), array_diff($expected[0], $result));
+		$this->assertSame(array(), array_diff($expected[0], $result));
 
 		$result = $Folder->tree(CAKE . 'Config', false, 'files');
-		$this->assertSame(array_diff($expected[1], $result), array());
-		$this->assertSame(array_diff($expected[1], $result), array());
+		$this->assertSame(array(), array_diff($expected[1], $result));
+		$this->assertSame(array(), array_diff($expected[1], $result));
 	}
 
 /**
@@ -452,7 +458,7 @@ class FolderTest extends CakeTestCase {
  * @return void
  */
 	public function testFolderTreeWithHiddenFiles() {
-		$this->skipIf(!is_writeable(TMP), 'Can\'t test Folder::tree with hidden files unless the tmp folder is writable.');
+		$this->skipIf(!is_writable(TMP), 'Can\'t test Folder::tree with hidden files unless the tmp folder is writable.');
 
 		$Folder = new Folder(TMP . 'folder_tree_hidden', true, 0777);
 		mkdir($Folder->path . DS . '.svn', 0777, true);
@@ -557,7 +563,7 @@ class FolderTest extends CakeTestCase {
  */
 	public function testSlashTerm() {
 		$result = Folder::slashTerm('/path/to/file');
-		$this->assertEquals($result, '/path/to/file/');
+		$this->assertEquals('/path/to/file/', $result);
 	}
 
 /**
@@ -568,15 +574,15 @@ class FolderTest extends CakeTestCase {
 	public function testNormalizePath() {
 		$path = '/path/to/file';
 		$result = Folder::normalizePath($path);
-		$this->assertEquals($result, '/');
+		$this->assertEquals('/', $result);
 
 		$path = '\\path\\\to\\\file';
 		$result = Folder::normalizePath($path);
-		$this->assertEquals($result, '/');
+		$this->assertEquals('/', $result);
 
 		$path = 'C:\\path\\to\\file';
 		$result = Folder::normalizePath($path);
-		$this->assertEquals($result, '\\');
+		$this->assertEquals('\\', $result);
 	}
 
 /**
@@ -587,15 +593,15 @@ class FolderTest extends CakeTestCase {
 	public function testCorrectSlashFor() {
 		$path = '/path/to/file';
 		$result = Folder::correctSlashFor($path);
-		$this->assertEquals($result, '/');
+		$this->assertEquals('/', $result);
 
 		$path = '\\path\\to\\file';
 		$result = Folder::correctSlashFor($path);
-		$this->assertEquals($result, '/');
+		$this->assertEquals('/', $result);
 
 		$path = 'C:\\path\to\\file';
 		$result = Folder::correctSlashFor($path);
-		$this->assertEquals($result, '\\');
+		$this->assertEquals('\\', $result);
 	}
 
 /**
@@ -635,7 +641,7 @@ class FolderTest extends CakeTestCase {
 		$this->assertSame(array_diff($expected, $result), array());
 
 		$result = $Folder->find('.*', true);
-		$expected = array('config.php', 'routes.php');
+		$expected = array('cacert.pem', 'config.php', 'routes.php');
 		$this->assertSame($expected, $result);
 
 		$result = $Folder->find('.*\.php');
@@ -749,16 +755,65 @@ class FolderTest extends CakeTestCase {
  */
 	public function testDirSize() {
 		$Folder = new Folder(TMP . 'config_non_existent', true);
-		$this->assertEquals($Folder->dirSize(), 0);
+		$this->assertEquals(0, $Folder->dirSize());
 
 		$File = new File($Folder->pwd() . DS . 'my.php', true, 0777);
 		$File->create();
 		$File->write('something here');
 		$File->close();
-		$this->assertEquals($Folder->dirSize(), 14);
+		$this->assertEquals(14, $Folder->dirSize());
 
 		$Folder->cd(TMP);
 		$Folder->delete($Folder->pwd() . 'config_non_existent');
+	}
+
+/**
+ * test that errors and messages can be resetted
+ *
+ * @return void
+ */
+	public function testReset() {
+		$path = TMP . 'folder_delete_test';
+		mkdir($path);
+		$folder = $path . DS . 'sub';
+		mkdir($folder);
+		$file = $folder . DS . 'file';
+		touch($file);
+
+		chmod($folder, 0555);
+		chmod($file, 0444);
+
+		$Folder = new Folder($folder);
+		$return = $Folder->delete();
+		$this->assertFalse($return);
+
+		$messages = $Folder->messages();
+		$errors = $Folder->errors();
+		$expected = array(
+			$file . ' NOT removed',
+			$folder . ' NOT removed',
+		);
+		sort($expected);
+		sort($errors);
+		$this->assertEmpty($messages);
+		$this->assertEquals($expected, $errors);
+
+		chmod($file, 0644);
+		chmod($folder, 0755);
+
+		$return = $Folder->delete();
+		$this->assertTrue($return);
+
+		$messages = $Folder->messages();
+		$errors = $Folder->errors();
+		$expected = array(
+			$file . ' removed',
+			$folder . ' removed',
+		);
+		sort($expected);
+		sort($messages);
+		$this->assertEmpty($errors);
+		$this->assertEquals($expected, $messages);
 	}
 
 /**
@@ -783,7 +838,7 @@ class FolderTest extends CakeTestCase {
 
 		$messages = $Folder->messages();
 		$errors = $Folder->errors();
-		$this->assertEquals($errors, array());
+		$this->assertEquals(array(), $errors);
 
 		$expected = array(
 			$path . DS . 'file_1 removed',
@@ -803,6 +858,64 @@ class FolderTest extends CakeTestCase {
 /**
  * testCopy method
  *
+ * Verify that subdirectories existing in both destination and source directory
+ * are merged recursively.
+ *
+ * @return void
+ */
+	public function testCopy() {
+		extract($this->_setupFilesystem());
+
+		$Folder = new Folder($folderOne);
+		$result = $Folder->copy($folderThree);
+		$this->assertTrue($result);
+		$this->assertTrue(file_exists($folderThree . DS . 'file1.php'));
+		$this->assertTrue(file_exists($folderThree . DS . 'folderA' . DS . 'fileA.php'));
+
+		$Folder = new Folder($folderTwo);
+		$result = $Folder->copy($folderThree);
+		$this->assertTrue($result);
+		$this->assertTrue(file_exists($folderThree . DS . 'file1.php'));
+		$this->assertTrue(file_exists($folderThree . DS . 'file2.php'));
+		$this->assertTrue(file_exists($folderThree . DS . 'folderA' . DS . 'fileA.php'));
+		$this->assertTrue(file_exists($folderThree . DS . 'folderB' . DS . 'fileB.php'));
+
+		$Folder = new Folder($path);
+		$Folder->delete();
+	}
+
+/**
+ * testCopyWithMerge method
+ *
+ * Verify that subdirectories existing in both destination and source directory
+ * are merged recursively.
+ *
+ * @return void
+ */
+	public function testCopyWithMerge() {
+		extract($this->_setupFilesystem());
+
+		$Folder = new Folder($folderOne);
+		$result = $Folder->copy($folderThree);
+		$this->assertTrue($result);
+		$this->assertTrue(file_exists($folderThree . DS . 'file1.php'));
+		$this->assertTrue(file_exists($folderThree . DS . 'folderA' . DS . 'fileA.php'));
+
+		$Folder = new Folder($folderTwo);
+		$result = $Folder->copy(array('to' => $folderThree, 'scheme' => Folder::MERGE));
+		$this->assertTrue($result);
+		$this->assertTrue(file_exists($folderThree . DS . 'file1.php'));
+		$this->assertTrue(file_exists($folderThree . DS . 'file2.php'));
+		$this->assertTrue(file_exists($folderThree . DS . 'folderA' . DS . 'fileA.php'));
+		$this->assertTrue(file_exists($folderThree . DS . 'folderB' . DS . 'fileB.php'));
+
+		$Folder = new Folder($path);
+		$Folder->delete();
+	}
+
+/**
+ * testCopyWithSkip method
+ *
  * Verify that directories and files are copied recursively
  * even if the destination directory already exists.
  * Subdirectories existing in both destination and source directory
@@ -810,51 +923,120 @@ class FolderTest extends CakeTestCase {
  *
  * @return void
  */
-	public function testCopy() {
-		$path = TMP . 'folder_test';
-		$folder1 = $path . DS . 'folder1';
-		$folder2 = $folder1 . DS . 'folder2';
-		$folder3 = $path . DS . 'folder3';
-		$file1 = $folder1 . DS . 'file1.php';
-		$file2 = $folder2 . DS . 'file2.php';
+	public function testCopyWithSkip() {
+		extract($this->_setupFilesystem());
 
-		new Folder($path, true);
-		new Folder($folder1, true);
-		new Folder($folder2, true);
-		new Folder($folder3, true);
-		touch($file1);
-		touch($file2);
-
-		$Folder = new Folder($folder1);
-		$result = $Folder->copy($folder3);
+		$Folder = new Folder($folderOne);
+		$result = $Folder->copy(array('to' => $folderTwo, 'scheme' => Folder::SKIP));
 		$this->assertTrue($result);
-		$this->assertTrue(file_exists($folder3 . DS . 'file1.php'));
-		$this->assertTrue(file_exists($folder3 . DS . 'folder2' . DS . 'file2.php'));
+		$this->assertTrue(file_exists($folderTwo . DS . 'file1.php'));
+		$this->assertTrue(file_exists($folderTwo . DS . 'folderA' . DS . 'fileA.php'));
 
-		$Folder = new Folder($folder3);
+		$Folder = new Folder($folderTwo);
 		$Folder->delete();
 
-		$Folder = new Folder($folder1);
-		$result = $Folder->copy($folder3);
+		$Folder = new Folder($folderOne);
+		$result = $Folder->copy(array('to' => $folderTwo, 'scheme' => Folder::SKIP));
 		$this->assertTrue($result);
-		$this->assertTrue(file_exists($folder3 . DS . 'file1.php'));
-		$this->assertTrue(file_exists($folder3 . DS . 'folder2' . DS . 'file2.php'));
+		$this->assertTrue(file_exists($folderTwo . DS . 'file1.php'));
+		$this->assertTrue(file_exists($folderTwo . DS . 'folderA' . DS . 'fileA.php'));
 
-		$Folder = new Folder($folder3);
+		$Folder = new Folder($folderTwo);
 		$Folder->delete();
 
-		new Folder($folder3, true);
-		new Folder($folder3 . DS . 'folder2', true);
-		file_put_contents($folder3 . DS . 'folder2' . DS . 'file2.php', 'untouched');
+		new Folder($folderTwo, true);
+		new Folder($folderTwo . DS . 'folderB', true);
+		file_put_contents($folderTwo . DS . 'file2.php', 'touched');
+		file_put_contents($folderTwo . DS . 'folderB' . DS . 'fileB.php', 'untouched');
 
-		$Folder = new Folder($folder1);
-		$result = $Folder->copy($folder3);
+		$Folder = new Folder($folderTwo);
+		$result = $Folder->copy(array('to' => $folderThree, 'scheme' => Folder::SKIP));
 		$this->assertTrue($result);
-		$this->assertTrue(file_exists($folder3 . DS . 'file1.php'));
-		$this->assertEquals(file_get_contents($folder3 . DS . 'folder2' . DS . 'file2.php'), 'untouched');
+		$this->assertTrue(file_exists($folderThree . DS . 'file2.php'));
+		$this->assertEquals('touched', file_get_contents($folderThree . DS . 'file2.php'));
+		$this->assertEquals('untouched', file_get_contents($folderThree . DS . 'folderB' . DS . 'fileB.php'));
 
 		$Folder = new Folder($path);
 		$Folder->delete();
+	}
+
+/**
+ * testCopyWithOverwrite
+ *
+ * Verify that subdirectories existing in both destination and source directory
+ * are overwritten/replaced recursively.
+ *
+ * @return void
+ */
+	public function testCopyWithOverwrite() {
+		extract($this->_setupFilesystem());
+
+		$Folder = new Folder($folderOne);
+		$result = $Folder->copy(array('to' => $folderThree, 'scheme' => Folder::OVERWRITE));
+
+		$this->assertTrue(file_exists($folderThree . DS . 'file1.php'));
+		$this->assertTrue(file_exists($folderThree . DS . 'folderA' . DS . 'fileA.php'));
+
+		$Folder = new Folder($folderTwo);
+		$result = $Folder->copy(array('to' => $folderThree, 'scheme' => Folder::OVERWRITE));
+		$this->assertTrue($result);
+
+		$this->assertTrue(file_exists($folderThree . DS . 'folderA' . DS . 'fileA.php'));
+
+		$Folder = new Folder($folderOne);
+		unlink($fileOneA);
+		$result = $Folder->copy(array('to' => $folderThree, 'scheme' => Folder::OVERWRITE));
+		$this->assertTrue($result);
+
+		$this->assertTrue(file_exists($folderThree . DS . 'file1.php'));
+		$this->assertTrue(file_exists($folderThree . DS . 'file2.php'));
+		$this->assertTrue(!file_exists($folderThree . DS . 'folderA' . DS . 'fileA.php'));
+		$this->assertTrue(file_exists($folderThree . DS . 'folderB' . DS . 'fileB.php'));
+
+		$Folder = new Folder($path);
+		$Folder->delete();
+	}
+
+/**
+ * Setup filesystem for copy tests
+ * $path: folder_test/
+ * - folder1/file1.php
+ * - folder1/folderA/fileA.php
+ * - folder2/file2.php
+ * - folder2/folderB/fileB.php
+ * - folder3/
+ *
+ * @return array Filenames to extract in the test methods
+ */
+	protected function _setupFilesystem() {
+		$path = TMP . 'folder_test';
+
+		$folderOne = $path . DS . 'folder1';
+		$folderOneA = $folderOne . DS . 'folderA';
+		$folderTwo = $path . DS . 'folder2';
+		$folderTwoB = $folderTwo . DS . 'folderB';
+		$folderThree = $path . DS . 'folder3';
+
+		$fileOne = $folderOne . DS . 'file1.php';
+		$fileTwo = $folderTwo . DS . 'file2.php';
+		$fileOneA = $folderOneA . DS . 'fileA.php';
+		$fileTwoB = $folderTwoB . DS . 'fileB.php';
+
+		new Folder($path, true);
+		new Folder($folderOne, true);
+		new Folder($folderOneA, true);
+		new Folder($folderTwo, true);
+		new Folder($folderTwoB, true);
+		new Folder($folderThree, true);
+		touch($fileOne);
+		touch($fileTwo);
+		touch($fileOneA);
+		touch($fileTwoB);
+
+		return compact(
+			'path',
+			'folderOne', 'folderOneA', 'folderTwo', 'folderTwoB', 'folderThree',
+			'fileOne', 'fileOneA', 'fileTwo', 'fileTwoB');
 	}
 
 /**
@@ -863,74 +1045,132 @@ class FolderTest extends CakeTestCase {
  * Verify that directories and files are moved recursively
  * even if the destination directory already exists.
  * Subdirectories existing in both destination and source directory
- * are skipped and not merged or overwritten.
+ * are merged recursively.
  *
  * @return void
  */
 	public function testMove() {
-		$path = TMP . 'folder_test';
-		$folder1 = $path . DS . 'folder1';
-		$folder2 = $folder1 . DS . 'folder2';
-		$folder3 = $path . DS . 'folder3';
-		$file1 = $folder1 . DS . 'file1.php';
-		$file2 = $folder2 . DS . 'file2.php';
+		extract($this->_setupFilesystem());
 
-		new Folder($path, true);
-		new Folder($folder1, true);
-		new Folder($folder2, true);
-		new Folder($folder3, true);
-		touch($file1);
-		touch($file2);
-
-		$Folder = new Folder($folder1);
-		$result = $Folder->move($folder3);
+		$Folder = new Folder($folderOne);
+		$result = $Folder->move($folderTwo);
 		$this->assertTrue($result);
-		$this->assertTrue(file_exists($folder3 . DS . 'file1.php'));
-		$this->assertTrue(is_dir($folder3 . DS . 'folder2'));
-		$this->assertTrue(file_exists($folder3 . DS . 'folder2' . DS . 'file2.php'));
-		$this->assertFalse(file_exists($file1));
-		$this->assertFalse(file_exists($folder2));
-		$this->assertFalse(file_exists($file2));
+		$this->assertTrue(file_exists($folderTwo . DS . 'file1.php'));
+		$this->assertTrue(is_dir($folderTwo . DS . 'folderB'));
+		$this->assertTrue(file_exists($folderTwo . DS . 'folderB' . DS . 'fileB.php'));
+		$this->assertFalse(file_exists($fileOne));
+		$this->assertTrue(file_exists($folderTwo . DS . 'folderA'));
+		$this->assertFalse(file_exists($folderOneA));
+		$this->assertFalse(file_exists($fileOneA));
 
-		$Folder = new Folder($folder3);
+		$Folder = new Folder($folderTwo);
 		$Folder->delete();
 
-		new Folder($folder1, true);
-		new Folder($folder2, true);
-		touch($file1);
-		touch($file2);
+		new Folder($folderOne, true);
+		new Folder($folderOneA, true);
+		touch($fileOne);
+		touch($fileOneA);
 
-		$Folder = new Folder($folder1);
-		$result = $Folder->move($folder3);
+		$Folder = new Folder($folderOne);
+		$result = $Folder->move($folderTwo);
 		$this->assertTrue($result);
-		$this->assertTrue(file_exists($folder3 . DS . 'file1.php'));
-		$this->assertTrue(is_dir($folder3 . DS . 'folder2'));
-		$this->assertTrue(file_exists($folder3 . DS . 'folder2' . DS . 'file2.php'));
-		$this->assertFalse(file_exists($file1));
-		$this->assertFalse(file_exists($folder2));
-		$this->assertFalse(file_exists($file2));
+		$this->assertTrue(file_exists($folderTwo . DS . 'file1.php'));
+		$this->assertTrue(is_dir($folderTwo . DS . 'folderA'));
+		$this->assertTrue(file_exists($folderTwo . DS . 'folderA' . DS . 'fileA.php'));
+		$this->assertFalse(file_exists($fileOne));
+		$this->assertFalse(file_exists($folderOneA));
+		$this->assertFalse(file_exists($fileOneA));
 
-		$Folder = new Folder($folder3);
+		$Folder = new Folder($folderTwo);
 		$Folder->delete();
 
-		new Folder($folder1, true);
-		new Folder($folder2, true);
-		new Folder($folder3, true);
-		new Folder($folder3 . DS . 'folder2', true);
-		touch($file1);
-		touch($file2);
-		file_put_contents($folder3 . DS . 'folder2' . DS . 'file2.php', 'untouched');
+		new Folder($folderOne, true);
+		new Folder($folderOneA, true);
+		new Folder($folderTwo, true);
+		new Folder($folderTwoB, true);
+		touch($fileOne);
+		touch($fileOneA);
+		new Folder($folderOne . DS . 'folderB', true);
+		touch($folderOne . DS . 'folderB' . DS . 'fileB.php');
+		file_put_contents($folderTwoB . DS . 'fileB.php', 'untouched');
 
-		$Folder = new Folder($folder1);
-		$result = $Folder->move($folder3);
+		$Folder = new Folder($folderOne);
+		$result = $Folder->move($folderTwo);
 		$this->assertTrue($result);
-		$this->assertTrue(file_exists($folder3 . DS . 'file1.php'));
-		$this->assertEquals(file_get_contents($folder3 . DS . 'folder2' . DS . 'file2.php'), 'untouched');
-		$this->assertFalse(file_exists($file1));
-		$this->assertFalse(file_exists($folder2));
-		$this->assertFalse(file_exists($file2));
+		$this->assertTrue(file_exists($folderTwo . DS . 'file1.php'));
+		$this->assertEquals('', file_get_contents($folderTwoB . DS . 'fileB.php'));
+		$this->assertFalse(file_exists($fileOne));
+		$this->assertFalse(file_exists($folderOneA));
+		$this->assertFalse(file_exists($fileOneA));
 
 		$Folder = new Folder($path);
 		$Folder->delete();
 	}
+
+/**
+ * testMoveWithSkip method
+ *
+ * Verify that directories and files are moved recursively
+ * even if the destination directory already exists.
+ * Subdirectories existing in both destination and source directory
+ * are skipped and not merged or overwritten.
+ *
+ * @return void
+ */
+	public function testMoveWithSkip() {
+		extract($this->_setupFilesystem());
+
+		$Folder = new Folder($folderOne);
+		$result = $Folder->move(array('to' => $folderTwo, 'scheme' => Folder::SKIP));
+		$this->assertTrue($result);
+		$this->assertTrue(file_exists($folderTwo . DS . 'file1.php'));
+		$this->assertTrue(is_dir($folderTwo . DS . 'folderB'));
+		$this->assertTrue(file_exists($folderTwoB . DS . 'fileB.php'));
+		$this->assertFalse(file_exists($fileOne));
+		$this->assertFalse(file_exists($folderOneA));
+		$this->assertFalse(file_exists($fileOneA));
+
+		$Folder = new Folder($folderTwo);
+		$Folder->delete();
+
+		new Folder($folderOne, true);
+		new Folder($folderOneA, true);
+		new Folder($folderTwo, true);
+		touch($fileOne);
+		touch($fileOneA);
+
+		$Folder = new Folder($folderOne);
+		$result = $Folder->move(array('to' => $folderTwo, 'scheme' => Folder::SKIP));
+		$this->assertTrue($result);
+		$this->assertTrue(file_exists($folderTwo . DS . 'file1.php'));
+		$this->assertTrue(is_dir($folderTwo . DS . 'folderA'));
+		$this->assertTrue(file_exists($folderTwo . DS . 'folderA' . DS . 'fileA.php'));
+		$this->assertFalse(file_exists($fileOne));
+		$this->assertFalse(file_exists($folderOneA));
+		$this->assertFalse(file_exists($fileOneA));
+
+		$Folder = new Folder($folderTwo);
+		$Folder->delete();
+
+		new Folder($folderOne, true);
+		new Folder($folderOneA, true);
+		new Folder($folderTwo, true);
+		new Folder($folderTwoB, true);
+		touch($fileOne);
+		touch($fileOneA);
+		file_put_contents($folderTwoB . DS . 'fileB.php', 'untouched');
+
+		$Folder = new Folder($folderOne);
+		$result = $Folder->move(array('to' => $folderTwo, 'scheme' => Folder::SKIP));
+		$this->assertTrue($result);
+		$this->assertTrue(file_exists($folderTwo . DS . 'file1.php'));
+		$this->assertEquals('untouched', file_get_contents($folderTwoB . DS . 'fileB.php'));
+		$this->assertFalse(file_exists($fileOne));
+		$this->assertFalse(file_exists($folderOneA));
+		$this->assertFalse(file_exists($fileOneA));
+
+		$Folder = new Folder($path);
+		$Folder->delete();
+	}
+
 }

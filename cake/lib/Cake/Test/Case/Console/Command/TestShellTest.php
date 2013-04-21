@@ -5,12 +5,13 @@
  * PHP 5
  *
  * CakePHP(tm) : Rapid Development Framework (http://cakephp.org)
- * Copyright 2005-2011, Cake Software Foundation, Inc. (http://cakefoundation.org)
+ * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
  * Licensed under The MIT License
+ * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright 2005-2011, Cake Software Foundation, Inc. (http://cakefoundation.org)
+ * @copyright     Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
  * @link          http://cakephp.org CakePHP(tm) Project
  * @package       Cake.Test.Case.Console.Command
  * @since         CakePHP(tm) v 2.0
@@ -29,10 +30,10 @@ class TestTestShell extends TestShell {
 	public function mapFileToCategory($file) {
 		return $this->_mapFileToCategory($file);
 	}
+
 }
 
 class TestShellTest extends CakeTestCase {
-
 
 /**
  * setUp test case
@@ -40,6 +41,7 @@ class TestShellTest extends CakeTestCase {
  * @return void
  */
 	public function setUp() {
+		parent::setUp();
 		$out = $this->getMock('ConsoleOutput', array(), array(), '', false);
 		$in = $this->getMock('ConsoleInput', array(), array(), '', false);
 
@@ -57,12 +59,13 @@ class TestShellTest extends CakeTestCase {
  * @return void
  */
 	public function tearDown() {
+		parent::tearDown();
 		unset($this->Dispatch, $this->Shell);
 	}
 
 /**
  * testMapCoreFileToCategory
- * 
+ *
  * @return void
  */
 	public function testMapCoreFileToCategory() {
@@ -82,7 +85,7 @@ class TestShellTest extends CakeTestCase {
  * testMapCoreFileToCase
  *
  * basics.php is a slightly special case - it's the only file in the core with a test that isn't Capitalized
- * 
+ *
  * @return void
  */
 	public function testMapCoreFileToCase() {
@@ -100,7 +103,7 @@ class TestShellTest extends CakeTestCase {
 
 /**
  * testMapAppFileToCategory
- * 
+ *
  * @return void
  */
 	public function testMapAppFileToCategory() {
@@ -111,7 +114,6 @@ class TestShellTest extends CakeTestCase {
 
 		$return = $this->Shell->mapFileToCategory(APP . 'My/File/Is/Here.php');
 		$this->assertSame('app', $return);
-
 	}
 
 /**
@@ -131,7 +133,7 @@ class TestShellTest extends CakeTestCase {
 
 /**
  * testMapPluginFileToCategory
- * 
+ *
  * @return void
  */
 	public function testMapPluginFileToCategory() {
@@ -142,7 +144,6 @@ class TestShellTest extends CakeTestCase {
 
 		$return = $this->Shell->mapFileToCategory(dirname(CAKE) . 'plugins/awesome/Controller/ExampleController.php');
 		$this->assertSame('awesome', $return);
-
 	}
 
 /**
@@ -162,7 +163,7 @@ class TestShellTest extends CakeTestCase {
 
 /**
  * testMapCoreTestToCategory
- * 
+ *
  * @return void
  */
 	public function testMapCoreTestToCategory() {
@@ -182,7 +183,7 @@ class TestShellTest extends CakeTestCase {
  * testMapCoreTestToCase
  *
  * basics.php is a slightly special case - it's the only file in the core with a test that isn't Capitalized
- * 
+ *
  * @return void
  */
 	public function testMapCoreTestToCase() {
@@ -200,7 +201,7 @@ class TestShellTest extends CakeTestCase {
 
 /**
  * testMapAppTestToCategory
- * 
+ *
  * @return void
  */
 	public function testMapAppTestToCategory() {
@@ -211,7 +212,6 @@ class TestShellTest extends CakeTestCase {
 
 		$return = $this->Shell->mapFileToCategory(APP . 'Test/Case/My/File/Is/HereTest.php');
 		$this->assertSame('app', $return);
-
 	}
 
 /**
@@ -231,7 +231,7 @@ class TestShellTest extends CakeTestCase {
 
 /**
  * testMapPluginTestToCategory
- * 
+ *
  * @return void
  */
 	public function testMapPluginTestToCategory() {
@@ -242,7 +242,6 @@ class TestShellTest extends CakeTestCase {
 
 		$return = $this->Shell->mapFileToCategory(dirname(CAKE) . 'plugins/awesome/Test/Case/Controller/ExampleControllerTest.php');
 		$this->assertSame('awesome', $return);
-
 	}
 
 /**
@@ -314,7 +313,7 @@ class TestShellTest extends CakeTestCase {
 
 		$this->Shell->expects($this->once())->method('_run');
 		$this->Shell->available();
-		$this->assertEquals($this->Shell->args, array('core', 'AllBehaviors'));
+		$this->assertEquals(array('core', 'AllBehaviors'), $this->Shell->args);
 	}
 
 /**

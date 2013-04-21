@@ -4,13 +4,14 @@
  *
  * PHP 5
  *
- * CakePHP(tm) Tests <http://book.cakephp.org/view/1196/Testing>
- * Copyright 2005-2011, Cake Software Foundation, Inc. (http://cakefoundation.org)
+ * CakePHP(tm) Tests <http://book.cakephp.org/2.0/en/development/testing.html>
+ * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
  * Licensed under The MIT License
+ * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice
  *
- * @copyright     Copyright 2005-2011, Cake Software Foundation, Inc. (http://cakefoundation.org)
+ * @copyright     Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
  * @link          http://cakephp.org CakePHP(tm) Project
  * @since         CakePHP(tm) v 1.3
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -24,10 +25,15 @@ require_once 'PHPUnit/TextUI/ResultPrinter.php';
  */
 class CakeBaseReporter extends PHPUnit_TextUI_ResultPrinter {
 
+/**
+ * Headers sent
+ *
+ * @var boolean
+ */
 	protected $_headerSent = false;
 
 /**
- * Array of request parameters.  Usually parsed GET params.
+ * Array of request parameters. Usually parsed GET params.
  *
  * @var array
  */
@@ -39,11 +45,6 @@ class CakeBaseReporter extends PHPUnit_TextUI_ResultPrinter {
  * @var string
  */
 	protected $_characterSet;
-
-/**
-* The number of assertions done for a test suite
-*/
-	protected $numAssertions = 0;
 
 /**
  * Does nothing yet. The first output will
@@ -86,7 +87,6 @@ class CakeBaseReporter extends PHPUnit_TextUI_ResultPrinter {
  * @return void
  */
 	public function paintDocumentStart() {
-
 	}
 
 /**
@@ -96,7 +96,6 @@ class CakeBaseReporter extends PHPUnit_TextUI_ResultPrinter {
  * @return void
  */
 	public function paintDocumentEnd() {
-
 	}
 
 /**
@@ -106,7 +105,6 @@ class CakeBaseReporter extends PHPUnit_TextUI_ResultPrinter {
  * @return void
  */
 	public function paintTestMenu() {
-
 	}
 
 /**
@@ -121,54 +119,64 @@ class CakeBaseReporter extends PHPUnit_TextUI_ResultPrinter {
 		return '';
 	}
 
+/**
+ * Print result
+ *
+ * @param PHPUnit_Framework_TestResult $result
+ */
 	public function printResult(PHPUnit_Framework_TestResult $result) {
 		$this->paintFooter($result);
 	}
 
+/**
+ * Paint result
+ *
+ * @param PHPUnit_Framework_TestResult $result
+ */
 	public function paintResult(PHPUnit_Framework_TestResult $result) {
 		$this->paintFooter($result);
 	}
 
 /**
-* An error occurred.
-*
-* @param  PHPUnit_Framework_Test $test
-* @param  Exception              $e
-* @param  float                  $time
-*/
+ * An error occurred.
+ *
+ * @param  PHPUnit_Framework_Test $test
+ * @param  Exception              $e
+ * @param  float                  $time
+ */
 	public function addError(PHPUnit_Framework_Test $test, Exception $e, $time) {
 		$this->paintException($e, $test);
 	}
 
 /**
-* A failure occurred.
-*
-* @param  PHPUnit_Framework_Test $test
-* @param  PHPUnit_Framework_AssertionFailedError $e
-* @param  float $time
-*/
+ * A failure occurred.
+ *
+ * @param  PHPUnit_Framework_Test $test
+ * @param  PHPUnit_Framework_AssertionFailedError $e
+ * @param  float $time
+ */
 	public function addFailure(PHPUnit_Framework_Test $test, PHPUnit_Framework_AssertionFailedError $e, $time) {
 		$this->paintFail($e, $test);
 	}
 
 /**
-* Incomplete test.
-*
-* @param  PHPUnit_Framework_Test $test
-* @param  Exception $e
-* @param  float $time
-*/
+ * Incomplete test.
+ *
+ * @param  PHPUnit_Framework_Test $test
+ * @param  Exception $e
+ * @param  float $time
+ */
 	public function addIncompleteTest(PHPUnit_Framework_Test $test, Exception $e, $time) {
 		$this->paintSkip($e, $test);
 	}
 
 /**
-* Skipped test.
-*
-* @param  PHPUnit_Framework_Test $test
-* @param  Exception $e
-* @param  float $time
-*/
+ * Skipped test.
+ *
+ * @param  PHPUnit_Framework_Test $test
+ * @param  Exception $e
+ * @param  float $time
+ */
 	public function addSkippedTest(PHPUnit_Framework_Test $test, Exception $e, $time) {
 		$this->paintSkip($e, $test);
 	}
@@ -209,6 +217,9 @@ class CakeBaseReporter extends PHPUnit_TextUI_ResultPrinter {
  */
 	public function endTest(PHPUnit_Framework_Test $test, $time) {
 		$this->numAssertions += $test->getNumAssertions();
+		if ($test->hasFailed()) {
+			return;
+		}
 		$this->paintPass($test, $time);
 	}
 

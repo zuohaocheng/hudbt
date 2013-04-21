@@ -5,12 +5,13 @@
  * PHP5
  *
  * CakePHP(tm) : Rapid Development Framework (http://cakephp.org)
- * Copyright 2005-2011, Cake Software Foundation, Inc. (http://cakefoundation.org)
+ * Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
  * Licensed under The MIT License
+ * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright 2005-2011, Cake Software Foundation, Inc. (http://cakefoundation.org)
+ * @copyright     Copyright (c) Cake Software Foundation, Inc. (http://cakefoundation.org)
  * @link          http://cakephp.org CakePHP(tm) Project
  * @package       Cake.Test.Case.TestSuite
  * @since         CakePHP(tm) v 2.0
@@ -21,6 +22,7 @@ App::uses('HtmlCoverageReport', 'TestSuite/Coverage');
 App::uses('CakeBaseReporter', 'TestSuite/Reporter');
 
 class HtmlCoverageReportTest extends CakeTestCase {
+
 /**
  * setUp
  *
@@ -127,7 +129,6 @@ class HtmlCoverageReportTest extends CakeTestCase {
 		}
 	}
 
-
 /**
  * Test that coverage works with phpunit 3.6 as the data formats from coverage are totally different.
  *
@@ -197,7 +198,6 @@ class HtmlCoverageReportTest extends CakeTestCase {
 			4 => array(array('id' => 'HtmlCoverageReportTest::testOther')),
 			5 => -1
 		);
-
 
 		$result = $this->Coverage->generateDiff('myfile.php', $file, $coverage);
 
