@@ -1,7 +1,8 @@
 <?php
 //Caching class (Based on file From ProjectGazelle)
-require('classes/class_apccache.php');
-class NPCache extends APECache {
+#require('classes/class_apccache.php');
+#class NPCache extends APECache {
+class NPCache extends Memcache {
 	var $isEnabled;
 	var $clearCache = 0;
 	var $language = 'en';
