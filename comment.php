@@ -56,7 +56,7 @@ if ($action == "add") {
 		else if($type == "request")
 			$res = sql_query("SELECT requests.request as name, userid as owner FROM requests WHERE id = $parent_id") or sqlerr(__FILE__,__LINE__);
 
-		$arr = mysql_fetch_array($res);
+		$arr = _mysql_fetch_array($res);
 		if (!$arr)
 			stderr($lang_comment['std_error'], $lang_comment['std_no_torrent_id']);
 
@@ -78,10 +78,10 @@ if ($action == "add") {
 		    $where = ' AND c.request=' . $parent_id;
 		  }
 		  $res = sql_query('SELECT c.user, u.commentpm FROM comments c INNER JOIN users u ON c.user = u.id WHERE c.id=' . $quote . $where ) or sqlerr(__FILE__, __LINE__);
-		  if (mysql_num_rows($res) != 1) {
+		  if (_mysql_num_rows($res) != 1) {
 		    $quote = 'NULL';
 		  }
-		  $quoteduser = mysql_fetch_array($res);
+		  $quoteduser = _mysql_fetch_array($res);
 		}
 		$values = array($CURUSER["id"], $parent_id, "'" . date("Y-m-d H:i:s") . "'", sqlesc($text), sqlesc($text), $quote);
 		if ($type == "torrent"){
@@ -96,7 +96,7 @@ if ($action == "add") {
 		  sql_query("INSERT INTO comments (user, request, added, text, ori_text, quote) VALUES (" . implode(',', $values) . ")");
 		}
 
-		$newid = mysql_insert_id();
+		$newid = _mysql_insert_id();
 		if($type == "torrent") {
 		  sql_query("UPDATE LOW_PRIORITY torrents SET comments = comments + 1 WHERE id = $parent_id");
 		}
@@ -115,7 +115,7 @@ if ($action == "add") {
 		}
 
 		$ras = sql_query("SELECT commentpm FROM users WHERE id = $arr[owner]") or sqlerr(__FILE__,__LINE__);
-		$arg = mysql_fetch_array($ras);
+		$arg = _mysql_fetch_array($ras);
 
 		if($arg["commentpm"] == 'yes' && $CURUSER['id'] != $arr["owner"]) {
 		  $subject = $lang_comment_target[get_user_lang($arr["owner"])]['msg_new_comment'];
@@ -161,10 +161,10 @@ if ($action == "add") {
 
 		$res2 = sql_query("SELECT comments.text, user FROM comments WHERE comments.id=$commentid") or sqlerr(__FILE__, __LINE__);
 
-		if (mysql_num_rows($res2) != 1)
+		if (_mysql_num_rows($res2) != 1)
 			stderr($lang_forums['std_error'], $lang_forums['std_no_comment_id']);
 
-		$arr2 = mysql_fetch_assoc($res2);
+		$arr2 = _mysql_fetch_assoc($res2);
 		$quote_input = '<input type="hidden" name="quote" value="' . $commentid . '" />';
 	}
 
@@ -180,7 +180,7 @@ if ($action == "add") {
 		$res = sql_query("SELECT requests.request as name, userid as owner FROM requests WHERE id = $parent_id") or sqlerr(__FILE__,__LINE__);
 		$url="viewrequests.php?id=$parent_id&req_details=1";
 	}
-	$arr = mysql_fetch_array($res);
+	$arr = _mysql_fetch_array($res);
 	if (!$arr)
 		stderr($lang_comment['std_error'], $lang_comment['std_no_torrent_id']);
 
@@ -211,7 +211,7 @@ elseif ($action == "edit")
 		else if($type == "request")
 			$res = sql_query("SELECT c.*, r.request as name, r.id AS parent_id FROM comments AS c JOIN requests AS r ON c.request = r.id WHERE c.id=$commentid") or sqlerr(__FILE__,__LINE__);
 
-		$arr = mysql_fetch_array($res);
+		$arr = _mysql_fetch_array($res);
 		if (!$arr)
 		stderr($lang_comment['std_error'], $lang_comment['std_invalid_id']);
 
@@ -255,7 +255,7 @@ elseif ($action == "edit")
 		print("<input type=\"hidden\" name=\"returnto\" value=\"" . htmlspecialchars($_SERVER["HTTP_REFERER"]) . "\" />\n");
 		begin_compose($title, "edit", htmlspecialchars(unesc($arr["text"])), false);
 		$res=sql_query("SELECT editnotseen,user FROM comments WHERE id = ".$commentid)or sqlerr(__FILE__, __LINE__);
-  	$arr = mysql_fetch_assoc($res) or stderr($lang_forums['std_forum_error'], $lang_forums['std_topic_not_found']);
+  	$arr = _mysql_fetch_assoc($res) or stderr($lang_forums['std_forum_error'], $lang_forums['std_topic_not_found']);
 		$editnotseen=$arr['editnotseen'];
 		$owner =$arr['user'];
   	if(CheckPrivilege(["Posts","editnotseen"]) && ($CURUSER['id']==$owner)){
@@ -292,7 +292,7 @@ elseif ($action == "delete")
 		else if($type == "request")
 		$res = sql_query("SELECT request as pid,user FROM comments WHERE id=$commentid")  or sqlerr(__FILE__,__LINE__);
 
-		$arr = mysql_fetch_array($res);
+		$arr = _mysql_fetch_array($res);
 		if ($arr)
 		{
 			$parent_id = $arr["pid"];
@@ -306,7 +306,7 @@ elseif ($action == "delete")
 			$Cache->delete_value('torrent_'.$arr['pid'].'_last_comment_content');
 		elseif ($type == "offer")
 			$Cache->delete_value('offer_'.$arr['pid'].'_last_comment_content');
-		if ($parent_id && mysql_affected_rows() > 0)
+		if ($parent_id && _mysql_affected_rows() > 0)
 		{
 			if($type == "torrent")
 			sql_query("UPDATE LOW_PRIORITY torrents SET comments = comments - 1 WHERE id = $parent_id") or sqlerr(__FILE__,__LINE__);
@@ -339,7 +339,7 @@ elseif ($action == "vieworiginal")
 		else if($type == "request")
 		$res = sql_query("SELECT c.*, r.request as name FROM comments AS c JOIN requests AS r ON c.request = r.id WHERE c.id=$commentid") or sqlerr(__FILE__,__LINE__);
 
-		$arr = mysql_fetch_array($res);
+		$arr = _mysql_fetch_array($res);
 		if (!$arr)
 		stderr($lang_comment['std_error'], $lang_comment['std_invalid_id']);
 

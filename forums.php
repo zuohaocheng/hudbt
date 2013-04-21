@@ -137,7 +137,7 @@ function update_topic_last_post($topicid)
 {
 	global $lang_forums;
 	$res = sql_query("SELECT id FROM posts WHERE topicid=".sqlesc($topicid)." ORDER BY id DESC LIMIT 1") or sqlerr(__FILE__, __LINE__);
-	$arr = mysql_fetch_row($res) or die($lang_forums['std_no_post_found']);
+	$arr = _mysql_fetch_row($res) or die($lang_forums['std_no_post_found']);
 	$postid = $arr[0];
 	sql_query("UPDATE topics SET lastpost=".sqlesc($postid)." WHERE id=".sqlesc($topicid)) or sqlerr(__FILE__, __LINE__);
 }
@@ -148,8 +148,8 @@ function get_last_read_post_id($topicid) {
 	if (!$ret && !$ret = $Cache->get_value('user_'.$CURUSER['id'].'_last_read_post_list')){
 		$ret = array();
 		$res = sql_query("SELECT * FROM readposts WHERE userid=" . sqlesc($CURUSER['id']));
-		if (mysql_num_rows($res) != 0){
-			while ($row = mysql_fetch_array($res))
+		if (_mysql_num_rows($res) != 0){
+			while ($row = _mysql_fetch_array($res))
 			$ret[$row['topicid']] = $row['lastpostread'];
 			$Cache->cache_value('user_'.$CURUSER['id'].'_last_read_post_list', $ret, 900);
 		}
@@ -193,12 +193,12 @@ function insert_compose_frame($id, $type = 'new')
 			$topicname = get_single_value("topics","subject","WHERE id=".sqlesc($topicid));
 			$title = $lang_forums['text_reply_to_topic']." <a href=\"".htmlspecialchars("?action=viewtopic&topicid=".$topicid)."\">".htmlspecialchars($topicname)."</a> ";
 			$res = sql_query("SELECT posts.body, userid FROM posts WHERE posts.id=$id") or sqlerr(__FILE__, __LINE__);
-			if (mysql_num_rows($res) != 1) {
+			if (_mysql_num_rows($res) != 1) {
 			  stderr($lang_forums['std_error'], $lang_forums['std_no_post_id']);
 			}
 
 			echo '<input type="hidden" name="quote" value="' . $id . '" />';
-			$arr = mysql_fetch_assoc($res);
+			$arr = _mysql_fetch_assoc($res);
 			$body = "[quote='[user=".htmlspecialchars($arr["userid"])."]']".htmlspecialchars(dequote(unesc($arr["body"])))."[/quote]";
 			$id = $topicid;
 			$type = 'reply';
@@ -208,7 +208,7 @@ function insert_compose_frame($id, $type = 'new')
 		case 'edit':
 		{
 			$res = sql_query("SELECT topicid, body FROM posts WHERE id=".sqlesc($id)." LIMIT 1") or sqlerr(__FILE__, __LINE__);
-			$row = mysql_fetch_array($res);
+			$row = _mysql_fetch_array($res);
 			$topicid=$row['topicid'];
 			$firstpost = get_single_value("posts","MIN(id)", "WHERE topicid=".sqlesc($topicid));
 			if ($firstpost == $id){
@@ -229,7 +229,7 @@ function insert_compose_frame($id, $type = 'new')
 	begin_compose($title, $type, $body, $hassubject, $subject);
 	if($type==edit){
 		$resedit=sql_query("SELECT editnotseen,userid FROM posts WHERE id = ".$id)or sqlerr(__FILE__, __LINE__);
- 		$arredit = mysql_fetch_assoc($resedit) or stderr($lang_forums['std_forum_error'], $lang_forums['std_topic_not_found']);
+ 		$arredit = _mysql_fetch_assoc($resedit) or stderr($lang_forums['std_forum_error'], $lang_forums['std_topic_not_found']);
 	  $editnotseen=$arredit['editnotseen'];
 	  $owner =$arredit['userid'];
 		if(checkprivilege(["Posts","editnotseen"]) && ($CURUSER['id']==$owner)){
@@ -302,10 +302,10 @@ elseif ($action == "editpost") {
 	check_whether_exist($postid, 'post');
 
 	$res = sql_query("SELECT userid, topicid FROM posts WHERE id=".sqlesc($postid)) or sqlerr(__FILE__, __LINE__);
-	$arr = mysql_fetch_assoc($res);
+	$arr = _mysql_fetch_assoc($res);
 
 	$res2 = sql_query("SELECT locked FROM topics WHERE id = " . $arr["topicid"]) or sqlerr(__FILE__, __LINE__);
-	$arr2 = mysql_fetch_assoc($res2);
+	$arr2 = _mysql_fetch_assoc($res2);
 	$locked = ($arr2["locked"] == 'yes');
 
 	$ismod = is_forum_moderator($postid, 'post'
@@ -352,10 +352,10 @@ elseif ($action == "post") {
 			if (array_key_exists('quote', $_REQUEST)) {
 			  $quote = 0 + $_REQUEST['quote'];
 			  $res = sql_query('SELECT p.userid FROM posts p INNER JOIN users u ON p.userid=u.id WHERE p.id=' . $quote . ' AND p.topicid=' . $id) or sqlerr(__FILE__, __LINE__);
-			  if (mysql_num_rows($res) != 1) {
+			  if (_mysql_num_rows($res) != 1) {
 			    $quote = 'NULL';
 			  }
-			  $quoteduser = mysql_fetch_array($res)[0];
+			  $quoteduser = _mysql_fetch_array($res)[0];
 			}
 
 			break;
@@ -364,7 +364,7 @@ elseif ($action == "post") {
 		{
 			check_whether_exist($id, 'post');
 			$res = sql_query("SELECT topicid FROM posts WHERE id=".sqlesc($id)." LIMIT 1") or sqlerr(__FILE__, __LINE__);
-			$row = mysql_fetch_array($res);
+			$row = _mysql_fetch_array($res);
 			$topicid=$row['topicid'];
 			$forumid = get_single_value("topics", "forumid", "WHERE id=".sqlesc($topicid));
 			$firstpost = get_single_value("posts","MIN(id)", "WHERE topicid=".sqlesc($topicid));
@@ -403,7 +403,7 @@ elseif ($action == "post") {
 		//---- Make sure topic is unlocked
 
 		$res = sql_query("SELECT locked FROM topics WHERE id=$topicid") or sqlerr(__FILE__, __LINE__);
-		$arr = mysql_fetch_assoc($res) or die("Topic id n/a");
+		$arr = _mysql_fetch_assoc($res) or die("Topic id n/a");
 		if ($arr["locked"] == 'yes' && get_user_class() < $postmanage_class && !is_forum_moderator($topicid, 'topic'))
 			stderr($lang_forums['std_error'], $lang_forums['std_topic_locked']);
 	}
@@ -428,7 +428,7 @@ elseif ($action == "post") {
 		else
 			$permi = "normal";
 		sql_query("UPDATE posts SET body=".sqlesc($body).", editdate=".sqlesc($date).", editedby=".sqlesc($CURUSER[id]).",editnotseen = ".$editnotseen." WHERE id=".sqlesc($id)) or sqlerr(__FILE__, __LINE__);
-		if(mysql_affected_rows())
+		if(_mysql_affected_rows())
 			write_forum_log("Post:$id in Topic:$topicid was edited by $CURUSER[username].", $permi);
 		$postid = $id;
 		$Cache->delete_value('post_'.$postid.'_content');
@@ -451,7 +451,7 @@ elseif ($action == "post") {
 
 			//---- Create topic
 			sql_query("INSERT INTO topics (userid, forumid, subject) VALUES($userid, $forumid, ".sqlesc($subject).")") or sqlerr(__FILE__, __LINE__);
-			$topicid = mysql_insert_id() or stderr($lang_forums['std_error'],$lang_forums['std_no_topic_id_returned']);
+			$topicid = _mysql_insert_id() or stderr($lang_forums['std_error'],$lang_forums['std_no_topic_id_returned']);
 			sql_query("UPDATE forums SET topiccount=topiccount+1, postcount=postcount+1 WHERE id=".sqlesc($forumid));
 		}
 		else { // new post
@@ -462,7 +462,7 @@ elseif ($action == "post") {
 		}
 		$values = array($topicid, $userid, sqlesc($date), sqlesc($body), sqlesc($body), $quote);
 		sql_query("INSERT INTO posts (topicid, userid, added, body, ori_body, quote) VALUES (" . implode(',', $values) . ')') or sqlerr(__FILE__, __LINE__);
-		$postid = mysql_insert_id() or die($lang_forums['std_post_id_not_available']);
+		$postid = _mysql_insert_id() or die($lang_forums['std_post_id_not_available']);
 		$Cache->delete_value('forum_'.$forumid.'_post_'.$today_date.'_count');
 		$Cache->delete_value('today_'.$today_date.'_posts_count');
 		$Cache->delete_value('forum_'.$forumid.'_last_replied_topic_content');
@@ -522,7 +522,7 @@ elseif ($action == "viewtopic") {
 	//------ Get topic info
 
 	$res = sql_query("SELECT * FROM topics WHERE id=".sqlesc($topicid)." LIMIT 1") or sqlerr(__FILE__, __LINE__);
-	$arr = mysql_fetch_assoc($res) or stderr($lang_forums['std_forum_error'], $lang_forums['std_topic_not_found']);
+	$arr = _mysql_fetch_assoc($res) or stderr($lang_forums['std_forum_error'], $lang_forums['std_topic_not_found']);
 
 	$forumid = $arr['forumid'];
 	$locked = $arr['locked'] == "yes";
@@ -552,7 +552,7 @@ elseif ($action == "viewtopic") {
 
 	//------ Get post count
 	$r = sql_query("SELECT COUNT(*) AS count, MAX(id) AS maxid FROM posts $where") or sqlerr(__FILE__, __LINE__);
-	$a = mysql_fetch_assoc($r) or die(mysql_error());
+	$a = _mysql_fetch_assoc($r) or die(_mysql_error());
 	$postcount = $a['count'];
 	$maxid = $a['maxid'];
 
@@ -566,7 +566,7 @@ elseif ($action == "viewtopic") {
 	if ($page[0] == "p") {
 	  $findpost = 0 + substr($page, 1);
 	  $res = sql_query("SELECT COUNT(*) FROM posts $where AND id < $findpost ORDER BY added") or sqlerr(__FILE__, __LINE__);
-	  $arr = mysql_fetch_row($res);
+	  $arr = _mysql_fetch_row($res);
 	  $i = $arr[0];
 	  $page = floor($i / $postsperpage);
 	}
@@ -620,7 +620,7 @@ elseif ($action == "viewtopic") {
 	print($pagertop);
 	print("</div>\n");
 
-	$pc = mysql_num_rows($res);
+	$pc = _mysql_num_rows($res);
 
 	$pn = 0;
 	$lpr = get_last_read_post_id($topicid);
@@ -639,7 +639,7 @@ SELECT id, rownum FROM (SELECT @x:=@x+1 AS rownum, id, userid FROM (SELECT @x:=0
 	  $r = sql_query($query) or sqlerr(__FILE__, __LINE__);
 	  $i = 0;
 	  $floorsDict = [];
-	  while ($arr = mysql_fetch_row($r)) {
+	  while ($arr = _mysql_fetch_row($r)) {
 	    $t = $arr[0];
 	    if ($t) {
 	      $floorsDict[$t] = $i;
@@ -648,7 +648,7 @@ SELECT id, rownum FROM (SELECT @x:=@x+1 AS rownum, id, userid FROM (SELECT @x:=0
 	  }
 	}
 	
-	while ($arr = mysql_fetch_assoc($res)) {
+	while ($arr = _mysql_fetch_assoc($res)) {
 	  if ($pn>=1) {
 	    if ($Advertisement->enable_ad()) {
 	      if ($forumpostad[$pn-1])
@@ -835,19 +835,19 @@ elseif ($action == "movetopic") {
 
 	$res = @sql_query("SELECT minclasswrite,minclassread FROM forums WHERE id=$forumid") or sqlerr(__FILE__, __LINE__);
 
-	if (mysql_num_rows($res) != 1)
+	if (_mysql_num_rows($res) != 1)
 	stderr($lang_forums['std_error'], $lang_forums['std_forum_not_found']);
 
-	$arr = mysql_fetch_row($res);
+	$arr = _mysql_fetch_row($res);
 
 	if (get_user_class() < $arr[0])
 		permissiondenied();
 	$des_mincread = $arr[1];
 
 	$res = @sql_query("SELECT forumid FROM topics WHERE id=$topicid") or sqlerr(__FILE__, __LINE__);
-	if (mysql_num_rows($res) != 1)
+	if (_mysql_num_rows($res) != 1)
 		stderr($lang_forums['std_error'], $lang_forums['std_topic_not_found']);
-	$arr = mysql_fetch_row($res);
+	$arr = _mysql_fetch_row($res);
 	$old_forumid=$arr[0];
 	$old_forum_row = get_forum_row($old_forumid);
 	$old_mincread = $old_forum_row["minclassread"];
@@ -857,9 +857,9 @@ elseif ($action == "movetopic") {
 		$permi = "normal";
 	// get posts count
 	$res = sql_query("SELECT COUNT(id) AS nb_posts FROM posts WHERE topicid=$topicid") or sqlerr(__FILE__, __LINE__);
-	if (mysql_num_rows($res) != 1)
+	if (_mysql_num_rows($res) != 1)
 	stderr($lang_forums['std_error'], $lang_forums['std_cannot_get_posts_count']);
-	$arr = mysql_fetch_row($res);
+	$arr = _mysql_fetch_row($res);
 	$nb_posts = $arr[0];
 
 	// move topic
@@ -894,7 +894,7 @@ elseif ($action == "movetopic") {
 elseif ($action == "deletetopic") {
 	$topicid = 0+$_GET["topicid"];
 	$res1 = sql_query("SELECT forumid, userid FROM topics WHERE id=".sqlesc($topicid)." LIMIT 1") or sqlerr(__FILE__, __LINE__);
-	$row1 = mysql_fetch_array($res1);
+	$row1 = _mysql_fetch_array($res1);
 	if (!$row1){
 		die;
 	}
@@ -949,18 +949,18 @@ elseif ($action == "deletepost") {
 
 	//------- Get topic id
 	$res = sql_query("SELECT topicid, userid FROM posts WHERE id=$postid") or sqlerr(__FILE__, __LINE__);
-	$arr = mysql_fetch_array($res) or stderr($lang_forums['std_error'], $lang_forums['std_post_not_found']);
+	$arr = _mysql_fetch_array($res) or stderr($lang_forums['std_error'], $lang_forums['std_post_not_found']);
 	$topicid = $arr['topicid'];
 	$userid = $arr['userid'];
 
 	//------- Get the id of the last post before the one we're deleting
 	$res = sql_query("SELECT id FROM posts WHERE topicid=$topicid AND id < $postid ORDER BY id DESC LIMIT 1") or sqlerr(__FILE__, __LINE__);
-	if (mysql_num_rows($res) == 0) // This is the first post of a topic
+	if (_mysql_num_rows($res) == 0) // This is the first post of a topic
 		stderr($lang_forums['std_error'], $lang_forums['std_cannot_delete_post'] .
 	"<a class=altlink href=?action=deletetopic&topicid=$topicid&sure=1>".$lang_forums['std_delete_topic_instead'],false);
 	else
 	{
-		$arr = mysql_fetch_row($res);
+		$arr = _mysql_fetch_row($res);
 		$redirtopost = "&page=p$arr[0]#pid$arr[0]";
 	}
 
@@ -1025,7 +1025,7 @@ elseif ($action == "setlocked") {
 	$act = ($locked=='yes'?"locked":"unlocked");
 	$locked = sqlesc($locked);
 	sql_query("UPDATE topics SET locked=$locked WHERE id=$topicid") or sqlerr(__FILE__, __LINE__);
-	if(mysql_affected_rows())
+	if(_mysql_affected_rows())
 		write_forum_log("Topic:$topicid was $act by $CURUSER[username].",$permi);
 	header("Location: $_POST[returnto]");
 	die;
@@ -1045,7 +1045,7 @@ elseif ($action == 'hltopic') {
 		$permi = "normal";
 	if ($color==0 || get_hl_color($color))
 		sql_query("UPDATE topics SET hlcolor=".sqlesc($color)." WHERE id=".sqlesc($topicid)) or sqlerr(__FILE__, __LINE__);
-	if(mysql_affected_rows()){
+	if(_mysql_affected_rows()){
 		if($color!=0)
 			write_forum_log("Topic:$topicid was highlighted by $CURUSER[username].",$permi);
 		else
@@ -1095,7 +1095,7 @@ elseif ($action == "setsticky" || $action == 'setselected') {
   $value = sqlesc($value);
    	
   sql_query("UPDATE topics SET $key=$value WHERE id=$topicid") or sqlerr(__FILE__, __LINE__);
-	if(mysql_affected_rows())
+	if(_mysql_affected_rows())
 		write_forum_log("Topic:$topicid was $act by $CURUSER[username].",$permi);
   header("Location: $_REQUEST[returnto]");
   die;
@@ -1118,10 +1118,11 @@ elseif ($action == "viewforum") {
 	
 	$forumname = $row['name'];
 	$forummoderators = get_forum_moderators($forumid,false);
-	$search = mysql_real_escape_string(trim($_GET["search"]));
-	if ($search){
-		$wherea = " AND subject LIKE '%$search%'";
-		$addparam .= "&search=".rawurlencode($search);
+	$search_raw = trim($_GET["search"]);
+	$search = '%' . $search_raw . '%';
+	if ($search_raw){
+		$wherea = " AND subject LIKE ?";
+		$addparam .= "&search=".rawurlencode($search_raw);
 	}
 	else {
 		$wherea = "";
@@ -1132,8 +1133,13 @@ elseif ($action == "viewforum") {
 	  $wherea .= " AND selected = 'yes'";
 	  $addparam .= '&filter=selected';
 	}
+
+	$args = [$forumid];
+	if ($search_raw) {
+	  $args[] = $search;
+	}
 	
-	$num = get_row_count("topics","WHERE forumid=".sqlesc($forumid).$wherea);
+	$num = get_row_count("topics","WHERE forumid=?".$wherea, $args);
 
 	list($pagertop, $pagerbottom, $limit) = pager($topicsperpage, $num, "?"."action=viewforum&forumid=".$forumid . $addparam."&", ['link' => 'bottom']);
 	if ($_GET["sort"]){
@@ -1169,8 +1175,8 @@ elseif ($action == "viewforum") {
 		$orderby = "lastpost DESC";
 	}
 	//------ Get topics data
-	$topicsres = sql_query("SELECT * FROM topics WHERE forumid=".sqlesc($forumid).$wherea." ORDER BY sticky DESC,".$orderby." ".$limit) or sqlerr(__FILE__, __LINE__);
-	$numtopics = mysql_num_rows($topicsres);
+	$topicsres = sql_query("SELECT * FROM topics WHERE forumid=?".$wherea." ORDER BY sticky DESC,".$orderby." ".$limit, $args);
+	$numtopics = _mysql_num_rows($topicsres);
 	stdhead($lang_forums['head_forum']." ".$forumname);
 	print("<h1 id=\"page-title\"><a class=\"faqlink\" href=\"forums.php\">".$SITENAME."&nbsp;".$lang_forums['text_forums'] ."</a> --> <a class=\"faqlink\" href=\"".htmlspecialchars("forums.php?action=viewforum&forumid=".$forumid)."\">".$forumname."</a></h1>\n");
 
@@ -1238,7 +1244,7 @@ elseif ($action == "viewforum") {
 		print("</tr></thead><tbody>\n");
 		$counter = 0;
 
-		while ($topicarr = mysql_fetch_assoc($topicsres)) {
+		while ($topicarr = _mysql_fetch_assoc($topicsres)) {
 			$topicid = $topicarr["id"];
 			$topic_userid = $topicarr["userid"];
 			$topic_views = $topicarr["views"];
@@ -1366,7 +1372,7 @@ elseif ($action == "viewunread") {
 	$n = 0;
 	$uc = get_user_class();
 
-	while ($arr = mysql_fetch_assoc($res))
+	while ($arr = _mysql_fetch_assoc($res))
 	{
 		$topiclastpost = $arr['lastpost'];
 		$topicid = $arr['id'];
@@ -1420,10 +1426,11 @@ elseif ($action == "search") {
 	$keywords = htmlspecialchars(trim($_GET["keywords"]));
 	if ($keywords != "")
 	{
-		$extraSql 	= " LIKE '%".mysql_real_escape_string($keywords)."%'";
+	  $keywords_sql = '%' . $keywords . '%';
+		$extraSql 	= " LIKE :keywords";
 
-		$res = sql_query("SELECT COUNT(posts.id) FROM posts LEFT JOIN topics ON posts.topicid = topics.id LEFT JOIN forums ON topics.forumid = forums.id WHERE forums.minclassread <= ".sqlesc(get_user_class())." AND ((topics.subject $extraSql AND posts.id=topics.firstpost) OR posts.body $extraSql)") or sqlerr(__FILE__, __LINE__);
-		$arr = mysql_fetch_row($res);
+		$res = sql_query("SELECT COUNT(posts.id) FROM posts LEFT JOIN topics ON posts.topicid = topics.id LEFT JOIN forums ON topics.forumid = forums.id WHERE forums.minclassread <= :class AND ((topics.subject $extraSql AND posts.id=topics.firstpost) OR posts.body $extraSql)", [':class' => get_user_class(), ':keywords' => $keywords_sql]);
+		$arr = _mysql_fetch_row($res);
 		$hits = 0 + $arr[0];
 		if ($hits){
 			$error = false;
@@ -1436,13 +1443,13 @@ elseif ($action == "search") {
 	if (!$error) {
 		$perpage = $topicsperpage;
 		list($pagertop, $pagerbottom, $limit) = pager($perpage, $hits, "forums.php?action=search&keywords=".rawurlencode($keywords)."&");
-		$res = sql_query("SELECT posts.id, posts.topicid, posts.userid, posts.added, topics.subject, topics.hlcolor, forums.id AS forumid, forums.name AS forumname FROM posts LEFT JOIN topics ON posts.topicid = topics.id LEFT JOIN forums ON topics.forumid = forums.id WHERE forums.minclassread <= ".sqlesc(get_user_class())." AND ((topics.subject $extraSql AND posts.id=topics.firstpost) OR posts.body $extraSql) ORDER BY posts.id DESC $limit") or sqlerr(__FILE__, __LINE__);
+		$res = sql_query("SELECT posts.id, posts.topicid, posts.userid, posts.added, topics.subject, topics.hlcolor, forums.id AS forumid, forums.name AS forumname FROM posts LEFT JOIN topics ON posts.topicid = topics.id LEFT JOIN forums ON topics.forumid = forums.id WHERE forums.minclassread <= :class AND ((topics.subject $extraSql AND posts.id=topics.firstpost) OR posts.body $extraSql) ORDER BY posts.id DESC $limit", [':class' => get_user_class(), ':keywords' => $keywords_sql]);
 
 		print($pagertop);
 		print("<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\" style=\"width:95%\"><thead>\n");
 		print("<tr><th align=\"center\">".$lang_forums['col_post']."</th><th align=\"center\" width=\"70%\">".$lang_forums['col_topic']."</th><th align=\"left\">".$lang_forums['col_forum']."</th><th align=\"left\">".$lang_forums['col_posted_by']."</th></tr></thead><tbody>\n");
 
-		while ($post = mysql_fetch_array($res))
+		while ($post = _mysql_fetch_array($res))
 		{
 			print("<tr><td class=\"rowfollow\" align=\"center\" width=\"1%\">".$post[id]."</td><td class=\"rowfollow\" align=\"left\"><a href=\"".htmlspecialchars("?action=viewtopic&topicid=".$post[topicid]."&highlight=".rawurlencode($keywords)."&page=p".$post[id]."#pid".$post[id])."\">" . highlight_topic(highlight($keywords,htmlspecialchars($post['subject'])), $post['hlcolor']) . "</a></td><td class=\"rowfollow nowrap\" align=\"left\"><a href=\"".htmlspecialchars("?action=viewforum&forumid=".$post['forumid'])."\"><b>" . htmlspecialchars($post["forumname"]) . "</b></a></td><td class=\"rowfollow nowrap\" align=\"left\">" . gettime($post['added'],true,false) . "&nbsp;|&nbsp;". get_username($post['userid']) ."</td></tr>\n");
 		}
@@ -1483,7 +1490,7 @@ print("<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\" width=\"100%\">\n
 if (!$overforums = $Cache->get_value('overforums_list')){
 	$overforums = array();
 	$res = sql_query("SELECT * FROM overforums ORDER BY sort ASC") or sqlerr(__FILE__, __LINE__);
-	while ($row = mysql_fetch_array($res))
+	while ($row = _mysql_fetch_array($res))
 		$overforums[] = $row;
 	$Cache->cache_value('overforums_list', $overforums, 86400);
 }
@@ -1529,7 +1536,7 @@ foreach ($overforums as $a) {
 		//Returns the ID of the last post of a forum
 		if (!$arr = $Cache->get_value('forum_'.$forumid.'_last_replied_topic_content')){
 			$res = sql_query("SELECT * FROM topics WHERE forumid=".sqlesc($forumid)." ORDER BY lastpost DESC LIMIT 1") or sqlerr(__FILE__, __LINE__);
-			$arr = mysql_fetch_array($res);
+			$arr = _mysql_fetch_array($res);
 			$Cache->cache_value('forum_'.$forumid.'_last_replied_topic_content', $arr, 900);
 		}
 

@@ -11,7 +11,7 @@
 if($userid != $arr['userid']) {
   $sqlCheckDonate = 'SELECT amount, message, action_date FROM donate_bonus WHERE object_id='.$topicid.' AND donater_id='.$userid.' AND `type`="topic"';
 	$result  = sql_query($sqlCheckDonate) or sqlerr();
-	$donated = mysql_fetch_assoc($result);
+	$donated = _mysql_fetch_assoc($result);
 	if(!empty($donated)) {
 		echo "<p class=\"donate_note\">你已经于 {$donated['action_date']} 对楼主捐赠过 {$donated['amount']} 魔力值，谢谢你！</p>";
 	} else {
@@ -37,7 +37,7 @@ if($Cache->get_value('sign_update_donate_bonus_topic_'.$topicid) == 'no') {
 } else {
 	// 'sign_update_donate_bonus_topic_{id}' is 'yes' or empty 
 	$donaterRecodes  = array();
-	while($donateInfo = mysql_fetch_assoc($result)) {
+	while($donateInfo = _mysql_fetch_assoc($result)) {
 		$donaterRecodes[] = $donateInfo;
 		$i++;
 	}

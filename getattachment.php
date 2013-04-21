@@ -12,7 +12,7 @@ $dlkey = $_GET["dlkey"];
 if (!$dlkey)
 	die('Invalid key');
 $res = sql_query("SELECT * FROM attachments WHERE id = ".sqlesc($id)." AND dlkey = ".sqlesc($dlkey)." LIMIT 1") or sqlerr(__FILE__, __LINE__);
-$row = mysql_fetch_assoc($res);
+$row = _mysql_fetch_assoc($res);
 if (!$row)
 	die('No attachment found.');
 $filelocation = $httpdirectory_attachment."/".$row['location'];

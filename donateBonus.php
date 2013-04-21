@@ -33,7 +33,7 @@ if(!empty($CURUSER['username'])) {
 			$objectId = (int) $_POST['torrent_id'];
 			
 			$result = sql_query('SELECT owner, name, anonymous FROM torrents WHERE id='.$objectId);
-			$torrentInfo = mysql_fetch_assoc($result);
+			$torrentInfo = _mysql_fetch_assoc($result);
 			
 			$receiverId = $torrentInfo['owner'];
 			$objectName = $torrentInfo['name'];
@@ -44,7 +44,7 @@ if(!empty($CURUSER['username'])) {
 			$objectId = (int) $_POST['topicid'];
 			
 			$result = sql_query('SELECT userid, subject, forumid, locked FROM topics WHERE id='.$objectId) or sqlerr();
-			$topicInfo = mysql_fetch_assoc($result);
+			$topicInfo = _mysql_fetch_assoc($result);
 			
 			$receiverId = $topicInfo['userid'];
 			$objectName = $topicInfo['subject'];
@@ -70,7 +70,7 @@ if(!empty($CURUSER['username'])) {
 		}else {
 			$sqlCheckDonate = 'SELECT donater_id FROM donate_bonus WHERE object_id='.$objectId.' AND donater_id='.$donaterId.' AND `type`="'.$objectType.'"';
 			$result  = sql_query($sqlCheckDonate);
-			$donated = mysql_fetch_assoc($result);
+			$donated = _mysql_fetch_assoc($result);
 			
 			if(!empty($donated)) {
 				$status = 6; // Already donated
@@ -84,13 +84,13 @@ if(!empty($CURUSER['username'])) {
 				            ." ({$donaterId}, '{$donater}', {$receiverId}, '{$objectType}', {$objectId}, {$amount}, {$amount_after_tax}, '')";
 				sql_query($sqlAddLog);
 				
-				if(mysql_affected_rows()) {
+				if(_mysql_affected_rows()) {
 					$status = 7; // Loged the donate
 
 					// Update the user details of donater  |->
 					$sqlReceiverInfo = 'SELECT username FROM users WHERE id='.$receiverId;
-					$result = mysql_query($sqlReceiverInfo);
-					$receiverInfo = mysql_fetch_assoc($result);
+					$result = _mysql_query($sqlReceiverInfo);
+					$receiverInfo = _mysql_fetch_assoc($result);
 					$receiver = $receiverInfo['username'];
 					$dotanerBonusComment = date("Y-m-d")." - {$amount} Points as donate to {$receiver} on {$objectType} {$objectId}.\n";
 
@@ -99,7 +99,7 @@ if(!empty($CURUSER['username'])) {
 					// End update the user details of donater
 					
 					
-					if(mysql_affected_rows()) {
+					if(_mysql_affected_rows()) {
 						$status = 8; // Reduced the bonus from donater
 						
 						$receiverBonusComment = date("Y-m-d")." + {$amount_after_tax} Points (after tax) as donate from {$donater} on {$objectType} {$objectId}.\n";
@@ -107,7 +107,7 @@ if(!empty($CURUSER['username'])) {
 						$sqlUpdateReceiverInfo = "UPDATE users SET seedbonus=seedbonus+{$amount_after_tax}, bonuscomment=CONCAT('{$receiverBonusComment}', bonuscomment) WHERE id={$receiverId}"; // Successful;
 						sql_query($sqlUpdateReceiverInfo);
 						
-						if(mysql_affected_rows()) {
+						if(_mysql_affected_rows()) {
 							$status = 9; // Successful
 				
 						}

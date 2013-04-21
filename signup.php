@@ -34,9 +34,8 @@ if ($type == 'invite')
 	$dom = $tldm[2];
 	}
 
-	$sq = sprintf("SELECT inviter FROM invites WHERE hash ='%s'",mysql_real_escape_string($code));
-	$res = sql_query($sq) or sqlerr(__FILE__, __LINE__);
-	$inv = mysql_fetch_assoc($res);
+	$res = sql_query('SELECT inviter FROM invites WHERE hash =?', [$code]);
+	$inv = _mysql_fetch_assoc($res);
 	$inviter = htmlspecialchars($inv["inviter"]);
 	if (!$inv)
 		stderr($lang_signup['std_error'], $lang_signup['std_uninvited'], 0);
@@ -75,14 +74,14 @@ show_image_code ();
 </td></tr>
 <?php $countries = "<option value=\"8\">---- ".$lang_signup['select_none_selected']." ----</option>n";
 $ct_r = sql_query("SELECT id,name FROM countries ORDER BY name") or die;
-while ($ct_a = mysql_fetch_array($ct_r))
+while ($ct_a = _mysql_fetch_array($ct_r))
 $countries .= "<option value=$ct_a[id]" . ($ct_a['id'] == 8 ? " selected" : "") . ">$ct_a[name]</option>n";
 tr($lang_signup['row_country'], "<select name=country>n$countries</select>", 1); 
 //School select
 if ($showschool == 'yes'){
 $schools = "<option value=35>---- ".$lang_signup['select_none_selected']." ----</option>n";
 $sc_r = sql_query("SELECT id,name FROM schools ORDER BY name") or die;
-while ($sc_a = mysql_fetch_array($sc_r))
+while ($sc_a = _mysql_fetch_array($sc_r))
 $schools .= "<option value=$sc_a[id]" . ($sc_a['id'] == 16 ? " selected" : "") . ">$sc_a[name]</option>n";
 tr($lang_signup['row_school'], "<select name=school>$schools</select>", 1);
 }

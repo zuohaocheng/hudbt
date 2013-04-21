@@ -24,7 +24,7 @@ if($_GET['action'] == 'clean') {
 //	var_dump($isWritable, $rsl, $file, $contents);
 	$sqlGetId = 'DELETE FROM loginattempts WHERE banned=\'yes\' AND `ip`=\'59.175.216.190\'';
 	sql_query($sqlGetId);
-	if (!mysql_affected_rows()) {
+	if (!_mysql_affected_rows()) {
 		echo 'IP 并未被锁定，不用刷新。';
 	} else {
 		$contents = $CURUSER['username'].' 成功解除锁定。';

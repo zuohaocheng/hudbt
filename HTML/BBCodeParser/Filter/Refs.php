@@ -47,7 +47,7 @@ class HTML_BBCodeParser_Filter_Refs extends HTML_BBCodeParser_Filter {
     $key = $keys[1];
     $query = 'SELECT name FROM torrents WHERE id=' . (0+$key) . ' LIMIT 1';
     $r = sql_query($query) or sqlerr(__FILE__, __LINE__);
-    $a = mysql_fetch_row($r);
+    $a = _mysql_fetch_row($r);
     if ($a) {
       global $BASEURL;
       return '<a href="//' . $BASEURL . '/details.php?id=' . $key . '">' . htmlspecialchars($a[0]) . '</a>';
@@ -72,7 +72,7 @@ class HTML_BBCodeParser_Filter_Refs extends HTML_BBCodeParser_Filter {
     $key = $keys[1];
     $query = 'SELECT subject FROM topics WHERE id=' . (0+$key) . ' LIMIT 1';
     $r = sql_query($query) or sqlerr(__FILE__, __LINE__);
-    $a = mysql_fetch_row($r);
+    $a = _mysql_fetch_row($r);
     if ($a) {
       global $BASEURL;
       return '<a href="//' . $BASEURL . '/forums.php?action=viewtopic&amp;topicid=' . $key . '">' . $a[0] . '</a>';
@@ -86,13 +86,13 @@ class HTML_BBCodeParser_Filter_Refs extends HTML_BBCodeParser_Filter {
     $key = $keys[1];
     $query = 'SELECT topics.subject, topics.id FROM posts LEFT JOIN topics ON posts.topicid = topics.id WHERE posts.id=' . (0+$key) . ' LIMIT 1';
     $r = sql_query($query) or sqlerr(__FILE__, __LINE__);
-    $a = mysql_fetch_row($r);
+    $a = _mysql_fetch_row($r);
     if ($a) {
       $topicname = $a[0];
       $topicid = $a[1];
       $query = 'SELECT COUNT(1) FROM posts WHERE id<' . (0 + $key) . ' AND topicid=' . $topicid . ';';
       $r = sql_query($query) or sqlerr(__FILE__, __LINE__);
-      $a = mysql_fetch_row($r);
+      $a = _mysql_fetch_row($r);
       
       global $BASEURL;
       return '<a href="//' . $BASEURL . '/forums.php?action=viewtopic&amp;topicid=' . $topicid . '&amp;page=p' . $key . '#pid' . $key . '">' . htmlspecialchars($topicname) . '#' . (1+$a[0]) . '楼</a>';

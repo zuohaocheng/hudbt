@@ -53,20 +53,8 @@ if ($action == 'savesettings_main')	// save main
 elseif ($action == 'savesettings_basic') 	// save basic
 {
 	stdhead($lang_settings['head_save_basic_settings']);
-	$validConfig = array('SITENAME', 'BASEURL', 'announce_url', 'mysql_host', 'mysql_user', 'mysql_pass', 'mysql_db');
+	$validConfig = array('SITENAME', 'BASEURL', 'announce_url');
 	GetVar($validConfig);
-	if (!mysql_connect($mysql_host, $mysql_user, $mysql_pass)) {
-		stdmsg($lang_settings['std_error'], $lang_settings['std_mysql_connect_error'].$lang_settings['std_click']."<a class=\"altlink\" href=\"settings.php\">".$lang_settings['std_here']."</a>".$lang_settings['std_to_go_back']);
-	} else {
-		dbconn();
-		foreach($validConfig as $config) {
-			$BASIC[$config] = $$config;
-		}
-		WriteConfig('BASIC', $BASIC);
-		$actiontime = date("F j, Y, g:i a");
-		write_log("Tracker basic settings updated by $CURUSER[username]. $actiontime",'mod');
-		go_back();
-	}
 }
 elseif ($action == 'savesettings_code') 	// save database
 {
@@ -173,7 +161,7 @@ elseif ($action == 'savesettings_authority') 	// save user authority
 elseif ($action == 'savesettings_tweak')	// save tweak
 {
 	stdhead($lang_settings['head_save_tweak_settings']);
-	$validConfig = array('where','iplog1','bonus','datefounded', 'enablelocation', 'titlekeywords', 'metakeywords', 'metadescription', 'enablesqldebug', 'sqldebug', 'cssdate', 'enabletooltip', 'prolinkimg', 'analyticscode', 'oday_forum_id', 'oday_bot_id');
+	$validConfig = array('iplog1','bonus','datefounded', 'enablelocation', 'titlekeywords', 'metakeywords', 'metadescription', 'enablesqldebug', 'sqldebug', 'cssdate', 'enabletooltip', 'prolinkimg', 'analyticscode', 'oday_forum_id', 'oday_bot_id');
 	GetVar($validConfig);
 	foreach($validConfig as $config) {
 		$TWEAK[$config] = $$config;
@@ -216,7 +204,6 @@ elseif ($action == 'tweaksettings')		// tweak settings
 	stdhead($lang_settings['head_tweak_settings']);
 	print ($notice);
 	print ("<form method='post' action='".$_SERVER["SCRIPT_NAME"]."'><input type='hidden' name='action' value='savesettings_tweak' />");
-	yesorno($lang_settings['row_save_user_location'], 'where', $TWEAK["where"], $lang_settings['text_save_user_location_note']);
 	yesorno($lang_settings['row_log_user_ips'], 'iplog1', $TWEAK["iplog1"], $lang_settings['text_store_user_ips_note']);
 	tr($lang_settings['row_kps_enabled'],"<input type='radio' id='bonusenable' name='bonus'" . ($TWEAK["bonus"] == "enable" ? " checked='checked'" : "") . " value='enable' /> <label for='bonusenable'>".$lang_settings['text_enabled']."</label> <input type='radio' id='bonusdisablesave' name='bonus'" . ($TWEAK["bonus"] == "disablesave" ? " checked='checked'" : "") . " value='disablesave' /> <label for='bonusdisablesave'>".$lang_settings['text_disabled_but_save']."</label> <input type='radio' id='bonusdisable' name='bonus'" . ($TWEAK["bonus"] == "disable" ? " checked='checked'" : "") . " value='disable' /> <label for='bonusdisable'>".$lang_settings['text_disabled_no_save']."</label> <br />".$lang_settings['text_kps_note'], 1);
 	yesorno($lang_settings['row_enable_location'], 'enablelocation', $TWEAK["enablelocation"], $lang_settings['text_enable_location_note']);
@@ -346,10 +333,6 @@ elseif ($action == 'basicsettings')	// basic settings
 	tr($lang_settings['row_site_name'],"<input type='text' style=\"width: 300px\" name=SITENAME value='".($BASIC["SITENAME"] ? $BASIC["SITENAME"]: "Nexus")."'> ".$lang_settings['text_site_name_note'], 1);
 	tr($lang_settings['row_base_url'],"<input type='text' style=\"width: 300px\" name=BASEURL value='".($BASIC["BASEURL"] ? $BASIC["BASEURL"] : $_SERVER["HTTP_HOST"])."'> ".$lang_settings['text_it_should_be'] . $_SERVER["HTTP_HOST"] . $lang_settings['text_base_url_note'], 1);
 	tr($lang_settings['row_announce_url'],"<input type='text' style=\"width: 300px\" name=announce_url value='".($BASIC["announce_url"] ? $BASIC["announce_url"] : $_SERVER["HTTP_HOST"]."/announce.php")."'> ".$lang_settings['text_it_should_be'] . $_SERVER["HTTP_HOST"]."/announce.php", 1);
-	tr($lang_settings['row_mysql_host'],"<input type='text' style=\"width: 300px\" name=mysql_host value='".($BASIC["mysql_host"] ? $BASIC["mysql_host"] : "localhost")."'> ".$lang_settings['text_mysql_host_note'], 1);
-	tr($lang_settings['row_mysql_user'],"<input type='text' style=\"width: 300px\" name=mysql_user value='".($BASIC["mysql_user"] ? $BASIC["mysql_user"] : "root")."'> ".$lang_settings['text_mysql_user_note'], 1);
-	tr($lang_settings['row_mysql_password'],"<input type='password' style=\"width: 300px\" name=mysql_pass value=''> ".$lang_settings['text_mysql_password_note'], 1);
-	tr($lang_settings['row_mysql_database_name'],"<input type='text' style=\"width: 300px\" name=mysql_db value='".($BASIC["mysql_db"] ? $BASIC["mysql_db"] : "nexus")."'> ".$lang_settings['text_mysql_database_name_note'], 1);
 	tr($lang_settings['row_save_settings'],"<input type='submit' name='save' value='".$lang_settings['submit_save_settings']."'>", 1);
 	print ("</form>");
 }
@@ -551,7 +534,7 @@ elseif ($action == 'mainsettings')	// main settings
 	tr($lang_settings['row_external_forum_url'],"<input type='text' style=\"width: 300px\" name=extforumurl value='".($MAIN["extforumurl"] ? $MAIN["extforumurl"] : "")."'> ".$lang_settings['text_external_forum_url_note'], 1);
 	$res = sql_query("SELECT id, name FROM searchbox") or sqlerr(__FILE__, __LINE__);
 	$catlist = "";
-	while($array = mysql_fetch_array($res)){
+	while($array = _mysql_fetch_array($res)){
 		$bcatlist .= "<input type=radio name=browsecat value='".$array['id']."'".($MAIN["browsecat"] == $array['id'] ? " checked" : "").">".$array['name']."&nbsp;";
 		$scatlist .= "<input type=radio name=specialcat value='".$array['id']."'".($MAIN["specialcat"] == $array['id'] ? " checked" : "").">".$array['name']."&nbsp;";
 	}
@@ -560,12 +543,12 @@ elseif ($action == 'mainsettings')	// main settings
 	tr($lang_settings['row_special_category_mode'], $scatlist."<br />".$lang_settings['text_special_category_mode_note'], 1);
 	$res = sql_query("SELECT * FROM language WHERE site_lang=1") or sqlerr(__FILE__, __LINE__);
 	$langlist = "";
-	while($array = mysql_fetch_array($res))
+	while($array = _mysql_fetch_array($res))
 		$langlist .= "<input type=radio name=defaultlang value='".$array['site_lang_folder']."'".($MAIN["defaultlang"] == $array['site_lang_folder'] ? " checked" : "").">".$array['lang_name']."&nbsp;";
 	tr($lang_settings['row_default_site_language'], $langlist."<br />".$lang_settings['text_default_site_language_note'], 1);
 	$res = sql_query("SELECT * FROM stylesheets ORDER BY name") or sqlerr(__FILE__, __LINE__);
 	$csslist = "<select name=defstylesheet>";
-	while($array = mysql_fetch_array($res))
+	while($array = _mysql_fetch_array($res))
 		$csslist .= "<option value='".$array['id']."'".($MAIN["defstylesheet"] == $array['id'] ? " selected" : "").">".$array['name']."</option>";
 	$csslist .= "</select>";
 	tr($lang_settings['row_default_stylesheet'], $csslist."<br />".$lang_settings['text_default_stylesheet_note'], 1);

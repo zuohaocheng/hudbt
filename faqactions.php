@@ -50,7 +50,7 @@ elseif ($_GET[action] == "edit" && isset($_GET[id])) {
 	print("<h1 align=\"center\">Edit Section or Item</h1>");
 
 	$res = sql_query("SELECT * FROM faq WHERE id=".sqlesc($_GET[id])." LIMIT 1");
-	while ($arr = mysql_fetch_array($res, MYSQL_BOTH)) {
+	while ($arr = _mysql_fetch_array($res, MYSQL_BOTH)) {
 		$arr[question] = htmlspecialchars($arr[question]);
 		$arr[answer] = htmlspecialchars($arr[answer]);
 		if ($arr[type] == "item") {
@@ -66,7 +66,7 @@ elseif ($_GET[action] == "edit" && isset($_GET[id])) {
 			else print("<tr><td>Status:</td><td><select name=\"flag\" style=\"width: 110px;\"><option value=\"0\" style=\"color: #FF0000;\">Hidden</option><option value=\"1\" style=\"color: #000000;\" selected=\"selected\">Normal</option><option value=\"2\" style=\"color: #0000FF;\">Updated</option><option value=\"3\" style=\"color: #008000;\">New</option></select></td></tr>");
 			print("<tr><td>Category:</td><td><select style=\"width: 400px;\" name=\"categ\" />");
 			$res2 = sql_query("SELECT `id`, `question`, `link_id` FROM `faq` WHERE `type`='categ' AND `lang_id` = ".sqlesc($lang_id)." ORDER BY `order` ASC");
-			while ($arr2 = mysql_fetch_array($res2, MYSQL_BOTH)) {
+			while ($arr2 = _mysql_fetch_array($res2, MYSQL_BOTH)) {
 				$selected = ($arr2[link_id] == $arr[categ]) ? " selected=\"selected\"" : "";
 				print("<option value=\"$arr2[link_id]\"". $selected .">$arr2[question]</option>");
 			}
@@ -76,7 +76,7 @@ elseif ($_GET[action] == "edit" && isset($_GET[id])) {
 		}
 		elseif ($arr[type] == "categ") {
 			$lang_res = sql_query("SELECT lang_name FROM language WHERE id=".sqlesc($arr[lang_id])." LIMIT 1");
-			if ($lang_arr = mysql_fetch_array($lang_res))
+			if ($lang_arr = _mysql_fetch_array($lang_res))
 				$lang_name = $lang_arr['lang_name'];
 			print("<form method=\"post\" action=\"faqactions.php?action=editsect\">");
 			print("<table border=\"1\" cellspacing=\"0\" cellpadding=\"10\" align=\"center\">\n");
@@ -202,7 +202,7 @@ elseif ($_GET[action] == "addnewitem" && $_POST[question] != NULL && $_POST[answ
 	$categ = 0+$_POST[categ];
 	$langid = 0+$_POST[langid];
 	$res = sql_query("SELECT MAX(`order`) AS maxorder, MAX(`link_id`) AS maxlinkid FROM `faq` WHERE `type`='item' AND `categ`=".sqlesc($categ)." AND lang_id=".sqlesc($langid));
-	while ($arr = mysql_fetch_array($res, MYSQL_BOTH)) 
+	while ($arr = _mysql_fetch_array($res, MYSQL_BOTH)) 
 	{
 		$order = $arr['maxorder'] + 1;
 		$link_id = $arr['maxlinkid']+1;
@@ -217,7 +217,7 @@ elseif ($_GET[action] == "addnewsect" && $_POST[title] != NULL && $_POST[flag] !
 	$title = $_POST[title];
 	$language = 0+$_POST['language'];
 	$res = sql_query("SELECT MAX(`order`) AS maxorder, MAX(`link_id`) AS maxlinkid FROM `faq` WHERE `type`='categ' AND `lang_id` = ".sqlesc($language));
-	while ($arr = mysql_fetch_array($res, MYSQL_BOTH)) {$order = $arr['maxorder'] + 1;$link_id = $arr['maxlinkid']+1;}
+	while ($arr = _mysql_fetch_array($res, MYSQL_BOTH)) {$order = $arr['maxorder'] + 1;$link_id = $arr['maxlinkid']+1;}
 	sql_query("INSERT INTO `faq` (`link_id`,`type`,`lang_id`, `question`, `answer`, `flag`, `categ`, `order`) VALUES (".sqlesc($link_id).",'categ', ".sqlesc($language).", ".sqlesc($title).", '', ".sqlesc($_POST[flag]).", '0', ".sqlesc($order).")") or sqlerr();
 	header("Location: " . get_protocol_prefix() . "$BASEURL/faqmanage.php");
 	die;

@@ -67,7 +67,7 @@ if($editid > 0) {
 	
 	$query = "SELECT * FROM locations WHERE id=" . sqlesc($editid);
 	$sql = sql_query($query);
-	$row = mysql_fetch_array($sql);
+	$row = _mysql_fetch_array($sql);
 	
 	$name = $row['name'];
 	$flagpic = $row['flagpic'];
@@ -194,7 +194,7 @@ echo("<table class=main cellspacing=0 cellpadding=5>");
 echo("<td class=colhead align=center><b>ID</b></td> <td class=colhead align=left><b>Name</b></td> <td class=colhead align=center><b>Pic</b></td> <td class=colhead align=center><b><nobr>Main Location</nobr></b></td> <td class=colhead align=center><b><nobr>Sub Location</nobr></b></td> <td class=colhead align=center><b>Start IP</b></td> <td class=colhead align=center><b>End IP</b></td> <td class=colhead align=center><b>T.U</b></td> <td class=colhead align=center><b>P.U</b></td>  <td class=colhead align=center><b>T.D</b></td> <td class=colhead align=center><b>P.D</b></td> <td class=colhead align=center><b>Edit</b></td><td class=colhead align=center><b>Delete</b></td>");
 
 $res = sql_query("SELECT COUNT(*) FROM locations ".$wherea);
-$row = mysql_fetch_array($res);
+$row = _mysql_fetch_array($res);
 $count = $row[0];
 $perpage = 50;
 list($pagertop, $pagerbottom, $limit) = pager($perpage, $count, "location.php?");
@@ -202,7 +202,7 @@ list($pagertop, $pagerbottom, $limit) = pager($perpage, $count, "location.php?")
 $query = "SELECT * FROM locations " . $wherea ." ORDER BY name ASC, start_ip ASC ".$limit;
 $sql = sql_query($query);
 $maxlen_sub_location = 40;
-while ($row = mysql_fetch_array($sql)) {
+while ($row = _mysql_fetch_array($sql)) {
 	$id = $row['id'];
 	$name = $row['name'];
 	$flagpic = $row['flagpic'];

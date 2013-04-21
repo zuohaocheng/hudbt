@@ -23,7 +23,7 @@ class TorrentTestCase extends CakeTestCase {
 		$this->Torrent = ClassRegistry::init('Torrent');
 
 		$res = sql_query("SELECT * FROM users WHERE users.id = 1 LIMIT 1");
-		$GLOBALS["CURUSER"] = mysql_fetch_array($res);
+		$GLOBALS["CURUSER"] = _mysql_fetch_array($res);
 	}
 
 /**

@@ -53,7 +53,7 @@ $monthselection.="</select>";
 <?php
 $keepers_res = sql_query("SELECT user_id FROM users_usergroups WHERE usergroup_id = 1 AND role = 'member' OR role = 'boss' AND removed_by IS NULL AND removed_date IS NULL") or sqlerr(__FILE__, __LINE__);
 
-if (mysql_num_rows($keepers_res)==0) {
+if (_mysql_num_rows($keepers_res)==0) {
 	print("<p align=\"center\">".$lang_keepers['text_no_keepers_yet']."</p>");
 }
 else {
@@ -66,10 +66,10 @@ else {
 	print("<th>".$lang_keepers['col_cur_storing']."</th>");
 	print("</tr></thead><tbody>");
 
-	while($keeperid = mysql_fetch_assoc($keepers_res)){
+	while($keeperid = _mysql_fetch_assoc($keepers_res)){
 		$storingInfoRes = sql_query("SELECT SUM(DISTINCT size) as size_total, SUM(out_seedtime-in_seedtime) as seedtime_total, COUNT(DISTINCT torrent_id) as num_total FROM storing_records 
 		JOIN torrents ON storing_records.torrent_id = torrents.id WHERE keeper_id = $keeperid[user_id] AND storing_records.in_date > ".sqlesc($sqlstarttime)." AND storing_records.in_date < ".sqlesc($sqlendtime)) or sqlerr(__FILE__,__LINE__);	
-		$storingInfo = mysql_fetch_assoc($storingInfoRes);
+		$storingInfo = _mysql_fetch_assoc($storingInfoRes);
 		print("<tr>");
 		$userid = $keeperid['user_id'];
 		$sizeTotal = $storingInfo['size_total'];

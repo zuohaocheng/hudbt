@@ -11,13 +11,13 @@ if (get_user_class() < $staffmem_class)
 
 if ($_POST['setdealt']){
 	$res = sql_query ("SELECT id FROM cheaters WHERE dealtwith=0 AND id IN (" . implode(", ", $_POST[delcheater]) . ")");
-	while ($arr = mysql_fetch_assoc($res))
+	while ($arr = _mysql_fetch_assoc($res))
 		sql_query ("UPDATE cheaters SET dealtwith=1, dealtby = $CURUSER[id] WHERE id = $arr[id]") or sqlerr();
 	$Cache->delete_value('staff_new_cheater_count');
 }
 elseif ($_POST['delete']){
 	$res = sql_query ("SELECT id FROM cheaters WHERE id IN (" . implode(", ", $_POST[delcheater]) . ")");
-	while ($arr = mysql_fetch_assoc($res))
+	while ($arr = _mysql_fetch_assoc($res))
 		sql_query ("DELETE from cheaters WHERE id = $arr[id]") or sqlerr();
 	$Cache->delete_value('staff_new_cheater_count');
 }
@@ -45,12 +45,12 @@ print("<tr><td class=colhead><nobr>".$lang_cheaterbox['col_added']."</nobr></td>
 print("<form method=post action=cheaterbox.php>");
 $cheatersres = sql_query("SELECT * FROM cheaters ORDER BY dealtwith ASC, id DESC $limit");
 
-while ($row = mysql_fetch_array($cheatersres))
+while ($row = _mysql_fetch_array($cheatersres))
 {
 	$upspeed = ($row['uploaded'] > 0 ? $row['uploaded'] / $row['anctime'] : 0);
 	$lespeed = ($row['downloaded'] > 0 ? $row['downloaded'] / $row['anctime'] : 0);
 	$torrentres = sql_query("SELECT name FROM torrents WHERE id=".sqlesc($row['torrentid']));
-	$torrentrow = mysql_fetch_array($torrentres);
+	$torrentrow = _mysql_fetch_array($torrentres);
 	if ($torrentrow)
 		$torrent = "<a href=details.php?id=".$row['torrentid'].">".htmlspecialchars($torrentrow['name'])."</a>";
 	else $torrent = $lang_cheaterbox['text_torrent_does_not_exist'];

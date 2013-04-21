@@ -25,10 +25,10 @@ function donationsForKey($key, $userid) {
   $where = 'WHERE ' . $key . ' = ' . $userid;
   $sql = 'SELECT COUNT(*), SUM(amount) FROM donate_bonus ' . $where;
 
-  $res = sql_query($sql) or die(mysql_error());
+  $res = sql_query($sql) or die(_mysql_error());
   $count = 0;
   $sum = 0;
-  while($row = mysql_fetch_array($res)) {
+  while($row = _mysql_fetch_array($res)) {
     $count += $row[0];
     $sum += $row[1];
   }
@@ -37,7 +37,7 @@ function donationsForKey($key, $userid) {
 
   $query = 'SELECT donate_bonus.' . $queryid . ', donate_bonus.amount, donate_bonus.action_date, donate_bonus.object_id, donate_bonus.type, torrents.name, topics.subject FROM donate_bonus LEFT JOIN torrents ON donate_bonus.object_id = torrents.id LEFT JOIN topics ON donate_bonus.object_id = topics.id ' . $where . ' ORDER BY action_date DESC ' . $limit;
 
-  $res = sql_query($query) or die(mysql_error());
+  $res = sql_query($query) or die(_mysql_error());
   
   return array($pagertop, $pagerbottom, $res, $queryid, $sum);
 }
@@ -47,7 +47,7 @@ function donationsTableFromResult($res, $queryid) {
   $out = '<table id="donations" cellpadding="5" style="width:750px;"><thead><tr><th>' . $lang_donations['col_time'] . '</th><th>' . $lang_donations['col_torrent'] . '</th><th>' . $lang_donations['col_username' ] . '</th><th>' . $lang_donations['col_amount'] . '</th></tr></thead><tbody>';
 
   $count = 0;
-  while ($row = mysql_fetch_assoc($res)) {
+  while ($row = _mysql_fetch_assoc($res)) {
     $count++;
     if ($row['type'] == 'torrent') {
       if ($row['name'] == '') {

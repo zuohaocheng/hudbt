@@ -37,7 +37,7 @@ elseif ($_GET["act"]=="addsect"){
 }
 elseif ($_GET["act"] == "edit"){
 	$id = $_GET["id"];
-	$res = @mysql_fetch_array(@sql_query("select * from rules where id='$id'"));
+	$res = @_mysql_fetch_array(@sql_query("select * from rules where id='$id'"));
 	stdhead("Edit rules");
 	//print("<td valign=top style=\"padding: 10px;\" colspan=2 align=center>");
 	//begin_main_frame();
@@ -85,7 +85,7 @@ else{
 	print("<h1 align=center>Rules Manangement</h1>");
 	print("<br /><table width=940 border=0 cellspacing=0 cellpadding=5>");
 	print("<tr><td align=center><a href=modrules.php?act=newsect>Add Section</a></td></tr></table>\n");
-	while ($arr=mysql_fetch_assoc($res)){
+	while ($arr=_mysql_fetch_assoc($res)){
 		print("<br /><table width=940 border=1 cellspacing=0 cellpadding=5>");
 		print("<tr><td class=colhead>$arr[title] - $arr[lang_name]</td></tr>\n");
 		print("<tr><td align=left>" . format_comment($arr["text"])."</td></tr>");

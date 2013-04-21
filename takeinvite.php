@@ -5,7 +5,7 @@ require_once(get_langfile_path());
 registration_check('invitesystem', true, false);
 if ($CURUSER[invites] <= 0 && get_user_class() < $sendinvite_class)
 stderr($lang_takeinvite['std_error'],$lang_takeinvite['std_invite_denied']);
-$restInvites = (@mysql_fetch_row(@sql_query("select invites from users where id=".$CURUSER['id']))) or die(mysql_error());
+$restInvites = (@_mysql_fetch_row(@sql_query("select invites from users where id=".$CURUSER['id']))) or die(_mysql_error());
 if ($restInvites[0] < 1 || $restInvites[0] > 1000)
 	stderr($lang_takeinvite['std_error'],$lang_takeinvite['std_no_invite']);
 function bark($msg) {
@@ -34,15 +34,15 @@ if(!$body)
 
 
 // check if email addy is already in use
-$a = (@mysql_fetch_row(@sql_query("select count(*) from users where email=".sqlesc($email)))) or die(mysql_error());
+$a = (@_mysql_fetch_row(@sql_query("select count(*) from users where email=".sqlesc($email)))) or die(_mysql_error());
 if ($a[0] != 0)
   bark($lang_takeinvite['std_email_address'].htmlspecialchars($email).$lang_takeinvite['std_is_in_use']);
-$b = (@mysql_fetch_row(@sql_query("select count(*) from invites where invitee=".sqlesc($email)))) or die(mysql_error());
+$b = (@_mysql_fetch_row(@sql_query("select count(*) from invites where invitee=".sqlesc($email)))) or die(_mysql_error());
 if ($b[0] != 0)
   bark($lang_takeinvite['std_invitation_already_sent_to'].htmlspecialchars($email).$lang_takeinvite['std_await_user_registeration']);
 
 $ret = sql_query("SELECT username FROM users WHERE id = ".sqlesc($id)) or sqlerr();
-$arr = mysql_fetch_assoc($ret); 
+$arr = _mysql_fetch_assoc($ret); 
 
 $hash  = md5(mt_rand(1,10000).$CURUSER['username'].TIMENOW.$CURUSER['passhash']);
 
@@ -61,9 +61,9 @@ $successed = sent_mail($email,$SITENAME,$SITEEMAIL,change_email_encode(get_langf
 //this email is sent only when someone give out an invitation
 
 if($successed) {
-	sql_query("UPDATE LOW_PRIORITY users SET invites = invites - 1 WHERE invites > 0 AND id = ".mysql_real_escape_string($id)."") or sqlerr(__FILE__, __LINE__);
-	if (mysql_affected_rows()) {
-	  sql_query("INSERT INTO invites (inviter, invitee, hash, time_invited) VALUES ('".mysql_real_escape_string($id)."', '".mysql_real_escape_string($email)."', '".mysql_real_escape_string($hash)."', " . sqlesc(date("Y-m-d H:i:s")) . ")");
+  sql_query("UPDATE LOW_PRIORITY users SET invites = invites - 1 WHERE invites > 0 AND id = ?", [$id]);
+	if (_mysql_affected_rows()) {
+	  sql_query("INSERT INTO invites (inviter, invitee, hash, time_invited) VALUES (?, ?, ?, ?)", [$id, $email, $hash, date("Y-m-d H:i:s")]);
 	}
 } else {
 	bark('通过 SMTP 服务器发送邮件失败，请稍后重新尝试发送。');

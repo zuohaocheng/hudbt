@@ -11,7 +11,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 	if ($_POST['sure'])
 	{
 		$res=sql_query("DELETE FROM users WHERE enabled='no'");
-		$deletecount=mysql_affected_rows();
+		$deletecount=_mysql_affected_rows();
 		$shownotice=true;
 	}
 }

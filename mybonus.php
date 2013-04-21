@@ -189,7 +189,7 @@ print("</ul>");
 		$A = 0;
 		$count = 0;
 		$torrentres = sql_query("select torrents.id, torrents.added, torrents.size, torrents.seeders from torrents LEFT JOIN peers ON peers.torrent = torrents.id WHERE peers.userid = $CURUSER[id] AND peers.seeder ='yes' GROUP BY torrents.id")  or sqlerr(__FILE__, __LINE__);
-		while ($torrent = mysql_fetch_array($torrentres))
+		while ($torrent = _mysql_fetch_array($torrentres))
 		{
 			$weeks_alive = ($timenow - strtotime($torrent[added])) / $sectoweek;
 			$gb_size = $torrent[size] / 1073741824;

@@ -16,7 +16,7 @@ if (!$Cache->get_page()) {
     $lang_id = 6; //English
   }
   $res = sql_query("SELECT * FROM rules WHERE lang_id = ".sqlesc($lang_id)." ORDER BY id");
-  while ($arr=mysql_fetch_assoc($res)) {
+  while ($arr=_mysql_fetch_assoc($res)) {
     begin_frame($arr['title'], false);
     print(format_comment($arr["text"]));
     end_frame();

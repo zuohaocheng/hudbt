@@ -88,12 +88,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $_REQUEST["action"] == "upload") {
     $torrent_id = 0 + $_POST["torrent_id"];
 
     $r = sql_query("SELECT owner FROM torrents WHERE id = ". sqlesc($torrent_id)) or sqlerr(__FILE__, __LINE__);
-    if(!mysql_num_rows($r)) {
+    if(!_mysql_num_rows($r)) {
       echo($lang_subtitles['std_invalid_torrent_id']);
       exit;
     }
     else {
-      $r_a = mysql_fetch_assoc($r);
+      $r_a = _mysql_fetch_assoc($r);
       if($r_a["owner"] != $CURUSER["id"] && get_user_class() < $uploadsub_class) {
 	echo($lang_subtitles['std_no_permission_uploading_others']);
 	exit;
@@ -114,7 +114,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $_REQUEST["action"] == "upload") {
 
   /*
     $r = sql_query("SELECT id FROM subs WHERE title=" . sqlesc($title)) or sqlerr(__FILE__, __LINE__);
-    if (mysql_num_rows($r) > 0)
+    if (_mysql_num_rows($r) > 0)
     {
     echo($lang_subtitles['std_file_same_name_exists']."<font color=red><b>" . htmlspecialchars($title) . "</b></font> ");
     exit;
@@ -148,7 +148,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $_REQUEST["action"] == "upload") {
   //stderr("",$file["name"]);
   
   $r = sql_query("SELECT lang_name from language WHERE sub_lang=1 AND id = " . sqlesc($lang_id)) or sqlerr(__FILE__, __LINE__);
-  $arr = mysql_fetch_assoc($r);
+  $arr = _mysql_fetch_assoc($r);
 
   $filename = $file["name"];
   $added = date("Y-m-d H:i:s");
@@ -157,7 +157,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $_REQUEST["action"] == "upload") {
 
   sql_query("INSERT INTO subs (torrent_id, lang_id, title, filename, added, uppedby, anonymous, size, ext) VALUES (" . implode(",", array_map("sqlesc", array($torrent_id, $lang_id, $title, $filename, $added, $uppedby, $anonymous, $size, $ext))). ")") or sqlerr();
   
-  $id = mysql_insert_id();
+  $id = _mysql_insert_id();
   
   //stderr("",make_folder($SUBSPATH."/",$torrent_id). "/" . $id . "." .$ext);
   if (!move_uploaded_file($file["tmp_name"], make_folder($SUBSPATH."/",$torrent_id). "/" . $id . "." .$ext))
@@ -173,8 +173,8 @@ if (get_user_class() >= $delownsub_class) {
   $delete = $_GET["delete"];
   if (is_valid_id($delete)) {
     $r = sql_query("SELECT id,torrent_id,ext,lang_id,title,filename,uppedby,anonymous FROM subs WHERE id=".sqlesc($delete)) or sqlerr(__FILE__, __LINE__);
-    if (mysql_num_rows($r) == 1) {
-      $a = mysql_fetch_assoc($r);
+    if (_mysql_num_rows($r) == 1) {
+      $a = _mysql_fetch_assoc($r);
       if (get_user_class() >= $submanage_class || $a["uppedby"] == $CURUSER["id"]) {
 	$sure = $_GET["sure"];
 	if ($sure == 1) {
@@ -195,7 +195,7 @@ if (get_user_class() >= $delownsub_class) {
 	    sql_query("INSERT INTO messages (sender, receiver, added, msg, subject) VALUES(0, $a[uppedby], '" . $time . "', " . sqlesc($msg) . ", ".sqlesc($subject).")") or sqlerr(__FILE__, __LINE__);
 	  }
 	  $res = sql_query("SELECT lang_name from language WHERE sub_lang=1 AND id = " . sqlesc($a["lang_id"])) or sqlerr(__FILE__, __LINE__);
-	  $arr = mysql_fetch_assoc($res);
+	  $arr = _mysql_fetch_assoc($res);
 	  write_log("$arr[lang_name] Subtitle $delete ($a[title]) was deleted by ". (($a["anonymous"] == 'yes' && $a["uppedby"] == $CURUSER["id"]) ? "Anonymous" : $CURUSER['username']). ($a["uppedby"] != $CURUSER["id"] ? ", Mod Delete":"").($reason != "" ? " (".$reason.")" : ""));
 
 	  if ($_REQUEST['returnto']) {
@@ -224,7 +224,7 @@ if (get_user_class() >= UC_PEASANT) {
 
   if (!$size = $Cache->get_value('subtitle_sum_size')) {
     $res = sql_query("SELECT SUM(size) FROM subs");
-    $row5 = mysql_fetch_row($res);
+    $row5 = _mysql_fetch_row($res);
     $size = $row5[0];
     $Cache->cache_value('subtitle_sum_size', $size, 3600);
   }
@@ -240,7 +240,7 @@ if (get_user_class() >= UC_PEASANT) {
   $perpage = 30;
   $query = ($query ? " WHERE ".$query : "");
   $res = sql_query("SELECT COUNT(*) FROM subs $query") or sqlerr(__FILE__, __LINE__);
-  $arr = mysql_fetch_row($res);
+  $arr = _mysql_fetch_row($res);
   $num = $arr[0];
   $rows = array();
 
@@ -252,7 +252,7 @@ if (get_user_class() >= UC_PEASANT) {
 
     $mod = get_user_class() >= $submanage_class;
     $pu = get_user_class() >= $delownsub_class;
-    while ($arr = mysql_fetch_assoc($res)) {
+    while ($arr = _mysql_fetch_assoc($res)) {
       // the number $start_subid is just for legacy support of prevoiusly uploaded subs, if the site is completely new, it should be 0 or just remove it
       $arr['candelete'] = ($mod || ($pu && $arr["uppedby"] == $CURUSER["id"]));
       $rows[] = $arr;
@@ -276,7 +276,7 @@ $s->assign(array('lang' => $lang_subtitles,
 if ($detail_torrent_id) {
   $query = "SELECT name FROM torrents WHERE id=$detail_torrent_id";
   $res = sql_query($query) or sqlerr(__FILE__, __LINE__);
-  $row = mysql_fetch_row($res);
+  $row = _mysql_fetch_row($res);
   if ($row) {
     $torrentname = $row[0];
     $s->assign(array(

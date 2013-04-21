@@ -22,14 +22,14 @@ if (!$is_rulelang){
 	$lang_id = 6; //English
 }
 $res = sql_query("SELECT `id`, `link_id`, `question`, `flag` FROM `faq` WHERE `type`='categ' AND `lang_id` = ".sqlesc($lang_id)." ORDER BY `order` ASC");
-while ($arr = mysql_fetch_array($res)) {
+while ($arr = _mysql_fetch_array($res)) {
 	$faq_categ[$arr[link_id]][title] = $arr[question];
 	$faq_categ[$arr[link_id]][flag] = $arr[flag];
 	$faq_categ[$arr[link_id]][link_id] = $arr[link_id];
 }
 
 $res = sql_query("SELECT `id`, `link_id`, `question`, `answer`, `flag`, `categ` FROM `faq` WHERE `type`='item' AND `lang_id` = ".sqlesc($lang_id)." ORDER BY `order` ASC");
-while ($arr = mysql_fetch_array($res, MYSQL_BOTH)) {
+while ($arr = _mysql_fetch_array($res, MYSQL_BOTH)) {
 	$faq_categ[$arr[categ]][items][$arr[id]][question] = $arr[question];
 	$faq_categ[$arr[categ]][items][$arr[id]][answer] = $arr[answer];
 	$faq_categ[$arr[categ]][items][$arr[id]][flag] = $arr[flag];

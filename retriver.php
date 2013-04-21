@@ -26,10 +26,10 @@ if (!isset($id) || !$id || !is_numeric($id) || !isset($type) || !$type || !is_nu
 die();
 
 $r = sql_query("SELECT * from torrents WHERE id = " . sqlesc($id)) or sqlerr(__FILE__, __LINE__);
-if(mysql_num_rows($r) != 1)
+if(_mysql_num_rows($r) != 1)
 die();
 
-$row = mysql_fetch_assoc($r);
+$row = _mysql_fetch_assoc($r);
 
 switch ($siteid)
 {

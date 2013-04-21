@@ -20,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	$seedbonus = sqlesc($_POST["seedbonus"]);
 	$operator = $CURUSER["username"];
 	$res = sql_query("SELECT id FROM users WHERE username=$username");
-	$arr = mysql_fetch_row($res);
+	$arr = _mysql_fetch_row($res);
 	$receiver = $arr[0];
 	$lang = get_user_lang($receiver);
 	$subject = $lang_takemessage_target[$lang]['Bonus_point_added'];

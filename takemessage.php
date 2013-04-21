@@ -23,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] != "POST")
 		if (!$origmsg)
 			stderr($lang_takemessage['std_error'], $lang_takemessage['std_invalid_id']);
 		$res = sql_query("SELECT * FROM messages WHERE id=" . sqlesc($origmsg) . " AND (receiver=" . sqlesc($CURUSER['id']) . " OR sender=" . sqlesc($CURUSER['id']) .") LIMIT 1") or sqlerr(__FILE__,__LINE__);
-		$origmsgrow = mysql_fetch_assoc($res);
+		$origmsgrow = _mysql_fetch_assoc($res);
 		if (!$origmsgrow)
 			stderr($lang_takemessage['std_error'], $lang_takemessage['std_no_permission_forwarding']);
 		if(!$_REQUEST['to'])
@@ -68,7 +68,7 @@ if ($_SERVER["REQUEST_METHOD"] != "POST")
 	// End of Change
 
 	$res = sql_query("SELECT id,username,parked,email,acceptpms, notifs, UNIX_TIMESTAMP(last_access) as la FROM users WHERE id=".sqlesc($receiver)) or sqlerr(__FILE__, __LINE__);
-	$user = mysql_fetch_assoc($res);
+	$user = _mysql_fetch_assoc($res);
 	if (!$user)
 		stderr($lang_takemessage['std_error'], $lang_takemessage['std_user_not_exist']);
 
@@ -80,13 +80,13 @@ if ($_SERVER["REQUEST_METHOD"] != "POST")
 		if ($user["acceptpms"] == "yes")
 		{
 			$res2 = sql_query("SELECT * FROM blocks WHERE userid=".sqlesc($receiver)." AND blockid=" . sqlesc($CURUSER["id"])) or sqlerr(__FILE__, __LINE__);
-			if (mysql_num_rows($res2) == 1)
+			if (_mysql_num_rows($res2) == 1)
 			stderr($lang_takemessage['std_refused'], $lang_takemessage['std_user_blocks_your_pms']);
 		}
 		elseif ($user["acceptpms"] == "friends")
 		{
 			$res2 = sql_query("SELECT * FROM friends WHERE userid=".sqlesc($receiver)." AND friendid=" . sqlesc($CURUSER["id"])) or sqlerr(__FILE__, __LINE__);
-			if (mysql_num_rows($res2) != 1)
+			if (_mysql_num_rows($res2) != 1)
 			stderr($lang_takemessage['std_refused'], $lang_takemessage['std_user_accepts_friends_pms']);
 		}
 		elseif ($user["acceptpms"] == "no")
@@ -99,7 +99,7 @@ if ($_SERVER["REQUEST_METHOD"] != "POST")
 	$Cache->delete_value('user_'.$receiver.'_inbox_count');
 	$Cache->delete_value('user_'.$CURUSER["id"].'_outbox_count');
 	
-	$msgid=mysql_insert_id();
+	$msgid=_mysql_insert_id();
 	$date=date("Y-m-d H:i:s");
 	// Update Last PM sent...
 	sql_query("UPDATE LOW_PRIORITY users SET last_pm = NOW() WHERE id = ".sqlesc($CURUSER['id'])) or sqlerr(__FILE__, __LINE__);
@@ -150,9 +150,9 @@ EOD;
 		{
 			// Make sure receiver of $origmsg is current user
 			$res = sql_query("SELECT * FROM messages WHERE id=$origmsg") or sqlerr(__FILE__, __LINE__);
-			if (mysql_num_rows($res) == 1)
+			if (_mysql_num_rows($res) == 1)
 			{
-				$arr = mysql_fetch_assoc($res);
+				$arr = _mysql_fetch_assoc($res);
 				if ($arr["receiver"] != $CURUSER["id"])
 				stderr("w00t","This shouldn't happen.");
 				if ($arr["saved"] == "no")

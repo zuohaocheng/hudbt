@@ -32,7 +32,7 @@ function takereport($reportid, $type, $reason)
 		die();
 	}
 	$res = sql_query("SELECT id FROM reports WHERE addedby = ".sqlesc($CURUSER[id])." AND reportid= ".sqlesc($reportid)." AND type = ".sqlesc($type)) or sqlerr(__FILE__,__LINE__);
-	if (mysql_num_rows($res) == 0)
+	if (_mysql_num_rows($res) == 0)
 	{
 		$date = sqlesc(date("Y-m-d H:i:s"));
 
@@ -107,13 +107,13 @@ elseif (isset($user))
 		die;
 	}
 	$res = sql_query("SELECT username, class FROM users WHERE id=".sqlesc($user)) or sqlerr(__FILE__,__LINE__);
-	if (mysql_num_rows($res) == 0)
+	if (_mysql_num_rows($res) == 0)
 	{
 		stderr($lang_report['std_error'],$lang_report['std_invalid_user_id']);
 		die();
 	}
 
-	$arr = mysql_fetch_assoc($res);
+	$arr = _mysql_fetch_assoc($res);
 	if ($arr["class"] >= $staffmem_class)
 	{
 		stderr($lang_report['std_sorry'],$lang_report['std_cannot_report'].get_user_class_name($arr["class"],false,true,true), false);
@@ -133,12 +133,12 @@ elseif (isset($torrent))
 	int_check($torrent);
 	$res = sql_query("SELECT name FROM torrents WHERE id=".sqlesc($torrent));
 
-	if (mysql_num_rows($res) == 0)
+	if (_mysql_num_rows($res) == 0)
 	{
 		stderr($lang_report['std_error'],$lang_report['std_invalid_torrent_id']);
 		die();
 	}
-	$arr = mysql_fetch_array($res);
+	$arr = _mysql_fetch_array($res);
 	stderr($lang_report['std_are_you_sure'], $lang_report['text_are_you_sure_torrent']."<a href=details.php?id=".htmlspecialchars($torrent)."><b>".htmlspecialchars($arr[name])."</b></a>".$lang_report['text_to_staff']."<br />".$lang_report['text_reason_note']."<br /><form method=post action=report.php><input type=hidden name=taketorrent value=\"".htmlspecialchars($torrent)."\">".$lang_report['text_reason_is']."<input type=text style=\"width: 200px\" name=reason><input type=submit value=\"".$lang_report['submit_confirm']."\"></form>", false);
 }
 //////////TORRENT #2 END//////////
@@ -149,11 +149,11 @@ elseif (isset($forumpost))
 	int_check($forumpost);
 	$res = sql_query("SELECT topics.id AS topicid, topics.subject AS subject, posts.userid AS postuserid FROM topics LEFT JOIN posts ON posts.topicid = topics.id WHERE posts.id=".sqlesc($forumpost));
 
-	if (mysql_num_rows($res) == 0)
+	if (_mysql_num_rows($res) == 0)
 	{
 		stderr($lang_report['std_error'],$lang_report['std_invalid_post_id']);
 	}
-	$arr = mysql_fetch_array($res);
+	$arr = _mysql_fetch_array($res);
 	stderr($lang_report['std_are_you_sure'], $lang_report['text_are_you_sure_post'].$forumpost.$lang_report['text_of_topic']."<a href=\"forums.php?action=viewtopic&topicid=".$arr['topicid']."&page=p".htmlspecialchars($forumpost)."#".htmlspecialchars($forumpost)."\"><b>".htmlspecialchars($arr['subject'])."</b></a>".$lang_report['text_by'].get_username($arr['postuserid']).$lang_report['text_to_staff']."<br />".$lang_report['text_reason_note']."<br /><form method=post action=report.php><input type=hidden name=takeforumpost value=\"".htmlspecialchars($forumpost)."\">".$lang_report['text_reason_is']."<input type=text style=\"width: 200px\" name=reason><input type=submit value=\"".$lang_report['submit_confirm']."\"></form>", false);
 }
 //////////FORUM POST #2 END//////////
@@ -163,10 +163,10 @@ elseif (isset($commentid))
 {
 	int_check($commentid);
 	$res = sql_query("SELECT id, user, torrent, offer FROM comments WHERE id=".sqlesc($commentid));
-	if (mysql_num_rows($res) == 0) {
+	if (_mysql_num_rows($res) == 0) {
 		stderr($lang_report['std_error'],$lang_report['std_invalid_comment_id']);
 	}
-	$arr = mysql_fetch_array($res);
+	$arr = _mysql_fetch_array($res);
 	if ($arr['torrent']) { //Comment of torrent. BTW, this is shitty code!
 		$name = get_single_value("torrents","name","WHERE id=".sqlesc($arr['torrent']));
 		$url = "details.php?id=".$arr['torrent']."#".$commentid;
@@ -189,11 +189,11 @@ elseif (isset($reportofferid))
 {
 	int_check($reportofferid);
 	$res = sql_query("SELECT id,name FROM offers WHERE id=".sqlesc($reportofferid));
-	if (mysql_num_rows($res) == 0)
+	if (_mysql_num_rows($res) == 0)
 	{
 		stderr($lang_report['std_error'],$lang_report['std_invalid_offer_id']);
 	}
-	$arr = mysql_fetch_array($res);
+	$arr = _mysql_fetch_array($res);
 	stderr($lang_report['std_are_you_sure'], $lang_report['text_are_you_sure_offer']."<a href=\"offers.php?id=".$arr[id]."&off_details=1\"><b>".htmlspecialchars($arr['name'])."</b></a>".$lang_report['text_to_staff']."<br />".$lang_report['text_reason_note']."<br /><form method=post action=report.php><input type=hidden name=takereportofferid value=\"".htmlspecialchars($reportofferid)."\">".$lang_report['text_reason_is']."<input type=text style=\"width: 200px\" name=reason><input type=submit value=\"".$lang_report['submit_confirm']."\"></form>", false);
 }
 //////////OFFERT #2 END//////////
@@ -203,11 +203,11 @@ elseif (isset($reportrequestid))
 {
 	int_check($reportrequestid);
 	$res = sql_query("SELECT id,request FROM requests WHERE id=".sqlesc($reportrequestid));
-	if (mysql_num_rows($res) == 0)
+	if (_mysql_num_rows($res) == 0)
 	{
 		stderr($lang_report['std_error'],$lang_report['std_invalid_request_id']);
 	}
-	$arr = mysql_fetch_array($res);
+	$arr = _mysql_fetch_array($res);
 	stderr($lang_report['std_are_you_sure'], $lang_report['text_are_you_sure_request']."<a href=\"viewrequests.php?id=".$arr['id']."&req_details=1\"><b>".htmlspecialchars($arr['request'])."</b></a>".$lang_report['text_to_staff']."<br />".$lang_report['text_reason_note']."<br /><form method=post action=report.php><input type=hidden name=takerequestid value=\"".htmlspecialchars($reportrequestid)."\">".$lang_report['text_reason_is']."<input type=text style=\"width: 200px\" name=reason><input type=submit value=\"".$lang_report['submit_confirm']."\"></form>", false);
 }
 //////////REQUEST #2 END//////////
@@ -217,11 +217,11 @@ elseif (isset($subtitle))
 {
 	int_check($subtitle);
 	$res = sql_query("SELECT id, torrent_id, title FROM subs WHERE id=".sqlesc($subtitle));
-	if (mysql_num_rows($res) == 0)
+	if (_mysql_num_rows($res) == 0)
 	{
 		stderr($lang_report['std_error'],$lang_report['std_invalid_subtitle_id']);
 	}
-	$arr = mysql_fetch_array($res);
+	$arr = _mysql_fetch_array($res);
 	stderr($lang_report['std_are_you_sure'], $lang_report['text_are_you_sure_subtitle']."<a href=\"downloadsubs.php?torrentid=" . $arr['torrent_id'] ."&subid=" .$arr['id']."\"><b>".htmlspecialchars($arr['title'])."</b></a>".$lang_report['text_to_staff']."<br />".$lang_report['text_reason_note']."<br /><form method=post action=report.php><input type=hidden name=takesubtitleid value=\"".htmlspecialchars($subtitle)."\">".$lang_report['text_reason_is']."<input type=text style=\"width: 200px\" name=reason><input type=submit value=\"".$lang_report['submit_confirm']."\"></form>", false);
 }
 //////////SUBTITLE #2 END//////////

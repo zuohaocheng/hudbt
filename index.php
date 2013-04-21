@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 	if ($CURUSER && $choice != "" && $choice < 256 && $choice == floor($choice))
 	  {
 	    $res = sql_query("SELECT * FROM polls ORDER BY added DESC LIMIT 1") or sqlerr(__FILE__, __LINE__);
-	    $arr = mysql_fetch_assoc($res) or die($lang_index['std_no_poll']);
+	    $arr = _mysql_fetch_assoc($res) or die($lang_index['std_no_poll']);
 	    $pollid = $arr["id"];
 
 	    $hasvoted = get_row_count("pollanswers","WHERE pollid=".sqlesc($pollid)." && userid=".sqlesc($CURUSER["id"]));
@@ -45,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 	    sql_query("INSERT INTO pollanswers VALUES(0, ".sqlesc($pollid).", ".sqlesc($CURUSER["id"]).", ".sqlesc($choice).")") or sqlerr(__FILE__, __LINE__);
 	    $Cache->delete_value('current_poll_content');
 	    $Cache->delete_value('current_poll_result', true);
-	    if (mysql_affected_rows() != 1)
+	    if (_mysql_affected_rows() != 1)
 	      stderr($lang_index['std_error'], $lang_index['std_vote_not_counted']);
 	    //add karma
 	    KPS("+",$pollvote_bonus,$userid);
@@ -67,13 +67,13 @@ print('<h2 class="page-titles">'.$lang_index['text_recent_news'].(get_user_class
 $Cache->new_page('recent_news', 86400, true);
 if (!$Cache->get_page()){
   $res = sql_query("SELECT * FROM news ORDER BY added DESC LIMIT ".(int)$maxnewsnum_main) or sqlerr(__FILE__, __LINE__);
-  if (mysql_num_rows($res) > 0)
+  if (_mysql_num_rows($res) > 0)
     {
       $Cache->add_whole_row();
       print('<div id="news" class="table td main minor-list-vertical"><ul>');
       $Cache->end_whole_row();
       $counter = 0;
-      while($array = mysql_fetch_array($res)) {
+      while($array = _mysql_fetch_array($res)) {
 	  $Cache->add_row();
 	  $Cache->add_part();
 	    print("<li><a href=\"javascript: klappe_news('a".$array['id']."')\"><img class=\"" . ($counter == 0 ? 'minus' : 'plus') . "\" src=\"pic/trans.gif\" id=\"pica".$array['id']."\" alt=\"Show/Hide\" title=\"".$lang_index['title_show_or_hide']."\" />&nbsp;" . date("Y.m.d",strtotime($array['added'])) . " - " ."<b>". $array['title'] . "</b></a>");
@@ -124,12 +124,12 @@ if ($showextinfo['imdb'] == 'yes' && ($showmovies['hot'] == "yes" || $showmovies
 
 		$imdbcfg = new imdb_config();
 		$res = sql_query("SELECT * FROM torrents WHERE picktype = " . sqlesc($type_each) . " AND seeders > 0 AND url != '' ORDER BY id DESC LIMIT 30") or sqlerr(__FILE__, __LINE__);
-		if (mysql_num_rows($res) > 0)
+		if (_mysql_num_rows($res) > 0)
 		  {
 		    $movies_list = "";
 		    $count = 0;
 		    $allImdb = array();
-		    while($array = mysql_fetch_array($res))
+		    while($array = _mysql_fetch_array($res))
 		      {
 			$pro_torrent = get_torrent_promotion_append($array[sp_state],'word');
 			if ($imdb_id = parse_imdb_id($array["url"]))
@@ -173,7 +173,7 @@ if ($showfunbox_main == "yes"){
   $owner = $Cache->get_value('current_fun_content_owner');
   if (!$funid){
     $result = sql_query("SELECT fun.id, fun.userid, IF(ADDTIME(added, '1 0:0:0') < NOW(),true,false) AS neednew FROM fun WHERE status != 'banned' AND status != 'dull' ORDER BY added DESC LIMIT 1") or sqlerr(__FILE__,__LINE__);
-    $row = mysql_fetch_array($result);
+    $row = _mysql_fetch_array($result);
     $funid = $row['id'];
     $neednew = $row['neednew'];
     $owner = $row['userid'];
@@ -248,11 +248,11 @@ if ($showshoutbox_main == "yes") {
 
 if ($showlastxforumposts_main == "yes" && $CURUSER) {
   $res = sql_query("SELECT posts.id AS pid, posts.userid AS userpost, posts.added, topics.id AS tid, topics.subject, topics.forumid, topics.views, forums.name FROM posts, topics, forums WHERE posts.topicid = topics.id AND topics.forumid = forums.id AND minclassread <=" . sqlesc(get_user_class()) . " ORDER BY posts.id DESC LIMIT 5") or sqlerr(__FILE__,__LINE__);
-  if(mysql_num_rows($res) != 0) {
+  if(_mysql_num_rows($res) != 0) {
     print('<h2 class="page-titles">'.$lang_index['text_last_five_posts']."</h2>");
     print("<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"5\"><tr><td class=\"colhead\" width=\"100%\" align=\"left\">".$lang_index['col_topic_title']."</td><td class=\"colhead\" align=\"center\">".$lang_index['col_view']."</td><td class=\"colhead\" align=\"center\">".$lang_index['col_author']."</td><td class=\"colhead\" align=\"left\">".$lang_index['col_posted_at']."</td></tr>");
 
-    while ($postsx = mysql_fetch_assoc($res)) {
+    while ($postsx = _mysql_fetch_assoc($res)) {
       print("<tr><td><a href=\"forums.php?action=viewtopic&amp;topicid=".$postsx["tid"]."&amp;page=p".$postsx["pid"]."#pid".$postsx["pid"]."\"><b>".htmlspecialchars($postsx["subject"])."</b></a><br />".$lang_index['text_in']."<a href=\"forums.php?action=viewforum&amp;forumid=".$postsx["forumid"]."\">".htmlspecialchars($postsx["name"])."</a></td><td align=\"center\">".$postsx["views"]."</td><td align=\"center\">" . get_username($postsx["userpost"]) ."</td><td>".gettime($postsx["added"])."</td></tr>");
     }
     print("</table>");
@@ -264,12 +264,12 @@ if ($showlastxforumposts_main == "yes" && $CURUSER) {
 
 if ($showlastxtorrents_main == "yes") {
   $result = sql_query("SELECT * FROM torrents where visible='yes' ORDER BY added DESC LIMIT 5") or sqlerr(__FILE__, __LINE__);
-  if(mysql_num_rows($result) != 0 )
+  if(_mysql_num_rows($result) != 0 )
     {
       print ('<h2 class="page-titles">'.$lang_index['text_last_five_torrent']."</h2>");
       print ("<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"5\"><tr><td class=\"colhead\" width=\"100%\">".$lang_index['col_name']."</td><td class=\"colhead\" align=\"center\">".$lang_index['col_seeder']."</td><td class=\"colhead\" align=\"center\">".$lang_index['col_leecher']."</td></tr>");
 
-      while( $row = mysql_fetch_assoc($result) )
+      while( $row = _mysql_fetch_assoc($result) )
 	{
 	  print ("<tr><a href=\"details.php?id=". $row['id'] ."&amp;hit=1\"><td><a href=\"details.php?id=". $row['id'] ."&amp;hit=1\"><b>" . htmlspecialchars($row['name']) . "</b></td></a><td align=\"center\">" . $row['seeders'] . "</td><td align=\"center\">" . $row['leechers'] . "</td></tr>");
 	}
@@ -284,7 +284,7 @@ if ($CURUSER && $showpolls_main == "yes")
     if (!$arr = $Cache->get_value('current_poll_content')){
       $res = sql_query("SELECT * FROM polls ORDER BY id DESC LIMIT 1") or sqlerr(__FILE__, __LINE__);
       
-      $arr = mysql_fetch_array($res);
+      $arr = _mysql_fetch_array($res);
       $Cache->cache_value('current_poll_content', $arr, 7226);
     }
     if (!$arr)
@@ -313,7 +313,7 @@ if ($CURUSER && $showpolls_main == "yes")
 
       // Check if user has already voted
       $res = sql_query("SELECT selection FROM pollanswers WHERE pollid=".sqlesc($pollid)." AND userid=".sqlesc($CURUSER["id"])) or sqlerr();
-      $voted = mysql_fetch_assoc($res);
+      $voted = _mysql_fetch_assoc($res);
       if ($voted) { //user has already voted
 	$uservote = $voted["selection"];
 	$cache_key = 'current_poll_result_' + $uservote;
@@ -576,10 +576,10 @@ if ($showtrackerload == "yes") {
       if (!$Cache->get_page()){
 	$Cache->add_whole_row();
 	$res = sql_query("SELECT * FROM links ORDER BY id ASC") or sqlerr(__FILE__, __LINE__);
-	if (mysql_num_rows($res) > 0)
+	if (_mysql_num_rows($res) > 0)
 	  {
 	    $links = "";
-	    while($array = mysql_fetch_array($res))
+	    while($array = _mysql_fetch_array($res))
 	      {
 		$links .= "<li><a href=\"" . $array['url'] . "\" title=\"" . $array['title'] . "\" target=\"_blank\">" . $array['name'] . "</a></li>";
 	      }

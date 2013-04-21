@@ -13,7 +13,7 @@
   {
   	// make sure message is in CURUSER's Inbox
 	  $res = sql_query("SELECT receiver, location FROM messages WHERE id=" . sqlesc($id)) or die("barf");
-	  $arr = mysql_fetch_array($res) or die($lang_deletemessage['std_bad_message_id']);
+	  $arr = _mysql_fetch_array($res) or die($lang_deletemessage['std_bad_message_id']);
 	  if ($arr["receiver"] != $CURUSER["id"])
 	    die($lang_deletemessage['std_not_suggested']);
     if ($arr["location"] == 'in')
@@ -27,7 +27,7 @@
   {
    	// make sure message is in CURUSER's Sentbox
 	  $res = sql_query("SELECT sender, location FROM messages WHERE id=" . sqlesc($id)) or die("barf");
-	  $arr = mysql_fetch_array($res) or die($lang_deletemessage['std_bad_message_id']);
+	  $arr = _mysql_fetch_array($res) or die($lang_deletemessage['std_bad_message_id']);
 	  if ($arr["sender"] != $CURUSER["id"])
 	    die($lang_deletemessage['std_not_suggested']);
     if ($arr["location"] == 'out')

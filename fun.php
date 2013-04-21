@@ -40,7 +40,7 @@ else if ($action == 'delcomment') {
   checkHTTPMethod('post');
   if (checkPrivilege(['Misc', 'fun'])) {
     $funcommentdel = 0 + $_REQUEST['commentid'];
-    sql_query("DELETE FROM funcomment WHERE id=".mysql_real_escape_string($funcommentdel));
+    sql_query("DELETE FROM funcomment WHERE id=?", [$funcommentdel]);
     $Cache->delete_value('current_fun_content_comment');
     $Cache->delete_value('current_fun_content_comment_delete');
 
@@ -50,7 +50,7 @@ else if ($action == 'delcomment') {
 else if ($action == 'delete') {
   int_check($id,true);
   $res = sql_query("SELECT userid FROM fun WHERE id=$id") or sqlerr(__FILE__,__LINE__);
-  $arr = mysql_fetch_array($res);
+  $arr = _mysql_fetch_array($res);
   if (!$arr)
     stderr($lang_fun['std_error'], $lang_fun['std_invalid_id']);
   if (!checkPrivilege(['Misc', 'fun']))
@@ -74,7 +74,7 @@ else if ($action == 'delete') {
 else if ($action == 'new') {
   $sql = "SELECT *, IF(ADDTIME(added, '1 0:0:0') < NOW(),true,false) AS neednew FROM fun WHERE status != 'banned' AND status != 'dull' ORDER BY added DESC LIMIT 1";
   $result = sql_query($sql) or sqlerr(__FILE__,__LINE__);
-  $row = mysql_fetch_array($result);
+  $row = _mysql_fetch_array($result);
   if ($row && !$row['neednew'])
     stderr($lang_fun['std_error'],$lang_fun['std_the_newest_fun_item'].htmlspecialchars($row['title']).$lang_fun['std_posted_on'].$row['added'].$lang_fun['std_need_to_wait']);
   else {
@@ -91,7 +91,7 @@ else if ($action == 'new') {
 else if ($action == 'add') {
   $sql = "SELECT *, IF(ADDTIME(added, '1 0:0:0') < NOW(),true,false) AS neednew FROM fun WHERE status != 'banned' AND status != 'dull' ORDER BY added DESC LIMIT 1";
   $result = sql_query($sql) or sqlerr(__FILE__,__LINE__);
-  $row = mysql_fetch_array($result);
+  $row = _mysql_fetch_array($result);
   if ($row && !$row['neednew'])
     stderr($lang_fun['std_error'],$lang_fun['std_the_newest_fun_item'].htmlspecialchars($row['title']).$lang_fun['std_posted_on'].$row['added'].$lang_fun['std_need_to_wait']);
   else {
@@ -113,7 +113,7 @@ else if ($action == 'add') {
     $Cache->delete_value('current_fun_content_comment');
     $Cache->delete_value('current_fun_content_comment_delete');
 
-    if (mysql_affected_rows() == 1)
+    if (_mysql_affected_rows() == 1)
       $warning = $lang_fun['std_fun_added_successfully'];
     else
       stderr($lang_fun['std_error'],$lang_fun['std_error_happened']);
@@ -128,7 +128,7 @@ else if ($action == 'view') {
 else if ($action == 'edit') {
   int_check($id,true);
   $res = sql_query("SELECT * FROM fun WHERE id=$id") or sqlerr(__FILE__,__LINE__);
-  $arr = mysql_fetch_array($res);
+  $arr = _mysql_fetch_array($res);
   if (!$arr) {
     stderr($lang_fun['std_error'], $lang_fun['std_invalid_id']);
   }
@@ -173,7 +173,7 @@ else if ($action == 'ban') {
   $id = 0+$_GET["id"];
   int_check($id,true);
   $res = sql_query("SELECT * FROM fun WHERE id=$id") or sqlerr(__FILE__,__LINE__);
-  $arr = mysql_fetch_array($res);
+  $arr = _mysql_fetch_array($res);
   if (!$arr)
     stderr($lang_fun['std_error'], $lang_fun['std_invalid_id']);
   if ($_SERVER['REQUEST_METHOD'] == 'POST')
@@ -208,13 +208,13 @@ else if ($action == 'vote') {
   checkHTTPMethod('POST');
   int_check($id,true);
   $res = sql_query("SELECT * FROM fun WHERE id=$id") or sqlerr(__FILE__,__LINE__);
-  $arr = mysql_fetch_array($res);
+  $arr = _mysql_fetch_array($res);
   if (!$arr) {
     stderr($lang_fun['std_error'], $lang_fun['std_invalid_id']);
   }
   else {
     $res = sql_query("SELECT * FROM funvotes WHERE funid=$id AND userid = $CURUSER[id]") or sqlerr(__FILE__,__LINE__);
-    $checkvote = mysql_fetch_array($res);
+    $checkvote = _mysql_fetch_array($res);
     if ($checkvote)
       stderr($lang_fun['std_error'], $lang_fun['std_already_vote']);
     else {

@@ -7,7 +7,7 @@ if($action == "regimage")
 {
 		$query = "SELECT * FROM regimages WHERE imagehash= ".sqlesc($imagehash);
 		$sql = sql_query($query);
-		$regimage = mysql_fetch_array($sql);
+		$regimage = _mysql_fetch_array($sql);
 		$imagestring = $regimage['imagestring'];
 		for($i=0;$i<strlen($imagestring);$i++)
 		{

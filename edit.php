@@ -10,7 +10,7 @@ if (!$id)
 	die();
 
 $res = sql_query("SELECT torrents.*, categories.mode as cat_mode FROM torrents LEFT JOIN categories ON category = categories.id WHERE torrents.id = $id");
-$row = mysql_fetch_array($res);
+$row = _mysql_fetch_array($res);
 if (!$row) die();
 
 if ($enablespecial == 'yes' && get_user_class() >= $movetorrent_class)

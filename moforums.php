@@ -81,7 +81,7 @@ if ($act == "forum")
 echo '<table width="100%"  border="0" align="center" cellpadding="2" cellspacing="0">';
 echo "<tr><td class=colhead align=left>".$lang_moforums['col_name']."</td><td class=colhead>".$lang_moforums['col_viewed_by']."</td><td class=colhead>".$lang_moforums['col_modify']."</td></tr>";
 $result = sql_query ("SELECT  * FROM overforums ORDER BY sort ASC");
-if ($row = mysql_fetch_array($result)) {
+if ($row = _mysql_fetch_array($result)) {
 do {
 
 
@@ -89,7 +89,7 @@ echo "<tr><td><a href=forums.php?action=forumview&forid=".$row["id"]."><b>".html
 echo "<td>" . get_user_class_name($row["minclassview"],false,true,true) . "</td><td><b><a href=\"".$PHP_SELF."?action=editforum&id=".$row["id"]."\">".$lang_moforums['text_edit']."</a>&nbsp;|&nbsp;<a href=\"javascript:confirm_delete('".$row["id"]."', '".$lang_moforums['js_sure_to_delete_overforum']."', '');\"><font color=red>".$lang_moforums['text_delete']."</font></a></b></td></tr>";
 
 
-} while($row = mysql_fetch_array($result));
+} while($row = _mysql_fetch_array($result));
 } else {print "<tr><td colspan=3>".$lang_moforums['text_no_records_found']."</td></tr>";}
 echo "</table>";
 ?>
@@ -127,7 +127,7 @@ echo "</table>";
     <select name=sort>
 <?php
 $res = sql_query ("SELECT sort FROM overforums");
-$nr = mysql_num_rows($res);
+$nr = _mysql_num_rows($res);
 	    $maxclass = $nr + 1;
 	  for ($i = 0; $i <= $maxclass; ++$i)
 	    print("<option value=$i>$i \n");
@@ -151,7 +151,7 @@ $nr = mysql_num_rows($res);
 $id = 0+$_GET["id"];
 
 $result = sql_query ("SELECT * FROM overforums where id = '$id'");
-if ($row = mysql_fetch_array($result)) {
+if ($row = _mysql_fetch_array($result)) {
 
 // Get OverForum Name - To Be Written
 
@@ -193,7 +193,7 @@ do {
     <select name=sort>
 <?php
 $res = sql_query ("SELECT sort FROM overforums");
-$nr = mysql_num_rows($res);
+$nr = _mysql_num_rows($res);
 	    $maxclass = $nr + 1;
 	  for ($i = 0; $i <= $maxclass; ++$i)
 	    print("<option value=$i" . ($row["sort"] == $i ? " selected" : "") . ">$i \n");
@@ -209,7 +209,7 @@ $nr = mysql_num_rows($res);
 </table>
 
 <?php
-} while($row = mysql_fetch_array($result));
+} while($row = _mysql_fetch_array($result));
 } else {print $lang_moforums['text_no_records_found'];}
 }
 end_main_frame();

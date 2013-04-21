@@ -14,7 +14,7 @@ if (!$id)
 $passkey = $_GET['passkey'];
 if ($passkey){
 	$res = sql_query("SELECT * FROM users WHERE passkey=". sqlesc($passkey)." LIMIT 1");
-	$user = mysql_fetch_array($res);
+	$user = _mysql_fetch_array($res);
 	if (!$user)
 		die("invalid passkey");
 	elseif ($user['enabled'] == 'no' || $user['parked'] == 'yes')
@@ -36,7 +36,7 @@ else
 	$letdown = $_GET['letdown'];
 	$noticequery = sprintf("SELECT COUNT(userid) FROM snatched where userid = %d",$CURUSER['id']);
 	$noticeres = sql_query($noticequery) or sqlerr(__FILE__, __LINE__);
-	$noticearr = mysql_fetch_array($noticeres);
+	$noticearr = _mysql_fetch_array($noticeres);
 	if (!$letdown && (!$noticearr[0]))
 	{
 		header("Location: " . get_protocol_prefix() . "$BASEURL/downloadnotice.php?torrentid=".$id."&type=firsttime");
@@ -87,7 +87,7 @@ else{
 
 
 $res = sql_query("SELECT name, filename, save_as,  size, owner,banned FROM torrents WHERE id = ".sqlesc($id)) or sqlerr(__FILE__, __LINE__);
-$row = mysql_fetch_assoc($res);
+$row = _mysql_fetch_assoc($res);
 $fn = "$torrent_dir/$id.torrent";
 if ($CURUSER['downloadpos']=="no")
 	permissiondenied();

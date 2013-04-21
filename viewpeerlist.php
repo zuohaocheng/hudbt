@@ -31,7 +31,7 @@ if(isset($CURUSER)) {
       "<th width=1%>".$lang_viewpeerlist['col_client']."</th></tr></thead><tbody>\n";
     $now = time();
     $count = 0;
-    while ($e = mysql_fetch_array($res)) {
+    while ($e = _mysql_fetch_array($res)) {
       $count += 1;
       $privacy = get_single_value("users", "privacy","WHERE id=".sqlesc($e['userid']));
       ++$num;
@@ -98,7 +98,7 @@ if(isset($CURUSER)) {
   $downloaders_res = sql_query("SELECT seeder, finishedat, downloadoffset, uploadoffset, ip, port, uploaded, downloaded, to_go, UNIX_TIMESTAMP(started) AS st, connectable, agent, peer_id, UNIX_TIMESTAMP(last_action) AS la, userid FROM peers WHERE torrent = $id AND seeder='no' ORDER BY to_go ASC") or sqlerror();
  
   $res = sql_query("SELECT torrents.id, torrents.owner, torrents.size, torrents.anonymous FROM torrents WHERE torrents.id = $id LIMIT 1") or sqlerr();
-  $row = mysql_fetch_array($res);
+  $row = _mysql_fetch_array($res);
 
   print(dltable($lang_viewpeerlist['text_seeders'], $seeders_res, $row, 'seeders'));
   print(dltable($lang_viewpeerlist['text_leechers'], $downloaders_res, $row, 'leechers'));

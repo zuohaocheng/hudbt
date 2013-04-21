@@ -101,7 +101,7 @@ if ($action == "viewposts") {
 
 	$res = sql_query($query) or sqlerr(__FILE__, __LINE__);
 
-	$arr = mysql_fetch_row($res) or stderr($lang_userhistory['std_error'], $lang_userhistory['std_no_posts_found']);
+	$arr = _mysql_fetch_row($res) or stderr($lang_userhistory['std_error'], $lang_userhistory['std_no_posts_found']);
 
 	$postcount = $arr[0];
 
@@ -113,9 +113,9 @@ if ($action == "viewposts") {
 
 	$res = sql_query("SELECT username, donor, warned, enabled FROM users WHERE id=$userid") or sqlerr(__FILE__, __LINE__);
 
-	if (mysql_num_rows($res) == 1)
+	if (_mysql_num_rows($res) == 1)
 	{
-		$arr = mysql_fetch_assoc($res);
+		$arr = _mysql_fetch_assoc($res);
 
 		$subject = get_username($userid);
 	}
@@ -132,7 +132,7 @@ if ($action == "viewposts") {
 
 	$res = sql_query($query) or sqlerr(__FILE__, __LINE__);
 
-	if (mysql_num_rows($res) == 0) stderr($lang_userhistory['std_error'], $lang_userhistory['std_no_posts_found']);
+	if (_mysql_num_rows($res) == 0) stderr($lang_userhistory['std_error'], $lang_userhistory['std_no_posts_found']);
 
 	$page['title'] = $lang_userhistory['head_posts_history'];
 	$page['h1'] = $lang_userhistory['text_posts_history_for'].$subject;
@@ -146,7 +146,7 @@ if ($action == "viewposts") {
 
 	begin_frame();
 
-	while ($arr = mysql_fetch_assoc($res)) {
+	while ($arr = _mysql_fetch_assoc($res)) {
 		$postid = $arr["id"];
 		$posterid = $arr["userid"];
 		$topicid = $arr["t_id"];
@@ -171,9 +171,9 @@ if ($action == "viewposts") {
       if (is_valid_id($arr['editedby']))
       {
       	$subres = sql_query("SELECT username FROM users WHERE id=$arr[editedby]");
-      	if (mysql_num_rows($subres) == 1)
+      	if (_mysql_num_rows($subres) == 1)
       	{
-      		$subrow = mysql_fetch_assoc($subres);
+      		$subrow = _mysql_fetch_assoc($subres);
       		$body .= '<div class="post-edited">'.$lang_userhistory['text_last_edited'].get_username($arr['editedby']).$lang_userhistory['text_at']."$arr[editdate]</div>\n";
       	}
       }
@@ -198,7 +198,7 @@ elseif ($action == 'viewquotedposts') {
   $order = 'p.id DESC';
   $query = "SELECT $select FROM $from WHERE $where ORDER BY $order";
   $res = sql_query($query) or sqlerr(__FILE__, __LINE__);
-  $arr = mysql_fetch_row($res) or stderr($lang_userhistory['std_error'], $lang_userhistory['std_no_posts_found']);
+  $arr = _mysql_fetch_row($res) or stderr($lang_userhistory['std_error'], $lang_userhistory['std_no_posts_found']);
   $postcount = $arr[0];
   list($pagertop, $pagerbottom, $limit) = pager($perpage, $postcount, "?action=viewquotedposts&id=$userid&");
   
@@ -212,7 +212,7 @@ elseif ($action == 'viewquotedposts') {
     echo $pagertop;
   }
   echo '<div id="forum-posts"><ol>';
-  while ($arr = mysql_fetch_assoc($subres)) {
+  while ($arr = _mysql_fetch_assoc($subres)) {
     list($read, $post, $modify) = get_forum_privilege($arr['forumid']);
     if (!$read) {
       continue;
@@ -245,7 +245,7 @@ elseif ($action == "viewcomments") {
 
   $res = sql_query($query) or sqlerr(__FILE__, __LINE__);
 
-  $arr = mysql_fetch_row($res) or stderr($lang_userhistory['std_error'], $lang_userhistory['std_no_comments_found']);
+  $arr = _mysql_fetch_row($res) or stderr($lang_userhistory['std_error'], $lang_userhistory['std_no_comments_found']);
 
   $commentcount = $arr[0];
 
@@ -257,8 +257,8 @@ elseif ($action == "viewcomments") {
 
   $res = sql_query("SELECT username, donor, warned, enabled FROM users WHERE id=$userid") or sqlerr(__FILE__, __LINE__);
 
-  if (mysql_num_rows($res) == 1) {
-    $arr = mysql_fetch_assoc($res);
+  if (_mysql_num_rows($res) == 1) {
+    $arr = _mysql_fetch_assoc($res);
     $subject = get_username($userid);
   }
   else {
@@ -273,7 +273,7 @@ elseif ($action == "viewcomments") {
 
   $res = sql_query($query) or sqlerr(__FILE__, __LINE__);
 
-  if (mysql_num_rows($res) == 0) stderr($lang_userhistory['std_error'], $lang_userhistory['std_no_comments_found']);
+  if (_mysql_num_rows($res) == 0) stderr($lang_userhistory['std_error'], $lang_userhistory['std_no_comments_found']);
 
   $page['title'] = $lang_userhistory['head_comments_history'];
   $page['h1'] = $lang_userhistory['text_comments_history_for']."$subject</h1>\n";
@@ -284,7 +284,7 @@ elseif ($action == "viewcomments") {
   //------ Print table
 
   echo '<div id="forum-posts"><ol>';
-  while ($arr = mysql_fetch_assoc($res)) {
+  while ($arr = _mysql_fetch_assoc($res)) {
     if ($arr['t_name']) {
       $arr['postname'] = $arr['t_name'];
     }
@@ -300,7 +300,7 @@ elseif ($action == "viewcomments") {
 }
 elseif ($action == 'viewquotedcomments') {
   $res = sql_query('SELECT COUNT(*) AS postname FROM comments c INNER JOIN comments c1 ON c.quote = c1.id WHERE c1.user=' . $userid . ' ORDER BY c.id') or sqlerr(__FILE__, __LINE__);
-  $arr = mysql_fetch_row($res) or stderr($lang_userhistory['std_error'], $lang_userhistory['std_no_comments_found']);
+  $arr = _mysql_fetch_row($res) or stderr($lang_userhistory['std_error'], $lang_userhistory['std_no_comments_found']);
   $commentcount = $arr[0];
   $perpage = 10;
   list($pagertop, $pagerbottom, $limit) = pager($perpage, $commentcount, $_SERVER["PHP_SELF"] . "?action=viewquotedcomments&id=$userid&");
@@ -316,7 +316,7 @@ elseif ($action == 'viewquotedcomments') {
 
   if ($commentcount > $perpage) echo $pagertop;
   echo '<div id="forum-posts"><ol>';
-  while ($arr = mysql_fetch_assoc($subres)) {
+  while ($arr = _mysql_fetch_assoc($subres)) {
     if ($arr['t_name']) {
       $arr['postname'] = $arr['t_name'];
     }

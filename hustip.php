@@ -16,7 +16,7 @@ if ($_POST['ip']) {
       echo '<table class="no-vertical-line center" cellpadding="5"><thead><tr><th>账号</th><th>IP</th></tr></thead><tbody>';
       $sql = 'SELECT account, ip FROM hustips '. $sqlwhere . ' ORDER BY account ASC ' . $limit;
       $res = sql_query($sql) or sqlerr();
-      while ($row = mysql_fetch_assoc($res)) {
+      while ($row = _mysql_fetch_assoc($res)) {
 	echo '<tr><td>' . $row['account'] . '</td><td>' . $row['ip'] . '</tr>';
       }
       echo '</tbody></table>';

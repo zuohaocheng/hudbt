@@ -8,13 +8,14 @@ $bucketpath = "$bitbucket";
 if (get_user_class() >= UC_MODERATOR) {
   $delete = $_GET["delete"];
   if (is_valid_id($delete)) {
-    $r = sql_query("SELECT name,owner FROM bitbucket WHERE id=".mysql_real_escape_string($delete)) or sqlerr(__FILE__, __LINE__);			
-    if (mysql_num_rows($r) == 1) {				
-      $a = mysql_fetch_assoc($r);				
+    $r = sql_fetchAll('SELECT name,owner FROM bitbucket WHERE id=?', [$delete]);
+    if (count($r) == 1) {				
+      $a = _mysql_fetch_assoc($r);				
       if (get_user_class() >= UC_MODERATOR || $a["owner"] == $CURUSER["id"]) {					
-	sql_query("DELETE FROM bitbucket WHERE id=".mysql_real_escape_string($delete)) or sqlerr(__FILE__, __LINE__);			
-	if (!unlink("$bucketpath/$a[name]"))						
+	sql_query('DELETE FROM bitbucket WHERE id=', [$delete]);
+	if (!unlink("$bucketpath/$a[name]")) {
 	  stderr("Warning", "Unable to unlink file: <b>$a[name]</b>. You should contact an administrator about this error.",false);
+	}
       }
     }
   }
@@ -27,12 +28,12 @@ print("<h1>BitBucket Log</h1>\n");
 print("Total Images Stored: $count");	
 echo $pagertop;	
 $res = sql_query("SELECT * FROM bitbucket ORDER BY added DESC $limit") or sqlerr(__FILE__, __LINE__);	
-if (mysql_num_rows($res) == 0) {	
+if (_mysql_num_rows($res) == 0) {	
   print("<b>BitBucket Log is empty</b>\n");
 }
 else {		
   print("<table align='center' border='0' cellspacing='0' cellpadding='5'>\n");		
-  while ($arr = mysql_fetch_assoc($res)) {
+  while ($arr = _mysql_fetch_assoc($res)) {
     $date = substr($arr['added'], 0, strpos($arr['added'], " "));			
     $time = substr($arr['added'], strpos($arr['added'], " ") + 1);			
     $name = $arr["name"];

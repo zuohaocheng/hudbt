@@ -23,7 +23,7 @@ if ($count){
 
 	$res = sql_query("SELECT * FROM snatched WHERE finished='yes' AND torrentid =" . sqlesc($id) . " ORDER BY completedat DESC $limit");
 
-	while ($arr = mysql_fetch_assoc($res))
+	while ($arr = _mysql_fetch_assoc($res))
 	{
 		//start torrent
 		if ($arr["downloaded"] > 0)

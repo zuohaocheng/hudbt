@@ -48,7 +48,7 @@ if ($action == 'add')
 	stderr($lang_friends['std_error'], $lang_friends['std_unknown_type']."$type");
 
 	$r = sql_query("SELECT id FROM $table_is WHERE userid=$userid AND $field_is=$targetid") or sqlerr(__FILE__, __LINE__);
-	if (mysql_num_rows($r) == 1)
+	if (_mysql_num_rows($r) == 1)
 	stderr($lang_friends['std_error'], $lang_friends['std_user_id'].$targetid.$lang_friends['std_already_in'].$table_is.$lang_friends['std_list']);
 
 	sql_query("INSERT INTO $table_is VALUES (0,$userid, $targetid)") or sqlerr(__FILE__, __LINE__);
@@ -80,14 +80,14 @@ if ($action == 'delete')
 	if ($type == 'friend')
 	{
 		sql_query("DELETE FROM friends WHERE userid=$userid AND friendid=$targetid") or sqlerr(__FILE__, __LINE__);
-		if (mysql_affected_rows() == 0)
+		if (_mysql_affected_rows() == 0)
 		stderr($lang_friends['std_error'], $lang_friends['std_no_friend_found']."$targetid");
 		$frag = "friends";
 	}
 	elseif ($type == 'block')
 	{
 		sql_query("DELETE FROM blocks WHERE userid=$userid AND blockid=$targetid") or sqlerr(__FILE__, __LINE__);
-		if (mysql_affected_rows() == 0)
+		if (_mysql_affected_rows() == 0)
 		stderr($lang_friends['std_error'], $lang_friends['std_no_block_found']."$targetid");
 		$frag = "blocks";
 	}
@@ -116,12 +116,12 @@ $i = 0;
 
 unset($friend_id_arr);
 $res = sql_query("SELECT f.friendid as id, u.last_access, u.class, u.avatar, u.title FROM friends AS f LEFT JOIN users as u ON f.friendid = u.id WHERE userid=$userid ORDER BY id") or sqlerr(__FILE__, __LINE__);
-if(mysql_num_rows($res) == 0) {
+if(_mysql_num_rows($res) == 0) {
   $friends = $lang_friends['text_friends_empty'];
 }
 else {
   print('<ul>');
-  while ($friend = mysql_fetch_array($res)) {
+  while ($friend = _mysql_fetch_array($res)) {
     $friend_id_arr[] = $friend["id"];
     $title = $friend["title"];
     if (!$title)
@@ -159,12 +159,12 @@ else {
 
 
 $res = sql_query("SELECT blockid as id FROM blocks WHERE userid=$userid ORDER BY id") or sqlerr(__FILE__, __LINE__);
-if(mysql_num_rows($res) == 0)
+if(_mysql_num_rows($res) == 0)
 $blocks = $lang_friends['text_blocklist_empty'];
 else {
 	$i = 0;
 	$blocks = '<ul>';
-	while ($block = mysql_fetch_array($res)) {
+	while ($block = _mysql_fetch_array($res)) {
 		if ($i % 6 == 0)
 		$blocks .= "<li>[<font class=small><a href=friends.php?id=$userid&action=delete&type=block&targetid=" .
 		$block['id'] . ">D</a></font>] " . get_username($block["id"]) . "</li>";

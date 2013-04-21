@@ -21,8 +21,8 @@ if (!$id)
 	die();
 
 
-$res = sql_query("SELECT category, owner, filename, save_as, anonymous, picktype, picktime, added FROM torrents WHERE id = ".mysql_real_escape_string($id));
-$row = mysql_fetch_array($res);
+$res = sql_query("SELECT category, owner, filename, save_as, anonymous, picktype, picktime, added FROM torrents WHERE id = ?", [$id]);
+$row = _mysql_fetch_array($res);
 $torrentAddedTimeString = $row['added'];
 if (!$row)
 	die();
@@ -196,17 +196,17 @@ if(get_user_class()>=$torrentmanage_class && $CURUSER['picker'] == 'yes')
 sql_query("UPDATE torrents SET " . join(",", $updateset) . " WHERE id = $id") or sqlerr(__FILE__, __LINE__);
 if($destoring===true){
 	$updateList_res = sql_query("SELECT keeper_id FROM storing_records WHERE torrent_id = $id AND checkout = 0") or sqlerr(__FILE__,__LINE__);
-	if(mysql_num_rows($updateList_res)!=0){
-		while($updateList = mysql_fetch_assoc($updateList_res)){
+	if(_mysql_num_rows($updateList_res)!=0){
+		while($updateList = _mysql_fetch_assoc($updateList_res)){
 			$outtime_res = sql_query("SELECT seedtime FROM snatched WHERE torrentid = $id AND userid = $updateList[keeper_id]") or sqlerr(__FILE__,__LINE__);
-			$outtime = mysql_fetch_assoc($outtime_res);
+			$outtime = _mysql_fetch_assoc($outtime_res);
 			
 			if($outtime['seedtime']){
 				$subject = $lang_takeedit['sbj_storing_canceled'];
 				$msg = $lang_takeedit['txt_your_torrent']."[torrent=$id]".$lang_takeedit['txt_has_been']."[user=$CURUSER[id]]".$lang_takeedit['txt_storing_canceled'];
 				
 				sql_query("UPDATE storing_records SET out_seedtime = $outtime[seedtime], out_date = NOW(), checkout = 1 WHERE torrent_id = $id AND keeper_id = $keeper_id AND checkout = 0") or sqlerr(__FILE__,__LINE__);
-				if(mysql_affected_rows()){
+				if(_mysql_affected_rows()){
 					send_pm(0,$keeper_id,$subject,$msg);
 				}
 			}

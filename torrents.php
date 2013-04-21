@@ -57,9 +57,13 @@ if ($showsubcat){
 }
 
 $searchstr_ori = htmlspecialchars(trim($_GET["search"]));
-$searchstr = mysql_real_escape_string(trim($_GET["search"]));
-if (empty($searchstr))
+$searchstr = trim($_GET["search"]);
+
+$args = [];
+
+if (empty($searchstr)) {
   unset($searchstr);
+}
 
 // sorting by MarkoStamcar
 if ($_GET['sort'] && $_GET['type']) {
@@ -345,7 +349,8 @@ if ($_GET["indate"]) {
 
   if ($indate) {
     $addparam .= 'indate=' . $indate .'&';
-    $wherea[] = " DATEDIFF('".date("Y-m-d H:i:s")."',torrents.added)<=" . mysql_real_escape_string($indate);
+    $wherea[] = " DATEDIFF('".date("Y-m-d")."',torrents.added)<= :indate";
+    $args[':indate'] = $indate;
   }
 }
 
@@ -797,24 +802,34 @@ if (isset($searchstr))
     };
     
     $generateMatchSql = function($fields, $canUseMatch) use ($matches, $likes, $ANDOR) {
-      global $matches, $likes, $exact;
+      global $matches, $likes, $exact, $args;
       $out = [];
+      $counter = 0;
       if ($canUseMatch) {
 	if (count($matches)) {
 	  if ($ANDOR == ' AND ') {
 	    $matches = array_map(function($o) {return '+' . $o;}, $matches);
 	  }
-	  $out[] = 'MATCH(' . implode(',', $fields) . ') AGAINST ("' . implode(' ', $matches) . '" IN BOOLEAN MODE)';
+	  $out[] = 'MATCH(' . implode(',', $fields) . ') AGAINST (:matches IN BOOLEAN MODE)';
+	  $args[':matches'] = implode(' ', $matches);
 	}
       }
       else {
 	$likes = array_merge($matches, $likes);
       }
-      $likes = array_map(function($o) {
-	  return 'LIKE "%' . $o . '%"';
+      $likes = array_map(function($o) use (&$counter) {
+	  global $args;
+	  $key = ':like' . $counter;
+	  $args[$key] = '%' . $o . '%';
+	  $counter += 1;
+	  return 'LIKE ' . $key;
 	}, $likes);
-      $exact = array_map(function($o) {
-	  return '= "' . $o . '"';
+      $exact = array_map(function($o) use (&$counter) {
+	  global $args;
+	  $key = ':eq' . $counter;
+	  $args[$key] = '%' . $o . '%';
+	  $counter += 1;
+	  return '= ' . $key;
 	}, $exact);
 
       $likes_sql = implode($ANDOR, array_map(function($o) use ($fields) {
@@ -950,7 +965,8 @@ function generateWhere($wherea) {
 $where = generateWhere($wherea);
 
 $sql_extra = $joins . $where;
-$sql_extra_md5 = MD5($sql_extra);
+$sql_args = $sql_extra . serialize($args);
+$sql_extra_md5 = MD5($sql_args);
 
 if($torrent_count_cache) {
 #  $timer_1_start = microtime(true);
@@ -959,7 +975,7 @@ if($torrent_count_cache) {
 #  var_dump($sql_key, $count);
   if(empty($count)) {
 #    $timer_2_start = microtime(true);
-    $count = get_row_count('torrents', $sql_extra);
+    $count = get_row_count('torrents', $sql_extra, $args);
     $Cache->cache_value($sql_key, $count, TORRENT_COUNT_CACHE_TIME);
     
 #    $timer_2_end = microtime(true);
@@ -969,7 +985,7 @@ if($torrent_count_cache) {
 #  $time_delta2 = $timer_2_end - $timer_2_start;
 }
 else {
-  $count = get_row_count('torrents', $sql_extra);
+  $count = get_row_count('torrents', $sql_extra, $args);
 }
 
 if ($torrentsperpage_main) {
@@ -1001,7 +1017,7 @@ if ($count) {
 
   list($pagertop, $pagerbottom, $limit, $next_page_href, $start) = pager($torrentsperpage, $count, "?" . $addparam);
 
-  $sql_extra_order_md5 = md5($sql_extra . $orderby . $start);
+  $sql_extra_order_md5 = md5($sql_args . $orderby . $start);
   
   $fields = 'torrents.id, torrents.sp_state, torrents.promotion_time_type, torrents.promotion_until, torrents.banned, torrents.picktype, torrents.pos_state, torrents.category, torrents.source, torrents.medium, torrents.codec, torrents.standard, torrents.processing, torrents.team, torrents.audiocodec, torrents.leechers, torrents.seeders, torrents.name, torrents.small_descr, torrents.times_completed, torrents.size, torrents.added, torrents.comments,torrents.anonymous,torrents.owner,torrents.url,torrents.cache_stamp,torrents.oday, torrents.storing, torrents.pos_state_until';
 
@@ -1034,7 +1050,7 @@ if ($count) {
       $wherea_sticky = $wherea;
       $wherea_sticky[] = 'pos_state = "sticky"';
       $where_sticky = generateWhere($wherea_sticky);
-      $stickynum = get_row_count('torrents', $joins . $where_sticky);
+      $stickynum = get_row_count('torrents', $joins . $where_sticky, $args);
       if ($torrents_list_cache) {
 	$Cache->cache_value($cache_key, $stickynum, STICKY_TORRENT_NUM_CACHE_TIME);
       }
@@ -1058,15 +1074,11 @@ if ($count) {
     // 缓存为空时从数据库获取数据
     if($stickyrows === false) {
       //查询固定置顶的种子
-      $res = sql_query($stickyquery) or sqlerr(__FILE__, __LINE__);
-      $stickyrows = [];
-      while ($row = mysql_fetch_assoc($res)) {
-	$stickyrows[] = $row;
-      }
+      $stickyrows = sql_fetchAll($stickyquery, $args);
       //查询随机置顶的种子
-      $res = sql_query($randomquery) or sqlerr(__FILE__, __LINE__);
+      $res = sql_query($randomquery, $args) or sqlerr(__FILE__, __LINE__);
       $randomrows = [];
-      while ($row = mysql_fetch_assoc($res)) {
+      while ($row = _mysql_fetch_assoc($res)) {
 	$row['lucky'] = true;
 	$randomrows[] = $row;
       }
@@ -1105,8 +1117,8 @@ if ($count) {
 
   if($normalrows === false) {
     $normalquery = "SELECT $fields FROM torrents " . $extraByState('sticky', false) . ' '. $limit;
-    $res = sql_query($normalquery) or sqlerr(__FILE__, __LINE__);
-    while ($row = mysql_fetch_assoc($res)) {//不保存已经被选上的随机种子
+    $res = sql_query($normalquery, $args) or sqlerr(__FILE__, __LINE__);
+    while ($row = _mysql_fetch_assoc($res)) {//不保存已经被选上的随机种子
       if (!isset($lucky_ids[$row['id']])) {
 	$normalrows[] = $row;
       }
@@ -1138,7 +1150,7 @@ if (isset($rows)) {
     $sql = 'SELECT torrentid, snatched.to_go, finished, peers.id AS peer_id FROM snatched LEFT JOIN peers ON peers.torrent = snatched.torrentid AND peers.userid = snatched.userid WHERE torrentid IN (' . implode(',', $ids) . ') AND snatched.userid=' . $CURUSER['id'];
     $res = sql_query($sql) or sqlerr(__FILE__, __LINE__);
 
-    while ($row = mysql_fetch_assoc($res)) {
+    while ($row = _mysql_fetch_assoc($res)) {
       $progress[$row['torrentid']] = $row;
     }
   }

@@ -13,10 +13,10 @@ if ($_GET['action'] == "del") {
 		die();
 	}
 	$result = sql_query ("SELECT * FROM topics where forumid = ".sqlesc($id));
-	if ($row = mysql_fetch_array($result)) {
+	if ($row = _mysql_fetch_array($result)) {
 		do {
 			sql_query ("DELETE FROM posts where topicid = ".$row["id"]) or sqlerr(__FILE__, __LINE__);
-		} while($row = mysql_fetch_array($result));
+		} while($row = _mysql_fetch_array($result));
 	}
 	sql_query ("DELETE FROM topics where forumid = ".sqlesc($id)) or sqlerr(__FILE__, __LINE__);
 	sql_query ("DELETE FROM forums where id = ".sqlesc($id)) or sqlerr(__FILE__, __LINE__);
@@ -61,7 +61,7 @@ elseif ($_POST['action'] == "addforum") {
 	sql_query("INSERT INTO forums (sort, name,  description, minclassread,  minclasswrite, minclasscreate, forid) VALUES(" . $_POST['sort'] . ", " . sqlesc($_POST['name']). ", " . sqlesc($_POST['desc']). ", " . $_POST['readclass'] . ", " . $_POST['writeclass'] . ", " . $_POST['createclass'] . ", ".sqlesc(($_POST['overforums'])).")") or sqlerr(__FILE__, __LINE__);
 	$Cache->delete_value('forums_list');
 	if ($_POST["moderator"]){
-	$id = mysql_insert_id();
+	$id = _mysql_insert_id();
 	$moderator = $_POST["moderator"];
 	set_forum_moderators($moderator,$id);
 	}
@@ -76,7 +76,7 @@ if ($_GET['action'] == "editforum") {
 	//EDIT PAGE FOR THE FORUMS
 	$id = 0 + ($_GET["id"]);
 	$result = sql_query ("SELECT * FROM forums where id = ".sqlesc($id));
-	if ($row = mysql_fetch_array($result)) {
+	if ($row = _mysql_fetch_array($result)) {
 		do {
 ?>
 <h1 align=center><a class=faqlink href=forummanage.php><?php echo $lang_forummanage['text_forum_management']?></a><b>--></b><?php echo $lang_forummanage['text_edit_forum']?></h2>
@@ -103,7 +103,7 @@ if ($_GET['action'] == "editforum") {
     <?php
             $forid = $row["forid"];
             $res = sql_query("SELECT * FROM overforums");
-             while ($arr = mysql_fetch_array($res)) {
+             while ($arr = _mysql_fetch_array($res)) {
 
              $name = $arr["name"];
              $i = $arr["id"];
@@ -158,7 +158,7 @@ if ($_GET['action'] == "editforum") {
     <select name=sort>
 <?php
 $res = sql_query ("SELECT sort FROM forums");
-$nr = mysql_num_rows($res);
+$nr = _mysql_num_rows($res);
             $maxclass = $nr + 1;
           for ($i = 0; $i <= $maxclass; ++$i)
             print("<option value=$i" . ($row["sort"] == $i ? " selected" : "") . ">$i \n");
@@ -173,7 +173,7 @@ $nr = mysql_num_rows($res);
 </table>
 
 <?php
-		} while($row = mysql_fetch_array($result));
+		} while($row = _mysql_fetch_array($result));
 	} 
 	else 
 	{
@@ -205,7 +205,7 @@ elseif ($_GET['action'] == "newforum"){
 <?php
             $forid = $row["forid"];
             $res = sql_query("SELECT * FROM overforums");
-             while ($arr = mysql_fetch_array($res)) {
+             while ($arr = _mysql_fetch_array($res)) {
 
              $name = $arr["name"];
              $i = $arr["id"];
@@ -255,7 +255,7 @@ elseif ($_GET['action'] == "newforum"){
     <select name=sort>
 <?php
 $res = sql_query ("SELECT sort FROM forums");
-$nr = mysql_num_rows($res);
+$nr = _mysql_num_rows($res);
             $maxclass = $nr + 1;
           for ($i = 0; $i <= $maxclass; ++$i)
             print("<option value=$i>$i \n");
@@ -281,7 +281,7 @@ else {
 echo '<table width="100%"  border="0" align="center" cellpadding="2" cellspacing="0"><thead>';
 echo "<tr><th align=left>".$lang_forummanage['col_name']."</th><th>".$lang_forummanage['col_overforum']."</th><th>".$lang_forummanage['col_read']."</th><th>".$lang_forummanage['col_write']."</th><th>".$lang_forummanage['col_create_topic']."</th><th>".$lang_forummanage['col_moderator']."</th><th>".$lang_forummanage['col_modify']."</th></tr></thead><tbody>";
 $result = sql_query ("SELECT forums.*, overforums.name AS of_name FROM forums LEFT JOIN overforums ON forums.forid=overforums.id ORDER BY forums.sort ASC");
-if ($row = mysql_fetch_array($result)) {
+if ($row = _mysql_fetch_array($result)) {
   do {
     $name = $row['of_name'];
     $moderators = get_forum_moderators($row['id'],false);
@@ -290,7 +290,7 @@ if ($row = mysql_fetch_array($result)) {
     }
     echo "<tr><td><a href=forums.php?action=viewforum&forumid=".$row["id"]."><b>".htmlspecialchars($row["name"])."</b></a><br />".htmlspecialchars($row["description"])."</td>";
     echo "<td>".htmlspecialchars($name)."</td><td>" . get_user_class_name($row["minclassread"],false,true,true) . "</td><td>" . get_user_class_name($row["minclasswrite"],false,true,true) . "</td><td>" . get_user_class_name($row["minclasscreate"],false,true,true) . "</td><td>".$moderators."</td><td><div class=\"minor-list list-seperator\"><ul><li><a href=\"".$PHP_SELF."?action=editforum&id=".$row["id"]."\">".$lang_forummanage['text_edit']."</a></li><li><a href=\"javascript:confirm_delete('".$row["id"]."', '".$lang_forummanage['js_sure_to_delete_forum']."', '');\"><span class=\"striking\">".$lang_forummanage['text_delete']."</span></a></li></ul></div></td></tr>";
-  } while($row = mysql_fetch_array($result));
+  } while($row = _mysql_fetch_array($result));
 }
 else {
   print "<tr><td colspan=6>".$lang_forummanage['text_no_records_found']."</td></tr>";

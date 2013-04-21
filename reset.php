@@ -21,7 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 	stderr("Error","Sorry, password is too short (min is 6 chars)");
 	
    $res = sql_query("SELECT * FROM users WHERE username=" . sqlesc($username) . " ") or sqlerr();
-$arr = mysql_fetch_assoc($res);
+$arr = _mysql_fetch_assoc($res);
 
 
 $id = $arr['id'];
@@ -30,7 +30,7 @@ $secret = mksecret();
 $wantpasshash = md5($secret . $wantpassword . $secret);
 sql_query("UPDATE LOW_PRIORITY users SET passhash=".sqlesc($wantpasshash).", secret= ".sqlesc($secret)." where id=$id");
 write_log("Password Reset For $username by $CURUSER[username]");
- if (mysql_affected_rows() != 1)
+ if (_mysql_affected_rows() != 1)
    stderr("Error", "Unable to RESET PASSWORD on this account.");
  stderr("Success", "The password of account <b>$username</b> is reset , please inform user of this change.",false);
 }

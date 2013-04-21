@@ -61,7 +61,7 @@ for ($i = 0;;++$i)
 print("</select>\n");
 $countries = "<option value=0>".$lang_users['select_any_country']."</option>\n";
 $ct_r = sql_query("SELECT id,name FROM countries ORDER BY name") or die;
-while ($ct_a = mysql_fetch_array($ct_r))
+while ($ct_a = _mysql_fetch_array($ct_r))
 	$countries .= "<option value=".htmlspecialchars($ct_a[id]).">".htmlspecialchars($ct_a[name])."</option>\n";
 print("<select name=country>".$countries."</select>");
 print("<input type=submit value=\"".$lang_users['submit_okay']."\">\n");
@@ -78,7 +78,7 @@ end_main_frame();
 $perpage = 50;
 
 $res = sql_query("SELECT COUNT(*) FROM users WHERE $query") or sqlerr();
-$arr = mysql_fetch_row($res);
+$arr = _mysql_fetch_row($res);
 $count = $arr[0];
 
 list($pagertop, $pagerbottom, $limit) = pager($perpage, $count, "users.php?".$q.($q ? "&" : ""));
@@ -110,7 +110,7 @@ $sql = sprintf('SELECT
 $res = sql_query($sql) or sqlerr();
 
 
-$num = mysql_num_rows($res);
+$num = _mysql_num_rows($res);
 
 if ($num == 0) {
   print('<h3 class="page-titles">' . $lang_users['text_no_found'] . '</h3>');
@@ -121,7 +121,7 @@ else {
   print("<tr><td class=colhead align=left>".$lang_users['col_user_name']."</td><td class=colhead>".$lang_users['col_registered']."</td><td class=colhead>".$lang_users['col_last_access']."</td><td class=colhead align=left>".$lang_users['col_class']."</td><td class=colhead>".$lang_users['col_country']."</td></tr>\n");
   for ($i = 0; $i < $num; ++$i)
     {
-      $arr = mysql_fetch_assoc($res);
+      $arr = _mysql_fetch_assoc($res);
 
       print("<tr><td align=left>".get_username($arr['id'])."</td><td>".gettime($arr['added'], true, false)."</td><td>".gettime($arr['last_access'],true,false)."</td><td align=left>". get_user_class_name($arr['class'],false,true,true) . "</td><td align=center>".$arr['country']."</td></tr>");
     }

@@ -17,7 +17,7 @@ $filename = 0 + $filename;
 $dirname = 0 + $dirname;
 
 $res = sql_query("SELECT * FROM subs WHERE id=$filename") or sqlerr(__FILE__, __LINE__);
-$arr = mysql_fetch_assoc($res);
+$arr = _mysql_fetch_assoc($res);
 if (!$arr)
 die("Not found\n");
 

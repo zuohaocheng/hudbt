@@ -16,7 +16,7 @@ function bark($msg)
 }
 
 $r = @sql_query("SELECT * FROM users WHERE status = 'pending' AND id = ".sqlesc($id)) or sqlerr(__FILE__, __LINE__);
-$user = mysql_fetch_array($r) or bark($lang_checkuser['std_no_user_id']);
+$user = _mysql_fetch_array($r) or bark($lang_checkuser['std_no_user_id']);
 
 if (get_user_class() < UC_MODERATOR) {
 	if ($user[invited_by] != $CURUSER[id])
@@ -33,9 +33,9 @@ else
   $joindate = "$user[added] (" . get_elapsed_time(strtotime($user["added"])) . " ago)";
   
 $res = sql_query("SELECT name,flagpic FROM countries WHERE id=$user[country] LIMIT 1") or sqlerr();
-if (mysql_num_rows($res) == 1)
+if (_mysql_num_rows($res) == 1)
 {
-  $arr = mysql_fetch_assoc($res);
+  $arr = _mysql_fetch_assoc($res);
   $country = "<td class=embedded><img src=pic/flag/$arr[flagpic] alt=\"$arr[name]\" style='margin-left: 8pt'></td>";
 }
 

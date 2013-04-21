@@ -19,7 +19,7 @@ if ($action == "confirmuser")
 {
 	$userid = $_POST["userid"];
 	$confirm = $_POST["confirm"];
-	sql_query('UPDATE `users` SET `status` = \''.mysql_real_escape_string($confirm).'\', `info` = NULL WHERE `id` = '.mysql_real_escape_string($userid).' LIMIT 1;') or sqlerr(__FILE__, __LINE__);
+	sql_query('UPDATE `users` SET `status` = ?, `info` = NULL WHERE `id` = ? LIMIT 1;', [$confirm, $userid]);
 	header("Location: " . get_protocol_prefix() . "$BASEURL/unco.php?status=1");
 	die;
 }
@@ -61,7 +61,7 @@ if ($action == "edituser")
 	if (get_user_class() <= $class)
 		stderr("Error", "You have no permission to change user's class to ".get_user_class_name($class,false,false,true).". BTW, how do you get here?");
 	$res = sql_query("SELECT * FROM users WHERE id = ".sqlesc($userid)) or sqlerr(__FILE__, __LINE__);
-	$arr = mysql_fetch_assoc($res) or puke();
+	$arr = _mysql_fetch_assoc($res) or puke();
 	
 	$curenabled = $arr["enabled"];
 	$curparked = $arr["parked"];

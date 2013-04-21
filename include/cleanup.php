@@ -42,7 +42,7 @@ function docleanup($forceAll = 0, $printProgress = false) {
 	}
 //11.calculate seeding bonus
 	$res = sql_query("SELECT DISTINCT userid FROM peers WHERE seeder = 'yes'") or sqlerr(__FILE__, __LINE__);
-	if (mysql_num_rows($res) > 0)
+	if (_mysql_num_rows($res) > 0)
 	{
 		$sqrtof2 = sqrt(2);
 		$logofpointone = log(0.1);
@@ -52,13 +52,13 @@ function docleanup($forceAll = 0, $printProgress = false) {
 		$valuethree = $logofpointone / ($nzero_bonus - 1);
 		$timenow = TIMENOW;
 		$sectoweek = 7*24*60*60;
-		while ($arr = mysql_fetch_assoc($res))	//loop for different users
+		while ($arr = _mysql_fetch_assoc($res))	//loop for different users
 		{
 			$A = 0;
 			$count = 0;
 			$all_bonus = 0;
 			$torrentres = sql_query("select torrents.added, torrents.size, torrents.seeders from torrents LEFT JOIN peers ON peers.torrent = torrents.id WHERE peers.userid = $arr[userid] AND peers.seeder ='yes'")  or sqlerr(__FILE__, __LINE__);
-			while ($torrent = mysql_fetch_array($torrentres))
+			while ($torrent = _mysql_fetch_array($torrentres))
 			{
 				$weeks_alive = ($timenow - strtotime($torrent[added])) / $sectoweek;
 				$gb_size = $torrent[size] / 1073741824;
@@ -81,7 +81,7 @@ function docleanup($forceAll = 0, $printProgress = false) {
 
 //Priority Class 2: cleanup every 30 mins
 	$res = sql_query("SELECT value_u FROM avps WHERE arg = 'lastcleantime2'");
-	$row = mysql_fetch_array($res);
+	$row = _mysql_fetch_array($res);
 	if (!$row) {
 		sql_query("INSERT INTO avps (arg, value_u) VALUES ('lastcleantime2',".sqlesc($now).")") or sqlerr(__FILE__, __LINE__);
 		return;
@@ -101,7 +101,7 @@ function docleanup($forceAll = 0, $printProgress = false) {
 	}
 //Priority Class 3: cleanup every 60 mins
 	$res = sql_query("SELECT value_u FROM avps WHERE arg = 'lastcleantime3'");
-	$row = mysql_fetch_array($res);
+	$row = _mysql_fetch_array($res);
 	if (!$row) {
 		sql_query("INSERT INTO avps (arg, value_u) VALUES ('lastcleantime3',$now)") or sqlerr(__FILE__, __LINE__);
 		return;
@@ -116,7 +116,7 @@ function docleanup($forceAll = 0, $printProgress = false) {
 	//4.update count of seeders, leechers, comments for torrents
 	$torrents = array();
 	$res = sql_query("SELECT torrent, seeder, COUNT(*) AS c FROM peers GROUP BY torrent, seeder") or sqlerr(__FILE__, __LINE__);
-	while ($row = mysql_fetch_assoc($res)) {
+	while ($row = _mysql_fetch_assoc($res)) {
 		if ($row["seeder"] == "yes")
 		$key = "seeders";
 		else
@@ -125,12 +125,12 @@ function docleanup($forceAll = 0, $printProgress = false) {
 	}
 
 	$res = sql_query("SELECT torrent, COUNT(*) AS c FROM comments GROUP BY torrent") or sqlerr(__FILE__, __LINE__);
-	while ($row = mysql_fetch_assoc($res)) {
+	while ($row = _mysql_fetch_assoc($res)) {
 		$torrents[$row["torrent"]]["comments"] = $row["c"];
 	}
 	$fields = explode(":", "comments:leechers:seeders");
 	$res = sql_query("SELECT id, seeders, leechers, comments FROM torrents") or sqlerr(__FILE__, __LINE__);
-	while ($row = mysql_fetch_assoc($res)) {
+	while ($row = _mysql_fetch_assoc($res)) {
 		$id = $row["id"];
 		$torr = $torrents[$id];
 		foreach ($fields as $field) {
@@ -156,15 +156,15 @@ function docleanup($forceAll = 0, $printProgress = false) {
 	}
 	//12. update forum post/topic count
 	$forums = sql_query("select id from forums") or sqlerr(__FILE__, __LINE__);
-	while ($forum = mysql_fetch_assoc($forums))
+	while ($forum = _mysql_fetch_assoc($forums))
 	{
 		$postcount = 0;
 		$topiccount = 0;
 		$topics = sql_query("select id from topics where forumid=$forum[id]") or sqlerr(__FILE__, __LINE__);
-		while ($topic = mysql_fetch_assoc($topics))
+		while ($topic = _mysql_fetch_assoc($topics))
 		{
 			$res = sql_query("select count(*) from posts where topicid=$topic[id]") or sqlerr(__FILE__, __LINE__);
-			$arr = mysql_fetch_row($res);
+			$arr = _mysql_fetch_row($res);
 			$postcount += $arr[0];
 			++$topiccount;
 		}
@@ -180,7 +180,7 @@ function docleanup($forceAll = 0, $printProgress = false) {
 		$secs = (int)$offervotetimeout_main;
 		$dt = sqlesc(date("Y-m-d H:i:s",(TIMENOW - ($offervotetimeout_main))));
 		$res = sql_query("SELECT id, name FROM offers WHERE added < $dt AND allowed <> 'allowed'") or sqlerr(__FILE__, __LINE__);
-		while($arr = mysql_fetch_assoc($res)){
+		while($arr = _mysql_fetch_assoc($res)){
 		sql_query("DELETE FROM offers WHERE id=$arr[id]") or sqlerr(__FILE__, __LINE__);
 		sql_query("DELETE FROM offervotes WHERE offerid=$arr[id]") or sqlerr(__FILE__, __LINE__);
 		sql_query("DELETE FROM comments WHERE offer=$arr[id]") or sqlerr(__FILE__, __LINE__);
@@ -196,7 +196,7 @@ function docleanup($forceAll = 0, $printProgress = false) {
 		$secs = (int)$offeruptimeout_main;
 		$dt = sqlesc(date("Y-m-d H:i:s",(TIMENOW - ($secs))));
 		$res = sql_query("SELECT id, name FROM offers WHERE allowedtime < $dt AND allowed = 'allowed'") or sqlerr(__FILE__, __LINE__);
-		while($arr = mysql_fetch_assoc($res)){
+		while($arr = _mysql_fetch_assoc($res)){
 		sql_query("DELETE FROM offers WHERE id=$arr[id]") or sqlerr(__FILE__, __LINE__);
 		sql_query("DELETE FROM offervotes WHERE offerid=$arr[id]") or sqlerr(__FILE__, __LINE__);
 		sql_query("DELETE FROM comments WHERE offer=$arr[id]") or sqlerr(__FILE__, __LINE__);
@@ -258,7 +258,7 @@ function torrent_promotion_expire($days, $type = 2, $targettype = 1){
 			break;
 		}
 	}
-	while($arr = mysql_fetch_assoc($res)){
+	while($arr = _mysql_fetch_assoc($res)){
 		sql_query("UPDATE torrents SET sp_state = ".sqlesc($sp_state)." WHERE id=$arr[id]") or sqlerr(__FILE__, __LINE__);
 		if ($sp_state == 1)
 			write_log("Torrent $arr[id] ($arr[name]) is no longer on promotion (time expired)",'normal');
@@ -305,7 +305,7 @@ function torrent_promotion_expire($days, $type = 2, $targettype = 1){
 
 //Priority Class 4: cleanup every 24 hours
 	$res = sql_query("SELECT value_u FROM avps WHERE arg = 'lastcleantime4'");
-	$row = mysql_fetch_array($res);
+	$row = _mysql_fetch_array($res);
 	if (!$row) {
 		sql_query("INSERT INTO avps (arg, value_u) VALUES ('lastcleantime4',$now)") or sqlerr(__FILE__, __LINE__);
 		return;
@@ -396,9 +396,9 @@ function torrent_promotion_expire($days, $type = 2, $targettype = 1){
 
 	//remove VIP status if time's up
 	$res = sql_query("SELECT id, modcomment FROM users WHERE vip_added='yes' AND vip_until < NOW()") or sqlerr(__FILE__, __LINE__);
-	if (mysql_num_rows($res) > 0)
+	if (_mysql_num_rows($res) > 0)
 	{
-		while ($arr = mysql_fetch_assoc($res))
+		while ($arr = _mysql_fetch_assoc($res))
 		{
 			$dt = sqlesc(date("Y-m-d H:i:s"));
 			$subject = sqlesc($lang_cleanup_target[get_user_lang($arr[id])]['msg_vip_status_removed']); 
@@ -424,10 +424,10 @@ function peasant_to_user($down_floor_gb, $down_roof_gb, $minratio){
 		$downlimit_floor = $down_floor_gb*1024*1024*1024;
 		$downlimit_roof = $down_roof_gb*1024*1024*1024;
 		$res = sql_query("SELECT id FROM users WHERE class = 0 AND downloaded >= $downlimit_floor ".($downlimit_roof > $down_floor_gb ? " AND downloaded < $downlimit_roof" : "")." AND uploaded / downloaded >= $minratio") or sqlerr(__FILE__, __LINE__);
-		if (mysql_num_rows($res) > 0)
+		if (_mysql_num_rows($res) > 0)
 		{
 			$dt = sqlesc(date("Y-m-d H:i:s"));
-			while ($arr = mysql_fetch_assoc($res))
+			while ($arr = _mysql_fetch_assoc($res))
 			{
 				$subject = sqlesc($lang_cleanup_target[get_user_lang($arr[id])]['msg_low_ratio_warning_removed']);
 				$msg = sqlesc($lang_cleanup_target[get_user_lang($arr[id])]['msg_your_ratio_warning_removed']);
@@ -458,10 +458,10 @@ function promotion($class, $down_floor_gb, $minratio, $time_week, $addinvite = 0
 		$limit = $down_floor_gb*1024*1024*1024;
 		$maxdt = date("Y-m-d H:i:s",(TIMENOW - 86400*7*$time_week));
 		$res = sql_query("SELECT id, max_class_once FROM users WHERE class = $oriclass AND downloaded >= $limit AND uploaded / downloaded >= $minratio AND added < ".sqlesc($maxdt)) or sqlerr(__FILE__, __LINE__);
-		if (mysql_num_rows($res) > 0)
+		if (_mysql_num_rows($res) > 0)
 		{
 			$dt = sqlesc(date("Y-m-d H:i:s"));
-			while ($arr = mysql_fetch_assoc($res))
+			while ($arr = _mysql_fetch_assoc($res))
 			{
 				$subject = sqlesc($lang_cleanup_target[get_user_lang($arr[id])]['msg_promoted_to'].get_user_class_name($class,false,false,false));
 				$msg = sqlesc($lang_cleanup_target[get_user_lang($arr[id])]['msg_now_you_are'].get_user_class_name($class,false,false,false).$lang_cleanup_target[get_user_lang($arr[id])]['msg_see_faq']);
@@ -495,10 +495,10 @@ function demotion($class,$deratio){
 
 	$newclass = $class - 1;
 	$res = sql_query("SELECT id FROM users WHERE class = $class AND uploaded / downloaded < $deratio") or sqlerr(__FILE__, __LINE__);
-	if (mysql_num_rows($res) > 0)
+	if (_mysql_num_rows($res) > 0)
 	{
 		$dt = sqlesc(date("Y-m-d H:i:s"));
-		while ($arr = mysql_fetch_assoc($res))
+		while ($arr = _mysql_fetch_assoc($res))
 		{
 			$subject = $lang_cleanup_target[get_user_lang($arr[id])]['msg_demoted_to'].get_user_class_name($newclass,false,false,false);
 			$msg = $lang_cleanup_target[get_user_lang($arr[id])]['msg_demoted_from'].get_user_class_name($class,false,false,false).$lang_cleanup_target[get_user_lang($arr[id])]['msg_to'].get_user_class_name($newclass,false,false,false).$lang_cleanup_target[get_user_lang($arr[id])]['msg_because_ratio_drop_below'].$deratio.".\n";
@@ -530,10 +530,10 @@ function user_to_peasant($down_floor_gb, $minratio){
 	$until = date("Y-m-d H:i:s",(TIMENOW + $length));
 	$downlimit_floor = $down_floor_gb*1024*1024*1024;
 	$res = sql_query("SELECT id FROM users WHERE class = 1 AND downloaded > $downlimit_floor AND uploaded / downloaded < $minratio") or sqlerr(__FILE__, __LINE__);
-	if (mysql_num_rows($res) > 0)
+	if (_mysql_num_rows($res) > 0)
 	{
 		$dt = sqlesc(date("Y-m-d H:i:s"));
-		while ($arr = mysql_fetch_assoc($res))
+		while ($arr = _mysql_fetch_assoc($res))
 		{
 			$subject = $lang_cleanup_target[get_user_lang($arr[id])]['msg_demoted_to'].get_user_class_name(UC_PEASANT,false,false,false);
 			$msg = $lang_cleanup_target[get_user_lang($arr[id])]['msg_must_fix_ratio_within'].$deletepeasant_account.$lang_cleanup_target[get_user_lang($arr[id])]['msg_days_or_get_banned'];
@@ -558,9 +558,9 @@ function user_to_peasant($down_floor_gb, $minratio){
 	$dt = sqlesc(date("Y-m-d H:i:s")); // take date time
 	$res = sql_query("SELECT id FROM users WHERE enabled = 'yes' AND leechwarn = 'yes' AND leechwarnuntil < $dt") or sqlerr(__FILE__, __LINE__);
 
-	if (mysql_num_rows($res) > 0)
+	if (_mysql_num_rows($res) > 0)
 	{
-		while ($arr = mysql_fetch_assoc($res))
+		while ($arr = _mysql_fetch_assoc($res))
 		{
 			writecomment($arr[id],"Banned by System because of Leech Warning expired.");
 
@@ -575,9 +575,9 @@ function user_to_peasant($down_floor_gb, $minratio){
 	$dt = sqlesc(date("Y-m-d H:i:s")); // take date time
 	$res = sql_query("SELECT id FROM users WHERE enabled = 'yes' AND warned = 'yes' AND warneduntil < $dt") or sqlerr(__FILE__, __LINE__);
 
-	if (mysql_num_rows($res) > 0)
+	if (_mysql_num_rows($res) > 0)
 	{
-		while ($arr = mysql_fetch_assoc($res))
+		while ($arr = _mysql_fetch_assoc($res))
 		{
 			$subject = $lang_cleanup_target[get_user_lang($arr[id])]['msg_warning_removed'];
 			$msg = $lang_cleanup_target[get_user_lang($arr[id])]['msg_your_warning_removed'];
@@ -592,11 +592,11 @@ function user_to_peasant($down_floor_gb, $minratio){
 
 	//17.update total seeding and leeching time of users
 	$res = sql_query("SELECT * FROM users") or sqlerr(__FILE__, __LINE__);
-	while($arr = mysql_fetch_assoc($res))
+	while($arr = _mysql_fetch_assoc($res))
 	{
 		//die("s" . $arr['id']);
 		$res2 = sql_query("SELECT SUM(seedtime) as st, SUM(leechtime) as lt FROM snatched where userid = " . $arr['id'] . " LIMIT 1") or sqlerr(__FILE__, __LINE__);
-		$arr2 = mysql_fetch_assoc($res2) or sqlerr(__FILE__, __LINE__);
+		$arr2 = _mysql_fetch_assoc($res2) or sqlerr(__FILE__, __LINE__);
 		
 		//die("ss" . $arr2['st']);
 		//die("sss" . "UPDATE users SET seedtime = " . $arr2['st'] . ", leechtime = " . $arr2['lt'] . " WHERE id = " . $arr['id']);
@@ -613,13 +613,13 @@ function user_to_peasant($down_floor_gb, $minratio){
 		$until = date("Y-m-d H:i:s",(TIMENOW - $length));
 		$dt = sqlesc(date("Y-m-d H:i:s"));
 		$res = sql_query("SELECT id, name, owner FROM torrents WHERE visible = 'no' AND last_action < ".sqlesc($until)." AND seeders = 0 AND leechers = 0") or sqlerr(__FILE__, __LINE__);
-		while($arr = mysql_fetch_assoc($res))
-		{
-			deletetorrent($arr['id']);
-			$subject = $lang_cleanup_target[get_user_lang($arr[owner])]['msg_your_torrent_deleted'];
-			$msg = $lang_cleanup_target[get_user_lang($arr[owner])]['msg_your_torrent']."[i]".$arr['name']."[/i]".$lang_cleanup_target[get_user_lang($arr[owner])]['msg_was_deleted_because_dead'];
-			sql_query("INSERT INTO messages (sender, receiver, added, subject, msg) VALUES(0, $arr[owner], $dt, ".sqlesc($subject).", ".sqlesc($msg).")") or sqlerr(__FILE__, __LINE__);
-			write_log("Torrent $arr[id] ($arr[name]) is deleted by system because of being dead for a long time.",'normal');
+		App::uses('Torrent', 'Model');
+		while($arr = _mysql_fetch_assoc($res)) {
+		  $Torrent = new Torrent();
+		  $Torrent->id = $arr['id'];
+		  $Torrent->reason = 'dead for a long time';
+		  $Torrent->user = 0;
+		  $Torrent->delete();
 		}
 	}
 	if ($printProgress) {
@@ -628,9 +628,9 @@ function user_to_peasant($down_floor_gb, $minratio){
 	
 //Cleanup storing records
 $updateList_res = sql_query("SELECT keeper_id, torrent_id, date_format(in_date,'%m') as month FROM storing_records WHERE checkout = 0") or sqlerr(__FILE__,__LINE__);
-while($updateList = mysql_fetch_assoc($updateList_res)){
+while($updateList = _mysql_fetch_assoc($updateList_res)){
 	$seedTime_res = sql_query("SELECT seedtime FROM snatched WHERE torrentid = $updateList[torrent_id] AND userid = $updateList[keeper_id]") or sqlerr(__FILE__,__LINE__);	
-	$seedTime = mysql_fetch_assoc($seedTime_res);
+	$seedTime = _mysql_fetch_assoc($seedTime_res);
 	if($seedTime['seedtime']){
 		$curMonth = date('n') + 0;
 		if($updateList['month']==$curMonth){
@@ -646,7 +646,7 @@ while($updateList = mysql_fetch_assoc($updateList_res)){
 	}
 //Priority Class 5: cleanup every 15 days
 	$res = sql_query("SELECT value_u FROM avps WHERE arg = 'lastcleantime5'");
-	$row = mysql_fetch_array($res);
+	$row = _mysql_fetch_array($res);
 	if (!$row) {
 		sql_query("INSERT INTO avps (arg, value_u) VALUES ('lastcleantime5',$now)") or sqlerr(__FILE__, __LINE__);
 		return;
@@ -660,7 +660,7 @@ while($updateList = mysql_fetch_assoc($updateList_res)){
 
 	//update clients' popularity
 	$res = sql_query("SELECT id FROM agent_allowed_family");
-	while($row = mysql_fetch_array($res)){
+	while($row = _mysql_fetch_array($res)){
 		$count = get_row_count("users","WHERE clientselect=".sqlesc($row['id']));
 		sql_query("UPDATE agent_allowed_family SET hits=".sqlesc($count)." WHERE id=".sqlesc($row['id']));
 	}
@@ -708,7 +708,7 @@ while($updateList = mysql_fetch_assoc($updateList_res)){
 	do {
 		$res = sql_query("SELECT id FROM torrents") or sqlerr(__FILE__, __LINE__);
 		$ar = array();
-		while ($row = mysql_fetch_array($res)) {
+		while ($row = _mysql_fetch_array($res)) {
 			$id = $row[0];
 			$ar[$id] = 1;
 		}
@@ -748,7 +748,7 @@ while($updateList = mysql_fetch_assoc($updateList_res)){
 
 		$res = sql_query("SELECT torrent FROM peers GROUP BY torrent") or sqlerr(__FILE__, __LINE__);
 		$delids = array();
-		while ($row = mysql_fetch_array($res)) {
+		while ($row = _mysql_fetch_array($res)) {
 			$id = $row[0];
 			if (isset($ar[$id]) && $ar[$id])
 			continue;
@@ -759,7 +759,7 @@ while($updateList = mysql_fetch_assoc($updateList_res)){
 
 		$res = sql_query("SELECT torrent FROM files GROUP BY torrent") or sqlerr(__FILE__, __LINE__);
 		$delids = array();
-		while ($row = mysql_fetch_array($res)) {
+		while ($row = _mysql_fetch_array($res)) {
 			$id = $row[0];
 			if ($ar[$id])
 			continue;

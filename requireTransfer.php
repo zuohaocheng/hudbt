@@ -13,8 +13,8 @@ parked();
 		stderr($lang_sendmessage['std_error'],$lang_sendmessage['std_permission_denied']);
 
 	
-	$res = sql_query("SELECT * FROM users WHERE id=$receiver") or die(mysql_error());
-	$user = mysql_fetch_assoc($res);
+	$res = sql_query("SELECT * FROM users WHERE id=$receiver") or die(_mysql_error());
+	$user = _mysql_fetch_assoc($res);
 	if (!$user)
 		stderr($lang_sendmessage['std_error'],$lang_sendmessage['std_no_user_id']);
 	$subject = "请求迁移：我想下载你发在旧平台的种子";
@@ -25,11 +25,11 @@ parked();
 	if ($replyto)
 	{
 		$res = sql_query("SELECT * FROM messages WHERE id=$replyto") or sqlerr();
-		$msga = mysql_fetch_assoc($res);
+		$msga = _mysql_fetch_assoc($res);
 		if ($msga["receiver"] != $CURUSER["id"])
 			stderr($lang_sendmessage['std_error'],$lang_sendmessage['std_permission_denied']);
 		$res = sql_query("SELECT username FROM users WHERE id=" . $msga["sender"]) or sqlerr();
-		$usra = mysql_fetch_assoc($res);
+		$usra = _mysql_fetch_assoc($res);
 		$body .= $msga[msg]."\n\n-------- [url=userdetails.php?id=".$CURUSER["id"]."]".$CURUSER["username"]."[/url][i] Wrote at ".date("Y-m-d H:i:s").":[/i] --------\n";
 		$subject = $msga['subject'];
 		if (preg_match('/^Re:\s/', $subject))

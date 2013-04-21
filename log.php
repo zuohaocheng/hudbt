@@ -60,7 +60,7 @@ function additem($title, $action) {
 function edititem($title, $action, $id) {
   global $lang_log;
   $result = sql_query ("SELECT * FROM ".$action." where id = ".sqlesc($id)) or sqlerr(__FILE__, __LINE__);
-  if ($row = mysql_fetch_array($result)) {
+  if ($row = _mysql_fetch_array($result)) {
     print("<table border=1 cellspacing=0 width=940 cellpadding=5>\n");
     print("<tr><td class=colhead align=left>".$title."</td></tr>\n");
     print("<tr><td class=toolbox align=left><form method=\"post\" action='" . $_SERVER['PHP_SELF'] . "'>\n");
@@ -84,7 +84,8 @@ else {
   case "dailylog":
     stdhead($lang_log['head_site_log']);
 
-    $query = mysql_real_escape_string(trim($_GET["query"]));
+    $query_raw = trim($_GET["query"]);
+    $query = '%' . $query_raw . '%';
     $search = $_GET["search"];
 
     $addparam = "";
@@ -102,25 +103,23 @@ else {
       $wherea=" WHERE security_level = 'normal'";
     }
 
-    if($query){
-      $wherea .= ($wherea ? " AND " : " WHERE ")." txt LIKE '%$query%' ";
-      $addparam .= "query=".rawurlencode($query)."&";
+    if($query_raw){
+      $wherea .= ($wherea ? " AND " : " WHERE ")." txt LIKE :query ";
+      $addparam .= "query=".rawurlencode($query_raw)."&";
     }
 
     logmenu('dailylog');
     $opt = array (all => $lang_log['text_all'], normal => $lang_log['text_normal'], mod => $lang_log['text_mod']);
     searchtable($lang_log['text_search_log'], 'dailylog',$opt);
 
-    $res = sql_query("SELECT COUNT(*) FROM sitelog".$wherea);
-    $row = mysql_fetch_array($res);
-    $count = $row[0];
+    $count = get_row_count('sitelog', $wherea, [':query' => $query]);
 
     $perpage = 50;
 
     list($pagertop, $pagerbottom, $limit) = pager($perpage, $count, "log.php?action=dailylog&".$addparam);
 
-    $res = sql_query("SELECT added, txt FROM sitelog $wherea ORDER BY added DESC $limit") or sqlerr(__FILE__, __LINE__);
-    if (mysql_num_rows($res) == 0)
+    $res = sql_query("SELECT added, txt FROM sitelog $wherea ORDER BY added DESC $limit", [':query' => $query]) or sqlerr(__FILE__, __LINE__);
+    if (_mysql_num_rows($res) == 0)
       print($lang_log['text_log_empty']);
     else
       {
@@ -129,7 +128,7 @@ else {
 
 	print("<table width=940 border=1 cellspacing=0 cellpadding=5>\n");
 	print("<tr><td class=colhead align=center><img class=\"time\" src=\"pic/trans.gif\" alt=\"time\" title=\"".$lang_log['title_time_added']."\" /></td><td class=colhead align=left>".$lang_log['col_event']."</td></tr>\n");
-	while ($arr = mysql_fetch_assoc($res))
+	while ($arr = _mysql_fetch_assoc($res))
 	  {
 	    $color = "";
 	    if (strpos($arr['txt'],'was uploaded by')) $color = "green";
@@ -155,7 +154,8 @@ else {
 
     stdhead($lang_log['head_forum_log']);
 
-    $query = mysql_real_escape_string(trim($_GET["query"]));
+    $query_raw = trim($_GET["query"]);
+    $query = '%' . $query_raw . '%';
     $search = $_GET["search"];
 
     $addparam = "";
@@ -173,24 +173,22 @@ else {
       $wherea=" WHERE security_level = 'normal'";
     }
 
-    if($query){
-      $wherea .= ($wherea ? " AND " : " WHERE ")." txt LIKE '%$query%' ";
-      $addparam .= "query=".rawurlencode($query)."&";
+    if($query_raw){
+      $wherea .= ($wherea ? " AND " : " WHERE ")." txt LIKE :query ";
+      $addparam .= "query=".rawurlencode($query_raw)."&";
     }
 
     logmenu('forumlog');
     $opt = array (all => $lang_log['text_all'], normal => $lang_log['text_normal'], high => $lang_log['text_high']);
     searchtable($lang_log['text_search_log'], 'forumlog',$opt);
-
-    $res = sql_query("SELECT COUNT(*) FROM forumlog".$wherea);
-    $row = mysql_fetch_array($res);
-    $count = $row[0];
+    
+    $count = get_row_count('forumlog', $wherea, [':query' => $query]);
 
     $perpage = 50;
 
     list($pagertop, $pagerbottom, $limit) = pager($perpage, $count, "log.php?action=forumlog&".$addparam);
     $res = sql_query("SELECT added, txt FROM forumlog $wherea ORDER BY added DESC $limit") or sqlerr(__FILE__, __LINE__);
-    if (mysql_num_rows($res) == 0)
+    if (_mysql_num_rows($res) == 0)
       print($lang_log['text_log_empty']);
     else
       {
@@ -199,7 +197,7 @@ else {
 
 	print("<table width=940 border=1 cellspacing=0 cellpadding=5>\n");
 	print("<tr><td class=colhead align=center><img class=\"time\" src=\"pic/trans.gif\" alt=\"time\" title=\"".$lang_log['title_time_added']."\" /></td><td class=colhead align=left>".$lang_log['col_event']."</td></tr>\n");
-	while ($arr = mysql_fetch_assoc($res))
+	while ($arr = _mysql_fetch_assoc($res))
 	  {
 	  	$txt_bb = $txt = $arr['txt'];
 	    $color = "";
@@ -253,10 +251,11 @@ else {
     
   case "chronicle":
     stdhead($lang_log['head_chronicle']);
-    $query = mysql_real_escape_string(trim($_GET["query"]));
-    if($query){
-      $wherea=" WHERE txt LIKE '%$query%' ";
-      $addparam = "query=".rawurlencode($query)."&";
+    $query_raw = trim($_GET["query"]);
+    $query = '%' . $query_raw . '%';
+    if($query_raw){
+      $wherea=" WHERE txt LIKE :query ";
+      $addparam = "query=".rawurlencode($query_raw)."&";
     }
     else{
       $wherea="";
@@ -285,15 +284,13 @@ else {
       }
     }
 
-    $res = sql_query("SELECT COUNT(*) FROM chronicle".$wherea);
-    $row = mysql_fetch_array($res);
-    $count = $row[0];
+    $count = get_row_count('chronicle', $wherea, [':query' => $query]);
 
     $perpage = 50;
 
     list($pagertop, $pagerbottom, $limit) = pager($perpage, $count, "log.php?action=chronicle&".$addparam);
-    $res = sql_query("SELECT id, added, txt FROM chronicle $wherea ORDER BY added DESC $limit") or sqlerr(__FILE__, __LINE__);
-    if (mysql_num_rows($res) == 0)
+    $res = sql_query("SELECT id, added, txt FROM chronicle $wherea ORDER BY added DESC $limit", [':query' => $query]) or sqlerr(__FILE__, __LINE__);
+    if (_mysql_num_rows($res) == 0)
       print($lang_log['text_chronicle_empty']);
     else
       {
@@ -302,7 +299,7 @@ else {
 
 	print("<table width=940 border=1 cellspacing=0 cellpadding=5>\n");
 	print("<tr><td class=colhead align=center>".$lang_log['col_date']."</td><td class=colhead align=left>".$lang_log['col_event']."</td>".(get_user_class() >= $chrmanage_class ? "<td class=colhead align=center>".$lang_log['col_modify']."</td>" : "")."</tr>\n");
-	while ($arr = mysql_fetch_assoc($res))
+	while ($arr = _mysql_fetch_assoc($res))
 	  {
 	    $date = gettime($arr['added'],true,false);
 	    print("<tr><td class=rowfollow align=center><nobr>$date</nobr></td><td class=rowfollow align=left>".format_comment($arr["txt"],true,false,true)."</td>".(get_user_class() >= $chrmanage_class ? "<td align=center nowrap><b><a href=\"".$PHP_SELF."?action=chronicle&do=edit&id=".$arr["id"]."\">".$lang_log['text_edit']."</a>&nbsp;|&nbsp;<a href=\"".$PHP_SELF."?action=chronicle&do=del&id=".$arr["id"]."\"><font color=red>".$lang_log['text_delete']."</font></a></b></td>" : "")."</tr>\n");
@@ -318,15 +315,16 @@ else {
     break;
   case "funbox":
     stdhead($lang_log['head_funbox']);
-    $query = mysql_real_escape_string(trim($_GET["query"]));
+    $query_raw = trim($_GET["query"]);
+    $query = '%' . $query_raw . '%';
     $search = $_GET["search"];
-    if($query){
+    if($query_raw){
       switch ($search){
-      case "title": $wherea=" WHERE title LIKE '%$query%' AND status != 'banned'"; break;
-      case "body": $wherea=" WHERE body LIKE '%$query%' AND status != 'banned'"; break;
-      case "both": $wherea=" WHERE (body LIKE '%$query%' or title LIKE '%$query%') AND status != 'banned'" ; break;
+      case "title": $wherea=" WHERE title LIKE :query AND status != 'banned'"; break;
+      case "body": $wherea=" WHERE body LIKE :query AND status != 'banned'"; break;
+      case "both": $wherea=" WHERE (body LIKE :query or title LIKE :query) AND status != 'banned'" ; break;
       }
-      $addparam = "search=".rawurlencode($search)."&query=".rawurlencode($query)."&";
+      $addparam = "search=".rawurlencode($search)."&query=".rawurlencode($query_raw)."&";
     }
     else{
       $wherea=" WHERE status != 'banned'";
@@ -335,18 +333,16 @@ else {
     logmenu("funbox");
     $opt = array (title => $lang_log['text_title'], body => $lang_log['text_body'], both => $lang_log['text_both']);
     searchtable($lang_log['text_search_funbox'], 'funbox', $opt);
-    $res = sql_query("SELECT COUNT(*) FROM fun ".$wherea);
-    $row = mysql_fetch_array($res);
-    $count = $row[0];
+    $count = get_row_count('fun', $wherea, [':query' => $query]);
 
     $perpage = 10;
     list($pagertop, $pagerbottom, $limit) = pager($perpage, $count, "log.php?action=funbox&".$addparam);
-    $res = sql_query("SELECT id, added, body, title, status FROM fun $wherea ORDER BY added DESC $limit") or sqlerr(__FILE__, __LINE__);
-    if (mysql_num_rows($res) == 0)
+    $res = sql_query("SELECT id, added, body, title, status FROM fun $wherea ORDER BY added DESC $limit", [':query' => $query]);
+    if (_mysql_num_rows($res) == 0)
       print($lang_log['text_funbox_empty']);
     else {
       //echo $pagertop;
-      while ($arr = mysql_fetch_assoc($res)){
+      while ($arr = _mysql_fetch_assoc($res)){
 	$date = gettime($arr['added'],true,false);
 	print("<table width=940 border=1 cellspacing=0 cellpadding=5>\n");
 	print("<tr><td class=rowhead width='10%'>".$lang_log['col_title']."</td><td class=rowfollow align=left>".$arr["title"]." - <b>".$arr["status"]."</b></td></tr><tr><td class=rowhead width='10%'>".$lang_log['col_date']."</td><td class=rowfollow align=left>".$date."</td></tr><tr><td class=rowhead width='10%'>".$lang_log['col_body']."</td><td class=rowfollow align=left>".format_comment($arr["body"],false,false,true)."</td></tr>\n");
@@ -378,13 +374,14 @@ else {
     break;
   case "news":
     stdhead($lang_log['head_news']);
-    $query = mysql_real_escape_string(trim($_GET["query"]));
+    $query_raw = trim($_GET["query"]);
+    $query = '%' . $query_raw . '%';
     $search = $_GET["search"];
-    if($query){
+    if($query_raw){
       switch ($search){
-      case "title": $wherea=" WHERE title LIKE '%$query%' "; break;
-      case "body": $wherea=" WHERE body LIKE '%$query%' "; break;
-      case "both": $wherea=" WHERE body LIKE '%$query%' or title LIKE '%$query%'" ; break;
+      case "title": $wherea=" WHERE title LIKE :query "; break;
+      case "body": $wherea=" WHERE body LIKE :query' "; break;
+      case "both": $wherea=" WHERE body LIKE :query' or title LIKE :query" ; break;
       }
       $addparam = "search=".rawurlencode($search)."&query=".rawurlencode($query)."&";
     }
@@ -396,21 +393,19 @@ else {
     $opt = array (title => $lang_log['text_title'], body => $lang_log['text_body'], both => $lang_log['text_both']);
     searchtable($lang_log['text_search_news'], 'news', $opt);
 
-    $res = sql_query("SELECT COUNT(*) FROM news".$wherea);
-    $row = mysql_fetch_array($res);
-    $count = $row[0];
+    $count = get_row_count('news', $wherea, [':query' => $query]);
 
     $perpage = 20;
 
     list($pagertop, $pagerbottom, $limit) = pager($perpage, $count, "log.php?action=news&".$addparam);
-    $res = sql_query("SELECT id, added, body, title FROM news $wherea ORDER BY added DESC $limit") or sqlerr(__FILE__, __LINE__);
-    if (mysql_num_rows($res) == 0)
+    $res = sql_query("SELECT id, added, body, title FROM news $wherea ORDER BY added DESC $limit", [':query' => $query]) or sqlerr(__FILE__, __LINE__);
+    if (_mysql_num_rows($res) == 0)
       print($lang_log['text_news_empty']);
     else
       {
 
 	//echo $pagertop;
-	while ($arr = mysql_fetch_assoc($res)){
+	while ($arr = _mysql_fetch_assoc($res)){
 	  $date = gettime($arr['added'],true,false);
 	  print("<table width=940 border=1 cellspacing=0 cellpadding=5>\n");
 	  print("<tr><td class=rowhead width='10%'>".$lang_log['col_title']."</td><td class=rowfollow align=left>".$arr["title"]."</td></tr><tr><td class=rowhead width='10%'>".$lang_log['col_date']."</td><td class=rowfollow align=left>".$date."</td></tr><tr><td class=rowhead width='10%'>".$lang_log['col_body']."</td><td class=rowfollow align=left>".format_comment($arr["body"],false,false,true)."</td></tr>\n");
@@ -455,7 +450,7 @@ else {
     }
 
     $rows = sql_query("SELECT COUNT(*) FROM polls") or sqlerr();
-    $row = mysql_fetch_row($rows);
+    $row = _mysql_fetch_row($rows);
     $pollcount = $row[0];
     if ($pollcount == 0) {
       stderr($lang_log['std_sorry'], $lang_log['std_no_polls']);
@@ -474,7 +469,7 @@ else {
       return 0;
     }
 
-    while ($poll = mysql_fetch_assoc($polls)) {
+    while ($poll = _mysql_fetch_assoc($polls)) {
       print('<li class="poll table td">');
 
       $out = "<a id=\"$poll[id]\"></a>";

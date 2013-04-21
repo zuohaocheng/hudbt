@@ -47,8 +47,8 @@ else {
 	}
 	
 	$rows=sql_query("SELECT  requests.*  FROM requests WHERE ".$limit." ORDER BY id DESC") or sqlerr(__FILE__, __LINE__);
-	list($pagertop, $pagerbottom, $limit2) = pager(20, mysql_num_rows($rows), "?$finishedlimit");
-	//if (mysql_num_rows($rows) == 0) stderr( "没有求种" , "没有符合条件的求种项目，<a href=viewrequests.php?action=new>点击这里增加新求种</a>",0);
+	list($pagertop, $pagerbottom, $limit2) = pager(20, _mysql_num_rows($rows), "?$finishedlimit");
+	//if (_mysql_num_rows($rows) == 0) stderr( "没有求种" , "没有符合条件的求种项目，<a href=viewrequests.php?action=new>点击这里增加新求种</a>",0);
 	//else 
 	{
 	stdhead("求种区");
@@ -61,14 +61,14 @@ $rows=sql_query("SELECT requests.* ,(SELECT count(DISTINCT torrentid) FROM resre
 	}
 	echo '/><input type="hidden" name="action" value="list" /><input type="hidden" name="finished" value="all" /><input type="submit" value="搜索"></form></li></ul></div>';
 	
-	if (mysql_num_rows($rows) == 0){
+	if (_mysql_num_rows($rows) == 0){
 	  print('<h3 class="center">森马都没有找到</h3>');
 	}
 	else {
 	  print("<table style=\"width:95%;\" cellspacing=\"0\" cellpadding=\"5\" class=\"no-vertical-line\"><thead>\n");
 
 	print("<tr class=\"center\"><th>名称</th><th>最新出价</th><th>原始出价</th><th>评论数</th><th>应求数</th><th>求种者</th><th>时间</th><th>状态</th></tr></thead><tbody>\n");
-	while($row = mysql_fetch_array( $rows )) {
+	while($row = _mysql_fetch_array( $rows )) {
 	print("<tr>
 	<td align=left class='rowfollow'><a href=viewrequests.php?action=view&id=".$row["id"]."><b>".$row["request"]."</b></a></td>
 	<td align=center class='rowfollow nowrap'><font color=#ff0000><b>".$row['amount']."</b></font></td>
@@ -93,8 +93,8 @@ $rows=sql_query("SELECT requests.* ,(SELECT count(DISTINCT torrentid) FROM resre
 	if(is_numeric($_GET["id"])){
 	$id = $_GET["id"];
 	$res = sql_query("SELECT * FROM requests WHERE id ='".$_GET["id"]."'") or sqlerr(__FILE__, __LINE__);
-	if (mysql_num_rows($res) == 0) stderr( "错误" , "ID不存在");
-	else $arr = mysql_fetch_assoc($res);
+	if (_mysql_num_rows($res) == 0) stderr( "错误" , "ID不存在");
+	else $arr = _mysql_fetch_assoc($res);
 	stdhead("求种区");
 	print("<h1 align=center id=top>求种-".htmlspecialchars($arr["request"])."</h1>\n");
 	print("<table width=940 cellspacing=0 cellpadding=5>\n");
@@ -104,20 +104,20 @@ $rows=sql_query("SELECT requests.* ,(SELECT count(DISTINCT torrentid) FROM resre
 	tr("操作", "<div class=\"minor-list list-seperator\"><ul><li><a href=report.php?reportrequestid=".$id." >举报</a></li>".
 	(($arr['userid']== $CURUSER['id'] || get_user_class() >= 13)&&$arr["finish"]=="no" ?"<li><a href=viewrequests.php?action=edit&id=".$id." >编辑</a></li>":"")."\n".
 	($arr['userid']== $CURUSER['id']||$arr["finish"]=="yes"?"":"<li><a href=viewrequests.php?action=res&id=".$id." >应求</a></li>\n").
-	((get_user_class() >= 13||$arr['userid']== $CURUSER['id'])&&$arr['finish']=="no" ?"<li><a href=viewrequests.php?action=delete&id=".$id." ".(mysql_num_rows($res)?">删除":"title='回收返还80%魔力值'>回收")."</a></li>":"")."</ul></div>\n"
+	((get_user_class() >= 13||$arr['userid']== $CURUSER['id'])&&$arr['finish']=="no" ?"<li><a href=viewrequests.php?action=delete&id=".$id." ".(_mysql_num_rows($res)?">删除":"title='回收返还80%魔力值'>回收")."</a></li>":"")."</ul></div>\n"
 	,1);
 	if($arr["finish"]=="no")tr("追加悬赏","<form action=viewrequests.php method=post> <input type=hidden name=action value=addamount><input type=hidden name=reqid value=".$arr["id"]."><input size=6 name=amount value=1000 ><input type=submit value=提交 > 追加悬赏每次将扣减25个魔力值作为手续费</form>",1);
 	tr("介绍",format_comment(unesc($arr["descr"])),1);
 	$limit = ($arr['finish']=="no"?"":" AND chosen = 'yes' ");
 	$ress="";
-	if (mysql_num_rows($res) == 0) $ress="还没有应求";
+	if (_mysql_num_rows($res) == 0) $ress="还没有应求";
 	else {
 		if($arr['userid']== $CURUSER['id'] || get_user_class() >= 13)
 		$ress.="<form action=viewrequests.php method=post>\n<input type=hidden name=action value=confirm > <input type=hidden name=id value=".$id." >\n";
-		while($row = mysql_fetch_array($res))
+		while($row = _mysql_fetch_array($res))
 			{
-			$each = mysql_fetch_assoc(sql_query("SELECT * FROM torrents WHERE id = '".$row["torrentid"]."'"));
-			if(mysql_num_rows(sql_query("SELECT * FROM torrents WHERE id = '".$row["torrentid"]."'")) ==1 )
+			$each = _mysql_fetch_assoc(sql_query("SELECT * FROM torrents WHERE id = '".$row["torrentid"]."'"));
+			if(_mysql_num_rows(sql_query("SELECT * FROM torrents WHERE id = '".$row["torrentid"]."'")) ==1 )
 			$ress.=(($arr['userid']== $CURUSER['id'] || get_user_class() >= 13)&&$arr['finish']=="no"?"<input type=checkbox name=torrentid[] value=".$each["id"].">":"")."<a href=details.php?id=".$each["id"]."&hit=1 >".$each["name"]."</a> ".($arr['finish']=="no"?"":"by ".get_username($each['owner']))."<br/>\n";
 			}
 		$ress.="";
@@ -142,7 +142,7 @@ $rows=sql_query("SELECT requests.* ,(SELECT count(DISTINCT torrentid) FROM resre
 		$subres = sql_query("SELECT * FROM comments WHERE request=".sqlesc($_GET["id"])." ORDER BY id $limit") or sqlerr(__FILE__, __LINE__);
 		
 		$allrows = array();
-		while ($subrow = mysql_fetch_array($subres)) {
+		while ($subrow = _mysql_fetch_array($subres)) {
 			$allrows[] = $subrow;
 		}
 		print($pagertop);
@@ -170,8 +170,8 @@ print("</form></div>");
 	{
 	if(!is_numeric($_GET["id"]))stderr("出错了！！！","求种ID必须为数字");
 	$res = sql_query("SELECT * FROM requests WHERE id ='".$_GET["id"]."'") or sqlerr(__FILE__, __LINE__);
-	if (mysql_num_rows($res) == 0) stderr("出错了！","该求种已被删除！");
-	$arr = mysql_fetch_assoc($res);
+	if (_mysql_num_rows($res) == 0) stderr("出错了！","该求种已被删除！");
+	$arr = _mysql_fetch_assoc($res);
 	if ($arr["finish"]=="yes") stderr("出错了！","该求种已完成！");
 	if($arr['userid']== $CURUSER['id'] || get_user_class() >= 13)
 		{	
@@ -284,7 +284,7 @@ $ruserid=0+$_GET["userid"];
 	sql_query("UPDATE users SET seedbonus = seedbonus - ".$amount." WHERE id = ".$CURUSER['id'] );
 		sql_query("INSERT requests ( request , descr, ori_descr ,amount , ori_amount , userid ,added ) VALUES ( ".sqlesc($_POST["request"])." , ".sqlesc($_POST["descr"])." , ".sqlesc($_POST["descr"])." , ".sqlesc($_POST["amount"])." , ".sqlesc($_POST["amount"])." , ".sqlesc($CURUSER['id'])." , '".date("Y-m-d H:i:s")."' )") or sqlerr(__FILE__, __LINE__);
 		
-		stderr("成功","新增求种成功，<a href=viewrequests.php?action=view&id=".mysql_insert_id().">点击这里返回</a>",0);
+		stderr("成功","新增求种成功，<a href=viewrequests.php?action=view&id="._mysql_insert_id().">点击这里返回</a>",0);
 		}
 	else stderr("出错了！！！","你没有该权限！！！<a href=viewrequests.php>点击这里返回</a>",0);
 	die;
@@ -297,8 +297,8 @@ $ruserid=0+$_GET["userid"];
 	$res = sql_query("SELECT * FROM requests WHERE id ='".$_POST["reqid"]."'") or sqlerr(__FILE__, __LINE__);
 	if(!$_POST["descr"])stderr("出错了！！！","介绍未填！<a href=viewrequests.php?action=edit&id=".$_POST["reqid"].">点击这里返回</a>",0);
 	if(!$_POST["request"])stderr("出错了！！！","名称未填！<a href=viewrequests.php?action=edit&id=".$_POST["reqid"].">点击这里返回</a>",0);
-	if (mysql_num_rows($res) == 0) stderr("出错了！","该求种已被删除！<a href=viewrequests.php>点击这里返回</a>",0);
-	$arr = mysql_fetch_assoc($res);
+	if (_mysql_num_rows($res) == 0) stderr("出错了！","该求种已被删除！<a href=viewrequests.php>点击这里返回</a>",0);
+	$arr = _mysql_fetch_assoc($res);
 	if ($arr["finish"]=="yes") stderr("出错了！","该求种已完成！<a href=viewrequests.php?action=view&id=".$_POST["reqid"].">点击这里返回</a>",0);
 	if($arr['userid']== $CURUSER['id'] || get_user_class() >= 13)
 		{
@@ -328,13 +328,13 @@ $ruserid=0+$_GET["userid"];
 	{
 	if(!is_numeric($_POST["reqid"]))stderr("出错了！！！","不要试图入侵系统！");
 	$res = sql_query("SELECT * FROM requests WHERE id ='".$_POST["reqid"]."'") or sqlerr(__FILE__, __LINE__);
-	if (mysql_num_rows($res) == 0) stderr("出错了！","该求种已被删除！<a href=viewrequests.php>点击这里返回</a>",0);
-	$arr = mysql_fetch_assoc($res);
+	if (_mysql_num_rows($res) == 0) stderr("出错了！","该求种已被删除！<a href=viewrequests.php>点击这里返回</a>",0);
+	$arr = _mysql_fetch_assoc($res);
 	if ($arr["finish"]=="yes") stderr("出错了！","该求种已完成！<a href=viewrequests.php?action=view&id=".$_POST["reqid"].">点击这里返回</a>",0);
 	if(!is_numeric($_POST["torrentid"]))stderr("出错了！！！","种子ID必须为数字！<a href=viewrequests.php?action=res&id=".$_POST["reqid"].">点击这里返回</a>",0);
 	$res = sql_query("SELECT * FROM torrents WHERE id ='".$_POST["torrentid"]."'") or sqlerr(__FILE__, __LINE__);
-	if (mysql_num_rows($res) == 0) stderr("出错了！","该种子不存在！<a href=viewrequests.php?action=res&id=".$_POST["reqid"].">点击这里返回</a>",0);
-	$tor=mysql_fetch_assoc($res);
+	if (_mysql_num_rows($res) == 0) stderr("出错了！","该种子不存在！<a href=viewrequests.php?action=res&id=".$_POST["reqid"].">点击这里返回</a>",0);
+	$tor=_mysql_fetch_assoc($res);
 	if ($tor['last_seed'] == "0000-00-00 00:00:00") stderr("出错了！！！","该种子尚未正式发布！<a href=viewrequests.php?action=res&id=".$_POST["reqid"].">点击这里返回</a>",0);
 	if(get_row_count('resreq', "where reqid ='".$_POST["reqid"]."' and torrentid='".$_POST["torrentid"]."'"))
 	stderr("出错了！！！","该应求已经存在！<a href=viewrequests.php?action=res&id=".$_POST["reqid"].">点击这里返回</a>",0);
@@ -361,8 +361,8 @@ $ruserid=0+$_GET["userid"];
 	{
 	if(!is_numeric($_POST["reqid"]))stderr("出错了！！！","不要试图入侵系统");
 	$res = sql_query("SELECT * FROM requests WHERE id ='".$_POST["reqid"]."'") or sqlerr(__FILE__, __LINE__);
-	if (mysql_num_rows($res) == 0) stderr("出错了！","该求种已被删除！");	
-	$arr = mysql_fetch_assoc($res);
+	if (_mysql_num_rows($res) == 0) stderr("出错了！","该求种已被删除！");	
+	$arr = _mysql_fetch_assoc($res);
 	if ($arr["finish"]=="yes") stderr("出错了！","该求种已完成！");
 	if(!is_numeric($_POST["amount"]))stderr("出错了！","赏金必须为数字！");
 	$amount=$_POST["amount"];
@@ -381,8 +381,8 @@ $ruserid=0+$_GET["userid"];
 	{
 	if(!is_numeric($_GET["id"]))stderr("出错了！！！","求种ID必须为数字");
 	$res = sql_query("SELECT * FROM requests WHERE id ='".$_GET["id"]."'") or sqlerr(__FILE__, __LINE__);
-	if (mysql_num_rows($res) == 0) stderr("出错了！","该求种已被删除！");
-	$arr = mysql_fetch_assoc($res);
+	if (_mysql_num_rows($res) == 0) stderr("出错了！","该求种已被删除！");
+	$arr = _mysql_fetch_assoc($res);
 	if(get_user_class() >= 13||$arr['userid']==$CURUSER["id"]&&$arr['finish']=='no')
 		{
 		if(!get_row_count("resreq","WHERE reqid=".sqlesc($_GET["id"]))){
@@ -402,8 +402,8 @@ $ruserid=0+$_GET["userid"];
 	{
 	if(!is_numeric($_POST["id"]))stderr("出错了！！！","不要试图入侵系统");
 	$res = sql_query("SELECT * FROM requests WHERE id ='".$_POST["id"]."'") or sqlerr(__FILE__, __LINE__);
-	if (mysql_num_rows($res) == 0) stderr("出错了！","该求种已被删除！");
-	$arr = mysql_fetch_assoc($res);
+	if (_mysql_num_rows($res) == 0) stderr("出错了！","该求种已被删除！");
+	$arr = _mysql_fetch_assoc($res);
 	if(empty($_POST["torrentid"]))stderr("出错了！","你没有选择符合条件的应求！");
 	else $torrentid = $_POST["torrentid"];
 	if($arr['userid']== $CURUSER['id'] || get_user_class() >= 13)
@@ -413,7 +413,7 @@ $ruserid=0+$_GET["userid"];
 		sql_query("UPDATE resreq SET chosen = 'yes' WHERE reqid = ".$_POST["id"]." AND ( torrentid = '".join("' OR torrentid = '",$torrentid )."' )")or sqlerr(__FILE__, __LINE__);
 		sql_query("DELETE FROM resreq WHERE reqid ='".$_POST["id"]."' AND chosen = 'no'") or sqlerr(__FILE__, __LINE__);
 		$res=sql_query("SELECT owner FROM torrents WHERE ( id = '".join("' OR id = '",$torrentid )."' ) ")or sqlerr(__FILE__, __LINE__);
-		while($row = mysql_fetch_array($res)){
+		while($row = _mysql_fetch_array($res)){
 		
 		$owner[]=$row[0];
 		$added = sqlesc(date("Y-m-d H:i:s"));
@@ -433,9 +433,9 @@ $ruserid=0+$_GET["userid"];
 	{
 	if(!is_numeric($_POST["id"]))stderr("出错了！！！","不要试图入侵系统");
 	$res = sql_query("SELECT * FROM requests WHERE id ='".$_POST["id"]."'") or sqlerr(__FILE__, __LINE__);
-	if (mysql_num_rows($res) == 0) stderr("出错了！","该求种已被删除！");
+	if (_mysql_num_rows($res) == 0) stderr("出错了！","该求种已被删除！");
 	if (!$_POST["message"])stderr("出错了！","留言不能为空！");
-	$arr = mysql_fetch_assoc($res);
+	$arr = _mysql_fetch_assoc($res);
 	$message = $arr["message"];
 	$message .= "<tr><td width=240>由".$CURUSER["username"]."添加于".date("Y-m-d H:i:s")."</td><td>".$_POST["message"]."</td></tr>";
 	

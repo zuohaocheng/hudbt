@@ -12,16 +12,16 @@ if (!is_valid_id($userid))
 	stderr($lang_iphistory['std_error'], $lang_iphistory['std_invalid_id']);
 
 $res = sql_query("SELECT username FROM users WHERE id = $userid") or sqlerr(__FILE__, __LINE__);
-if (mysql_num_rows($res) == 0)
+if (_mysql_num_rows($res) == 0)
 	stderr($lang_iphistory['error'], $lang_iphistory['text_user_not_found']);
 
-$arr = mysql_fetch_array($res);
+$arr = _mysql_fetch_array($res);
 $username = $arr["username"];
 
 $perpage = 20;
 
 $ipcountres = sql_query("SELECT COUNT(DISTINCT(access)) FROM iplog WHERE userid = $userid");
-$ipcountres = mysql_fetch_row($ipcountres);
+$ipcountres = _mysql_fetch_row($ipcountres);
 $countrows = $ipcountres[0]+1;
 $order = $_GET['order'];
 
@@ -45,7 +45,7 @@ print("<thead><tr><th>".$lang_iphistory['col_last_access']."</th>\n
 <th>".$lang_iphistory['col_ip']."</th>");
 #echo "<th>".$lang_iphistory['col_hostname']."</th>";
 echo '</tr></thead><tbody>';
-while ($arr = mysql_fetch_array($res)) {
+while ($arr = _mysql_fetch_array($res)) {
   $addr = "";
   $ipshow = "";
   if ($arr["ip"]) {
@@ -63,7 +63,7 @@ UNION SELECT u.id FROM users AS u RIGHT JOIN iplog ON u.id = iplog.userid WHERE 
 GROUP BY u.id
 ) AS ipsearch";
     $resip = sql_query($queryc) or sqlerr(__FILE__, __LINE__);
-    $arrip = mysql_fetch_row($resip);
+    $arrip = _mysql_fetch_row($resip);
     $ipcount = $arrip[0];
 
     if ($ipcount > 1) {

@@ -20,7 +20,7 @@ class HTML_BBCodeParser_Filter_Template extends HTML_BBCodeParser_Filter {
     $key = $keys[1];
     $query = 'SELECT body FROM posts WHERE id=' . (0+$key) . ' LIMIT 1';
     $r = sql_query($query) or sqlerr(__FILE__, __LINE__);
-    $a = mysql_fetch_row($r);
+    $a = _mysql_fetch_row($r);
     if ($a) {
       $body = $a[0];
       $sargs = $keys[2] . '  ';

@@ -5,9 +5,6 @@ if(!defined('IN_TRACKER'))
 include_once($rootpath . 'include/globalfunctions.php');
 include_once($rootpath . 'classes/class_advertisement.php');
 include($rootpath . get_langfile_path("functions.php"));
-if (!defined('HB_CAKE')) {
-  require_once('./cake/app/webroot/index.php');
-}
 
 $privilegeConfig = ['Maintenance'=>['staticResources' => UC_MODERATOR],
 		    'Tcategory' => ['lock' => UC_UPLOADER,'delete' => UC_VIP,],
@@ -119,7 +116,7 @@ function get_langfolder_cookie() {
 function get_langlist() {
   $langs = [];
   $res = sql_query('SELECT site_lang_folder FROM language WHERE site_lang=1;') or sqlerr(__FILE__, __LINE__);
-  while ($a = mysql_fetch_row($res)) {
+  while ($a = _mysql_fetch_row($res)) {
     $langs[] = $a[0];
   }
   return $langs;
@@ -127,7 +124,7 @@ function get_langlist() {
 
 function get_user_lang($user_id) {
   $lang_res = sql_query("SELECT site_lang_folder FROM language LEFT JOIN users ON language.id = users.lang WHERE language.site_lang=1 AND users.id= ". sqlesc($user_id) ." LIMIT 1") or sqlerr(__FILE__, __LINE__);
-  $lang = mysql_fetch_assoc($lang_res);
+  $lang = _mysql_fetch_assoc($lang_res);
   return $lang['site_lang_folder'];
 }
 
@@ -230,21 +227,20 @@ function get_langfile_path($script_name ="", $target = false, $lang_folder = "")
   return "lang/" . ($target == false ? $lang_folder : "_target") ."/lang_". ( $script_name == "" ? substr(strrchr($_SERVER['SCRIPT_NAME'],'/'),1) : $script_name);
 }
 
-function get_row_count($table, $suffix = "") {
-  $r = sql_query("SELECT COUNT(1) FROM $table $suffix") or sqlerr(__FILE__, __LINE__);
-  $a = mysql_fetch_row($r) or die(mysql_error());
-  return $a[0];
+function get_row_count($table, $suffix = "", $args = []) {
+  $a = sql_fetchAll("SELECT COUNT(1) FROM $table $suffix", $args)[0] or die(_mysql_error());
+  return 0 + $a[0];
 }
 
 function get_row_sum($table, $field, $suffix = "") {
   $r = sql_query("SELECT SUM($field) FROM $table $suffix") or sqlerr(__FILE__, __LINE__);
-  $a = mysql_fetch_row($r) or die(mysql_error());
+  $a = _mysql_fetch_row($r) or die(_mysql_error());
   return $a[0];
 }
 
 function get_single_value($table, $field, $suffix = "") {
   $r = sql_query("SELECT $field FROM $table $suffix LIMIT 1") or sqlerr(__FILE__, __LINE__);
-  $a = mysql_fetch_row($r);
+  $a = _mysql_fetch_row($r);
   if ($a) {
     return $a[0];
   } else {
@@ -323,7 +319,7 @@ function permissionAuth($needle,$usergroups,$userclass){
 
 function get_user_group($userid){
 	$user_groups_r = sql_query("SELECT gp.group_name,u_gp.role,u_gp.removed_by,u_gp.removed_date FROM users_usergroups AS u_gp JOIN usergroups AS gp ON u_gp.usergroup_id = gp.group_id WHERE u_gp.user_id =".sqlesc($userid)) or sqlerr(__FILE__, __LINE__);
-	while($row = mysql_fetch_assoc($user_groups_r)){
+	while($row = _mysql_fetch_assoc($user_groups_r)){
 		if($row['removed_by']==NULL){
 			$user_groups[$row['group_name']] = array('role' => $row['role']);
 		}
@@ -396,12 +392,35 @@ function stderr($heading, $text, $htmlstrip = true, $head = true, $foot = true, 
   if ($die) die;
 }
 
-function sqlerr($file = '', $line = '', $stack = true) {
-  echo "<div style=\"font-family: menlo, monaco, courier, monospace; background: blue;color:white;position:fixed;width:100%;height:100%;top: 0%;left: 0%;\"><h1>SQL Error</h1>";
-  if ($stack) {
-    debug_print_backtrace();
+function sqlerr($file = '', $line = '', $stack = true, $q = '', $args = [], $e = null) {
+  echo "<div style=\"font-family: menlo, monaco, courier, monospace; background: blue;color:white;position:fixed;overflow-y:scroll;width:100%;height:100%;top: 0%;left: 0%;\"><h1>出错啦，出错啦</h1><p>请保存此页面(菜单/文件/保存，请勿截图)，<a href=\"sendmessage.php?receiver=26058\" style=\"color:yellow\">点此发送给管理员</a>，多谢!</p><div style=\"display:none\">";
+  ob_start();
+
+  if ($q) {
+    echo '<h2>SQL Statement</h2><p>' , $q;
+    if ($args) {
+      echo '</p><h2>Arguments</h2><pre>';
+      var_dump($args);
+    }
+    if ($e) {
+      echo '</pre><h2>Exception</h2><pre>';
+      var_dump($e);
+    }
+    echo '</pre>';
   }
-  echo mysql_error() . ($file != '' && $line != '' ? "<p>in $file, line $line</p>" : "") . "</div>";
+
+  echo '<h2>$_SERVER</h2><pre>';
+  var_dump($_SERVER);
+  echo '</pre>';
+
+  if ($stack) {
+    echo '<h2>Stack</h2><pre>';
+    debug_print_backtrace();
+    echo '</pre>';
+  }
+#  echo str_replace("\n", '<br/>', ob_get_clean());
+
+  echo _mysql_error() . ($file != '' && $line != '' ? "<p>in $file, line $line</p>" : "") . "</div></div>";
   die;
 }
 
@@ -798,9 +817,9 @@ function get_torrent_extinfo_identifier($torrentid) {
 
   if($torrentid) {
     $res = sql_query("SELECT url FROM torrents WHERE id=" . $torrentid) or sqlerr(__FILE__,__LINE__);
-    if(mysql_num_rows($res) == 1)
+    if(_mysql_num_rows($res) == 1)
       {
-	$arr = mysql_fetch_array($res) or sqlerr(__FILE__,__LINE__);
+	$arr = _mysql_fetch_array($res) or sqlerr(__FILE__,__LINE__);
 
 	$imdb_id = parse_imdb_id($arr["url"]);
 	$result['imdb_id'] = $imdb_id;
@@ -829,8 +848,8 @@ function get_torrent_2_user_value($user_snatched_arr) {
   $torrent_2_user_value = 1.0;
 
   $torrent_res = sql_query("SELECT * FROM torrents WHERE id = " . $user_snatched_arr['torrentid']) or sqlerr(__FILE__, __LINE__);
-  if(mysql_num_rows($torrent_res) == 1) { // torrent still exists
-    $torrent_arr = mysql_fetch_array($torrent_res) or sqlerr(__FILE__, __LINE__);
+  if(_mysql_num_rows($torrent_res) == 1) { // torrent still exists
+    $torrent_arr = _mysql_fetch_array($torrent_res) or sqlerr(__FILE__, __LINE__);
     if($torrent_arr['owner'] == $user_snatched_arr['userid']) { // owner's torrent
       $torrent_2_user_value *= 0.7;  // owner's torrent
       $torrent_2_user_value += ($user_snatched_arr['uploaded'] / $torrent_arr['size'] ) -1 > 0 ? 0.2 - exp(-(($user_snatched_arr['uploaded'] / $torrent_arr['size'] ) -1)) : ($user_snatched_arr['uploaded'] / $torrent_arr['size'] ) -1;
@@ -900,7 +919,7 @@ function get_agent($peer_id, $agent) {
 function EmailBanned($newEmail) {
   $newEmail = trim(strtolower($newEmail));
   $sql = sql_query("SELECT * FROM bannedemails") or sqlerr(__FILE__, __LINE__);
-  $list = mysql_fetch_array($sql);
+  $list = _mysql_fetch_array($sql);
   $addresses = explode(' ', preg_replace("/[[:space:]]+/", " ", trim($list[value])) );
 
   if(count($addresses) > 0) {
@@ -935,7 +954,7 @@ function EmailAllowed($newEmail) {
   if ($restrictemaildomain == 'yes') {
     $newEmail = trim(strtolower($newEmail));
     $sql = sql_query("SELECT * FROM allowedemails") or sqlerr(__FILE__, __LINE__);
-    $list = mysql_fetch_array($sql);
+    $list = _mysql_fetch_array($sql);
     $addresses = explode(' ', preg_replace("/[[:space:]]+/", " ", trim($list[value])) );
 
     if (count($addresses) > 0) {
@@ -968,7 +987,7 @@ function EmailAllowed($newEmail) {
 
 function allowedemails() {
   $sql = sql_query("SELECT * FROM allowedemails") or sqlerr(__FILE__, __LINE__);
-  $list = mysql_fetch_array($sql);
+  $list = _mysql_fetch_array($sql);
   return $list['value'];
 }
 
@@ -1142,7 +1161,7 @@ function failedloginscheck ($type = 'Login') {
   $total = 0;
   $ip = sqlesc(getip());
   $Query = sql_query("SELECT SUM(attempts) FROM loginattempts WHERE ip=$ip") or sqlerr(__FILE__, __LINE__);
-  list($total) = mysql_fetch_array($Query);
+  list($total) = _mysql_fetch_array($Query);
   if ($total >= $maxloginattempts) {
     sql_query("UPDATE loginattempts SET banned = 'yes' WHERE ip=$ip") or sqlerr(__FILE__, __LINE__);
     stderr($type.$lang_functions['std_locked'].$type.$lang_functions['std_attempts_reached'], $lang_functions['std_your_ip_banned']);
@@ -1153,7 +1172,7 @@ function failedlogins ($type = 'login', $recover = false, $head = true) {
   global $lang_functions;
   $ip = sqlesc(getip());
   $added = sqlesc(date("Y-m-d H:i:s"));
-  $a = (@mysql_fetch_row(@sql_query("select count(*) from loginattempts where ip=$ip"))) or sqlerr(__FILE__, __LINE__);
+  $a = (@_mysql_fetch_row(@sql_query("select count(*) from loginattempts where ip=$ip"))) or sqlerr(__FILE__, __LINE__);
   if ($a[0] == 0)
     sql_query("INSERT INTO loginattempts (ip, added, attempts) VALUES ($ip, $added, 1)") or sqlerr(__FILE__, __LINE__);
   else
@@ -1175,7 +1194,7 @@ function login_failedlogins($type = 'login', $recover = false, $head = true) {
   global $lang_functions;
   $ip = sqlesc(getip());
   $added = sqlesc(date("Y-m-d H:i:s"));
-  $a = (@mysql_fetch_row(@sql_query("select count(*) from loginattempts where ip=$ip"))) or sqlerr(__FILE__, __LINE__);
+  $a = (@_mysql_fetch_row(@sql_query("select count(*) from loginattempts where ip=$ip"))) or sqlerr(__FILE__, __LINE__);
   if ($a[0] == 0)
     sql_query("INSERT INTO loginattempts (ip, added, attempts) VALUES ($ip, $added, 1)") or sqlerr(__FILE__, __LINE__);
   else
@@ -1197,7 +1216,7 @@ function remaining ($type = 'login') {
   $total = 0;
   $ip = sqlesc(getip());
   $Query = sql_query("SELECT SUM(attempts) FROM loginattempts WHERE ip=$ip") or sqlerr(__FILE__, __LINE__);
-  list($total) = mysql_fetch_array($Query);
+  list($total) = _mysql_fetch_array($Query);
   $remaining = $maxloginattempts - $total;
   if ($remaining <= 2 )
     $remaining = "<font color=\"red\" size=\"2\">[".$remaining."]</font>";
@@ -1224,15 +1243,14 @@ function registration_check($type = "invitesystem", $maxuserscheck = true, $ipch
 
   if ($maxuserscheck) {
     $res = sql_query("SELECT COUNT(*) FROM users") or sqlerr(__FILE__, __LINE__);
-    $arr = mysql_fetch_row($res);
+    $arr = _mysql_fetch_row($res);
     if ($arr[0] >= $maxusers)
       stderr($lang_functions['std_sorry'], $lang_functions['std_account_limit_reached'], 0);
   }
 
   if ($ipcheck) {
     $ip = getip () ;
-    $a = (@mysql_fetch_row(@sql_query("select count(*) from users where ip='" . mysql_real_escape_string($ip) . "'"))) or sqlerr(__FILE__, __LINE__);
-    if ($a[0] > $maxip)
+    if (get_row_count('users', 'where ip=?', [$ip]) > $maxip)
       stderr($lang_functions['std_sorry'], $lang_functions['std_the_ip']."<b>" . htmlspecialchars($ip) ."</b>". $lang_functions['std_used_many_times'],false);
   }
   return true;
@@ -1253,29 +1271,22 @@ function image_code () {
   $imagehash = md5($randomstr);
   $dateline = time();
   $sql = 'INSERT INTO `regimages` (`imagehash`, `imagestring`, `dateline`) VALUES (\''.$imagehash.'\', \''.$randomstr.'\', \''.$dateline.'\');';
-  sql_query($sql) or die(mysql_error());
+  sql_query($sql) or die(_mysql_error());
   return $imagehash;
 }
 
 function check_code ($imagehash, $imagestring, $where = 'signup.php',$maxattemptlog=false,$head=true) {
   global $lang_functions;
-  $query = sprintf("SELECT * FROM regimages WHERE imagehash='%s' AND imagestring='%s'",
-		   mysql_real_escape_string($imagehash),
-		   mysql_real_escape_string($imagestring));
-  $sql = sql_query($query);
-  $imgcheck = mysql_fetch_array($sql);
+  $sql = sql_query("SELECT * FROM regimages WHERE imagehash=? AND imagestring=?", [$imagehash, $imagestring]);
+  $imgcheck = _mysql_fetch_array($sql);
   if(!$imgcheck['dateline']) {
-    $delete = sprintf("DELETE FROM regimages WHERE imagehash='%s'",
-		      mysql_real_escape_string($imagehash));
-    sql_query($delete);
+    sql_query("DELETE FROM regimages WHERE imagehash=?", [$imagehash]);
     if (!$maxattemptlog)
       bark($lang_functions['std_invalid_image_code']."<a href=\"".htmlspecialchars($where)."\">".$lang_functions['std_here_to_request_new']);
     else
       failedlogins($lang_functions['std_invalid_image_code']."<a href=\"".htmlspecialchars($where)."\">".$lang_functions['std_here_to_request_new'],true,$head);
   }else{
-    $delete = sprintf("DELETE FROM regimages WHERE imagehash='%s'",
-		      mysql_real_escape_string($imagehash));
-    sql_query($delete);
+    sql_query('DELETE FROM regimages WHERE imagehash=?', [$imagehash]);
     return true;
   }
 }
@@ -1299,7 +1310,7 @@ function get_ip_location($ip) {
   if (!$ret = $Cache->get_value('location_list')){
     $ret = array();
     $res = sql_query("SELECT * FROM locations") or sqlerr(__FILE__, __LINE__);
-    while ($row = mysql_fetch_array($res))
+    while ($row = _mysql_fetch_array($res))
       $ret[] = $row;
     $Cache->cache_value('location_list', $ret, 152800);
   }
@@ -1422,29 +1433,6 @@ function dbconn($autoclean = false, $test = false) {
   global $mysql_host, $mysql_user, $mysql_pass;
   global $useCronTriggerCleanUp;
 
-  if (!mysql_pconnect($mysql_host, $mysql_user, $mysql_pass)) {
-    header('HTTP/1.0 502 Internal Server Error');
-    switch (mysql_errno()) {
-    case 1040:
-    case 2002:
-      die("<html><head><meta http-equiv=refresh content=\"10 $_SERVER[REQUEST_URI]\"><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body><table border=0 width=100% height=100%><tr><td><h3 align=center>".$lang_functions['std_server_load_very_high']."</h3></td></tr></table></body></html>");
-    default:
-      die("[" . mysql_errno() . "] dbconn: mysql_pconnect: " . mysql_error());
-    }
-  }
-  mysql_query("SET NAMES UTF8");
-  mysql_query("SET collation_connection = 'utf8_general_ci'");
-  mysql_query("SET sql_mode=''");
-  if ($test) {
-    global $mysql_db_test;
-    $db = $mysql_db_test;
-  }
-  else {
-    global $mysql_db;
-    $db = $mysql_db;
-  }
-  mysql_select_db($db) or die('dbconn: mysql_select_db: ' + mysql_error());
-
   userlogin();
 
   if (!$useCronTriggerCleanUp && $autoclean) {
@@ -1466,7 +1454,7 @@ function get_user_row($id) {
     }
   } elseif (!$row = $Cache->get_value('user_'.$id.'_content')){
     $res = sql_query("SELECT ".implode(',', $neededColumns)." FROM users WHERE id = ".sqlesc($id)) or sqlerr(__FILE__,__LINE__);
-    $row = mysql_fetch_array($res);
+    $row = _mysql_fetch_array($res);
     $Cache->cache_value('user_'.$id.'_content', $row, 900);
   }
 
@@ -1488,7 +1476,7 @@ function userlogin() {
     {
       
       $res = sql_query("SELECT * FROM bans WHERE $nip >= first AND $nip <= last") or sqlerr(__FILE__, __LINE__);
-      if (mysql_num_rows($res) > 0)
+      if (_mysql_num_rows($res) > 0)
 	{
 	  header("HTTP/1.0 403 Forbidden");
 	  print("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body>".$lang_functions['text_unauthorized_ip']."</body></html>\n");
@@ -1516,7 +1504,7 @@ function userlogin() {
     }
 
   $res = sql_query("SELECT * FROM users WHERE users.id = ".sqlesc($id)." AND users.enabled='yes' AND users.status = 'confirmed' LIMIT 1");
-  $row = mysql_fetch_array($res);
+  $row = _mysql_fetch_array($res);
   if (!$row)
     return;
 
@@ -1543,7 +1531,7 @@ function userlogin() {
     }
   if (!$row["passkey"]){
     $passkey = md5($row['username'].date("Y-m-d H:i:s").$row['passhash']);
-    sql_query("UPDATE users SET passkey = ".sqlesc($passkey)." WHERE id=" . sqlesc($row["id"]));// or die(mysql_error());
+    sql_query("UPDATE users SET passkey = ".sqlesc($passkey)." WHERE id=" . sqlesc($row["id"]));// or die(_mysql_error());
   }
 
   $oldip = $row['ip'];
@@ -1568,7 +1556,7 @@ function autoclean() {
   $now = TIMENOW;
 
   $res = sql_query("SELECT value_u FROM avps WHERE arg = 'lastcleantime'");
-  $row = mysql_fetch_array($res);
+  $row = _mysql_fetch_array($res);
   if (!$row) {
     sql_query("INSERT INTO avps (arg, value_u) VALUES ('lastcleantime',$now)") or sqlerr(__FILE__, __LINE__);
     return false;
@@ -1578,7 +1566,7 @@ function autoclean() {
     return false;
   }
   sql_query("UPDATE avps SET value_u=$now WHERE arg='lastcleantime' AND value_u = $ts") or sqlerr(__FILE__, __LINE__);
-  if (!mysql_affected_rows()) {
+  if (!_mysql_affected_rows()) {
     return false;
   }
   require_once($rootpath . 'include/cleanup.php');
@@ -1770,9 +1758,9 @@ function validlang($langid) {
   global $deflang;
   $langid = 0 + $langid;
   $res = sql_query("SELECT site_lang_folder FROM language WHERE site_lang = 1 AND id = " . sqlesc($langid)) or sqlerr(__FILE__, __LINE__);
-  if(mysql_num_rows($res) == 1)
+  if(_mysql_num_rows($res) == 1)
     {
-      $arr = mysql_fetch_array($res)  or sqlerr(__FILE__, __LINE__);
+      $arr = _mysql_fetch_array($res)  or sqlerr(__FILE__, __LINE__);
       return $arr['site_lang_folder'];
     }
   else return $deflang;
@@ -1793,7 +1781,7 @@ function get_if_restricted_is_open()
 function menu ($selected = "home") {
   global $lang_functions;
   global $BASEURL,$CURUSER;
-  global $enableoffer, $enablerequest, $enablespecial, $enableextforum, $extforumurl, $where_tweak;
+  global $enableoffer, $enablerequest, $enablespecial, $enableextforum, $extforumurl;
   global $USERUPDATESET;
   $script_name = $_SERVER["SCRIPT_FILENAME"];
 
@@ -1858,11 +1846,6 @@ function menu ($selected = "home") {
   echo navbar_item('faq.php', $lang_functions['text_faq'], $selected == "faq");
   echo navbar_item('staff.php', $lang_functions['text_staff'], $selected == "staff");
   print ("</ul></div>");
-
-  if ($CURUSER){
-    if ($where_tweak == 'yes')
-      $USERUPDATESET[] = "page = ".sqlesc($selected);
-  }
 }
     
 function get_css_id() {
@@ -1878,7 +1861,7 @@ function get_css_rows() {
   if (!$rows && !$rows = $Cache->get_value('stylesheet_content')){
     $rows = array();
     $res = sql_query("SELECT * FROM stylesheets ORDER BY id ASC");
-    while($row = mysql_fetch_array($res)) {
+    while($row = _mysql_fetch_array($res)) {
       $rows[$row['id']] = $row;
     }
     $Cache->cache_value('stylesheet_content', $rows, 95400);
@@ -1937,12 +1920,12 @@ function get_cat_folder($cat = 401, $caticon = -1) {
 function get_style_highlight() {
   global $CURUSER;
   if ($CURUSER) {
-    $ss_a = @mysql_fetch_array(@sql_query("select hltr from stylesheets where id=" . $CURUSER["stylesheet"]));
+    $ss_a = @_mysql_fetch_array(@sql_query("select hltr from stylesheets where id=" . $CURUSER["stylesheet"]));
     if ($ss_a) $hltr = $ss_a["hltr"];
   }
   if (!$hltr) {
-    $r = sql_query("SELECT hltr FROM stylesheets WHERE id=5") or die(mysql_error());
-    $a = mysql_fetch_array($r) or die(mysql_error());
+    $r = sql_query("SELECT hltr FROM stylesheets WHERE id=5") or die(_mysql_error());
+    $a = _mysql_fetch_array($r) or die(_mysql_error());
     $hltr = $a["hltr"];
   }
   return $hltr;
@@ -2076,7 +2059,7 @@ function stdhead($title = "", $msgalert = true, $script = "", $place = "") {
     }
     if (!$connect = $Cache->get_value('user_'.$CURUSER["id"].'_connect')){
       $res3 = sql_query("SELECT connectable FROM peers WHERE userid=" . sqlesc($CURUSER["id"]) . " LIMIT 1");
-      if($row = mysql_fetch_row($res3))
+      if($row = _mysql_fetch_row($res3))
 	$connect = $row[0];
       else $connect = 'unknown';
       $Cache->cache_value('user_'.$CURUSER["id"].'_connect', $connect, 900);
@@ -2399,7 +2382,7 @@ function get_protocol_prefix()
 function get_langid_from_langcookie()
 {
   global $CURLANGDIR;
-  $row = mysql_fetch_array(sql_query("SELECT id FROM language WHERE site_lang = 1 AND site_lang_folder = " . sqlesc($CURLANGDIR) . "ORDER BY id ASC")) or sqlerr(__FILE__, __LINE__);
+  $row = _mysql_fetch_array(sql_query("SELECT id FROM language WHERE site_lang = 1 AND site_lang_folder = " . sqlesc($CURLANGDIR) . "ORDER BY id ASC")) or sqlerr(__FILE__, __LINE__);
   return $row['id'];
 }
 
@@ -2494,21 +2477,8 @@ function loggedinorreturn3($mainpage = false) {
   }
 }
 
-function deletetorrent($id) {
-  global $torrent_dir;
-  sql_query("DELETE FROM torrents WHERE id = ".mysql_real_escape_string($id));
-  sql_query("DELETE FROM snatched WHERE torrentid = ".mysql_real_escape_string($id));
-  foreach(array("peers", "files", "comments") as $x) {
-    sql_query("DELETE FROM $x WHERE torrent = ".mysql_real_escape_string($id));
-  }
-  sql_query("DELETE FROM subs WHERE torrent_id = ".mysql_real_escape_string($id));
-
-  unlink("$torrent_dir/$id.torrent");
-}
-
 function send_pm($from, $to, $subject, $msg) {
-  $added = sqlesc(date("Y-m-d H:i:s"));
-  sql_query("INSERT INTO messages (sender, receiver, subject, msg, added) VALUES($from, $to, " . sqlesc($subject) . ", " . sqlesc($msg) . ", $added)") or sqlerr(__FILE__, __LINE__);
+  sql_query("INSERT INTO messages (sender, receiver, subject, msg, added) VALUES(?, ?, ?, ?, ?)", [$from, $to, $subject, $msg, date("Y-m-d H:i:s")]);
 }
 
 function pager($rpp, $count, $href, $opts = array(), $pagename = "page") {
@@ -2897,7 +2867,7 @@ function get_forum_row($forumid = 0) {
   if (!$forums = $Cache->get_value('forums_list')){
     $forums = array();
     $res2 = sql_query("SELECT * FROM forums ORDER BY forid ASC, sort ASC") or sqlerr(__FILE__, __LINE__);
-    while ($row2 = mysql_fetch_array($res2))
+    while ($row2 = _mysql_fetch_array($res2))
       $forums[$row2['id']] = $row2;
     $Cache->cache_value('forums_list', $forums, 86400);
   }
@@ -2910,7 +2880,7 @@ function get_forum_id($query_id = 0,$query_type = "topic") {
 	switch($query_type){
 	case "post":
 		$query_res = sql_query("SELECT topicid FROM posts WHERE id = $query_id") or sqlerr(__FILE__, __LINE__);
-		$row = mysql_fetch_array($query_res);
+		$row = _mysql_fetch_array($query_res);
 		if(!$row){
 			return -1;
 		}
@@ -2918,7 +2888,7 @@ function get_forum_id($query_id = 0,$query_type = "topic") {
 		//deliberately fall through
 	case "topic":
 		$query_res = sql_query("SELECT forumid FROM topics WHERE id = $query_id") or sqlerr(__FILE__, __LINE__);
-		$row = mysql_fetch_array($query_res);
+		$row = _mysql_fetch_array($query_res);
 		if(!$row){
 			return -1;
 		}
@@ -3007,7 +2977,7 @@ function genrelist($catmode = 1) {
   if (!$ret = $Cache->get_value('category_list_mode_'.$catmode)){
     $ret = array();
     $res = sql_query("SELECT id, mode, name FROM categories WHERE mode = ".sqlesc($catmode)." ORDER BY sort_index, id");
-    while ($row = mysql_fetch_array($res))
+    while ($row = _mysql_fetch_array($res))
       $ret[] = $row;
     $Cache->cache_value('category_list_mode_'.$catmode, $ret, 152800);
   }
@@ -3019,7 +2989,7 @@ function searchbox_item_list($table = "sources"){
   if (!$ret = $Cache->get_value($table.'_list')){
     $ret = array();
     $res = sql_query("SELECT * FROM ".$table." ORDER BY sort_index, id");
-    while ($row = mysql_fetch_array($res))
+    while ($row = _mysql_fetch_array($res))
       $ret[] = $row;
     $Cache->cache_value($table.'_list', $ret, 152800);
   }
@@ -3031,7 +3001,7 @@ function langlist($type) {
   if (!$ret = $Cache->get_value($type.'_lang_list')){
     $ret = array();
     $res = sql_query("SELECT id, lang_name, flagpic, site_lang_folder FROM language WHERE ". $type ."=1 ORDER BY site_lang DESC, id ASC");
-    while ($row = mysql_fetch_array($res))
+    while ($row = _mysql_fetch_array($res))
       $ret[] = $row;
     $Cache->cache_value($type.'_lang_list', $ret, 152800);
   }
@@ -3048,7 +3018,7 @@ function linkcolor($num) {
 
 function writecomment($userid, $comment) {
   $res = sql_query("SELECT modcomment FROM users WHERE id = '$userid'") or sqlerr(__FILE__, __LINE__);
-  $arr = mysql_fetch_assoc($res);
+  $arr = _mysql_fetch_assoc($res);
 
   $modcomment = date("d-m-Y") . " - " . $comment . "" . ($arr[modcomment] != "" ? "\n\n" : "") . "$arr[modcomment]";
   $modcom = sqlesc($modcomment);
@@ -3064,8 +3034,8 @@ function return_torrent_bookmark_array($userid)
     if (!$ret = $Cache->get_value('user_'.$userid.'_bookmark_array')){
       $ret = array();
       $res = sql_query("SELECT * FROM bookmarks WHERE userid=" . sqlesc($userid));
-      if (mysql_num_rows($res) != 0){
-        while ($row = mysql_fetch_array($res))
+      if (_mysql_num_rows($res) != 0){
+        while ($row = _mysql_fetch_array($res))
           $ret[] = $row['torrentid'];
         $Cache->cache_value('user_'.$userid.'_bookmark_array', $ret, 132800);
       } else {
@@ -3103,9 +3073,9 @@ function torrentTableCake($torrents) {
     $ids[] = $torrent['Torrent']['id'];
   }
   $query = 'SELECT torrents.id, torrents.sp_state, torrents.promotion_time_type, torrents.promotion_until, torrents.banned, torrents.picktype, torrents.pos_state, torrents.category, torrents.source, torrents.medium, torrents.codec, torrents.standard, torrents.processing, torrents.team, torrents.audiocodec, torrents.leechers, torrents.seeders, torrents.name, torrents.small_descr, torrents.times_completed, torrents.size, torrents.added, torrents.comments,torrents.anonymous,torrents.owner,torrents.url,torrents.cache_stamp,torrents.oday FROM torrents WHERE id IN (' . implode(',', $ids) . ') ORDER BY pos_state DESC, torrents.id DESC';
-  $res = sql_query($query) or die(mysql_error());
+  $res = sql_query($query) or die(_mysql_error());
   $rows = [];
-  while ($row = mysql_fetch_assoc($res)) {
+  while ($row = _mysql_fetch_assoc($res)) {
     $rows[] = $row;
   }
   torrenttable($rows);
@@ -3169,22 +3139,11 @@ function torrenttable($rows, $var) {
 <thead><tr>
 <?php
 $count_get = 0;
-$oldlink = "";
-foreach ($_GET as $get_name => $get_value) {
-  $get_name = mysql_real_escape_string(strip_tags(str_replace(array("\"","'"),array("",""),$get_name)));
-  $get_value = mysql_real_escape_string(strip_tags(str_replace(array("\"","'"),array("",""),$get_value)));
-
-  if ($get_name != "sort" && $get_name != "type") {
-    if ($count_get > 0) {
-      $oldlink .= "&amp;" . $get_name . "=" . $get_value;
-    }
-    else {
-      $oldlink .= $get_name . "=" . $get_value;
-    }
-    $count_get++;
-  }
-}
-if ($count_get > 0) {
+$args = $_REQUEST;
+unset($args['sort']);
+unset($args['type']);
+$oldlink = http_build_query($args);
+if ($oldlink > 0) {
   $oldlink = $oldlink . "&amp;";
 }
 
@@ -3464,7 +3423,7 @@ foreach($rows as $row)
       {
         if (!$lastcom = $Cache->get_value('torrent_'.$id.'_last_comment_content')){
           $res2 = sql_query("SELECT user, added, text FROM comments WHERE torrent = $id ORDER BY id DESC LIMIT 1");
-          $lastcom = mysql_fetch_array($res2);
+          $lastcom = _mysql_fetch_array($res2);
           $Cache->cache_value('torrent_'.$id.'_last_comment_content', $lastcom, 1855);
         }
         $timestamp = strtotime($lastcom["added"]);
@@ -4054,7 +4013,7 @@ function get_category_icon_rows() {
   if (!$rows && !$rows = $Cache->get_value('category_icon_content')){
     $rows = array();
     $res = sql_query("SELECT * FROM caticons ORDER BY id ASC");
-    while($row = mysql_fetch_array($res)) {
+    while($row = _mysql_fetch_array($res)) {
       $rows[$row['id']] = $row;
     }
     $Cache->cache_value('category_icon_content', $rows, 156400);
@@ -4075,7 +4034,7 @@ function get_category_row($catid = NULL)
   static $rows;
   if (!$rows && !$rows = $Cache->get_value('category_content')){
     $res = sql_query("SELECT categories.*, searchbox.name AS catmodename FROM categories LEFT JOIN searchbox ON categories.mode=searchbox.id");
-    while($row = mysql_fetch_array($res)) {
+    while($row = _mysql_fetch_array($res)) {
       $rows[$row['id']] = $row;
     }
     $Cache->cache_value('category_content', $rows, 126400);
@@ -4101,7 +4060,7 @@ function get_second_icon($row, $catimgurl) {//for CHDBits
   $audiocodec=$row['audiocodec'];
   if (!$sirow = $Cache->get_value('secondicon_'.$source.'_'.$medium.'_'.$codec.'_'.$standard.'_'.$processing.'_'.$team.'_'.$audiocodec.'_content')){
     $res = sql_query("SELECT * FROM secondicons WHERE (source = ".sqlesc($source)." OR source=0) AND (medium = ".sqlesc($medium)." OR medium=0) AND (codec = ".sqlesc($codec)." OR codec = 0) AND (standard = ".sqlesc($standard)." OR standard = 0) AND (processing = ".sqlesc($processing)." OR processing = 0) AND (team = ".sqlesc($team)." OR team = 0) AND (audiocodec = ".sqlesc($audiocodec)." OR audiocodec = 0) LIMIT 1");
-    $sirow = mysql_fetch_array($res);
+    $sirow = _mysql_fetch_array($res);
     if (!$sirow)
       $sirow = 'not allowed';
     $Cache->cache_value('secondicon_'.$source.'_'.$medium.'_'.$codec.'_'.$standard.'_'.$processing.'_'.$team.'_'.$audiocodec.'_content', $sirow, 116400);
@@ -4157,7 +4116,7 @@ if ($mode == 'icon') {
 function get_user_id_from_name($username,$sqlerrorreturn=1){
   global $lang_functions;
   $res = sql_query("SELECT id FROM users WHERE LOWER(username)=LOWER(" . sqlesc($username).")");
-  $arr = mysql_fetch_array($res);
+  $arr = _mysql_fetch_array($res);
   if (!$arr){
   	if($sqlerrorreturn)
     	stderr($lang_functions['std_error'],$lang_functions['std_no_user_named']."'".$username."'");
@@ -4172,7 +4131,7 @@ function is_forum_moderator($id, $in = 'post'){
   switch($in){
     case 'post':{
       $res = sql_query("SELECT topicid FROM posts WHERE id=$id") or sqlerr(__FILE__, __LINE__);
-      if ($arr = mysql_fetch_array($res)){
+      if ($arr = _mysql_fetch_array($res)){
         if (is_forum_moderator($arr['topicid'],'topic'))
           return true;
       }
@@ -4181,7 +4140,7 @@ function is_forum_moderator($id, $in = 'post'){
     }
     case 'topic':{
       $modcount = sql_query("SELECT COUNT(forummods.userid) FROM forummods LEFT JOIN topics ON forummods.forumid = topics.forumid WHERE topics.id=$id AND forummods.userid=".sqlesc($CURUSER['id'])) or sqlerr(__FILE__, __LINE__);
-      $arr = mysql_fetch_array($modcount);
+      $arr = _mysql_fetch_array($modcount);
       if ($arr[0])
         return true;
       else return false;
@@ -4204,7 +4163,7 @@ function get_guest_lang_id(){
   global $CURLANGDIR;
   $langfolder=$CURLANGDIR;
   $res = sql_query("SELECT id FROM language WHERE site_lang_folder=".sqlesc($langfolder)." AND site_lang=1");
-  $row = mysql_fetch_array($res);
+  $row = _mysql_fetch_array($res);
   if ($row){
     return $row['id'];
   }
@@ -4239,7 +4198,7 @@ function get_searchbox_value($mode = 1, $item = 'showsubcat'){
   if (!$rows && !$rows = $Cache->get_value('searchbox_content')){
     $rows = array();
     $res = sql_query("SELECT * FROM searchbox ORDER BY id ASC");
-    while ($row = mysql_fetch_array($res)) {
+    while ($row = _mysql_fetch_array($res)) {
       $rows[$row['id']] = $row;
     }
     $Cache->cache_value('searchbox_content', $rows, 100500);
@@ -4408,7 +4367,7 @@ function get_forum_moderators($forumid, $plaintext = true)
   if (!$moderatorsArray && !$moderatorsArray = $Cache->get_value('forum_moderator_array')) {
     $moderatorsArray = array();
     $res = sql_query("SELECT forumid, userid FROM forummods ORDER BY forumid ASC") or sqlerr(__FILE__, __LINE__);
-    while ($row = mysql_fetch_array($res)) {
+    while ($row = _mysql_fetch_array($res)) {
       $moderatorsArray[$row['forumid']][] = $row['userid'];
     }
     $Cache->cache_value('forum_moderator_array', $moderatorsArray, 86200);
@@ -4455,7 +4414,7 @@ function get_post_row($postid)
   global $Cache;
   if (!$row = $Cache->get_value('post_'.$postid.'_content')){
     $res = sql_query("SELECT * FROM posts WHERE id=".sqlesc($postid)." LIMIT 1") or sqlerr(__FILE__,__LINE__);
-    $row = mysql_fetch_array($res);
+    $row = _mysql_fetch_array($res);
     $Cache->cache_value('post_'.$postid.'_content', $row, 7200);
   }
   if (!$row)
@@ -4468,7 +4427,7 @@ function get_country_row($id)
   global $Cache;
   if (!$row = $Cache->get_value('country_'.$id.'_content')){
     $res = sql_query("SELECT * FROM countries WHERE id=".sqlesc($id)." LIMIT 1") or sqlerr(__FILE__,__LINE__);
-    $row = mysql_fetch_array($res);
+    $row = _mysql_fetch_array($res);
     $Cache->cache_value('country_'.$id.'_content', $row, 86400);
   }
   if (!$row)
@@ -4481,7 +4440,7 @@ function get_downloadspeed_row($id)
   global $Cache;
   if (!$row = $Cache->get_value('downloadspeed_'.$id.'_content')){
     $res = sql_query("SELECT * FROM downloadspeed WHERE id=".sqlesc($id)." LIMIT 1") or sqlerr(__FILE__,__LINE__);
-    $row = mysql_fetch_array($res);
+    $row = _mysql_fetch_array($res);
     $Cache->cache_value('downloadspeed_'.$id.'_content', $row, 86400);
   }
   if (!$row)
@@ -4494,7 +4453,7 @@ function get_uploadspeed_row($id)
   global $Cache;
   if (!$row = $Cache->get_value('uploadspeed_'.$id.'_content')){
     $res = sql_query("SELECT * FROM uploadspeed WHERE id=".sqlesc($id)." LIMIT 1") or sqlerr(__FILE__,__LINE__);
-    $row = mysql_fetch_array($res);
+    $row = _mysql_fetch_array($res);
     $Cache->cache_value('uploadspeed_'.$id.'_content', $row, 86400);
   }
   if (!$row)
@@ -4507,7 +4466,7 @@ function get_isp_row($id)
   global $Cache;
   if (!$row = $Cache->get_value('isp_'.$id.'_content')){
     $res = sql_query("SELECT * FROM isp WHERE id=".sqlesc($id)." LIMIT 1") or sqlerr(__FILE__,__LINE__);
-    $row = mysql_fetch_array($res);
+    $row = _mysql_fetch_array($res);
     $Cache->cache_value('isp_'.$id.'_content', $row, 86400);
   }
   if (!$row)
@@ -4680,7 +4639,7 @@ function votes($poll, $uservote = 255) {
   }
 
   // Count votes
-  while ($poll_itm = mysql_fetch_row($pollanswers_count)) {
+  while ($poll_itm = _mysql_fetch_row($pollanswers_count)) {
     $idx = $poll_itm[0];
     $count = $poll_itm[1];
     if (array_key_exists($idx, $os)) {
@@ -4735,7 +4694,7 @@ function get_fun($id = 0, $pager_count = null) {
 
   if (!$content || !$id) {
     $result = sql_query($sql)  or sqlerr(__FILE__,__LINE__);
-    $row = mysql_fetch_array($result);
+    $row = _mysql_fetch_array($result);
 
     if (!$row) {
       return '无';
@@ -4793,7 +4752,7 @@ function get_fun($id = 0, $pager_count = null) {
     $funcomment .= ('<dl class="table midt" id="funcomment">');
     ob_start();
 
-    while ($subrow = mysql_fetch_array($subres)) {
+    while ($subrow = _mysql_fetch_array($subres)) {
       /* if ($subrow["text"]==$temptxt && $tempuserid==$subrow["userid"])continue; */
       
       /* $temptxt=$subrow["text"]; */
@@ -4825,8 +4784,8 @@ function get_fun($id = 0, $pager_count = null) {
 
 function storing_keeper_list($torrentid){
 	$list_res = sql_query("SELECT keeper_id FROM storing_records WHERE checkout = 0 AND torrent_id = $torrentid") or sqlerr(__FILE__, __LINE__);
-	if(mysql_num_rows($list_res)!=0){
-		while($keeperid = mysql_fetch_assoc($list_res)){
+	if(_mysql_num_rows($list_res)!=0){
+		while($keeperid = _mysql_fetch_assoc($list_res)){
 			$list[] = $keeperid['keeper_id'];
 		}
 	}

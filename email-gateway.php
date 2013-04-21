@@ -4,8 +4,7 @@ dbconn();
 $id = 0 + $_GET["id"];
 int_check($id,true);
 
-$res = sql_query("SELECT username, class, email FROM users WHERE id=".mysql_real_escape_string($id));
-$arr = mysql_fetch_assoc($res) or stderr("Error", "No such user.");
+$arr = sql_fetchAll('SELECT username, class, email FROM users WHERE id=?', [$id])[0] or stderr("Error", "No such user.");
 $username = $arr["username"];
 if ($arr["class"] < UC_MODERATOR)
 	stderr("Error", "The gateway can only be used to e-mail staff members.");

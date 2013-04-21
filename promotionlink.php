@@ -11,13 +11,13 @@ if ($key)
 	if ($prolinkpoint_bonus)
 	{
 		$res=sql_query("SELECT id FROM users WHERE promotion_link=".sqlesc($key)." LIMIT 1");
-		$row=mysql_fetch_array($res);
+		$row=_mysql_fetch_array($res);
 		if ($row)
 		{
 			$ip = getip();
 			$dt=sqlesc(date("Y-m-d H:i:s",(TIMENOW-$prolinktime_bonus)));
 			$res2=sql_query("SELECT COUNT(id) FROM prolinkclicks WHERE userid=".sqlesc($row['id'])." AND (added > ".$dt." OR ip=".sqlesc($ip).")");
-			$row2=mysql_fetch_array($res2);
+			$row2=_mysql_fetch_array($res2);
 			if ($row2[0]==0)
 			{
 				KPS("+", $prolinkpoint_bonus, $row['id']);

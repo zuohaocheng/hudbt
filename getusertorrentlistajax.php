@@ -109,7 +109,7 @@ function maketable($res, $mode = 'seeding')
 	$ret = "<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\" width=\"800\"><thead><tr><th class=\"unsortable\" style=\"padding: 0px\">".$lang_getusertorrentlistajax['col_type']."</th><th align=\"center\">".$lang_getusertorrentlistajax['col_name']."</th>".
 	($showsize ? "<th align=\"center\"><img class=\"size\" src=\"pic/trans.gif\" alt=\"size\" title=\"".$lang_getusertorrentlistajax['title_size']."\" /></th>" : "").($showsenum ? "<th align=\"center\"><img class=\"seeders\" src=\"pic/trans.gif\" alt=\"seeders\" title=\"".$lang_getusertorrentlistajax['title_seeders']."\" /></th>" : "").($showlenum ? "<th align=\"center\"><img class=\"leechers\" src=\"pic/trans.gif\" alt=\"leechers\" title=\"".$lang_getusertorrentlistajax['title_leechers']."\" /></th>" : "").($showuploaded ? "<th align=\"center\">".$lang_getusertorrentlistajax['col_uploaded']."</th>" : "") . ($showdownloaded ? "<th align=\"center\">".$lang_getusertorrentlistajax['col_downloaded']."</th>" : "").($showratio ? "<th align=\"center\">".$lang_getusertorrentlistajax['col_ratio']."</th>" : "").($showsetime ? "<th align=\"center\">".$lang_getusertorrentlistajax['col_se_time']."</th>" : "").($showletime ? "<th align=\"center\">".$lang_getusertorrentlistajax['col_le_time']."</th>" : "").($showcotime ? "<th align=\"center\">".$lang_getusertorrentlistajax['col_time_completed']."</th>" : "").($showanonymous ? "<th align=\"center\">".$lang_getusertorrentlistajax['col_anonymous']."</th>" : "").
 	($showstoringtime ? "<th align=\"center\">".$lang_getusertorrentlistajax['col_time_storing']."</th>" : "")."</tr></thead><tbody>\n";
-	while ($arr = mysql_fetch_assoc($res))
+	while ($arr = _mysql_fetch_assoc($res))
 	{
 		$catimage = htmlspecialchars($arr["image"]);
 		$catname = htmlspecialchars($arr["catname"]);
@@ -195,7 +195,7 @@ permissiondenied();
 switch ($type) {
 case 'uploaded': {
   $res = sql_query("SELECT torrents.id AS torrent, torrents.name as torrentname, small_descr, seeders, leechers, anonymous, categories.name AS catname, category, sp_state, size, snatched.seedtime, snatched.uploaded FROM torrents LEFT JOIN snatched ON torrents.id = snatched.torrentid LEFT JOIN categories ON torrents.category = categories.id WHERE torrents.owner=$id AND snatched.userid=$id " . (($CURUSER["id"] != $id) && (get_user_class() < $viewanonymous_class) ? " AND anonymous = 'no'":"") ." ORDER BY torrents.added DESC") or sqlerr(__FILE__, __LINE__);
-		$count = mysql_num_rows($res);
+		$count = _mysql_num_rows($res);
 		if ($count > 0)
 		{
 			$torrentlist = maketable($res, 'uploaded');
@@ -207,7 +207,7 @@ case 'uploaded': {
 	case 'seeding':
 	{
 		$res = sql_query("SELECT torrent,added,snatched.uploaded,snatched.downloaded,torrents.name as torrentname, torrents.small_descr, torrents.sp_state, categories.name as catname,size,category,seeders,leechers FROM peers LEFT JOIN torrents ON peers.torrent = torrents.id LEFT JOIN categories ON torrents.category = categories.id LEFT JOIN snatched ON torrents.id = snatched.torrentid WHERE peers.userid=$id AND snatched.userid = $id AND peers.seeder='yes' ORDER BY torrents.added DESC") or sqlerr();
-		$count = mysql_num_rows($res);
+		$count = _mysql_num_rows($res);
 		if ($count > 0){
 			$torrentlist = maketable($res, 'seeding');
 		}
@@ -218,7 +218,7 @@ case 'uploaded': {
 	case 'leeching':
 	{
 		$res = sql_query("SELECT torrent,snatched.uploaded,snatched.downloaded,torrents.name as torrentname, torrents.small_descr, torrents.sp_state, categories.name as catname,size,category,seeders,leechers FROM peers LEFT JOIN torrents ON peers.torrent = torrents.id LEFT JOIN categories ON torrents.category = categories.id LEFT JOIN snatched ON torrents.id = snatched.torrentid WHERE peers.userid=$id AND snatched.userid = $id AND peers.seeder='no' ORDER BY torrents.added DESC") or sqlerr();
-		$count = mysql_num_rows($res);
+		$count = _mysql_num_rows($res);
 		if ($count > 0){
 			$torrentlist = maketable($res, 'leeching');
 		}
@@ -229,7 +229,7 @@ case 'uploaded': {
 	case 'completed':
 	{
 		$res = sql_query("SELECT torrents.id AS torrent, torrents.name AS torrentname, small_descr, categories.name AS catname, category, sp_state, size, snatched.uploaded, snatched.seedtime, snatched.leechtime, snatched.completedat FROM torrents LEFT JOIN snatched ON torrents.id = snatched.torrentid LEFT JOIN categories on torrents.category = categories.id WHERE snatched.finished='yes' AND torrents.owner != $id AND userid=$id ORDER BY snatched.completedat DESC") or sqlerr();
-		$count = mysql_num_rows($res);
+		$count = _mysql_num_rows($res);
 		if ($count > 0)
 		{
 			$torrentlist = maketable($res, 'completed');
@@ -241,7 +241,7 @@ case 'uploaded': {
 	case 'incomplete':
 	{
 		$res = sql_query("SELECT torrents.id AS torrent, torrents.name AS torrentname, small_descr, categories.name AS catname, category, sp_state, size, snatched.uploaded, snatched.downloaded, snatched.leechtime FROM torrents LEFT JOIN snatched ON torrents.id = snatched.torrentid LEFT JOIN categories on torrents.category = categories.id WHERE snatched.finished='no' AND userid=$id AND torrents.owner != $id ORDER BY snatched.startdat DESC") or sqlerr();
-		$count = mysql_num_rows($res);
+		$count = _mysql_num_rows($res);
 		if ($count > 0)
 		{
 			$torrentlist = maketable($res, 'incomplete');
@@ -254,7 +254,7 @@ case 'uploaded': {
 	//$res = sql_query("SELECT torrents.id AS torrent, torrents.name AS torrentname, small_descr, categories.name AS catname, category, sp_state, size, snatched.uploaded, snatched.seedtime, snatched.leechtime, snatched.completedat FROM torrents LEFT JOIN snatched ON torrents.id = snatched.torrentid LEFT JOIN categories on torrents.category = categories.id WHERE snatched.finished='yes' AND torrents.owner != $id AND userid=$id ORDER BY snatched.completedat DESC") or sqlerr();
 		$res = sql_query("SELECT torrents.id AS torrent, torrents.name AS torrentname, small_descr, categories.name AS catname, category, sp_state, size, seeders, storing_records.in_seedtime, storing_records.out_seedtime FROM torrents JOIN storing_records ON torrents.id = storing_records.torrent_id LEFT JOIN categories on torrents.category = categories.id WHERE checkout = 0 AND storing_records.keeper_id = $id ORDER BY storing_records.torrent_id DESC") or sqlerr();
 	
-		$count = mysql_num_rows($res);
+		$count = _mysql_num_rows($res);
 		if ($count > 0)
 		{
 			$torrentlist = maketable($res, 'storing');

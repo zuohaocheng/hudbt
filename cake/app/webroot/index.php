@@ -3,17 +3,6 @@ global $NEXUSPHP;
 if (!defined('HB_CAKE')) {
   define('HB_CAKE', true);
 }
-if (!isset($NEXUSPHP)) {
-  require_once('../../../include/bittorrent.php');
-  $dispatch = true;
-
-  $s = smarty();
-  $s->addTemplateDir('../../../templates');
-  $s->setCompileDir('../../../templates_c');
-}
-else {
-  $dispatch = false;
-}
 
 /**
  * Index
@@ -106,9 +95,20 @@ else {
 		return;
 	}
 
+if (!isset($NEXUSPHP)) {
+  require_once('../../../include/bittorrent.php');
+  $dispatch = true;
+
+  $s = smarty();
+  $s->addTemplateDir('../../../templates');
+  $s->setCompileDir('../../../templates_c');
+}
+else {
+  $dispatch = false;
+}
+
 if ($dispatch) {
 	App::uses('Dispatcher', 'Routing');
-
 	$Dispatcher = new Dispatcher();
 	$Dispatcher->dispatch(new CakeRequest(), new CakeResponse(array('charset' => Configure::read('App.encoding'))));
 }

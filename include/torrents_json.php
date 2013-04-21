@@ -79,7 +79,7 @@ if($row['storing']==1) {
     if ($enabletooltip_tweak == 'yes') {
       if (!$lastcom = $Cache->get_value('torrent_'.$id.'_last_comment_content')){
 	$res2 = sql_query("SELECT user, added, text FROM comments WHERE torrent = $id ORDER BY id DESC LIMIT 1");
-	$lastcom = mysql_fetch_array($res2);
+	$lastcom = _mysql_fetch_array($res2);
 	$Cache->cache_value('torrent_'.$id.'_last_comment_content', $lastcom, 1855);
       }
       $timestamp = strtotime($lastcom["added"]);

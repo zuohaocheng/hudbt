@@ -17,7 +17,7 @@ function bark($text = "")
 if ($iv == "yes")
 	check_code ($_POST['imagehash'], $_POST['imagestring'],'login.php',true);
 $res = sql_query("SELECT id, passhash, secret, enabled, status FROM users WHERE username = " . sqlesc($username));
-$row = mysql_fetch_array($res);
+$row = _mysql_fetch_array($res);
 
 if (!$row)
 	failedlogins();

@@ -15,7 +15,7 @@ if($CURUSER['id'] == $row['owner']) {
 } else {
 	$sqlCheckDonate = 'SELECT amount, message, action_date FROM donate_bonus WHERE object_id='.$torrent_id.' AND donater_id='.$CURUSER['id'].' AND `type`="torrent"';
 	$result  = sql_query($sqlCheckDonate);
-	$donated = mysql_fetch_assoc($result);
+	$donated = _mysql_fetch_assoc($result);
 	if(!empty($donated)) {
 		echo "<p class=\"donate_note\">你已经于 {$donated['action_date']} 对种子发布者捐赠过 {$donated['amount']} 魔力值，谢谢你！</p>";
 	} else {
@@ -41,7 +41,7 @@ if($Cache->get_value('sign_update_donate_bonus_torrent_'.$torrent_id) == 'no') {
 } else {
 	// 'sign_update_donate_bonus_torrent_{id}' is 'yes' or empty 
 	$donaterRecodes  = array();
-	while($donateInfo = mysql_fetch_assoc($result)) {
+	while($donateInfo = _mysql_fetch_assoc($result)) {
 		$donaterRecodes[] = $donateInfo;
 		$i++;
 	}

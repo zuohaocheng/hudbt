@@ -743,7 +743,7 @@ if (count($_GET) > 0 && !$_GET['h'])
   $query = "SELECT ".$distinct." ".$select_is." ".$querypm;
 
   $res = sql_query($queryc) or sqlerr();
-  $arr = mysql_fetch_row($res);
+  $arr = _mysql_fetch_row($res);
   $count = $arr[0];
 
   $q = isset($q)?($q."&"):"";
@@ -756,7 +756,7 @@ if (count($_GET) > 0 && !$_GET['h'])
 
   $res = sql_query($query) or sqlerr();
 
-  if (mysql_num_rows($res) == 0)
+  if (_mysql_num_rows($res) == 0)
   	stdmsg("Warning","No user was found.");
   else
   {
@@ -775,7 +775,7 @@ if (count($_GET) > 0 && !$_GET['h'])
         "<td class=colhead>pUL</td>".
         "<td class=colhead>pDL</td>".
         "<td class=colhead>History</td></tr>";
-    while ($user = mysql_fetch_array($res))
+    while ($user = _mysql_fetch_array($res))
     {
     	if ($user['added'] == '0000-00-00 00:00:00')
       	$user['added'] = '---';
@@ -786,7 +786,7 @@ if (count($_GET) > 0 && !$_GET['h'])
       {
 	    	$nip = ip2long($user['ip']);
         $auxres = sql_query("SELECT COUNT(*) FROM bans WHERE $nip >= first AND $nip <= last") or sqlerr(__FILE__, __LINE__);
-        $array = mysql_fetch_row($auxres);
+        $array = _mysql_fetch_row($auxres);
     	  if ($array[0] == 0)
       		$ipstr = $user['ip'];
 	  	  else
@@ -796,7 +796,7 @@ if (count($_GET) > 0 && !$_GET['h'])
       	$ipstr = "---";
 
       $auxres = sql_query("SELECT SUM(uploaded) AS pul, SUM(downloaded) AS pdl FROM peers WHERE userid = " . $user['id']) or sqlerr(__FILE__, __LINE__);
-      $array = mysql_fetch_array($auxres);
+      $array = _mysql_fetch_array($auxres);
 
       $pul = $array['pul'];
       $pdl = $array['pdl'];
@@ -805,13 +805,13 @@ if (count($_GET) > 0 && !$_GET['h'])
       	LEFT JOIN forums AS f ON t.forumid = f.id WHERE p.userid = " . $user['id'] . " AND f.minclassread <= " .
       	$CURUSER['class']) or sqlerr(__FILE__, __LINE__);
 
-      $n = mysql_fetch_row($auxres);
+      $n = _mysql_fetch_row($auxres);
       $n_posts = $n[0];
 
       $auxres = sql_query("SELECT COUNT(id) FROM comments WHERE user = ".$user['id']) or sqlerr(__FILE__, __LINE__);
 			// Use LEFT JOIN to exclude orphan comments
       // $auxres = sql_query("SELECT COUNT(c.id) FROM comments AS c LEFT JOIN torrents as t ON c.torrent = t.id WHERE c.user = '".$user['id']."'") or sqlerr(__FILE__, __LINE__);
-      $n = mysql_fetch_row($auxres);
+      $n = _mysql_fetch_row($auxres);
       $n_comments = $n[0];
 
     	echo "<tr><td>" .

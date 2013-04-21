@@ -70,7 +70,7 @@ GROUP BY u.id
 ) AS ipsearch";
 
 	$res = sql_query($queryc) or sqlerr(__FILE__, __LINE__);
-	$row = mysql_fetch_array($res);
+	$row = _mysql_fetch_array($res);
 	$count = $row[0];
 
 	if ($count == 0)
@@ -126,7 +126,7 @@ $limit";
 "<td class=colhead align=center><a class=colhead href=\"?ip=$ip&mask=$mask&order=added\">".$lang_ipsearch['col_added']."</a></td>".
 "<td class=colhead align=center>".$lang_ipsearch['col_invited_by']."</td>");
 
-	while ($user = mysql_fetch_array($res))
+	while ($user = _mysql_fetch_array($res))
 	{
 		if ($user['added'] == '0000-00-00 00:00:00')
 			$added = $lang_ipsearch['text_not_available'];
@@ -141,7 +141,7 @@ $limit";
 			$ipstr = $lang_ipsearch['text_not_available'];
 
 		$resip = sql_query("SELECT ip FROM iplog WHERE userid=" . sqlesc($user['id']) . " GROUP BY iplog.ip") or sqlerr(__FILE__, __LINE__);
-$iphistory = mysql_num_rows($resip);
+$iphistory = _mysql_num_rows($resip);
 
 		if ($user["invited_by"] > 0)
 		{

@@ -29,25 +29,12 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 		global $lang_functions;
 		$where = 'userdetails.php?id='.GUEST_UID;
 		
-		$query = sprintf("SELECT * FROM regimages WHERE imagehash='%s' AND imagestring='%s'",
-						  mysql_real_escape_string($imagehash),
-						  mysql_real_escape_string($imagestring));
+		$sql = sql_query("SELECT * FROM regimages WHERE imagehash=? AND imagestring=?", $imagehash, $imagestring);
+		$imgcheck = _mysql_fetch_array($sql);
 		
-		$sql = sql_query($query);
-		$imgcheck = mysql_fetch_array($sql);
-		
-		if(!$imgcheck['dateline']) {
-		
-			$delete = sprintf("DELETE FROM regimages WHERE imagehash='%s'",
-			mysql_real_escape_string($imagehash));
-			sql_query($delete);
-		}else{
-		
-			$delete = sprintf("DELETE FROM regimages WHERE imagehash='%s'",
-			mysql_real_escape_string($imagehash));
-			sql_query($delete);
-			return true;
-			
+		sql_query('DELETE FROM regimages WHERE imagehash=', [$imagehash]);
+		if($imgcheck['dateline']) {
+		  return true;
 		}
 	}
 	$accountBindSuccsess = false;
@@ -61,7 +48,7 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 			echo '<br /><br />';
 		} else {
 			$res = sql_query("SELECT id, passhash, secret, enabled, status FROM users WHERE username = " . sqlesc($_POST['username']));
-			$row = mysql_fetch_array($res);
+			$row = _mysql_fetch_array($res);
 			if (!$row) {
 				stdmsg('HUDBT 账号绑定', 'HUDBT 账号不正确或者不存在');
 				echo '<br /><br />';
@@ -94,7 +81,7 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 
 	if ($id != $CURUSER['id']){
 		$r = sql_query("SELECT * FROM users WHERE id=".sqlesc($id)) or sqlerr(__FILE__, __LINE__);
-		$user = mysql_fetch_array($r) or bark($lang_userdetails['std_no_such_user']);
+		$user = _mysql_fetch_array($r) or bark($lang_userdetails['std_no_such_user']);
 		$groups = get_user_group($id);
 		$user['usergroups'] = $groups;
 	}
@@ -117,10 +104,10 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 		$lastseen .= " (" . gettime($lastseen, true, false, true).")";
 	}
 	$res = sql_query("SELECT COUNT(*) FROM comments WHERE user=" . $user[id]) or sqlerr();
-	$arr3 = mysql_fetch_row($res);
+	$arr3 = _mysql_fetch_row($res);
 	$torrentcomments = $arr3[0];
 	$res = sql_query("SELECT COUNT(*) FROM posts WHERE userid=" . $user[id]) or sqlerr();
-	$arr3 = mysql_fetch_row($res);
+	$arr3 = _mysql_fetch_row($res);
 	$forumposts = $arr3[0];
 
 		$arr = get_country_row($user[country]);
@@ -153,9 +140,9 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 	elseif ($CURUSER["id"] != $user["id"])
 	{
 		$r = sql_query("SELECT id FROM friends WHERE userid=$CURUSER[id] AND friendid=$id") or sqlerr(__FILE__, __LINE__);
-		$friend = mysql_num_rows($r);
+		$friend = _mysql_num_rows($r);
 		$r = sql_query("SELECT id FROM blocks WHERE userid=$CURUSER[id] AND blockid=$id") or sqlerr(__FILE__, __LINE__);
-		$block = mysql_num_rows($r);
+		$block = _mysql_num_rows($r);
 
 		print('<div class="minor-list list-seperator minor-nav"><ul><li>');
 		if ($friend)
@@ -182,18 +169,18 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 		if (isset($CURUSER) && $CURUSER[id] != $user[id])
 		{
 			$user_snatched = sql_query("SELECT * FROM snatched WHERE userid = $CURUSER[id]") or sqlerr(__FILE__, __LINE__);
-			if(mysql_num_rows($user_snatched) == 0)
+			if(_mysql_num_rows($user_snatched) == 0)
 			$compatibility_info = $lang_userdetails['text_unknown'];
 			else
 			{
-				while ($user_snatched_arr = mysql_fetch_array($user_snatched))
+				while ($user_snatched_arr = _mysql_fetch_array($user_snatched))
 				{
 					$torrent_2_user_value = get_torrent_2_user_value($user_snatched_arr);
 
 					$user_snatched_res_target = sql_query("SELECT * FROM snatched WHERE torrentid = " . $user_snatched_arr['torrentid'] . " AND userid = " . $user[id]) or sqlerr(__FILE__, __LINE__);	//
-					if(mysql_num_rows($user_snatched_res_target) == 1)	// have other peole snatched this torrent
+					if(_mysql_num_rows($user_snatched_res_target) == 1)	// have other peole snatched this torrent
 					{
-						$user_snatched_arr_target = mysql_fetch_array($user_snatched_res_target) or sqlerr(__FILE__, __LINE__);	// find target user's current analyzing torrent's snatch info
+						$user_snatched_arr_target = _mysql_fetch_array($user_snatched_res_target) or sqlerr(__FILE__, __LINE__);	// find target user's current analyzing torrent's snatch info
 						$torrent_2_user_value_target = get_torrent_2_user_value($user_snatched_arr_target);	//get this torrent to target user's value
 
 						if(!isset($other_user_2_curuser_value[$user_snatched_arr_target['userid']]))	// first, set to 0
@@ -262,15 +249,12 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 		}
 		tr_small($lang_userdetails['row_join_date'], $joindate, 1);
 		tr_small($lang_userdetails['row_last_seen'], $lastseen, 1);
-	if ($where_tweak == "yes") {
-		tr_small($lang_userdetails['row_last_seen_location'], $user[page], 1);
-	}
 	if (get_user_class() >= $userprofile_class OR $user["privacy"] == "low") {
 		tr_small($lang_userdetails['row_email'], "<a href=\"mailto:".$user[email]."\">".$user[email]."</a>", 1);
 	}
 	if (get_user_class() >= $userprofile_class) {
 		$resip = sql_query("SELECT ip FROM iplog WHERE userid =$id GROUP BY ip") or sqlerr(__FILE__, __LINE__);
-		$iphistory = mysql_num_rows($resip);
+		$iphistory = _mysql_num_rows($resip);
 
 		if ($iphistory > 0)
 		tr_small($lang_userdetails['row_ip_history'], $lang_userdetails['text_user_earlier_used']."<b><a href=\"iphistory.php?id=" . $user['id'] . "\">" . $iphistory. $lang_userdetails['text_different_ips'].add_s($iphistory, true)."</a></b>", 1);
@@ -287,11 +271,11 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 	}
 
 	$res = sql_query("SELECT agent, peer_id, ip, port FROM peers WHERE userid = $user[id] GROUP BY agent") or sqlerr();
-	if (mysql_num_rows($res) > 0)
+	if (_mysql_num_rows($res) > 0)
 	{
 		$first = true;
 		$clientselect = "";
-		while($arr = mysql_fetch_assoc($res))
+		while($arr = _mysql_fetch_assoc($res))
 		{
 			$clientselect .= ($first == true ? "" : " ; ") . get_agent($arr["peer_id"], $arr["agent"]);
 			$first = false;
@@ -377,12 +361,12 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 	elseif ($user["acceptpms"] == "yes")
 	{
 		$r = sql_query("SELECT id FROM blocks WHERE userid=$user[id] AND blockid=$CURUSER[id]") or sqlerr(__FILE__,__LINE__);
-		$showpmbutton = (mysql_num_rows($r) == 1 ? 0 : 1);
+		$showpmbutton = (_mysql_num_rows($r) == 1 ? 0 : 1);
 	}
 	elseif ($user["acceptpms"] == "friends")
 	{
 		$r = sql_query("SELECT id FROM friends WHERE userid=$user[id] AND friendid=$CURUSER[id]") or sqlerr(__FILE__,__LINE__);
-		$showpmbutton = (mysql_num_rows($r) == 1 ? 1 : 0);
+		$showpmbutton = (_mysql_num_rows($r) == 1 ? 1 : 0);
 	}
 	if ($CURUSER["id"] != $user["id"]){
 	print("<tr><td colspan=\"2\" align=\"center\">");
@@ -486,7 +470,7 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 			if ($user["warnedby"] != "System")
 			{
 				$res = sql_query("SELECT id, username, warnedby FROM users WHERE id = " . $user['warnedby'] . "") or sqlerr(__FILE__,__LINE__);
-				$arr = mysql_fetch_assoc($res);
+				$arr = _mysql_fetch_assoc($res);
 				$warnedby = "<br />[".$lang_userdetails['text_by']."<u>" . get_username($arr['id']) . "</u></a>]";
 			}else{
 				$warnedby = "<br />[".$lang_userdetails['text_by_system']."]";

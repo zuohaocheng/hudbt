@@ -34,7 +34,7 @@ function success($action) {
      header("Location: mybonus.php?do=$action");
   }
   else {
-    $row = mysql_fetch_array(sql_query("SELECT seedbonus, title, uploaded, invites,color FROM users WHERE id=".sqlesc($CURUSER['id']))) or sqlerr(__FILE__, __LINE__);
+    $row = _mysql_fetch_array(sql_query("SELECT seedbonus, title, uploaded, invites,color FROM users WHERE id=".sqlesc($CURUSER['id']))) or sqlerr(__FILE__, __LINE__);
     echo php_json_encode(array('success' => true, 'title' => '成功', 'text' => bonusTextFromAction($action, $row['title']), 'bonus' => number_format($row['seedbonus'], 1), 'uploaded' => mksize($row['uploaded']), 'invites' => $row['invites']));
   }
 
@@ -165,7 +165,7 @@ if($CURUSER['seedbonus'] >= $points) {
     else {
       $usernamegift = sqlesc(trim($_REQUEST["username"]));
       $res = sql_query("SELECT id, bonuscomment FROM users WHERE username=" . $usernamegift);
-      $arr = mysql_fetch_assoc($res);
+      $arr = _mysql_fetch_assoc($res);
       $useridgift = $arr['id'];
     }
     $userseedbonus = $arr['seedbonus'];

@@ -41,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 	if (!check_email($email))
 	failedlogins($lang_confirm_resend['std_invalid_email_address'],true);
 	$res = sql_query("SELECT * FROM users WHERE email=" . sqlesc($email) . " LIMIT 1") or sqlerr(__FILE__, __LINE__);
-	$arr = mysql_fetch_assoc($res) or failedlogins($lang_confirm_resend['std_email_not_found'],true);
+	$arr = _mysql_fetch_assoc($res) or failedlogins($lang_confirm_resend['std_email_not_found'],true);
 	if($arr["status"] != "pending") failedlogins($lang_confirm_resend['std_user_already_confirm'],true);
 	
 	if ($wantpassword != $passagain)
@@ -62,7 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 
 	sql_query("UPDATE LOW_PRIORITY users SET passhash=" .sqlesc($wantpasshash) . ",secret=" . sqlesc($secret) . ",editsecret=" . sqlesc($editsecret) . " WHERE id=" . sqlesc($arr["id"])) or sqlerr(__FILE__, __LINE__);
 	
-	if (!mysql_affected_rows())
+	if (!_mysql_affected_rows())
 	stderr($lang_confirm_resend['std_error'], $lang_confirm_resend['std_database_error']);
 
 	$psecret = md5($editsecret);

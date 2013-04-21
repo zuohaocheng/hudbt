@@ -57,7 +57,7 @@ class ADVERTISEMENT{
 			{
 				$res = 	sql_query("SELECT code FROM advertisements WHERE enabled=1 AND position=".sqlesc($pos)." AND (starttime IS NULL OR starttime < ".sqlesc($now).") AND (endtime IS NULL OR endtime > ".sqlesc($now).") ORDER BY displayorder ASC, id DESC LIMIT 10") or sqlerr(__FILE__, __LINE__);
 				$adarray = array();
-				while($row = mysql_fetch_array($res))
+				while($row = _mysql_fetch_array($res))
 					$adarray[]=$row['code'];
 				$arr[$pos]=$adarray;
 			}

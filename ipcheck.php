@@ -21,18 +21,18 @@ if (get_user_class() >= UC_MODERATOR || $CURUSER["guard"] == "yes")
  <td class=colhead width=125>IP</td>
  <td class=colhead width=40>Peer</td></tr>\n");
  $uc = 0;
-  while($ras = mysql_fetch_assoc($res))
+  while($ras = _mysql_fetch_assoc($res))
   {
 	if ($ras["dupl"] <= 1)
 	  break;
 	if ($ip <> $ras['ip'])
     {
 	  $ros = sql_query("SELECT  id, username, email, added, last_access, downloaded, uploaded, ip, warned, donor, enabled FROM users WHERE ip='".$ras['ip']."' ORDER BY id") or sqlerr();
-	  $num2 = mysql_num_rows($ros);
+	  $num2 = _mysql_num_rows($ros);
 	  if ($num2 > 1)
 	  {
 		$uc++;
-	    while($arr = mysql_fetch_assoc($ros))
+	    while($arr = _mysql_fetch_assoc($ros))
 		{
 		  if ($arr['added'] == '0000-00-00 00:00:00')
 			$arr['added'] = '-';
@@ -54,7 +54,7 @@ if (get_user_class() >= UC_MODERATOR || $CURUSER["guard"] == "yes")
 			$utc = " bgcolor=\"ECE9D8\"";
 			
 			$peer_res = sql_query("SELECT count(*) FROM peers WHERE ip = " . sqlesc($ras['ip']) . " AND userid = " . $arr['id']);
-			$peer_row = mysql_fetch_row($peer_res);
+			$peer_row = _mysql_fetch_row($peer_res);
 		  print("<tr$utc><td align=left>" . get_username($arr["id"])."</td>
 				  <td align=center>$arr[email]</td>
 				  <td align=center>$added</td>

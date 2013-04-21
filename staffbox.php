@@ -38,7 +38,7 @@ if (!$action) {
 
 	$res = sql_query("SELECT staffmessages.id, staffmessages.added, staffmessages.subject, staffmessages.answered, staffmessages.answeredby, staffmessages.sender, staffmessages.answer FROM staffmessages ORDER BY id desc $limit");
 
-	while ($arr = mysql_fetch_assoc($res))
+	while ($arr = _mysql_fetch_assoc($res))
 	{
     		if ($arr[answered])
     		{
@@ -71,7 +71,7 @@ if ($action == "viewpm")
 $pmid = 0 + $_GET["pmid"];
 
 $ress4 = sql_query("SELECT * FROM staffmessages WHERE id=".sqlesc($pmid));
-$arr4 = mysql_fetch_assoc($ress4);
+$arr4 = _mysql_fetch_assoc($ress4);
 
 $answeredby = get_username($arr4["answeredby"]);
 
@@ -130,14 +130,14 @@ if ($action == "answermessage") {
 
         int_check($receiver,true);
 
-        $res = sql_query("SELECT * FROM users WHERE id=$receiver") or die(mysql_error());
-        $user = mysql_fetch_assoc($res);
+        $res = sql_query("SELECT * FROM users WHERE id=$receiver") or die(_mysql_error());
+        $user = _mysql_fetch_assoc($res);
 
         if (!$user)
    		stderr($lang_staffbox['std_error'], $lang_staffbox['std_no_user_id']);
 
-        $res2 = sql_query("SELECT * FROM staffmessages WHERE id=$answeringto") or die(mysql_error());
-        $staffmsg = mysql_fetch_assoc($res2);
+        $res2 = sql_query("SELECT * FROM staffmessages WHERE id=$answeringto") or die(_mysql_error());
+        $staffmsg = _mysql_fetch_assoc($res2);
 	stdhead($lang_staffbox['head_answer_to_staff_pm']);
 	begin_main_frame();
         ?>
@@ -235,12 +235,12 @@ if ($action == "takecontactanswered") {
 
 if ($_POST['setdealt']){
 	$res = sql_query ("SELECT id FROM staffmessages WHERE answered=0 AND id IN (" . implode(", ", $_POST[setanswered]) . ")");
-	while ($arr = mysql_fetch_assoc($res))
+	while ($arr = _mysql_fetch_assoc($res))
 		sql_query ("UPDATE staffmessages SET answered=1, answeredby = $CURUSER[id] WHERE id = $arr[id]") or sqlerr();
 }
 elseif ($_POST['delete']){
 	$res = sql_query ("SELECT id FROM staffmessages WHERE id IN (" . implode(", ", $_POST[setanswered]) . ")");
-	while ($arr = mysql_fetch_assoc($res))
+	while ($arr = _mysql_fetch_assoc($res))
 		sql_query ("DELETE FROM staffmessages WHERE id = $arr[id]") or sqlerr();
 }
 $Cache->delete_value('staff_new_message_count');

@@ -25,7 +25,7 @@ if (is_array($updateset)) {
 }
 $subject = trim($_POST['subject']);
 $query = sql_query("SELECT id FROM users WHERE class IN (".implode(",", $updateset).")");
-while($dat=mysql_fetch_assoc($query))
+while($dat=_mysql_fetch_assoc($query))
 {
 	sql_query("INSERT INTO messages (sender, receiver, added,  subject, msg) VALUES ($sender_id, $dat[id], $dt, " . sqlesc($subject) .", " . sqlesc($msg) .")") or sqlerr(__FILE__,__LINE__);
 }

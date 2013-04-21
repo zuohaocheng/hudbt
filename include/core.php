@@ -43,3 +43,82 @@ function get_langfolder_list() {
 	//do not access db for speed up, or for flexibility
 	return array("en", "chs", "cht", "ko", "ja");
 }
+
+if (defined('ANNOUNCE')) {
+  require('cake/app/Config/database.php');
+  try {
+    $config = new DATABASE_CONFIG();
+    $default = $config->default;
+    $dsn = 'mysql:dbname=' . $default['database'] . ';host=' . $default['host'];
+    $pdo = new PDO($dsn, $default['login'], $default['password']);
+  } catch (PDOException $e) {
+    die('dbconn: mysql_pconnect: ' . $e->getMessage());
+  }
+}
+else {
+  if (!defined('HB_CAKE')) {
+    require_once('./cake/app/webroot/index.php');
+  }
+  App::uses('ConnectionManager', 'Model');
+  $datasource = ConnectionManager::getDataSource('default');
+  $pdo = $datasource->getConnection();
+}
+
+  // Set this will cause named parameters can't be use
+  //$pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+  $lastStmt;
+
+function _mysql_query($q, $args=[]) {
+  global $pdo, $lastStmt;
+  try {
+    if ($args) {
+      $lastStmt = $pdo->prepare($q);
+      $lastStmt->execute($args);
+    }
+    else {
+      $lastStmt = $pdo->query($q);
+    }
+  }
+  catch (PDOException $e) {
+    if (function_exists('sqlerr')) {
+      sqlerr(__FILE__, __LINE__, true, $q, $args, $e);
+    }
+  }
+  return $lastStmt;
+}
+
+function sql_fetchAll($q, $args) {
+  $stmt = sql_query($q, $args);
+  return $stmt->fetchAll();
+}
+
+function _mysql_insert_id() {
+  global $pdo;
+  return $pdo->lastInsertId();
+}
+
+function _mysql_error() {
+  global $pdo;
+  return implode(', ', $pdo->errorInfo());
+}
+
+function _mysql_affected_rows() {
+  global $lastStmt;
+  return $lastStmt->rowCount();
+}
+
+function _mysql_num_rows($stmt) {
+  return $stmt->rowCount();
+}
+
+function _mysql_fetch_row($stmt) {
+  return $stmt->fetch(PDO::FETCH_NUM);
+}
+
+function _mysql_fetch_assoc($stmt) {
+  return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+function _mysql_fetch_array($stmt) {
+  return $stmt->fetch();
+}

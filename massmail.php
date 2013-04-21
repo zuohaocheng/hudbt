@@ -10,7 +10,7 @@ $or = $_POST["or"];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST")
 {
-$res = sql_query("SELECT id, username, email FROM users WHERE class $or ".mysql_real_escape_string($class)) or sqlerr(__FILE__, __LINE__);
+  $res = sql_query("SELECT id, username, email FROM users WHERE class $or ?", [$class]);
 
 $subject = substr(htmlspecialchars(trim($_POST["subject"])), 0, 80);
 if ($subject == "") $subject = "(no subject)";
@@ -19,7 +19,7 @@ $subject = "Fw: $subject";
 $message1 = htmlspecialchars(trim($_POST["message"]));
 if ($message1 == "") stderr("Error", "Empty message!");
 
-while($arr=mysql_fetch_array($res)){
+while($arr=_mysql_fetch_array($res)){
 
 $to = $arr["email"];
 

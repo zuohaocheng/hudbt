@@ -13,7 +13,7 @@ $donated = sqlesc($_POST["donated"]);
 
 sql_query("UPDATE LOW_PRIORITY users SET donated=$donated WHERE username=$username") or sqlerr(__FILE__, __LINE__);
 $res = sql_query("SELECT id FROM users WHERE username=$username");
-$arr = mysql_fetch_row($res);
+$arr = _mysql_fetch_row($res);
 if (!$arr)
 stderr("Error", "Unable to update account.");
 header("Location: " . get_protocol_prefix() . "$BASEURL/userdetails.php?id=$arr[0]");

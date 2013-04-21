@@ -43,7 +43,7 @@ if (!$my_img = unserialize($Cache->get_value('userbar_'.$_SERVER['REQUEST_URI'])
   }
   
   $res = sql_query("SELECT username, uploaded, downloaded, class, privacy FROM users WHERE id=".sqlesc($userid)." LIMIT 1");
-  $row = mysql_fetch_array($res);
+  $row = _mysql_fetch_array($res);
   if (!$row) {
     die;
   }

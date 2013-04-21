@@ -23,11 +23,11 @@ stdhead("Stats");
 begin_main_frame();
 
 $res = sql_query("/*".__FILE__."*/SELECT COUNT(*) FROM torrents") or sqlerr(__FILE__, __LINE__);
-$n = mysql_fetch_row($res);
+$n = _mysql_fetch_row($res);
 $n_tor = $n[0];
 
 $res = sql_query("SELECT COUNT(*) FROM peers") or sqlerr(__FILE__, __LINE__);
-$n = mysql_fetch_row($res);
+$n = _mysql_fetch_row($res);
 $n_peers = $n[0];
 
 $uporder = $_GET['uporder'];
@@ -50,7 +50,7 @@ $query = "SELECT u.id, u.username AS name, MAX(t.added) AS last, COUNT(DISTINCT 
 
 $res = sql_query($query) or sqlerr(__FILE__, __LINE__);
 
-if (mysql_num_rows($res) == 0)
+if (_mysql_num_rows($res) == 0)
 	stdmsg("Sorry...", "No uploaders.");
 else
 {
@@ -64,7 +64,7 @@ else
 	<td class=colhead><a href=\"" . $_SERVER['PHP_SELF'] . "?uporder=peers&catorder=$catorder\" class=colheadlink>Peers</a></td>\n
 	<td class=colhead>Perc.</td>\n
 	</tr>\n");
-	while ($uper = mysql_fetch_array($res))
+	while ($uper = _mysql_fetch_array($res))
 	{
 		print("<tr><td>" . get_username($uper['id']) . "</td>\n");
 		print("<td " . ($uper['last']?(">".$uper['last']." (".get_elapsed_time(strtotime($uper['last']))." ago)"):"align=center>---") . "</td>\n");
@@ -102,7 +102,7 @@ else
 	<td class=colhead>Perc.</td>
 	<td class=colhead><a href=\"" . $_SERVER['PHP_SELF'] . "?uporder=$uporder&catorder=peers\" class=colheadlink>Peers</a></td>
 	<td class=colhead>Perc.</td></tr>\n");
-	while ($cat = mysql_fetch_array($res))
+	while ($cat = _mysql_fetch_array($res))
 	{
 		print("<tr><td class=rowhead>" . $cat['name'] . "</b></a></td>");
 		print("<td " . ($cat['last']?(">".$cat['last']." (".get_elapsed_time(strtotime($cat['last']))." ago)"):"align = center>---") ."</td>");

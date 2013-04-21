@@ -133,7 +133,7 @@ if (!$Cache->get_page()){
 	$searchres = sql_query("SELECT keywords, COUNT(DISTINCT userid) as count FROM suggest WHERE adddate >" . $dt . " GROUP BY keywords ORDER BY count DESC LIMIT 15") or sqlerr();
 	$hotcount = 0;
 	$hotsearch = "";
-	while ($searchrow = mysql_fetch_assoc($searchres))
+	while ($searchrow = _mysql_fetch_assoc($searchres))
 	{
 		$hotsearch .= "<li><a href=\"".htmlspecialchars("?search=" . rawurlencode($searchrow["keywords"]) . "&notnewword=1")."\">" . $searchrow["keywords"] . '</a></li>';
 		$hotcount += mb_strlen($searchrow["keywords"],"UTF-8");

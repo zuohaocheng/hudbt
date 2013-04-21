@@ -367,15 +367,15 @@ if (!$ret) {
 	if (mysql_errno() == 1062){
 		$dupequery = "SELECT id FROM torrents where info_hash=".sqlesc(stripslashes($infohash));
 		$duperes = sql_query($dupequery)or sqlerr(__FILE__, __LINE__);
-		$dupearr = mysql_fetch_row($duperes);
+		$dupearr = _mysql_fetch_row($duperes);
 		$dupeid = $dupearr[0];
 		$torrlink = sprintf($lang_takeupload['std_click_it'],$dupeid);
 		stderr($lang_takeupload['std_upload_failed'],$lang_takeupload['std_torrent_existed'].$torrlink,false);
 	}
-	bark("mysql puked: ".mysql_error());
-	//bark("mysql puked: ".preg_replace_callback('/./s', "hex_esc2", mysql_error()));
+	bark("mysql puked: "._mysql_error());
+	//bark("mysql puked: ".preg_replace_callback('/./s', "hex_esc2", _mysql_error()));
 }
-$id = mysql_insert_id();
+$id = _mysql_insert_id();
 
 @sql_query("DELETE FROM files WHERE torrent = $id");
 foreach ($filelist as $file) {
@@ -415,7 +415,7 @@ write_log("Torrent $id ($torrent) was uploaded by $anon");
 if ($is_offer) {
 	$res = sql_query("SELECT `userid` FROM `offervotes` WHERE `userid` != " . $CURUSER["id"] . " AND `offerid` = ". sqlesc($offerid)." AND `vote` = 'yeah'") or sqlerr(__FILE__, __LINE__);
 
-	while($row = mysql_fetch_assoc($res)) 
+	while($row = _mysql_fetch_assoc($res)) 
 	{
 		$pn_msg = $lang_takeupload_target[get_user_lang($row["userid"])]['msg_offer_you_voted'].$torrent.$lang_takeupload_target[get_user_lang($row["userid"])]['msg_was_uploaded_by']. $CURUSER["username"] .$lang_takeupload_target[get_user_lang($row["userid"])]['msg_you_can_download'] ."[url=" . get_protocol_prefix() . "$BASEURL/details.php?id=$id&hit=1]".$lang_takeupload_target[get_user_lang($row["userid"])]['msg_here']."[/url]";
 		
@@ -481,7 +481,7 @@ $body_arr[$langfolder_array[$i]] = str_replace("<br />","<br />",nl2br($body_arr
 	$i++;
 }
 
-while($arr = mysql_fetch_array($res)) {
+while($arr = _mysql_fetch_array($res)) {
   $current_lang = $arr["lang"];
   $to = $arr["email"];
 

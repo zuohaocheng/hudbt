@@ -19,11 +19,11 @@ $r = "d" . benc_str("files") . "d";
 
 $res = sql_query($query);
 
-if (mysql_num_rows($res) < 1){
+if (_mysql_num_rows($res) < 1){
 	err("Torrent not registered with this tracker.");
 }
 
-while ($row = mysql_fetch_assoc($res)) {
+while ($row = _mysql_fetch_assoc($res)) {
 	$r .= "20:" . hash_pad($row["info_hash"]) . "d" .
 		benc_str("complete") . "i" . $row["seeders"] . "e" .
 		benc_str("downloaded") . "i" . $row["times_completed"] . "e" .

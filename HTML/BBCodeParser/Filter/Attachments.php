@@ -22,7 +22,7 @@ class HTML_BBCodeParser_Filter_Attachments extends HTML_BBCodeParser_Filter {
 
     if (!$row = $Cache->get_value('attachment_'.$dlkey.'_content')) {
       $res = sql_query("SELECT * FROM attachments WHERE dlkey=".sqlesc($dlkey)." LIMIT 1") or sqlerr(__FILE__,__LINE__);
-      $row = mysql_fetch_array($res);
+      $row = _mysql_fetch_array($res);
       $Cache->cache_value('attachment_'.$dlkey.'_content', $row, 86400);
     }
 

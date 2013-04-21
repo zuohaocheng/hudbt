@@ -11,7 +11,7 @@ begin_frame("Warned Users: ($warned)", true);
 begin_table();
 
 $res = sql_query("SELECT * FROM users WHERE warned=1 AND enabled='yes' ORDER BY (users.uploaded/users.downloaded)") or sqlerr();
-$num = mysql_num_rows($res);
+$num = _mysql_num_rows($res);
 print("<table border=1 width=675 cellspacing=0 cellpadding=2><form action=\"nowarn.php\" method=post>\n");
 print("<tr align=center><td class=colhead width=90>User Name</td>
  <td class=colhead width=70>Registered</td>
@@ -25,7 +25,7 @@ print("<tr align=center><td class=colhead width=90>User Name</td>
  <td class=colhead width=65>Disable<br>Account</td></tr>\n");
 for ($i = 1; $i <= $num; $i++)
 {
-$arr = mysql_fetch_assoc($res);
+$arr = _mysql_fetch_assoc($res);
 if ($arr['added'] == '0000-00-00 00:00:00')
   $arr['added'] = '-';
 if ($arr['last_access'] == '0000-00-00 00:00:00')
