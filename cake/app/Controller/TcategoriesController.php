@@ -10,10 +10,6 @@ parked();
  * @property Tcategory $Tcategory
  */
 
-dbconn();
-loggedinorreturn();
-parked();
-
 class TcategoriesController extends AppController {
 
   public $components = array('RequestHandler');

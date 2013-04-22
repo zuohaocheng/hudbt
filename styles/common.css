@@ -137,4 +137,7 @@ td.torrent {
 .progress.uploaded.seeding {background-color: sandybrown}
 .progress.uploaded {background-color: #FAD7B7}
 
-img.game_video{background: url(game_video.png) no-repeat top left; width: 46px; height: 46px; } 
+img.game_video{background: url(../pic/category/chd/modern/sprite.png) no-repeat top left; background-position: 0 -1457px; width: 46px; height: 46px; } 
+img.ebook{background: url(../pic/category/chd/modern/sprite.png) no-repeat top left; background-position: 0 -1504px; width: 46px; height: 46px; } 
+
+.category-icon img {display: block;}

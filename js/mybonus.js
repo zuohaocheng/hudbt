@@ -110,10 +110,12 @@ $(function() {
     (function() {
 	var color = $('.color')[0];
 	if (color.type !== 'color') { // type=color supported
-	    console.log(color.value);
 	    color.value = color.value.replace(/#/, '');
-	    console.log(color.value);
 	    jscolor.bind();
 	}
+
+	$('#color-default').click(function() {
+	    color.disabled = this.checked;
+	});
     })();
 });

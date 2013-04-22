@@ -64,9 +64,9 @@ else {
   $pdo = $datasource->getConnection();
 }
 
-  // Set this will cause named parameters can't be use
-  //$pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-  $lastStmt;
+// Set this will cause named parameters can't be use
+//$pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+$lastStmt;
 
 function _mysql_query($q, $args=[]) {
   global $pdo, $lastStmt;

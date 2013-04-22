@@ -1,7 +1,6 @@
 <?php
 require_once("include/benc.php");
 require_once("include/bittorrent.php");
-
 ini_set("upload_max_filesize",$max_torrent_size);
 dbconn();
 require_once(get_langfile_path());
@@ -220,6 +219,13 @@ list($ann, $info) = dict_check($dict, "announce(string):info");
 
 $infohash = pack("H*", sha1($info["string"]));
 
+$dupid = get_single_value('torrents', 'id', 'WHERE info_hash= ?', [stripslashes($infohash)]);
+
+if ($dupid !== false) {
+  $torrlink = sprintf($lang_takeupload['std_click_it'],$dupeid);
+  stderr($lang_takeupload['std_upload_failed'],$lang_takeupload['std_torrent_existed'].$torrlink,false);
+}
+
 function hex_esc2($matches) {
 	return sprintf("%02x", ord($matches[0]));
 }
@@ -361,26 +367,26 @@ foreach ($promotionrules_torrent as $rule)
 }
 }
 
-$ret = sql_query("INSERT INTO torrents (filename, owner, visible, anonymous, name, size, numfiles, type, url, small_descr, descr, ori_descr, category, source, medium, codec, audiocodec, standard, processing, team, save_as, sp_state, added, last_action, nfo, info_hash) VALUES (".sqlesc($fname).", ".sqlesc($CURUSER["id"]).", 'yes', ".sqlesc($anonymous).", ".sqlesc($torrent).", ".sqlesc($totallen).", ".count($filelist).", ".sqlesc($type).", ".sqlesc($url).", ".sqlesc($small_descr).", ".sqlesc($descr).", ".sqlesc($descr).", ".sqlesc($catid).", ".sqlesc($sourceid).", ".sqlesc($mediumid).", ".sqlesc($codecid).", ".sqlesc($audiocodecid).", ".sqlesc($standardid).", ".sqlesc($processingid).", ".sqlesc($teamid).", ".sqlesc($dname).", ".sqlesc($sp_state) .
-		 ", " . sqlesc(date("Y-m-d H:i:s")) . ", " . sqlesc(date("Y-m-d H:i:s")) . ", ".sqlesc($nfo).", " . sqlesc(stripslashes($infohash)). ")");
-if (!$ret) {
-	if (mysql_errno() == 1062){
-		$dupequery = "SELECT id FROM torrents where info_hash=".sqlesc(stripslashes($infohash));
-		$duperes = sql_query($dupequery)or sqlerr(__FILE__, __LINE__);
-		$dupearr = _mysql_fetch_row($duperes);
-		$dupeid = $dupearr[0];
-		$torrlink = sprintf($lang_takeupload['std_click_it'],$dupeid);
-		stderr($lang_takeupload['std_upload_failed'],$lang_takeupload['std_torrent_existed'].$torrlink,false);
-	}
-	bark("mysql puked: "._mysql_error());
-	//bark("mysql puked: ".preg_replace_callback('/./s', "hex_esc2", _mysql_error()));
-}
+sql_query("INSERT INTO torrents (filename, owner, visible, anonymous, name, size, numfiles, type, url, small_descr, descr, ori_descr, category, source, medium, codec, audiocodec, standard, processing, team, save_as, sp_state, added, last_action, nfo, info_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [$fname, $CURUSER["id"], 'yes', $anonymous, $torrent, $totallen, count($filelist), $type, $url, $small_descr, $descr, $descr, $catid, $sourceid, $mediumid, $codecid, $audiocodecid, $standardid, $processingid, $teamid, $dname, $sp_state, date("Y-m-d H:i:s"), date("Y-m-d H:i:s"), $nfo, stripslashes($infohash)]);
+
 $id = _mysql_insert_id();
 
-@sql_query("DELETE FROM files WHERE torrent = $id");
+sql_query("DELETE FROM files WHERE torrent = ?", [$id]);
+
+$sql = "INSERT INTO files (torrent, filename, size) VALUES (?,?,?)";
+$first = true;
+$args = [];
 foreach ($filelist as $file) {
-	@sql_query("INSERT INTO files (torrent, filename, size) VALUES ($id, ".sqlesc($file[0]).",".$file[1].")");
+  if ($first) {
+    $first = false;
+  }
+  else {
+    $sql .= ',(?,?,?)';
+  }
+  array_push($args, $id, $file[0], $file[1]);
 }
+
+sql_query($sql, $args);
 
 //move_uploaded_file($tmpname, "$torrent_dir/$id.torrent");
 $fp = fopen("$torrent_dir/$id.torrent", "w");

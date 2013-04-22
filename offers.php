@@ -816,7 +816,7 @@ print("<td class=\"colhead\">".$lang_offers['col_offered_by']."</td>".
 	elseif ($arr["allowed"] == 'denied')
 	  $allowed = "&nbsp;[<span class=\"offer-denied\">".$lang_offers['text_denied']."</span>]</b>";
 	elseif ($arr["allowed"] == 'frozen')
-	  $allowed = "&nbsp;[<span class=\"offer-frozen\">".$lang_offers['text_denied']."</span>]</b>";
+	  $allowed = "&nbsp;[<span class=\"offer-frozen\">冻结</span>]</b>";
 	else
 	  $allowed = "&nbsp;[<span class=\"offer-pending\">".$lang_offers['text_pending']."</span>]";
 	//===end

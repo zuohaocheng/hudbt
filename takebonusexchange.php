@@ -23,7 +23,7 @@ function error($heading, $text) {
     stderr($heading, $text);
   }
   elseif ($format == 'json') {
-    echo php_json_encode(array('title' => $heading, 'text' => $text));
+    echo json_encode(array('title' => $heading, 'text' => $text));
   }
   die();
 }
@@ -109,14 +109,27 @@ if($CURUSER['seedbonus'] >= $points) {
     success('title');
   }
    elseif($art == "color") {
-    //===custom title
-    $color = $_POST["color"];
-    if(strlen($color)==7){
-  		$color = substr($color, 1, 6);
-  	}
-    $color = sqlesc($color);
+     //===custom title
+     if (isset($_REQUEST['color-default'])) {
+       if (is_null($CURUSER['color'])) {
+	 error('别无聊啦', '根本就没换嘛，小心扣你233魔力值做惩罚噢!');
+       }
+
+       $color = null;
+     }
+     else {
+       $color = $_REQUEST["color"];
+       if(strlen($color)==7){
+	 $color = substr($color, 1, 6);
+       }
+
+       if ($color == $CURUSER['color']) {
+	 error('别无聊啦', '根本就没换嘛，小心扣你233魔力值做惩罚噢!');
+       }
+     }
+    
     $bonuscomment = date("Y-m-d") . " - " .$points. " Points for custom color. New color is $color\n " .htmlspecialchars($bonuscomment);
-    sql_query("UPDATE LOW_PRIORITY users SET color = $color, seedbonus = seedbonus - $points, bonuscomment = ".sqlesc($bonuscomment)." WHERE id = ".sqlesc($userid)) or sqlerr(__FILE__, __LINE__);
+    sql_query("UPDATE LOW_PRIORITY users SET color = ?, seedbonus = seedbonus - ?, bonuscomment = ? WHERE id = ?", [$color, $points, $bonuscomment,$userid]) or sqlerr(__FILE__, __LINE__);
     success('color');
   }
   elseif($art == "noad" && $enablead_advertisement == 'yes' && $enablebonusnoad_advertisement == 'yes') {
@@ -161,22 +174,22 @@ if($CURUSER['seedbonus'] >= $points) {
     //==gift for peeps with no more options
     if (isset($_REQUEST['userid'])) {
       $useridgift = 0 + $_REQUEST['userid'];
+      $usernamegift = get_user_row($useridgift)['username'];
     }
     else {
-      $usernamegift = sqlesc(trim($_REQUEST["username"]));
-      $res = sql_query("SELECT id, bonuscomment FROM users WHERE username=" . $usernamegift);
+      $usernamegift = trim($_REQUEST["username"]);
+      $res = sql_query("SELECT id FROM users WHERE username=?", [$usernamegift]);
       $arr = _mysql_fetch_assoc($res);
       $useridgift = $arr['id'];
     }
     $userseedbonus = $arr['seedbonus'];
-    $receiverbonuscomment = $arr['bonuscomment'];
     if ($points < 25 || $points > 10000) {
       //write_log("User " . $CURUSER["username"] . "," . $CURUSER["ip"] . " is hacking bonus system",'mod');
       error($lang_mybonus['text_error'], $lang_mybonus['bonus_amount_not_allowed']);
     }
     if($CURUSER['seedbonus'] >= $points) {
       $points2= number_format($points,1);
-      $bonuscomment = date("Y-m-d") . " - " .$points2. " Points as gift to ".htmlspecialchars(trim($_POST["username"])).".\n " .htmlspecialchars($bonuscomment);
+      $bonuscomment = date("Y-m-d") . " - " .$points2. " Points as gift to ".htmlspecialchars($usernamegift).".\n " .htmlspecialchars($bonuscomment);
 
       $aftertaxpoint = $points;
       if ($taxpercentage_bonus)
@@ -185,7 +198,7 @@ if($CURUSER['seedbonus'] >= $points) {
 	$aftertaxpoint -= $basictax_bonus;
 
       $points2receiver = number_format($aftertaxpoint,1);
-      $newreceiverbonuscomment = date("Y-m-d") . " + " .$points2receiver. " Points (after tax) as a gift from ".($CURUSER["username"]).".\n " .htmlspecialchars($receiverbonuscomment);
+      $newreceiverbonuscomment = date("Y-m-d") . " + " .$points2receiver. " Points (after tax) as a gift from ".($CURUSER["username"]).".\n ";
       if ($userid==$useridgift){
 	error($lang_mybonus['text_huh'], $lang_mybonus['text_karma_self_giving_warning'], 0);
       }
@@ -194,17 +207,15 @@ if($CURUSER['seedbonus'] >= $points) {
       }
 
       sql_query("UPDATE LOW_PRIORITY users SET seedbonus = seedbonus - $points, bonuscomment = ".sqlesc($bonuscomment)." WHERE id = ".sqlesc($userid)) or sqlerr(__FILE__, __LINE__);
-      sql_query("UPDATE LOW_PRIORITY users SET seedbonus = seedbonus + $aftertaxpoint, bonuscomment = ".sqlesc($newreceiverbonuscomment)." WHERE id = ".sqlesc($useridgift));
+      sql_query("UPDATE LOW_PRIORITY users SET seedbonus = seedbonus + ?, bonuscomment = CONCAT(?, bonuscomment) WHERE id = ?", [$aftertaxpoint, $newreceiverbonuscomment, $useridgift]);
 
       //===send message
-      $subject = sqlesc($lang_mybonus_target[get_user_lang($useridgift)]['msg_someone_loves_you']);
-      $added = sqlesc(date("Y-m-d H:i:s"));
+      $subject = $lang_mybonus_target[get_user_lang($useridgift)]['msg_someone_loves_you'];
+      $added = date("Y-m-d H:i:s");
       $msg = $lang_mybonus_target[get_user_lang($useridgift)]['msg_you_have_been_given'].$points2.$lang_mybonus_target[get_user_lang($useridgift)]['msg_after_tax'].$points2receiver.$lang_mybonus_target[get_user_lang($useridgift)]['msg_karma_points_by'].$CURUSER['username'];
       if ($message)
 	$msg .= "\n".$lang_mybonus_target[get_user_lang($useridgift)]['msg_personal_message_from'].$CURUSER['username'].$lang_mybonus_target[get_user_lang($useridgift)]['msg_colon'].$message;
-      $msg = sqlesc($msg);
-      sql_query("INSERT INTO messages (sender, subject, receiver, msg, added) VALUES(0, $subject, $useridgift, $msg, $added)") or sqlerr(__FILE__, __LINE__);
-      $usernamegift = unesc($_POST["username"]);
+      send_pm(0, $useridgift, $subject, $msg);
       success('transfer');
     }
     else {
@@ -213,4 +224,4 @@ if($CURUSER['seedbonus'] >= $points) {
   }
 }
 
-?>
+

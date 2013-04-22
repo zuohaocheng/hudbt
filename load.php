@@ -7,6 +7,7 @@ $debug = $_REQUEST['debug'];
 $purge = $_REQUEST['purge'];
 $fullname = strtolower($_REQUEST['name']);
 $format = strtolower($_REQUEST['format']);
+$user = 0 + $_REQUEST['user'];
 
 $tokens = preg_split('/\./', $fullname);
 $type = array_pop($tokens);
@@ -18,10 +19,10 @@ if ($type == 'php' || $fullname == '') {
 }
 
 if ($type == 'js') {
-  header('Content-type: text/javascript');
+  header('Content-type: text/javascript; charset=utf-8');
 }
 elseif ($type == 'css') {
-  header('Content-type: text/css');
+  header('Content-type: text/css; charset=utf-8');
   $theme = 0 + $_REQUEST['theme'];
   $caticon = 0 + $_REQUEST['caticon'];
 }
@@ -62,12 +63,13 @@ function lastModified($modifiedTime, $notModifiedExit = true) {
 function expires($seconds = 1800) {
   $time = date('r', time() + $seconds);
   header("Expires: $time");
+  header('Cache-control: public, max-age=' . $seconds);
 }
 
-$cache_key = generate_key($name, $type, $multifile);
+$cache_key = generate_key($name, $type, $multifile, $user);
 $lastMod = false;
 if (!$debug && !$purge) {
-  expires(900);
+  expires(1800);
   $modified = $Cache->get_value($cache_key . '_md');
 
   if ($modified) {
@@ -90,7 +92,7 @@ if (!$lastMode && !$debug) {
 }
 echo $out;
 
-function generate_key($name, $type, $multiple) {
+function generate_key($name, $type, $multiple, $user = null) {
   $key = 'load_';
   if ($multiple) {
     $key .= 'm_';
@@ -102,12 +104,15 @@ function generate_key($name, $type, $multiple) {
   else {
     $key .= $name . $type;
   }
+  if ($user) {
+    $key .= '_u' . $user;
+  }
   return $key;
 }
 
 function load_files_cache($name, $type, $debug, $purge) {
   global $Cache;
-  global $cache_key;
+  global $cache_key, $user;
   $key = $cache_key;
   if (!$debug) {
     if ($purge) {
@@ -125,7 +130,7 @@ function load_files_cache($name, $type, $debug, $purge) {
 
   if ($type == 'js') {
     if (!$name) {
-      if ($_REQUEST['user']) {
+      if ($user) {
 	App::uses('User', 'Model');
 	$User = new User;
 	$User->id = $_REQUEST['user'];
@@ -158,18 +163,32 @@ function load_files_cache($name, $type, $debug, $purge) {
     }
   }
   elseif ($type == 'css') {
-    global $theme, $caticon;
-    $css_uri = get_css_uri('', $theme);
-    global $css_files;
-    $jqui = 'styles/jqui/' . jqui_css_name($theme);
-    $files = array_merge($css_files, array(get_forum_pic_folder().'/forumsprites.css', $css_uri."theme.css", $css_uri."DomTT.css", 'pic/' . get_cat_folder(401, $caticon) . "sprite.css",  $jqui . '/jquery-ui.min.css', $jqui . '/jquery.ui.theme.css'));   
-    $out .= load_files($files, $type, $debug, $purge, true);
+    if ($user) {
+      App::uses('User', 'Model');
+      $User = new User;
+      $User->id = $_REQUEST['user'];
+      $js = $User->read('Property.css', $User->id);
+      if ($js) {
+	$out = $js['Property']['css'];
+      }
+      else {
+	$out = '';
+      }
+    }
+    else {
+      global $theme, $caticon;
+      $css_uri = get_css_uri('', $theme);
+      global $css_files;
+      $jqui = 'styles/jqui/' . jqui_css_name($theme);
+      $files = array_merge($css_files, array(get_forum_pic_folder().'/forumsprites.css', $css_uri."theme.css", $css_uri."DomTT.css", 'pic/' . get_cat_folder(401, $caticon) . "sprite.css",  $jqui . '/jquery-ui.min.css', $jqui . '/jquery.ui.theme.css'));   
+      $out .= load_files($files, $type, $debug, $purge, true);
 
-    if ($CURUSER){
-      $caticonrow = get_category_icon_row($CURUSER['caticon']);
-      if($caticonrow['cssfile']){
-	$file = $caticonrow['cssfile'];
-	load_file_cache($file, $type, $debug, $purge, true);
+      if ($CURUSER){
+	$caticonrow = get_category_icon_row($CURUSER['caticon']);
+	if($caticonrow['cssfile']){
+	  $file = $caticonrow['cssfile'];
+	  load_file_cache($file, $type, $debug, $purge, true);
+	}
       }
     }
   }

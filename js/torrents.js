@@ -11,6 +11,7 @@ $(function() {
     ie = $.browser.msie,
 
     History = !ie,
+    errCount = 0,
 
     args = argsFromUri(window.location.search),
     oripage = parseInt(args.page) || 0,
@@ -35,10 +36,16 @@ $(function() {
 	title : '刷新后生效'
     })));
 
-    $(document).ajaxError(function() {
-	jqui_dialog('失败','网络连接有问题', 5000, function() {
-	    location.reload();
-	});
+    $(document).ajaxError(function(event, jqxhr, settings) {
+	errCount += 1;
+	if (errCount > 5 && (('onLine' in navigator) && navigator.onLine)) {
+	    jqui_confirm('哎呀','好像有点问题，刷新看看?', function() {
+		location.search = '?'+$.param(args); //reload
+	    });
+	}
+	else {
+	    $.ajax(settings);
+	}
     });
 
     var $sortHeaders = table.find('thead th:not(.unsortable)'),
@@ -396,15 +403,6 @@ $(function() {
 	window.addEventListener('popstate', function(e){
             var initialPop = !(('state' in e) && e.state) && location.href == initialURL;
             if (initialPop) return;
-	    var t;
-	    if (hb.config.torrents_query !== '') {
-		t = '?' + hb.config.torrents_query;
-	    }
-	    else {
-		t = '';
-	    }
-	    var backPop = (t === location.search);
-	    if (backPop) return;
     	    getFromUri(argsFromUri(window.location.href));
 	}, false);
 	window.history.replaceState(state, document.title, initialURL);
@@ -518,39 +516,3 @@ $(function() {
 
 
 });
-
-//Select all
-var form='searchbox';
-function SetChecked(chkName,ctrlName,checkall_name,uncheckall_name,start,count) {
-    var dml=document.forms[form];
-    var len = dml.elements.length;
-    var begin;
-    var end;
-    var check_state;
-    if (start == -1){
-	begin = 0;
-	end = len;
-    }
-    else{
-	begin = start;
-	end = start + count;
-    }
-    var check_state;
-    var button = document.getElementById(ctrlName)
-
-    if(button.value == checkall_name) {
-	button.value = uncheckall_name;
-	check_state=1;
-    }
-    else {
-	button.value = checkall_name;
-	check_state=0;
-    }
-
-    for( i=begin ; i<end ; i++) {
-	if (dml.elements[i].name.indexOf(chkName) != -1) {
-	    dml.elements[i].checked=check_state;
-	}
-
-    }
-}

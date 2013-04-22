@@ -172,7 +172,7 @@ function get_load_uri($type, $script_name ="", $absolute = true) {
     $userjs = 'cache/users/' . $CURUSER['id'] . '.js';
     if (file_exists($userjs) && $name != 'usercp.php') {
       if ($debug) {
-	$hrefs[] = $pagename . '?format=js&amp;user=' . $CURUSER['id'];
+	$hrefs[] = $pagename . '?format=js&amp;debug=1&amp;user=' . $CURUSER['id'];
       }
       else {
 	$hrefs[] = '//' . $BASEURL . '/' . $userjs;
@@ -205,7 +205,7 @@ function get_load_uri($type, $script_name ="", $absolute = true) {
     $usercss = 'cache/users/' . $CURUSER['id'] . '.css';
     if (file_exists($usercss)) {
       if ($debug) {
-	$hrefs[] = $pagename . '?format=css&amp;user=' . $CURUSER['id'];
+	$hrefs[] = $pagename . '?format=css&amp;debug=1&amp;user=' . $CURUSER['id'];
       }
       else {
 	$hrefs[] = '//' . $BASEURL . '/' . $usercss;
@@ -228,19 +228,17 @@ function get_langfile_path($script_name ="", $target = false, $lang_folder = "")
 }
 
 function get_row_count($table, $suffix = "", $args = []) {
-  $a = sql_fetchAll("SELECT COUNT(1) FROM $table $suffix", $args)[0] or die(_mysql_error());
+  $a = sql_query("SELECT COUNT(1) FROM $table $suffix", $args)->fetch();
   return 0 + $a[0];
 }
 
-function get_row_sum($table, $field, $suffix = "") {
-  $r = sql_query("SELECT SUM($field) FROM $table $suffix") or sqlerr(__FILE__, __LINE__);
-  $a = _mysql_fetch_row($r) or die(_mysql_error());
+function get_row_sum($table, $field, $suffix = "", $args = []) {
+  $r = sql_query("SELECT SUM($field) FROM $table $suffix", $args)->fetch();
   return $a[0];
 }
 
-function get_single_value($table, $field, $suffix = "") {
-  $r = sql_query("SELECT $field FROM $table $suffix LIMIT 1") or sqlerr(__FILE__, __LINE__);
-  $a = _mysql_fetch_row($r);
+function get_single_value($table, $field, $suffix = "", $args = []) {
+  $a = sql_query("SELECT $field FROM $table $suffix LIMIT 1", $args)->fetch();
   if ($a) {
     return $a[0];
   } else {
@@ -393,7 +391,7 @@ function stderr($heading, $text, $htmlstrip = true, $head = true, $foot = true, 
 }
 
 function sqlerr($file = '', $line = '', $stack = true, $q = '', $args = [], $e = null) {
-  echo "<div style=\"font-family: menlo, monaco, courier, monospace; background: blue;color:white;position:fixed;overflow-y:scroll;width:100%;height:100%;top: 0%;left: 0%;\"><h1>出错啦，出错啦</h1><p>请保存此页面(菜单/文件/保存，请勿截图)，<a href=\"sendmessage.php?receiver=26058\" style=\"color:yellow\">点此发送给管理员</a>，多谢!</p><div style=\"display:none\">";
+  echo "<div style=\"font-family: menlo, monaco, courier, monospace; background: blue;color:white;position:fixed;overflow-y:scroll;width:100%;height:100%;top: 0%;left: 0%;\"><h1>出错啦，出错啦</h1><p>请保存此页面(菜单/文件/保存，<span style=\"font-size:xx-large\">请勿截图</span>)，<a href=\"sendmessage.php?receiver=26058\" style=\"color:yellow\">点此发送给管理员</a>，多谢!</p><div style=\"display:none\">";
   ob_start();
 
   if ($q) {
@@ -1683,12 +1681,12 @@ function mkglobal($vars) {
   if (!is_array($vars))
     $vars = explode(":", $vars);
   foreach ($vars as $v) {
-    if (isset($_GET[$v]))
-      $GLOBALS[$v] = unesc($_GET[$v]);
-    elseif (isset($_POST[$v]))
-      $GLOBALS[$v] = unesc($_POST[$v]);
-    else
+    if (isset($_REQUEST[$v])) {
+      $GLOBALS[$v] = unesc($_REQUEST[$v]);
+    }
+    else {
       return 0;
+    }
   }
   return 1;
 }
@@ -2269,6 +2267,8 @@ function stdhead($title = "", $msgalert = true, $script = "", $place = "") {
     $key = '0';
   }
   $s->display('stdhead.tpl', $key);
+  ob_flush();
+  flush();
 }
 
 function stdfoot() {
@@ -3452,6 +3452,13 @@ foreach($rows as $row)
     //size
     print("<td class=\"rowfollow\">" . mksize_compact($row["size"])."</td>");
 
+    if ($row["leechers"] < 0) {
+      $row["leechers"] = 0;
+    }
+    if ($row["seeders"] < 0) {
+      $row["seeders"] = 0;
+    }
+    
     if ($row["seeders"]) {
         $ratio = ($row["leechers"] ? ($row["seeders"] / $row["leechers"]) : 1);
         $ratiocolor = get_slr_color($ratio);
@@ -3580,7 +3587,7 @@ function get_username($id, $big = false, $link = true, $bold = true, $target = f
     if ($underline) {
       $name_style .= 'text-decoration:underline;';
     }
-    if($arr["color"]!="FFFFFF"){
+    if(!is_null($arr["color"])){
       $name_style .= 'color:#'.$arr['color'] . ';';
     }
 

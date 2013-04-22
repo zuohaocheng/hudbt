@@ -53,6 +53,7 @@ end_frame();
 //--------------------- FIRST LINE SUPPORT SECTION ---------------------------//
 
 //--------------------- film critics section ---------------------------//
+/*
 unset($ppl);
 $res = sql_query("SELECT id,country,pickfor,last_access FROM users WHERE users.picker='yes' AND users.status='confirmed' ORDER BY users.username") or sqlerr();
 while ($arr = _mysql_fetch_assoc($res))
@@ -85,7 +86,7 @@ begin_frame($lang_staff['text_movie_critics']."<font class=small> - [<a class=al
 </table>
 <?php
 end_frame();
-
+*/
 //--------------------- film critics section ---------------------------//
 
 /***************************Keepers************************/

@@ -236,7 +236,13 @@ class Torrent extends AppModel {
 	    write_log("Torrent " . $this->id . ' (' . $data['Torrent']['name'] . ") was deleted by its anonymous uploader " . $this->reason,'normal');
 	  }
 	  else {
-	    write_log("Torrent " . $this->id . ' (' . $data['Torrent']['name'] . ") was deleted by " . $CURUSER['username'] . $this->reason,'normal');
+	    if (isset($this->user)) {
+	      $username = 'System';
+	    }
+	    else {
+	      $username = $CURUSER['username'];
+	    }
+	    write_log("Torrent " . $this->id . ' (' . $data['Torrent']['name'] . ") was deleted by " . $username . $this->reason,'normal');
 	  }
 	}	  
 }

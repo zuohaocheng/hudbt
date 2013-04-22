@@ -113,7 +113,7 @@ $torrent = file_get_contents($fn);
 
 $announce_header = '8:announce';
 $ap = strpos($torrent, $announce_header);
-if ($ap === false) {
+if ($ap !== false) {
   $ap += strlen($announce_header);
   $otorrent = substr($torrent, 0, $ap);
 

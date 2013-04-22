@@ -3,7 +3,7 @@ $(function() {
     var base = hb.constant.url.base;
     var title = $('title');
     var origTitle = title.text();
-    var checkInt = 10;
+    var checkInt = 30;
     var alertMsg = $('#alert-message');
     var dialogOpen = false;
 
@@ -32,7 +32,7 @@ $(function() {
 		if (!dialogOpen) {
 		    var text = '<table cellpadding="2" class="no-vertical-line" style="width:100%"><thead><th>主题</th><th>发信人</th><th class="unsortable"></th><th class="unsortable"></th><th class="unsortable">预览 (点击显示全部)</th></thead><tbody></tbody></table>'; 
 		    var dialog = $('<div></div>', {
-			title : '站内信 (<a href="//' + base + '/messages.php">打开传统界面</a>)',
+			title : '站内信',
 			html : text
 		    });
 		    var tbody = dialog.find('tbody');
@@ -117,6 +117,7 @@ $(function() {
 			    dialog.remove();
 			}
 		    }).find('table').tablesorter();
+		    $('.ui-dialog-title').append(' (<a href="//' + base + '/messages.php">打开传统界面</a>)');
 		}
 	    };
 	    alertMsg.unbind('click').click(function(e) {

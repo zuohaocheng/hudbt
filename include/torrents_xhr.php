@@ -1,6 +1,8 @@
 <?php
 
-header('Content-type: application/json');
+header('Content-type: application/json; charset=utf-8');
+$time = date('r', time() + 60);
+header("Expires: $time");
 
 ob_start();
 if (isset($_REQUEST['counter'])) {

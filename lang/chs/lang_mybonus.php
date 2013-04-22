@@ -128,7 +128,7 @@ $lang_mybonus = array
 	'std_no_users_need_charity' => "暂时没有需要慈善帮助的用户。",
 	'text_success_charity' => "谢谢！感谢你的慷慨捐赠。",
 	'text_change_color' => "改变颜色",
-	'text_change_color_note' => "给你点颜色瞧瞧！<br>全F的白色表示恢复系统默认颜色！",
+	'text_change_color_note' => "给你点颜色瞧瞧！",
 	'text_success_color' => "祝贺你，你成功地改变了颜色！",
 );
 
