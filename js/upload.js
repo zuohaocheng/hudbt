@@ -1,10 +1,13 @@
 $(function() {
-    var file = $('#torrent');
-    file.change(function () {
-	var filename = document.getElementById("torrent").value;
-	var filename = filename.toString();
-	var lowcase = filename.toLowerCase();
-	var start = lowcase.lastIndexOf("\\"); //for Google Chrome on windows/mac
+    var file = $('#torrent').change(function () {
+	var filename = document.getElementById("torrent").value,
+	lowcase = filename.toLowerCase(),
+	start = lowcase.lastIndexOf("\\"); //for Google Chrome on windows/mac
+
+	if (lowcase.length === 0) {
+	    return;
+	}
+	
 	if (start == -1){
 	    start = lowcase.lastIndexOf("\/"); // for Google Chrome on linux
 	    if (start == -1)
@@ -37,7 +40,11 @@ $(function() {
 	noext = noext.replace(/H_264/g,"H.264");
 	noext = noext.replace(/5_1/g,"5.1");
 	noext = noext.replace(/2_1/g,"2.1");
-	document.getElementById("name").value=noext;
+	
+	var name = document.getElementById("name");
+	if (!$.trim(name.value)) {
+	    name.value=noext;
+	}
     });
 
     var validateInputs = function(target, validateSelect) {
@@ -82,9 +89,7 @@ $(function() {
 	    });
 	}
     });
-});
 
-$(function() {
     var compose = $('#compose');
     var validating = (function() {
 	var val = false;
@@ -243,5 +248,29 @@ $(function() {
 		dialog.remove();
 	    }, 3000);
 	}
+	document.getElementById('browsecat').disabled = false;
     });
+
+    $('#offer').change(function() {
+	var name = document.getElementById('name'), 
+	cat = document.getElementById('browsecat'),
+	descr = document.getElementById('descr'),
+	sel = (this.value == 0);
+	if (sel) {
+	    name.value = '';
+	    cat.value = '';
+	    descr.value = '';
+	    file.trigger('change');
+	}
+	else {
+	    var offer = hb.offers[this.value];
+	    name.value = offer.name;
+	    cat.value = offer.category;
+	    descr.value = offer.descr;
+	}
+
+	name.readOnly = !sel;
+	cat.disabled = !sel;
+	descr.readOnly = !sel;
+    }).trigger('change');
 });

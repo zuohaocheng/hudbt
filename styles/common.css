@@ -63,6 +63,7 @@ header {
 .offer-frozen {color: darkblue}
 .offer-denied {color: red}
 .offer-allowed {color: green}
+.offer-uploaded {color: gray}
 .offer-pending {color: orange}
 
 .faq-status-img {

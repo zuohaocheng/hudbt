@@ -195,7 +195,7 @@ function docleanup($forceAll = 0, $printProgress = false) {
 	if($offeruptimeout_main){
 		$secs = (int)$offeruptimeout_main;
 		$dt = sqlesc(date("Y-m-d H:i:s",(TIMENOW - ($secs))));
-		$res = sql_query("SELECT id, name FROM offers WHERE allowedtime < $dt AND allowed = 'allowed'") or sqlerr(__FILE__, __LINE__);
+		$res = sql_query("SELECT id, name FROM offers WHERE allowedtime < $dt AND allowed = 'allowed' AND ISNULL(torrent_id)") or sqlerr(__FILE__, __LINE__);
 		while($arr = _mysql_fetch_assoc($res)){
 		sql_query("DELETE FROM offers WHERE id=$arr[id]") or sqlerr(__FILE__, __LINE__);
 		sql_query("DELETE FROM offervotes WHERE offerid=$arr[id]") or sqlerr(__FILE__, __LINE__);

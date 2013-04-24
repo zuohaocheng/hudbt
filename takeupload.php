@@ -219,9 +219,9 @@ list($ann, $info) = dict_check($dict, "announce(string):info");
 
 $infohash = pack("H*", sha1($info["string"]));
 
-$dupid = get_single_value('torrents', 'id', 'WHERE info_hash= ?', [stripslashes($infohash)]);
+$dupeid = get_single_value('torrents', 'id', 'WHERE info_hash= ?', [stripslashes($infohash)]);
 
-if ($dupid !== false) {
+if ($dupeid !== false) {
   $torrlink = sprintf($lang_takeupload['std_click_it'],$dupeid);
   stderr($lang_takeupload['std_upload_failed'],$lang_takeupload['std_torrent_existed'].$torrlink,false);
 }
@@ -250,15 +250,18 @@ if ($browsecatmode != $specialcatmode && $catmod == $specialcatmode){//upload to
 		bark($lang_takeupload['std_unauthorized_upload_freely']);
 }
 elseif($catmod == $browsecatmode){//upload to torrents section
- 	if ($offerid){//it is a offer
-		$allowed_offer_count = get_row_count("offers","WHERE allowed='allowed' AND userid=".sqlesc($CURUSER["id"]));
-		if ($allowed_offer_count && $enableoffer == 'yes'){
-				$allowed_offer = get_row_count("offers","WHERE id=".sqlesc($offerid)." AND allowed='allowed' AND userid=".sqlesc($CURUSER["id"]));
-				if ($allowed_offer != 1)//user uploaded torrent that is not an allowed offer
-					bark($lang_takeupload['std_uploaded_not_offered']);
-				else $is_offer = true;
-		}
-		else bark($lang_takeupload['std_uploaded_not_offered']);
+ 	if ($offerid && $enableoffer == 'yes'){//it is a offer
+	  $allowed_offer = sql_query("SELECT name FROM offers WHERE id= ? AND allowed='allowed' AND userid=? AND ISNULL(torrent_id)", [$offerid, $CURUSER["id"]]);
+	  if ($allowed_offer->rowCount()) {
+	    if ($_REQUEST['name'] != $allowed_offer->fetch()['name']) {
+	      bark('候选名称必须一致!');
+	    }
+	    $is_offer = true;
+	  }
+	  else {
+	    //user uploaded torrent that is not an allowed offer
+	    bark($lang_takeupload['std_uploaded_not_offered']);
+	  }	  
 	}
 	elseif (!$allowtorrents)
 		bark($lang_takeupload['std_unauthorized_upload_freely']);
@@ -436,10 +439,8 @@ if ($is_offer) {
 		//sql_query("INSERT INTO messages (sender, receiver, added, msg) VALUES ".$some_variable."") or sqlerr(__FILE__, __LINE__);
 		//===end
 	}
-	//=== delete all offer stuff
-	sql_query("DELETE FROM offers WHERE id = ". $offerid);
-	sql_query("DELETE FROM offervotes WHERE offerid = ". $offerid);
-	sql_query("DELETE FROM comments WHERE offer = ". $offerid);
+
+	sql_query('UPDATE offers SET torrent_id = ? WHERE id = ?', [$id, $offerid]);
 }
 //=== end notify people who voted on offer
 

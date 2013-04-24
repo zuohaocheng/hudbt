@@ -8,8 +8,10 @@ parked();
 if ($CURUSER["uploadpos"] == 'no')
 	stderr($lang_upload['std_sorry'], $lang_upload['std_unauthorized_to_upload'],false);
 
-if ($enableoffer == 'yes')
-	$has_allowed_offer = get_row_count("offers","WHERE allowed='allowed' AND userid = ". sqlesc($CURUSER["id"]));
+if ($enableoffer == 'yes') {
+  $offerres = sql_query("SELECT id, name, descr, category FROM offers WHERE userid = ? AND allowed = 'allowed' AND ISNULL(torrent_id) ORDER BY name ASC", [$CURUSER['id']]);
+  $has_allowed_offer = $offerres->rowCount();
+}
 else $has_allowed_offer = 0;
 $uploadfreely = user_can_upload("torrents");
 $allowtorrents = ($has_allowed_offer || $uploadfreely);
@@ -60,7 +62,12 @@ stdhead($lang_upload['head_upload']);
 	if ($enablenfo_main=='yes')
 	  dl_item($lang_upload['row_nfo_file'], "<input type=\"file\" class=\"file\" name=\"nfo\" /><br /><font class=\"medium\">".$lang_upload['text_only_viewed_by'].get_user_class_name($viewnfo_class,false,true,true).$lang_upload['text_or_above']."</font>", 1);
 	print('<dt class="required">' . $lang_upload['row_description'] . '</dt><dd>');
-	textbbcode("upload","descr","",false);
+	if ($uploadfreely || $allowspecial) {
+	  textbbcode("upload","descr","",false);
+	}
+	else {
+	  echo '<textarea class="bbcode" cols="100" style="width: 70%;" name="descr" id="descr" rows="20" readonly="readonly"></textarea>';
+	}
 	print("</dd>\n");
 
 	if ($allowtorrents){
@@ -130,11 +137,17 @@ stdhead($lang_upload['head_upload']);
 	}
 
 	//==== offer dropdown for offer mod  from code by S4NE
-	$offerres = sql_query("SELECT id, name FROM offers WHERE userid = ".sqlesc($CURUSER['id'])." AND allowed = 'allowed' ORDER BY name ASC") or sqlerr(__FILE__, __LINE__);
-	if (_mysql_num_rows($offerres) > 0) {
-	  $offer = "<select name=\"offer\"><option value=\"0\">".$lang_upload['select_choose_one']."</option>";
-	  while($offerrow = _mysql_fetch_array($offerres))
-	    $offer .= "<option value=\"" . $offerrow["id"] . "\">" . htmlspecialchars($offerrow["name"]) . "</option>";
+
+	if ($has_allowed_offer > 0) {
+	  $offer = "<select name=\"offer\" id=\"offer\">";
+	  if ($uploadfreely || $allowspecial) {
+	    $offer .= "<option value=\"0\">".$lang_upload['select_choose_one']."</option>";
+	  }
+	  $js = [];
+	  while($offerrow = _mysql_fetch_array($offerres)) {
+	    $offer .= "<option value=\"" . $offerrow["id"] . '">' . htmlspecialchars($offerrow["name"]) . "</option>";
+	    $js[$offerrow["id"]] = $offerrow;
+	  }
 	  $offer .= "</select>";
 	  $dt = $lang_upload['row_your_offer'];
 	  if (!$uploadfreely && !$allowspecial) {
@@ -144,6 +157,8 @@ stdhead($lang_upload['head_upload']);
 	    $class = '';
 	  }
 	  dl_item($dt, $offer.$lang_upload['text_please_select_offer'] , 1, $class);
+
+	  echo '<script type="text/javascript">hb.offers=' . json_encode($js) . '</script>';
 	}
 	//===end
 

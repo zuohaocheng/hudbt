@@ -139,6 +139,15 @@ if ($_GET["off_details"]){
 	$res = sql_query("SELECT * FROM offers WHERE id = $id") or sqlerr(__FILE__,__LINE__);
 	$num = _mysql_fetch_array($res);
 
+	if (!is_null($num['torrent_id'])) {
+	  if (!$_REQUEST['noredir']) {
+	    header('Location: details.php?id=' . $num['torrent_id'] , true, 301);
+	  }
+	  else {
+	    $torrent = sql_query('SELECT id, name FROM torrents WHERE id = ?', [$num['torrent_id']])->fetch();
+	  }
+	}
+
 	$s = $num["name"];
 
 	stdhead($lang_offers['head_offer_detail_for']." \"".$s."\"");
@@ -150,8 +159,14 @@ if ($_GET["off_details"]){
 	tr($lang_offers['row_info'], $lang_offers['text_offered_by'].get_username($num['userid']).$offertime, 1);
 	if ($num["allowed"] == "pending")
 	$status="<span color=\"offer-pending\">".$lang_offers['text_pending']."</span>";
-	elseif ($num["allowed"] == "allowed")
-	$status="<span class=\"offer-allowed\">".$lang_offers['text_allowed']."</span>";
+	elseif ($num["allowed"] == "allowed") {
+	  if (is_null($num['torrent_id'])) {
+	    $status="<span class=\"offer-allowed\">".$lang_offers['text_allowed']."</span>";
+	  }
+	  else {
+	    $status="<span class=\"offer-uploaded\">已发布</span>";
+	  }
+	}
 	elseif ($num["allowed"] == "frozen")
 	$status='<span class="offer-frozen">冻结</span>';
 	else
@@ -176,11 +191,25 @@ if ($_GET["off_details"]){
 	"<b>".$lang_offers['text_for'].":</b> $za  <b>".$lang_offers['text_against']."</b> $protiv &nbsp; &nbsp; <a href=\"?id=".$id."&amp;offer_vote=1\"><i>".$lang_offers['text_see_vote_detail']."</i></a>", 1);
 	}
 	//===upload torrent message
-	if ($num["allowed"] == "allowed" && $CURUSER["id"] != $num["userid"])
-	tr($lang_offers['row_offer_allowed'], $lang_offers['text_voter_receives_pm_note'], 1);
-	if ($num["allowed"] == "allowed" && $CURUSER["id"] == $num["userid"]){
-		tr($lang_offers['row_offer_allowed'],
-		$lang_offers['text_urge_upload_offer_note'], 1);
+	if ($num["allowed"] == "allowed") {
+	  if (is_null($num['torrent_id'])) {
+	  if ($CURUSER["id"] != $num["userid"]) {
+	    $msg = $lang_offers['text_voter_receives_pm_note'];
+	  }
+	  else {
+	    $msg = $lang_offers['text_urge_upload_offer_note'];
+	  }
+	  }
+	  else {
+	    if (isset($torrent)) {
+	      $msg = '<a href="details.php?id=' . $torrent['id'] . '">' . $torrent['name'] . '</a>';
+	    }
+	    else {
+	      $msg = '不过，种子好像不见了:(';
+	    }
+	  }
+
+	  tr($lang_offers['row_offer_allowed'],$msg, 1);
 	}
 	if ($CURUSER['id'] == $num['userid'] || get_user_class() >= $offermanage_class){
 		$edit = "<a href=\"?id=".$id."&amp;edit_offer=1\"><img class=\"dt_edit\" src=\"pic/trans.gif\" alt=\"edit\" />&nbsp;<b><font class=\"small\">".$lang_offers['text_edit_offer'] . "</font></b></a>&nbsp;|&nbsp;";
@@ -716,7 +745,7 @@ list($pagertop, $pagerbottom, $limit) = pager($perpage, $count, $_SERVER["PHP_SE
 if($sort == "")
 $sort =  "ORDER BY added desc ";
 
-$res = sql_query("SELECT offers.id, offers.userid, offers.name, offers.added, offers.allowedtime, offers.comments, offers.yeah, offers.against, offers.category as cat_id, offers.allowed, categories.name as cat FROM offers inner join categories on offers.category = categories.id $categ $search $sort $limit") or sqlerr(__FILE__,__LINE__);
+$res = sql_query("SELECT offers.id, offers.userid, offers.name, offers.added, offers.allowedtime, offers.comments, offers.yeah, offers.against, offers.torrent_id, offers.category as cat_id, offers.allowed, categories.name as cat FROM offers INNER JOIN categories ON offers.category = categories.id $categ $search $sort $limit") or sqlerr(__FILE__,__LINE__);
 $num = _mysql_num_rows($res);
 
 stdhead($lang_offers['head_offers']);
@@ -811,8 +840,14 @@ print("<td class=\"colhead\">".$lang_offers['col_offered_by']."</td>".
 	}
 
 	//==== if you want allow deny for offers use this next bit
-	if ($arr["allowed"] == 'allowed')
-	  $allowed = "&nbsp;[<span class=\"offer-allowed\">".$lang_offers['text_allowed']."</span>]";
+	if ($arr["allowed"] == 'allowed') {
+	  if (is_null($arr['torrent_id'])) {
+	    $allowed = "&nbsp;[<span class=\"offer-allowed\">".$lang_offers['text_allowed']."</span>]";
+	  }
+	  else {
+	    $allowed = "&nbsp;[<span class=\"offer-uploaded\">已发布</span>]";
+	  }
+	}
 	elseif ($arr["allowed"] == 'denied')
 	  $allowed = "&nbsp;[<span class=\"offer-denied\">".$lang_offers['text_denied']."</span>]</b>";
 	elseif ($arr["allowed"] == 'frozen')
@@ -845,7 +880,7 @@ print("<td class=\"colhead\">".$lang_offers['col_offered_by']."</td>".
 	$max_length_of_offer_name = 70;
 	if($count_dispname > $max_length_of_offer_name)
 		$dispname=mb_substr($dispname, 0, $max_length_of_offer_name-2,"UTF-8") . "..";
-	print("<tr><td class=\"rowfollow\" style=\"padding: 0px\"><a href=\"?category=".$arr['cat_id']."\">".return_category_image($arr['cat_id'], "")."</a></td><td style='text-align: left'><a href=\"?id=".$arr[id]."&amp;off_details=1\" title=\"".htmlspecialchars($arr[name])."\"><b>".htmlspecialchars($dispname)."</b></a>".(strtotime($arr["added"]) >= $last_offer ? "<b> (<font class='new'>".$lang_offers['text_new']."</font>)</b>" : "").$allowed.((get_user_class() >= $offermanage_class && $arr["allowed"] == 'pending') ? "<br /><form method=\"post\" action=\"?allow_offer=1\"><input type=\"hidden\" value=\"".$arr[id]."\" name=\"offerid\" />"."<input class=\"btn\" type=\"submit\" value=\"".$lang_offers['submit_allow']."\" />&nbsp;</form>" : "")."</td><td class=\"rowfollow nowrap\" style='padding: 5px' align=\"center\">".$v_res."</td><td class=\"rowfollow nowrap\" ".(get_user_class() < $againstoffer_class ? " colspan=\"2\" " : "")/*." style='padding: 5px'><a href=\"?id=".$arr[id]."&amp;vote=yeah\" title=\"".$lang_offers['title_i_want_this']."\"><font color=\"green\"><b>".$lang_offers['text_yep']."</b></font></a></td>".(get_user_class() >= $againstoffer_class ? "<td class=\"rowfollow nowrap\" align=\"center\"><a href=\"?id=".$arr[id]."&amp;vote=against\" title=\"".$lang_offers['title_do_not_want_it']."\"><font color=\"red\"><b>".$lang_offers['text_nah']."</b></font></a></td>" : ""*/);
+	print("<tr><td class=\"rowfollow\" style=\"padding: 0px\"><a href=\"?category=".$arr['cat_id']."\">".return_category_image($arr['cat_id'], "")."</a></td><td style='text-align: left'><a href=\"?id=".$arr[id]."&amp;off_details=1".((is_null($arr['torrent_id']))? '':'&amp;noredir=1')."\" title=\"".htmlspecialchars($arr[name])."\"><b>".htmlspecialchars($dispname)."</b></a>".(strtotime($arr["added"]) >= $last_offer ? "<b> (<font class='new'>".$lang_offers['text_new']."</font>)</b>" : "").$allowed.((get_user_class() >= $offermanage_class && $arr["allowed"] == 'pending') ? "<br /><form method=\"post\" action=\"?allow_offer=1\"><input type=\"hidden\" value=\"".$arr[id]."\" name=\"offerid\" />"."<input class=\"btn\" type=\"submit\" value=\"".$lang_offers['submit_allow']."\" />&nbsp;</form>" : "")."</td><td class=\"rowfollow nowrap\" style='padding: 5px' align=\"center\">".$v_res."</td><td class=\"rowfollow nowrap\" ".(get_user_class() < $againstoffer_class ? " colspan=\"2\" " : "")/*." style='padding: 5px'><a href=\"?id=".$arr[id]."&amp;vote=yeah\" title=\"".$lang_offers['title_i_want_this']."\"><font color=\"green\"><b>".$lang_offers['text_yep']."</b></font></a></td>".(get_user_class() >= $againstoffer_class ? "<td class=\"rowfollow nowrap\" align=\"center\"><a href=\"?id=".$arr[id]."&amp;vote=against\" title=\"".$lang_offers['title_do_not_want_it']."\"><font color=\"red\"><b>".$lang_offers['text_nah']."</b></font></a></td>" : ""*/);
 
 	print("<td class=\"rowfollow\">".$comment."</td><td class=\"rowfollow nowrap\">" . $addtime. "</td>");
 	if ($offervotetimeout_main > 0 && $offeruptimeout_main > 0){
