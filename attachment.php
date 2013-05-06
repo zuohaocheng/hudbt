@@ -14,6 +14,7 @@ $allowed_exts = $Attach->get_allowed_ext();
 $css_uri = get_css_uri();
 $altsize = $_POST['altsize'];
 ?>
+<!DOCTYPE HTML>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">

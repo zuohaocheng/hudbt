@@ -9,7 +9,7 @@ $lang_staff = array
 	'text_movie_critics' => "批评家",
 	'text_movie_critics_note' => "批评家负责挑选优秀的电影、音乐等资源，撰写点评，奖励用户的评论。总之，致力于创造交流的良好氛围。",
 	'text_general_staff' => "常规管理员",
-	'text_general_staff_note' => "所有软件和<a href=faq.php><b>常见问题</b></a>中已解答的问题将被无视。<br /><br />点击<a href=contactstaff.php><b>这里</b></a>发短讯给管理组。",
+	'text_general_staff_note' => "发短讯给管理组",
 	'text_username' => "用户名",
 	'text_online_or_offline' => "是否在线",
 	'text_country' => "国家",
@@ -35,4 +35,4 @@ $lang_staff = array
 	'text_member' => "<strong>组员</strong>",
 );
 
-?>
+

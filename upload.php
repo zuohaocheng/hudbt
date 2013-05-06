@@ -36,7 +36,7 @@ stdhead($lang_upload['head_upload']);
 <form id="compose" enctype="multipart/form-data" action="takeupload.php" method="post" name="upload">
   <div class="edit-hint minor-list-vertical"><ul>
     <li><?php echo $lang_upload['text_red_star_required']; ?></li>
-    <li><?php echo $lang_upload['text_tracker_url'] ?>: &nbsp;&nbsp;&nbsp;&nbsp;<strong><?php echo  get_protocol_prefix() . $announce_urls[0]?></strong></li>
+    <li><?php echo $lang_upload['text_tracker_url'] ?>: <strong><?php echo get_protocol_prefix() . $announce_urls[0]?></strong></li>
     <?php
       if(!is_writable($torrent_dir)) {
 	print("<li><b>ATTENTION</b>: Torrent directory isn't writable. Please contact the administrator about this problem!</li>");
@@ -48,15 +48,15 @@ stdhead($lang_upload['head_upload']);
   </ul></div>
   <dl class="table">
     <?php
-	dl_item($lang_upload['row_torrent_file'], "<input type=\"file\" class=\"file\" id=\"torrent\" name=\"file\" />\n", 1, 'required');
+	dl_item($lang_upload['row_torrent_file'], "<input type=\"file\" class=\"file\" id=\"torrent\" name=\"file\" data-url=\"torrentupload.php\" required=\"required\" />\n", 1, 'required');
 	if ($altname_main == 'yes'){
 	  dl_item($lang_upload['row_torrent_name'], "<b>".$lang_upload['text_english_title']."</b>&nbsp;<input type=\"text\" style=\"width: 250px;\" name=\"name\" />&nbsp;&nbsp;&nbsp;
-	  <b>".$lang_upload['text_chinese_title']."</b>&nbsp;<input type=\"text\" style=\"width: 250px\" name=\"cnname\"><br /><font class=\"medium\">".$lang_upload['text_titles_note']."</font>", 1);
+	  <b>".$lang_upload['text_chinese_title']."</b>&nbsp;<input type=\"text\" style=\"width: 250px\" name=\"cnname\" ><br /><span class=\"medium\">".$lang_upload['text_titles_note']."</span>", 1);
 	}
 	else
-	  dl_item($lang_upload['row_torrent_name'], "<input type=\"text\" style=\"width: 650px;\" id=\"name\" name=\"name\" /><br /><font class=\"medium\">".$lang_upload['text_torrent_name_note']."</font>", 1);
+	  dl_item($lang_upload['row_torrent_name'], "<input type=\"text\" style=\"width: 650px;\" id=\"name\" name=\"name\" required=\"required\" /><div class=\"medium\">".$lang_upload['text_torrent_name_note']."</div>", 1, 'required');
 	if ($smalldescription_main == 'yes')
-	  dl_item($lang_upload['row_small_description'], "<input type=\"text\" style=\"width: 650px;\" name=\"small_descr\" /><br /><font class=\"medium\">".$lang_upload['text_small_description_note']."</font>", 1);
+	  dl_item($lang_upload['row_small_description'], "<input type=\"text\" style=\"width: 650px;\" name=\"small_descr\" /><div class=\"medium\">".$lang_upload['text_small_description_note']."</div>", 1);
 	
 	get_external_tr('', true);
 	if ($enablenfo_main=='yes')

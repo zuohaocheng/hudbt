@@ -74,6 +74,7 @@ $privilegeConfig = ['Maintenance'=>['staticResources' => UC_MODERATOR],
 				       'hustip' => UC_MODERATOR,
 				       'ssh' => UC_SYSOP,
 				       'staffPanel' => UC_UPLOADER,
+				       'staffbox' => UC_UPLOADER,
 				       'settings' => UC_SYSOP,]
 		    ];
 
@@ -393,7 +394,7 @@ function stderr($heading, $text, $htmlstrip = true, $head = true, $foot = true, 
 function sqlerr($file = '', $line = '', $stack = true, $q = '', $args = [], $e = null) {
   echo "<div style=\"font-family: menlo, monaco, courier, monospace; background: blue;color:white;position:fixed;overflow-y:scroll;width:100%;height:100%;top: 0%;left: 0%;\"><h1>出错啦，出错啦</h1><p>请保存此页面(菜单/文件/保存，<span style=\"font-size:xx-large\">请勿截图</span>)，<a href=\"sendmessage.php?receiver=26058\" style=\"color:yellow\">点此发送给管理员</a>，多谢!</p><div style=\"display:none\">";
   ob_start();
-
+  echo '<h2>', date('d M Y H:i:s'), '</h2>';
   if ($q) {
     echo '<h2>SQL Statement</h2><p>' , $q;
     if ($args) {
@@ -419,6 +420,13 @@ function sqlerr($file = '', $line = '', $stack = true, $q = '', $args = [], $e =
 #  echo str_replace("\n", '<br/>', ob_get_clean());
 
   echo _mysql_error() . ($file != '' && $line != '' ? "<p>in $file, line $line</p>" : "") . "</div></div>";
+
+  $msg = ob_get_flush() . "\n\n---------------------------------\n\n";
+  $h = fopen('log/sqlerr.log', 'a');
+  if ($h) {
+    fwrite($h, $msg);
+    fclose($h);
+  }
   die;
 }
 
@@ -735,7 +743,7 @@ function textbbcode($form,$text,$content="",$hastitle=false, $col_num = 130) {
 		   ));
 #  echo '<script type="text/javascript" src="js/userAutoTips.js"></script>';
 #  echo '<link rel="js/userAutoTips.css" href="url" type="text/css" media="screen" />';
-  $s->display('bbcode.tpl', php_json_encode(array('form' => $form, 'text' => $text)));
+  $s->display('bbcode.tpl', json_encode(array('form' => $form, 'text' => $text)));
 #  echo '<script type="text/javascript">userAutoTips({id:"body"});</script>';
 }
 
@@ -784,12 +792,12 @@ function end_compose() {
   print('<div class="minor-list list-seperator minor-nav">编辑帮助：<ul><li><a href="tags.php" target="_blank">'.$lang_functions['text_tags'].'</a></li><li><a href="smilies.php" target="_blank">'.$lang_functions['text_smilies'].'</a></li></ul></div>');
 }
 
-function insert_suggest($keyword, $userid, $pre_escaped = true) {
+function insert_suggest($keyword, $userid) {
   if(mb_strlen($keyword,"UTF-8") >= 2)
     {
       $userid = 0 + $userid;
       if($userid)
-	sql_query("INSERT INTO suggest(keywords, userid, adddate) VALUES (" . ($pre_escaped == true ? "'" . $keyword . "'" : sqlesc($keyword)) . "," . sqlesc($userid) . ", NOW())") or sqlerr(__FILE__,__LINE__);
+	sql_query("INSERT INTO suggest(keywords, userid, adddate) VALUES (?,?,NOW())", [$keyword, $userid]);
     }
 }
 
@@ -887,6 +895,14 @@ function get_torrent_2_user_value($user_snatched_arr) {
 function cur_user_check ($redir = '') {
   global $lang_functions;
   global $CURUSER;
+  global $securelogin;
+  if ($securelogin == "op-yes" || $securelogin == 'yes') {
+    // nginx, fastcgi_param HTTPS $https;
+    if (!(isset($_SERVER['HTTPS']) && $_SERVER["HTTPS"] == "on")) {
+      header('Location: https://' . $_SERVER['HTTP_HOST'] . $_SERVER["REQUEST_URI"]);
+    }
+  }
+  
   if ($CURUSER) {
     if ($redir) {
       header("Location: $redir");
@@ -1004,40 +1020,6 @@ function set_cachetimestamp($id, $field = "cache_stamp") {
 
 function reset_cachetimestamp($id, $field = "cache_stamp") {
   sql_query("UPDATE torrents SET $field = 0 WHERE id = " . sqlesc($id)) or sqlerr(__FILE__, __LINE__);
-}
-
-function cache_check ($file = 'cachefile',$endpage = true, $cachetime = 600) {
-  global $lang_functions;
-  global $rootpath,$cache,$CURLANGDIR;
-  $cachefile = $rootpath.$cache ."/" . $CURLANGDIR .'/'.$file.'.html';
-  // Serve from the cache if it is younger than $cachetime
-  if (file_exists($cachefile) && (time() - $cachetime < filemtime($cachefile)))
-    {
-      include($cachefile);
-      if ($endpage)
-	{
-	  print("<p align=\"center\"><font class=\"small\">".$lang_functions['text_page_last_updated'].date('Y-m-d H:i:s', filemtime($cachefile))."</font></p>");
-	  end_main_frame();
-	  stdfoot();
-	  exit;
-	}
-      return false;
-    }
-  ob_start();
-  return true;
-}
-
-function cache_save  ($file = 'cachefile') {
-  global $rootpath,$cache;
-  global $CURLANGDIR;
-  $cachefile = $rootpath.$cache ."/" . $CURLANGDIR . '/'.$file.'.html';
-  $fp = fopen($cachefile, 'w');
-  // save the contents of output buffer to the file
-  fwrite($fp, ob_get_contents());
-  // close the file
-  fclose($fp);
-  // Send the output to the browser
-  ob_end_flush();
 }
 
 function get_email_encode($lang) {
@@ -1427,8 +1409,6 @@ function getExportedValue($input,$t = null) {
 }
 
 function dbconn($autoclean = false, $test = false) {
-  global $lang_functions;
-  global $mysql_host, $mysql_user, $mysql_pass;
   global $useCronTriggerCleanUp;
 
   userlogin();
@@ -1996,7 +1976,7 @@ function stdhead($title = "", $msgalert = true, $script = "", $place = "") {
   global $Advertisement;
 
   $Cache->setLanguage($CURLANGDIR);
-  
+
   $Advertisement = new ADVERTISEMENT($CURUSER['id']);
   $cssupdatedate = $cssdate_tweak;
   // Variable for Start Time
@@ -2022,7 +2002,16 @@ function stdhead($title = "", $msgalert = true, $script = "", $place = "") {
   $title .= $showversion;
   if ($SITE_ONLINE == "no") {
     if (get_user_class() < UC_ADMINISTRATOR) {
-      die($lang_functions['std_site_down_for_maintenance']);
+      echo '<h1>' . $lang_functions['std_site_down_for_maintenance'] . '</h1>';
+
+      echo '<div id="sns"><h2 class="page-titles">社交网站</h2><div class="minor-list text table td center"><ul>';
+      global $sns;
+      foreach ($sns as $s) {
+	echo '<li><a href="' . $s['url'] . '">' . $s['text'] . '</a></li>';
+      }
+      echo '</ul></div></div>';
+
+      die();
     }
     else
       {
@@ -2307,14 +2296,6 @@ function stdfoot() {
   }
 }
 
-function genbark($x,$y) {
-  stdhead($y);
-  print("<h1>" . htmlspecialchars($y) . "</h1>\n");
-  print('<div style="text-align:center;">' . htmlspecialchars($x) . "</div>\n");
-  stdfoot();
-  exit();
-}
-
 function mksecret($len = 20) {
   $ret = "";
   for ($i = 0; $i < $len; $i++)
@@ -2333,8 +2314,8 @@ function logincookie($id, $passhash, $updatedb = 1, $expires = 0x7fffffff, $secu
   if ($expires != 0x7fffffff && $expires != 0)
   $expires = time()+$expires;
 
-  setcookie("c_secure_uid", base64($id), $expires, "/", NULL, NULL, true);
-  setcookie("c_secure_pass", $passhash, $expires, "/", NULL, NULL, true);
+  setcookie("c_secure_uid", base64($id), $expires, "/", NULL, $ssl, true);
+  setcookie("c_secure_pass", $passhash, $expires, "/", NULL, $ssl, true);
   if($ssl)
   setcookie("c_secure_ssl", base64("yeah"), $expires, "/");
   else
@@ -2349,7 +2330,6 @@ function logincookie($id, $passhash, $updatedb = 1, $expires = 0x7fffffff, $secu
   setcookie("c_secure_login", base64("yeah"), $expires, "/");
   else
   setcookie("c_secure_login", base64("nope"), $expires, "/");
-
 
   if ($updatedb)
   sql_query("UPDATE LOW_PRIORITY users SET last_login = NOW(), lang=" . sqlesc(get_langid_from_langcookie()) . " WHERE id = ".sqlesc($id));
@@ -4799,3 +4779,8 @@ function storing_keeper_list($torrentid){
 	return $list;
 }
 
+function strip_local_domain($link) {
+  global $possibleUrls;
+  $regpre = '!^https?://(?:' . implode('|', $possibleUrls) . ')/!i';
+  return preg_replace($regpre, '/', $link);
+}

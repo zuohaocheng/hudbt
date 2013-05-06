@@ -15,26 +15,18 @@ $(function() {
 
     args = argsFromUri(window.location.search),
     oripage = parseInt(args.page) || 0,
-    disableAutoPaging = false,
+    disableAutoPaging = false;
 
     //Auto paging switch
-    auto_paging_switch = $('<input />', {
-	type : 'checkbox',
-	id : 'disable-autopaging',
-	title : '换了浏览器要重新设置的亲'
-    }).click(function() {
-	disableAutoPaging = (auto_paging_switch.attr('checked') === 'checked');
+    $('#hotbox>ul').append($('<li title="换了浏览器要重新设置的亲"><label><input type="checkbox" />禁用自动翻页</label></li>').find('input').click(function() {
+	disableAutoPaging = this.checked;
 	$.jStorage.set('disableAutoPaging', disableAutoPaging);
-    });
-    if ($.jStorage.get('disableAutoPaging', false)) {
-	disableAutoPaging = true;
-	auto_paging_switch.attr('checked', 'checked');
-    }
-    $('#hotbox>ul').append($('<li></li>').append(auto_paging_switch).append($('<label></label>', {
-	text : '禁用自动翻页',
-	'for' : 'disable-autopaging',
-	title : '刷新后生效'
-    })));
+    }).each(function() {
+	if ($.jStorage.get('disableAutoPaging', false)) {
+	    disableAutoPaging = true;
+	    this.checked = true;
+	}
+    }).end());
 
     $(document).ajaxError(function(event, jqxhr, settings) {
 	errCount += 1;

@@ -72,19 +72,14 @@ else {
   $BASEURL = $BASIC['BASEURL'];
 }
 $CAKEURL = $BASIC['BASEURL'] . '/' . $BASIC['CAKEDIR'];
-$announce_urls = array();
-$announce_urls[] = $BASIC['announce_url'];
-$mysql_host = $BASIC['mysql_host'];
-$mysql_user = $BASIC['mysql_user'];
-$mysql_pass = $BASIC['mysql_pass'];
-$mysql_db = $BASIC['mysql_db'];
-$mysql_db_test = $BASIC['mysql_db_test'];
+$announce_urls = [$BASIC['announce_url']];
 if (array_key_exists('enable_memcached', $BASIC)) {
   $enable_memcached = $BASIC['enable_memcached'];
 }
 else {
   $enable_memcached = true;
 }
+$possibleUrls = array_merge([$BASEURL], $BASIC['possible_urls']);
 
 $SITE_ONLINE = $MAIN['site_online'];
 $max_torrent_size = $MAIN['max_torrent_size'];

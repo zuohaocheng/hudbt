@@ -7,7 +7,7 @@ parked();
 
 function bark($msg) {
 	global $lang_topten;
-	genbark($msg, $lang_topten['std_error']);
+	stderr($lang_topten['std_error'], $msg);
 }
 if (get_user_class() < $topten_class){
 	stderr($lang_topten['std_sorry'],$lang_topten['std_permission_denied_only'].get_user_class_name($topten_class,false,true,true).$lang_topten['std_or_above_can_view'],false);

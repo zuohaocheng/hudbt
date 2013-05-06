@@ -59,7 +59,7 @@ $(function() {
 			var $t = $(t);
 			$t.find('.alert-message-reply').click(function(e) {
 			    e.preventDefault();
-			    jqui_form($('<form action="//' + base + '/takemessage.php?format=json&receiver=' + msg.sender.id + '&subject=Re%3A' + encodeURIComponent(msg.subject) + '&origmsg=' + msg.id + '" style="height:200px"><textarea name="body" style="width:100%;height:100%" autofocus="autofocus" required="required">' + msg.msg_bbcode + "\n\n-------- [user=" + msg.sender.id + '] [i] Wrote at ' + msg.added + ":[/i] --------\n\n</textarea></form>"), 'Re:' + msg.subject + ' (<a href="' + replyUri + '">打开完整编辑</a>)', function(result, dialog) {
+			    var d = jqui_form($('<form action="//' + base + '/takemessage.php?format=json&receiver=' + msg.sender.id + '&subject=Re%3A' + encodeURIComponent(msg.subject) + '&origmsg=' + msg.id + '" style="height:200px"><textarea name="body" style="width:100%;height:100%" autofocus="autofocus" required="required">' + msg.msg_bbcode + "\n\n-------- [user=" + msg.sender.id + '] [i] Wrote at ' + msg.added + ":[/i] --------\n\n</textarea></form>"), 'Re:' + msg.subject, function(result, dialog) {
 				if (!result.success) {
 				    dialog.find('#dialog-hint').text(result.message);
 				    return false;
@@ -73,6 +73,7 @@ $(function() {
 				    return true;
 				}
 			    }, null, 500);
+			    d.parent().find('.ui-dialog-title').append(' (<a href="' + replyUri + '">打开完整编辑</a>');
 			});
 			
 			$t.find('.alert-message-read').click(function(e) {

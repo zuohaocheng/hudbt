@@ -16,38 +16,17 @@ if (!$Cache->get_page()){
 	$sendpmimg = "<img class=\"button_pm\" src=\"pic/trans.gif\" alt=\"pm\" />";
 //--------------------- FIRST LINE SUPPORT SECTION ---------------------------//
 	unset($ppl);
-	$res = sql_query("SELECT id,country,last_access,supportlang,supportfor FROM users WHERE users.support='yes' AND users.status='confirmed' ORDER BY users.username") or sqlerr();
-	while ($arr = _mysql_fetch_assoc($res))
-		{
-		$countryrow = get_country_row($arr['country']);
-		$ppl .= "<tr><td class=embedded>". get_username($arr['id']) ."</td><td class=embedded><img width=24 height=15 src=\"pic/flag/".$countryrow[flagpic]."\" title=\"".$countryrow['name']."\" style=\"padding-bottom:1px;\"></td>
- 		<td class=embedded> ".(strtotime($arr['last_access']) > $dt ? $onlineimg : $offlineimg)."</td>".
- 		"<td class=embedded><a href=sendmessage.php?receiver=".$arr['id']." title=\"".$lang_staff['title_send_pm']."\">".$sendpmimg."</a></td>".
- 		"<td class=embedded>".$arr['supportlang']."</td>".
- 		"<td class=embedded>".$arr['supportfor']."</td></tr>\n";
-		}
+	$res = sql_query("SELECT id,country,last_access,supportlang,supportfor FROM users WHERE users.support='yes' AND users.status='confirmed' ORDER BY users.username");
+	foreach ($res as $arr) {
+	  $ppl .= "<li>". get_username($arr['id']) ."</li>";
+	}
 
-	begin_frame($lang_staff['text_firstline_support']."<font class=small> - [<a class=altlink href=contactstaff.php><b>".$lang_staff['text_apply_for_it']."</b></a>]</font>");
-	?>
-	<?php echo $lang_staff['text_firstline_support_note'] ?>
-	<br /><br />
-	<table width="100%" cellspacing="0" class="transparent">
-		<tr>
-		<td class=embedded><b><?php echo $lang_staff['text_username'] ?></b></td>
-		<td class=embedded align=center><b><?php echo $lang_staff['text_country'] ?></b></td>
-		<td class=embedded align=center><b><?php echo $lang_staff['text_online_or_offline'] ?></b></td>
-		<td class=embedded align=center><b><?php echo $lang_staff['text_contact'] ?></b></td>
-		<td class=embedded align=center><b><?php echo $lang_staff['text_language'] ?></b></td>
-		<td class=embedded><b><?php echo $lang_staff['text_support_for'] ?></b></td>
-	</tr>
-	<tr>
-		<td class=embedded colspan=6>
-			<hr color="#4040c0">
-		</td>
-	</tr>
-	<?php echo $ppl?>
-</table>
-<?php
+	begin_frame($lang_staff['text_firstline_support']."<span class=\"small\"> - [<a class=\"altlink\" href=\"contactstaff.php\">联系客服</a>] - [<a class=\"altlink\" href=\"contactstaff.php\">".$lang_staff['text_apply_for_it']."</a>]</span>");
+	echo $lang_staff['text_firstline_support_note']; 
+	echo '<div class="minor-list"><ul>';
+	echo $ppl;
+	echo '</ul></div>';
+
 end_frame();
 
 //--------------------- FIRST LINE SUPPORT SECTION ---------------------------//
@@ -90,38 +69,20 @@ end_frame();
 //--------------------- film critics section ---------------------------//
 
 /***************************Keepers************************/
-unset($ppl);
+$ppl = '';
 $res = sql_query("SELECT u.country,u.id,u.username,u.last_access,u_ugp.role FROM users_usergroups AS u_ugp
-JOIN users AS u ON u_ugp.user_id = u.id WHERE u_ugp.usergroup_id = 1 AND removed_by IS NULL AND removed_date IS NULL ORDER BY role") or sqlerr();
-while ($arr = _mysql_fetch_assoc($res))
-{
-	$countryrow = get_country_row($arr['country']);
-	$ppl .= "<tr height=15><td class=embedded>". get_username($arr['id'])  ."</td><td class=embedded ><img width=24 height=15 src=\"pic/flag/".$countryrow['flagpic']."\" title=\"".$countryrow['name']."\" style=\"padding-bottom:1px;\"></td>
- <td class=embedded> ".(strtotime($arr['last_access']) > $dt ? $onlineimg : $offlineimg)."</td>".
- "<td class=embedded><a href=sendmessage.php?receiver=".$arr['id']." title=\"".$lang_staff['title_send_pm']."\">".$sendpmimg."</a></td>".
- "<td class=embedded>".($arr['role']=='boss'? $lang_staff['text_boss']:$lang_staff['text_member'])."</td></tr>\n";
+JOIN users AS u ON u_ugp.user_id = u.id WHERE u_ugp.usergroup_id = 1 AND removed_by IS NULL AND removed_date IS NULL ORDER BY role");
+foreach ($res as $arr) {
+  $ppl .= "<li>". get_username($arr['id']) ."</li>";
 }
 
-begin_frame($lang_staff['text_keepers']."<font class=small> - [<a class=altlink href=contactstaff.php><b>".$lang_staff['text_apply_for_it']."</b></a>]</font>");
-?>
-<?php echo $lang_staff['text_keepers_note'] ?>
-<br /><br />
-<table width="100%" cellspacing="0" class="transparent">
-	<tr>
-		<td class=embedded><b><?php echo $lang_staff['text_username'] ?></b></td>
-		<td class=embedded align=center><b><?php echo $lang_staff['text_country'] ?></b></td>
-		<td class=embedded align=center><b><?php echo $lang_staff['text_online_or_offline'] ?></b></td>
-		<td class=embedded align=center><b><?php echo $lang_staff['text_contact'] ?></b></td>
-		<td class=embedded align=center><b><?php echo $lang_staff['text_role'] ?></b></td>
-	</tr>
-	<tr>
-		<td class=embedded colspan=5>
-			<hr color="#4040c0">
-		</td>
-	</tr>
-	<?php echo $ppl?>
-</table>
-<?php
+begin_frame($lang_staff['text_keepers']."<span class=\"small\"> - [<a class=\"altlink\" href=\"contactstaff.php\">".$lang_staff['text_apply_for_it']."</a>]</span>");
+echo $lang_staff['text_keepers_note'];
+
+echo '<div class="minor-list"><ul>';
+echo $ppl;
+echo '</ul></div>';
+
 end_frame();
 //--------------------- forum moderators section ---------------------------//
 /*
@@ -193,9 +154,8 @@ while ($arr = _mysql_fetch_assoc($res))
  "<td class=embedded>".$arr['stafffor']."</td></tr>\n";
 }
 
-begin_frame($lang_staff['text_general_staff']."<font class=small> - [<a class=altlink href=contactstaff.php><b>".$lang_staff['text_apply_for_it']."</b></a>]</font>");
+begin_frame($lang_staff['text_general_staff']."<span class=\"small\"> - [<a class=\"altlink\" href=\"contactstaff.php\">" . $lang_staff['text_general_staff_note'] . "</a>] - [<a class=\"altlink\" href=\"contactstaff.php\">".$lang_staff['text_apply_for_it']."</a>]</span>");
 ?>
-<?php echo $lang_staff['text_general_staff_note'] ?>
 <br /><br />
 <table width="100%" cellspacing="0" class="transparent">
 	<?php echo $ppl?>

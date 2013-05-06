@@ -123,8 +123,9 @@ $rows=sql_query("SELECT requests.* ,(SELECT count(DISTINCT torrentid) FROM resre
 		$ress.="";
 		
 		if(($arr['userid']== $CURUSER['id'] || get_user_class() >= 13)&&$arr['finish']=="no")
-		$ress.="<input type=submit value=使用勾选的资源作为所需资源></form>\n";
+		$ress.="<input type=submit value=使用勾选的资源作为所需资源>\n";
 		}
+	$ress .= '</form>';
 	tr("应求",$ress,1);
 	print("</table><br/><br/>\n");
 	
@@ -351,7 +352,7 @@ $ruserid=0+$_GET["userid"];
 	
 	
 	
-	
+		
 	stderr("成功","应求成功，<a href=viewrequests.php?action=view&id=".$_POST["reqid"].">点击这里返回</a>",0);
 	die;
 	break;
@@ -428,37 +429,9 @@ $ruserid=0+$_GET["userid"];
 		}
 	
 	}
-	
-	case "message":
-	{
-	if(!is_numeric($_POST["id"]))stderr("出错了！！！","不要试图入侵系统");
-	$res = sql_query("SELECT * FROM requests WHERE id ='".$_POST["id"]."'") or sqlerr(__FILE__, __LINE__);
-	if (_mysql_num_rows($res) == 0) stderr("出错了！","该求种已被删除！");
-	if (!$_POST["message"])stderr("出错了！","留言不能为空！");
-	$arr = _mysql_fetch_assoc($res);
-	$message = $arr["message"];
-	$message .= "<tr><td width=240>由".$CURUSER["username"]."添加于".date("Y-m-d H:i:s")."</td><td>".$_POST["message"]."</td></tr>";
-	
-	
-	
-	//sql_query("UPDATE requests SET message = '".$message."' WHERE id = ".$_POST["id"])or sqlerr(__FILE__, __LINE__);
-	
-	//sql_query("INSERT reqcommen (user , added ,text ,reqid) VALUES ( '".$CURUSER["id"]."' , ".sqlesc(date("Y-m-d H:i:s"))." , ".sqlesc($_POST["message"])." , '".$_POST["id"]."'    )");
-	sql_query("INSERT INTO comments (user, request, added, text, ori_text) VALUES (" .$CURUSER["id"] . ',' . sqlesc(0 + $_POST['id']) . ", '" . date("Y-m-d H:i:s") . "', " . sqlesc($_POST["message"]) . "," . sqlesc($_POST["message"]) . ")");
-
-	if($CURUSER["id"]<>$arr['userid'])sql_query("INSERT INTO messages (sender, receiver, subject, msg, added) VALUES(0, " . $arr['userid'] . ", '你的求种请求收到新回复', ".sqlesc(" [url=viewrequests.php?action=view&id=$_POST[id]] " . $arr['request'] . "[/url].").", ".sqlesc(date("Y-m-d H:i:s")).")") or sqlerr(__FILE__, __LINE__);
-
-	$ruserid=0+$_POST["ruserid"];
-	if($ruserid<>$CURUSER["id"]&&$ruserid<>$arr['userid'])sql_query("INSERT INTO messages (sender, receiver, subject, msg, added) VALUES(0, " . $ruserid . ", '你的求种评论收到新回复', ".sqlesc(" [url=viewrequests.php?action=view&id=$_POST[id]] " . $arr['request'] . "[/url].").", ".sqlesc(date("Y-m-d H:i:s")).")") or sqlerr(__FILE__, __LINE__);
-	
-	header("Location: viewrequests.php?action=view&id=".$_POST['id']);
-	}
 }
 
 
 }
 die;
 
-
-
-?>

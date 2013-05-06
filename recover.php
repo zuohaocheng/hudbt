@@ -4,6 +4,13 @@ dbconn();
 failedloginscheck ("Recover",true);
 cur_user_check ('index.php') ;
 
+if ($securelogin == "op-yes" || $securelogin == 'yes') {
+  $link = 'https://';
+}
+else {
+  $link = 'http://';
+}
+
 $take_recover = !isset($_GET['sitelanguage']);
 $langid = 0 + $_GET['sitelanguage'];
 if ($langid)
@@ -42,17 +49,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 
 	$sec = mksecret();
 
-	sql_query("UPDATE LOW_PRIORITY users SET editsecret=" . sqlesc($sec) . " WHERE id=" . sqlesc($arr["id"])) or sqlerr(__FILE__, __LINE__);
+	sql_query("UPDATE LOW_PRIORITY users SET editsecret=? WHERE id=?", [$sec, $arr['id']]);
 	if (!_mysql_affected_rows())
 	stderr($lang_recover['std_error'], $lang_recover['std_database_error']);
 
 	$hash = md5($sec . $email . $arr["passhash"] . $sec);
 	$ip = getip() ;
 	$title = $SITENAME.$lang_recover['mail_title'];
+	$link .= "$BASEURL/recover.php?id=" . $arr["id"] . "&secret=$hash";
 	$body = <<<EOD
 {$lang_recover['mail_one']}($email){$lang_recover['mail_two']}$ip{$lang_recover['mail_three']}
-<b><a href="javascript:void(null)" onclick="window.open('http://$BASEURL/recover.php?id={$arr["id"]}&secret=$hash')"> {$lang_recover['mail_this_link']} </a></b><br />
-http://$BASEURL/recover.php?id={$arr["id"]}&secret=$hash
+<b><a href="$link" onclick="window.open('$link');return false"> {$lang_recover['mail_this_link']} </a></b><br />
 {$lang_recover['mail_four']}
 EOD;
 
@@ -67,9 +74,8 @@ elseif($_SERVER["REQUEST_METHOD"] == "GET" && $take_recover && isset($_GET["id"]
 	if (!$id)
 	httperr();
 
-	$res = sql_query("SELECT username, email, passhash, editsecret FROM users WHERE id = " . sqlesc($id)) or sqlerr(__FILE__, __LINE__);
+	$res = sql_query("SELECT username, email, passhash, editsecret FROM users WHERE id = ?", [$id]) or sqlerr(__FILE__, __LINE__);
 	$arr = _mysql_fetch_array($res) or httperr();
-
 	$email = $arr["email"];
 
 	$sec = hash_pad($arr["editsecret"]);
@@ -94,14 +100,12 @@ elseif($_SERVER["REQUEST_METHOD"] == "GET" && $take_recover && isset($_GET["id"]
 	if (!_mysql_affected_rows())
 	stderr($lang_recover['std_error'], $lang_recover['std_unable_updating_user_data']);
 	$title = $SITENAME.$lang_recover['mail_two_title'];
+	$link .= "$BASEURL/usercp.php?action=security";
 	$body = <<<EOD
 {$lang_recover['mail_two_one']}{$arr["username"]}
 {$lang_recover['mail_two_two']}$newpassword
 {$lang_recover['mail_two_three']}
-<b><a href="javascript:void(null)" onclick="window.open('http://$BASEURL/login.php')">{$lang_recover['mail_here']}</a></b>
-{$lang_recover['mail_three_1']}
-<b><a href="http://www.google.com/support/bin/answer.py?answer=23852" target='_blank'>{$lang_confirm_resend['mail_google_answer']}</a></b>
-{$lang_recover['mail_three_2']}
+<b><a href="$link" onclick="window.open('$link');return false">{$lang_recover['mail_here']}</a></b>
 {$lang_recover['mail_two_four']}
 
 EOD;

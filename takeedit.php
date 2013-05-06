@@ -8,7 +8,7 @@ $action = $_POST['action'];
 
 function bark($msg) {
 	global $lang_takeedit;
-	genbark($msg, $lang_takeedit['std_edit_failed']);
+	stderr($lang_takeedit['std_edit_failed'], $msg);
 }
 
 if (!mkglobal("id:name:descr:type")){

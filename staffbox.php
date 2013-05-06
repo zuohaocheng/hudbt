@@ -3,8 +3,7 @@ require "include/bittorrent.php";
 dbconn();
 require_once(get_langfile_path());
 loggedinorreturn();
-if (get_user_class() < $staffmem_class)
-	permissiondenied();
+checkPrivilegePanel();
 
 $action = $_GET["action"];
 
@@ -65,8 +64,6 @@ if (!$action) {
 
 if ($action == "viewpm")
 {
-	if (get_user_class() < $staffmem_class)
-		permissiondenied();
 
 $pmid = 0 + $_GET["pmid"];
 
@@ -122,8 +119,6 @@ stdfoot();
        //////////////////////////
 
 if ($action == "answermessage") {
-	if (get_user_class() < $staffmem_class)
-		permissiondenied();
 
         $answeringto = $_GET["answeringto"];
         $receiver = 0 + $_GET["receiver"];
@@ -163,9 +158,6 @@ if ($action == "takeanswer") {
   if ($_SERVER["REQUEST_METHOD"] != "POST")
     die();
 
-    if (get_user_class() < $staffmem_class)
-   permissiondenied();
-
      $receiver = 0 + $_POST["receiver"];
    $answeringto = $_POST["answeringto"];
 
@@ -200,8 +192,6 @@ if ($action == "deletestaffmessage") {
     if (!is_numeric($id) || $id < 1 || floor($id) != $id)
     die;
 
-          if (get_user_class() < $staffmem_class)
-          permissiondenied();
 
     sql_query("DELETE FROM staffmessages WHERE id=" . sqlesc($id)) or die();
 $Cache->delete_value('staff_message_count');
@@ -215,8 +205,6 @@ $Cache->delete_value('staff_new_message_count');
 
 if ($action == "setanswered") {
 
- if (get_user_class() < $staffmem_class)
-    permissiondenied();
 
 $id = 0 + $_GET["id"];
 
@@ -230,8 +218,6 @@ header("Refresh: 0; url=staffbox.php?action=viewpm&pmid=$id");
        //////////////////////////
 
 if ($action == "takecontactanswered") {
-	if (get_user_class() < $staffmem_class)
-		permissiondenied();
 
 if ($_POST['setdealt']){
 	$res = sql_query ("SELECT id FROM staffmessages WHERE answered=0 AND id IN (" . implode(", ", $_POST[setanswered]) . ")");

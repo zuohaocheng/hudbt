@@ -6,8 +6,6 @@ stdhead($lang_rules['head_rules']);
 $Cache->new_page('rules', 900, true);
 if (!$Cache->get_page()) {
   $Cache->add_whole_row();
-  //make_folder("cache/" , get_langfolder_cookie());
-  //cache_check ('rules');
   begin_main_frame();
 
   $lang_id = get_guest_lang_id();
@@ -23,6 +21,5 @@ if (!$Cache->get_page()) {
   }
   end_main_frame();
 }
-//cache_save ('rules');
 stdfoot();
 

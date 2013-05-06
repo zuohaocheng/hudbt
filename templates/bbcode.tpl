@@ -14,5 +14,5 @@
   <a id="showmoresmilies" href="#">{$lang['text_more_smilies']}</a>
 </div>
 <div id="moresmilies" style="display:none;" title="{$lang_functions['text_more_smilies']}"></div>
-<textarea class="bbcode" cols="100" style="width: 70%;" name="{$config['text']}" id="{$config['text']}" rows="20" onkeydown="ctrlenter(event,'compose','qr')">{nocache}{$content}{nocache}</textarea>
+<textarea class="bbcode" cols="100" style="width: 70%;" name="{$config['text']}" id="{$config['text']}" rows="20" onkeydown="ctrlenter(event,'compose','qr')" required="required">{nocache}{$content}{nocache}</textarea>
 {get_load_uri('js', 'bbcode.js')}

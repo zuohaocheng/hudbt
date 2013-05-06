@@ -31,9 +31,9 @@ $lang_recover = array
 	'mail_two_title' => " 网站账户信息",
 	'mail_two_one' => "你好，<br /><br />依你的请求，我们给你的账户生成了新的密码。<br /><br />以下是你的账户重置后的信息：<br /><br />用户名：",
 	'mail_two_two' => "<br />密码：",
-	'mail_two_three' => "<br /><br />你可以从这里登录： ",
-	'mail_two_four' => "<br /><br />登录后你可以在控制面板-安全设定中修改密码。<br />------<br />".$SITENAME." 网站",
+	'mail_two_three' => "<br /><br />你可以从这里登录并修改密码： ",
+	'mail_two_four' => "<br />------<br />".$SITENAME." 网站",
 	'text_select_lang' => "Select Site Language: ",
 	'std_user_account_unconfirmed' => "该账户还未通过验证。如果你没有收到验证邮件，试试<a href='confirm_resend.php'><b>重新发送验证邮件</b></a>。",
 );
-?>
+

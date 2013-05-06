@@ -4,10 +4,10 @@
  * Added by BruceWolf. 2011.10.15
  */
 
+ob_start();
+if (get_user_row($row['owner']) !== false) {
 ?>
-<dt id="donating">捐赠魔力值</dt>
-<dd>
-	<div id="to_donate">
+<div id="to_donate">
 <?php
 $torrent_id = (int) $_GET['id'];
 if($CURUSER['id'] == $row['owner']) {
@@ -19,17 +19,20 @@ if($CURUSER['id'] == $row['owner']) {
 	if(!empty($donated)) {
 		echo "<p class=\"donate_note\">你已经于 {$donated['action_date']} 对种子发布者捐赠过 {$donated['amount']} 魔力值，谢谢你！</p>";
 	} else {
-	?>
-			<a class="donate donate-0" title="向楼主捐赠 64 魔力">64</a>
-			<a class="donate donate-1" title="向楼主捐赠 128 魔力">128</a>
-			<a class="donate donate-2" title="向楼主捐赠 256 魔力">256</a>
-			<a class="donate donate-3" title="向楼主捐赠 512 魔力">512</a>
-			<a class="donate donate-4" title="You know~ I'm rich!">1024</a>
-	<?php 
+?>
+<a class="donate donate-0" title="向楼主捐赠 64 魔力" href="#">64</a>
+<a class="donate donate-1" title="向楼主捐赠 128 魔力" href="#">128</a>
+<a class="donate donate-2" title="向楼主捐赠 256 魔力" href="#">256</a>
+<a class="donate donate-3" title="向楼主捐赠 512 魔力" href="#">512</a>
+<a class="donate donate-4" title="You know~ I'm rich!" href="#">1024</a>
+<?php 
 	}
 }
 ?>
-	</div>
+</div>
+<?php
+    }
+?>
 <div id="donater_list">
 <?php 
 $torrent_id = (int) $_GET['id'];
@@ -57,6 +60,8 @@ $classForAmount = [64 => 'donate-0',
 		   512 => 'donate-3',
 		   1024 => 'donate-4'];
 
+$content = ob_get_clean();
+
 if($doanterCount) {
 	$amount = 0;
 	$donateListHTML = '';
@@ -68,17 +73,23 @@ if($doanterCount) {
 	$donateListHTML .= '<div style="clear:both;"></div>';
 	if($CURUSER['id'] == $row['owner']) {
 		$amount_after_tax = $amount - ($amount / 8);
-		echo "<p class=\"donate_note\">共有 {$doanterCount} 人给你捐赠了 {$amount} 魔力值，你收到的为 {$amount_after_tax} 魔力值[税后]。</p>";
+		$content .= "<p class=\"donate_note\">共有 {$doanterCount} 人给你捐赠了 {$amount} 魔力值，你收到的为 {$amount_after_tax} 魔力值[税后]。</p>";
 	}
 	
-	echo $donateListHTML;
+	$content .= $donateListHTML;
 } else {
 	if($CURUSER['id'] == $row['owner']) {
-		echo '<p class="donate_note">暂时还没有人给你捐赠魔力值，随缘的哦~</p>';
-	} else {
-		echo '<p class="donate_note">支持发种者，你来做第一个捐赠人吧~</p>';
+		$content .= '<p class="donate_note">暂时还没有人给你捐赠魔力值，随缘的哦~</p>';
+	} else if (get_user_row($row['owner']) !== false) {
+		$content .= '<p class="donate_note">支持发种者，你来做第一个捐赠人吧~</p>';
+	}
+	else {
+	  $content = '';
 	}
 }
-?>
 
-</div></dd>
+if ($content) {
+  $content .= '</div>';
+  echo '<dt id="donating">捐赠魔力值</dt><dd>', $content, '</dd>';
+}
+

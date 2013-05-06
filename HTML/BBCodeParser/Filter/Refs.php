@@ -11,8 +11,7 @@ class HTML_BBCodeParser_Filter_Refs extends HTML_BBCodeParser_Filter {
     $ce = $options['close_esc'];
     $this->_preparsed = $this->_text;
 
-    global $BASEURL;
-    $possibleUrls = [$BASEURL, 'kmgtp.org', 'sp-pt.hust.edu.cn(?:\:81)?'];
+    global $possibleUrls;
     $regpre = '!(^|[^="])https?://(?:' . implode('|', $possibleUrls) . ')/';
     foreach (['user' => 'userdetails.php\?id=([0-9]+)[&;=%0-9a-z#]*',
 	      'torrent' => 'details.php\?id=([0-9]+)[&;=%0-9a-z#]*',

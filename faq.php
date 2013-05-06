@@ -9,8 +9,6 @@ $Cache->new_page('faq', 900, true);
 if (!$Cache->get_page())
 {
 $Cache->add_whole_row();
-//make_folder("cache/" , get_langfolder_cookie());
-//cache_check ('faq');
 begin_main_frame();
 
 echo '<h1>' . $lang_faq['text_welcome_to'].$SITENAME." - ".$SLOGAN . '</h1>';
@@ -83,6 +81,5 @@ end_main_frame();
 	$Cache->cache_page();
 }
 echo $Cache->next_row();
-//cache_save ('faq');
 stdfoot();
 

@@ -94,5 +94,9 @@ class HTML_BBCodeParser_Filter_Images extends HTML_BBCodeParser_Filter
 			"!".$oe."img(\s?.*)".$ce."(.*)".$oe."/img".$ce."!Ui",
 			$o."img=\"\$2\"\$1".$c.$o."/img".$c,
 			$this->_text);
+
+	global $possibleUrls;
+	$regpre = '!'.$oe.'img=(["\']?)https?://(?:' . implode('|', $possibleUrls) . ')/!i';
+	$this->_preparsed = preg_replace($regpre, $o.'img=$1/', $this->_preparsed);
     }
 }

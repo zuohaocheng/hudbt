@@ -332,8 +332,8 @@ else {
 
 if (count($updateset)) { // Update only when there is change in peer counts
   $updateset[] = "visible = 'yes'";
-  $updateset[] = "last_action = $dt";
   if ($seeder == 'yes') {
+    $updateset[] = "last_action = $dt";
     $updateset[] = "startseed = 'yes'";
   }
   sql_query("UPDATE LOW_PRIORITY torrents SET " . join(",", $updateset) . " WHERE id = $torrentid");

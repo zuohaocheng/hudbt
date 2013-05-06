@@ -752,6 +752,9 @@ stdhead($lang_offers['head_offers']);
 
 print('<h1>' . $lang_offers['text_offers_section'] . '</h1>');
 print('<div class="table td" style="margin-bottom:2em;padding:10px;">');
+if (get_user_class() >= $addoffer_class) {
+  print("<h2 class=\"center\"><a href=\"?add_offer=1\">".$lang_offers['text_add_offer']."</a></h2>");
+}
 print("<h2>".$lang_offers['text_rules']."</h2>\n");
 print("<div align=\"left\"><ul>");
 $rule_args = array([], 
@@ -773,9 +776,6 @@ foreach ($rule_args as $k => $v) {
 }
 
 print("</ul></div>");
-if (get_user_class() >= $addoffer_class)
-print("<div align=\"center\" style=\"margin-bottom: 8px;\"><a href=\"?add_offer=1\">".
-"<b>".$lang_offers['text_add_offer']."</b></a></div>");
 print("<div align=\"center\"><form method=\"get\" action=\"?\">".$lang_offers['text_search_offers']."&nbsp;&nbsp;<input type=\"text\" id=\"specialboxg\" name=\"search\" />&nbsp;&nbsp;");
 $cats = genrelist($browsecatmode);
 $catdropdown = "";

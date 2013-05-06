@@ -31,14 +31,15 @@ else {
   }
 
   if (!isset($_GET["cmtpage"])) {
+    if ($_GET["uploaded"]) {
+      header("refresh: 1; url=download.php?id=$id");
+    }
+
     stdhead($lang_details['head_details_for_torrent']. "\"" . $row["name"] . "\"");
 
-    if ($_GET["uploaded"])
-      {
+    if ($_GET["uploaded"]) {
 	print('<h1 class="page-titles">'.$lang_details['text_successfully_uploaded']."</h1>");
 	print('<div style="text-align:center">'.$lang_details['text_redownload_torrent_note']."</div>");
-	header("refresh: 1; url=download.php?id=$id");
-	//header("refresh: 1; url=getimdb.php?id=$id&type=1");
       }
     elseif ($_GET["edited"]) {
       print('<h1 class="page-titles">'.$lang_details['text_successfully_edited']."</h1>");

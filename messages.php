@@ -341,7 +341,7 @@ if ($_POST['markread']) {
 //Mark a single message as read
 	@sql_query("UPDATE messages SET unread='no' WHERE id=" . sqlesc($pm_id) . " AND receiver=" . $CURUSER['id'] . " LIMIT 1");
 	}
-	else {
+	else if (!empty($pm_messages)) {
 // Mark multiple messages as read
 	@sql_query("UPDATE messages SET unread='no' WHERE id IN (" . implode(", ", array_map("sqlesc",$pm_messages)) . ") AND receiver=" .$CURUSER['id']);
 	}

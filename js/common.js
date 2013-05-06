@@ -523,6 +523,7 @@ var jqui_confirm = function(title, html, onOK, onCancel) {
 	    }
 	}
     });
+    return dialog;
 };
 
 var jqui_form = function(form, title, callback, buttons, width) {
@@ -574,7 +575,7 @@ var jqui_form = function(form, title, callback, buttons, width) {
 	buttons = defaultButtons;
     }
     
-    dialog.dialog({
+    return dialog.dialog({
 	modal : true,
 	autoOpen : true,
 	buttons : buttons,

@@ -102,13 +102,10 @@ if ($action){
 				$upload = $_POST["upload"];
 				$isp = $_POST["isp"];
 				//	$tzoffset = $_POST["tzoffset"];
-				if ( $_POST["avatar"] == '' )
-				$avatar=$_POST["savatar"];
-				else
-				$avatar = $_POST["avatar"];
+				$avatar = trim($_POST["avatar"]);
 
-				if(preg_match("/^http:\/\/[^\s'\"<>]+\.(jpg|gif|png|jpeg)$/i", $avatar) && !preg_match("/\.php/i",$avatar) && !preg_match("/\.js/i",$avatar) && !preg_match("/\.cgi/i",$avatar)) {
-					$avatar = htmlspecialchars( trim( $avatar ) );
+				if(preg_match("/^https?:\/\/[^\s'\"<>]+\.(jpg|gif|png|jpeg)$/i", $avatar) && !preg_match("/\.php/i",$avatar) && !preg_match("/\.js/i",$avatar) && !preg_match("/\.cgi/i",$avatar)) {
+					$avatar = htmlspecialchars( strip_local_domain( $avatar ) );
 					$updateset[] = "avatar = " . sqlesc($avatar);
 				}
 				$info = trim($_POST["info"]);
