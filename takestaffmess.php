@@ -9,7 +9,6 @@ if (get_user_class() < UC_ADMINISTRATOR)
 	stderr("Sorry", "Permission denied.");
 
 $sender_id = ($_POST['sender'] == 'system' ? 0 : (int)$CURUSER['id']);
-$dt = sqlesc(date("Y-m-d H:i:s"));
 $msg = trim($_POST['msg']);
 if (!$msg)
 	stderr("Error","Don't leave any fields blank.");
@@ -25,10 +24,9 @@ if (is_array($updateset)) {
 }
 $subject = trim($_POST['subject']);
 $query = sql_query("SELECT id FROM users WHERE class IN (".implode(",", $updateset).")");
-while($dat=_mysql_fetch_assoc($query))
-{
-	sql_query("INSERT INTO messages (sender, receiver, added,  subject, msg) VALUES ($sender_id, $dat[id], $dt, " . sqlesc($subject) .", " . sqlesc($msg) .")") or sqlerr(__FILE__,__LINE__);
+while($dat=_mysql_fetch_assoc($query)) {
+	send_pm($sender_id, $dat['id'], $subject, $msg);
 }
 
 header("Refresh: 0; url=staffmess.php?sent=1");
-?>
+

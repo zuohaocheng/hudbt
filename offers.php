@@ -293,7 +293,7 @@ if ($_GET["allow_offer"]) {
 
 	$subject = $lang_offers_target[get_user_lang($arr["userid"])]['msg_your_offer_allowed'];
 	$allowedtime = date("Y-m-d H:i:s");
-	sql_query("INSERT INTO messages (sender, receiver, added, msg, subject) VALUES(0, $arr[userid], '" . $allowedtime . "', " . sqlesc($msg) . ", ".sqlesc($subject).")") or sqlerr(__FILE__, __LINE__);
+	send_pm(0, $arr['userid'], $subject, $msg);
 	sql_query ("UPDATE offers SET allowed = 'allowed', allowedtime = '".$allowedtime."' WHERE id = $offid") or sqlerr(__FILE__,__LINE__);
 
 	write_log("$CURUSER[username] allowed offer $arr[name]",'normal');
@@ -343,9 +343,7 @@ if ($_GET["finish_offer"]) {
 	}
 			//===use this line if you DO HAVE subject in your PM system
 	$subject = $lang_offers_target[get_user_lang($arr[userid])]['msg_your_offer'].$arr[name].$lang_offers_target[get_user_lang($arr[userid])]['msg_voted_on'];
-	sql_query("INSERT INTO messages (sender, subject, receiver, added, msg) VALUES(0, ".sqlesc($subject).", $arr[userid], '" . $finishvotetime . "', " . sqlesc($msg) . ")") or sqlerr(__FILE__, __LINE__);
-	//===use this line if you DO NOT subject in your PM system
-	//sql_query("INSERT INTO messages (sender, receiver, added, msg) VALUES(0, $arr[userid], '" . date("Y-m-d H:i:s") . "', " . sqlesc($msg) . ")") or sqlerr(__FILE__, __LINE__);
+	send_pm(0, $arr['userid'], $subject, $msg);
 	write_log("$CURUSER[username] closed poll $arr[name]",'normal');
 
 	header("Refresh: 0; url=" . get_protocol_prefix() . "$BASEURL/offers.php");
@@ -537,7 +535,7 @@ if ($_POST["vote"]) {
 				sql_query("UPDATE offers SET allowed='allowed', allowedtime=".sqlesc($finishtime)." WHERE id=".sqlesc($offerid)) or sqlerr(__FILE__,__LINE__);
 				$msg = $lang_offers_target[get_user_lang($arr['userid'])]['msg_offer_voted_on']."[b][url=". get_protocol_prefix() . $BASEURL."/offers.php?id=$offerid&off_details=1]" . $arr[name] . "[/url][/b].". $lang_offers_target[get_user_lang($arr['userid'])]['msg_find_offer_option'].$timeoutnote;
 				$subject = $lang_offers_target[get_user_lang($arr['userid'])]['msg_your_offer_allowed'];
-				sql_query("INSERT INTO messages (sender, receiver, added, msg, subject) VALUES(0, $arr[userid], " . sqlesc(date("Y-m-d H:i:s")) . ", " . sqlesc($msg) . ", ".sqlesc($subject).")") or sqlerr(__FILE__, __LINE__);
+				send_pm(0, $arr['userid'], $subject, $msg);
 				write_log("System allowed offer $arr[name]",'normal');
 			}
 			//denied and send offer voted off message
@@ -546,7 +544,7 @@ if ($_POST["vote"]) {
 				sql_query("UPDATE offers SET allowed='denied' WHERE id=".sqlesc($offerid)) or sqlerr(__FILE__,__LINE__);
 				$msg = $lang_offers_target[get_user_lang($arr['userid'])]['msg_offer_voted_off']."[b][url=" . get_protocol_prefix() . $BASEURL."/offers.php?id=$offid&off_details=1]" . $arr[name] . "[/url][/b].".$lang_offers_target[get_user_lang($arr['userid'])]['msg_offer_deleted'] ;
 				$subject = $lang_offers_target[get_user_lang($arr['userid'])]['msg_offer_deleted'];
-				sql_query("INSERT INTO messages (sender, receiver, added, msg, subject) VALUES(0, $arr[userid], " . sqlesc(date("Y-m-d H:i:s")) . ", " . sqlesc($msg) . ", ".sqlesc($subject).")") or sqlerr(__FILE__, __LINE__);
+				send_pm(0, $arr['userid'], $subject, $msg);
 				write_log("System denied offer $arr[name]",'normal');
 			}
 
@@ -609,10 +607,9 @@ if ($_GET["del_offer"]){
 
 		if ($CURUSER["id"] != $num["userid"])
 		{
-			$added = sqlesc(date("Y-m-d H:i:s"));
-			$subject = sqlesc($lang_offers_target[get_user_lang($num["userid"])]['msg_offer_deleted']);
-			$msg = sqlesc($lang_offers_target[get_user_lang($num["userid"])]['msg_your_offer'].$num['name'].$lang_offers_target[get_user_lang($num["userid"])]['msg_was_deleted_by']. "[user=".$CURUSER['id']."]".$lang_offers_target[get_user_lang($num["userid"])]['msg_blank'].($reason != "" ? $lang_offers_target[get_user_lang($num["userid"])]['msg_reason_is'].$reason : ""));
-			sql_query("INSERT INTO messages (sender, receiver, msg, added, subject) VALUES(0, $num[userid], $msg, $added, $subject)") or sqlerr(__FILE__, __LINE__);
+			$subject = ($lang_offers_target[get_user_lang($num["userid"])]['msg_offer_deleted']);
+			$msg = ($lang_offers_target[get_user_lang($num["userid"])]['msg_your_offer'].$num['name'].$lang_offers_target[get_user_lang($num["userid"])]['msg_was_deleted_by']. "[user=".$CURUSER['id']."]".$lang_offers_target[get_user_lang($num["userid"])]['msg_blank'].($reason != "" ? $lang_offers_target[get_user_lang($num["userid"])]['msg_reason_is'].$reason : ""));
+			send_pm(0, $num['userid'], $subject, $msg);
 		}
 		write_log("Offer: $offer ($num[name]) was deleted by $CURUSER[username]".($reason != "" ? " (".$reason.")" : ""),'normal');
 		header("Refresh: 0; url=offers.php");

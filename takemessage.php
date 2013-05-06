@@ -94,7 +94,7 @@ if ($_SERVER["REQUEST_METHOD"] != "POST")
 	}
 
 	$subject = trim($_REQUEST['subject']);
-	sql_query("INSERT INTO messages (sender, receiver, added, msg, subject, saved, location) VALUES(" . sqlesc($CURUSER["id"]) . ", ".sqlesc($receiver).", '" . date("Y-m-d H:i:s") . "', " . sqlesc($msg) . ", " . sqlesc($subject) . ", " . sqlesc($save) . ", 1)") or sqlerr(__FILE__, __LINE__);
+        send_pm($CURUSER["id"], $receiver, $subject, $msg, $save);
 	$Cache->delete_value('user_'.$receiver.'_unread_message_count');
 	$Cache->delete_value('user_'.$receiver.'_inbox_count');
 	$Cache->delete_value('user_'.$CURUSER["id"].'_outbox_count');

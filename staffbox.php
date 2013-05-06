@@ -174,7 +174,7 @@ if ($action == "takeanswer") {
    if (!$msg)
      stderr($lang_staffbox['std_error'], $lang_staffbox['std_body_is_empty']);
 
-sql_query("INSERT INTO messages (sender, receiver, added, msg) VALUES($userid, $receiver, $added, $message)") or sqlerr(__FILE__, __LINE__);
+send_pm($userid, $receiver, '管理组信息回复', $message);
 
 sql_query("UPDATE staffmessages SET answer=$message, answered='1', answeredby='$userid' WHERE id=$answeringto") or sqlerr(__FILE__, __LINE__);
 $Cache->delete_value('staff_new_message_count');

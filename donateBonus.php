@@ -160,25 +160,9 @@ MESSAGE;
 谢谢你发布{$object}，祝愉快~
 MESSAGE;
 
-	// Send PM to donater |->
-	/* $sqlSendPMToDonater = 'INSERT INTO messages (sender, receiver, added, subject, msg, unread, saved, location)' */
-	/*              .' VALUES' */
-	/*              ." (0, {$donaterId}, '{$now}', '{$donaterSubject}', '{$donaterMessage}', 'yes', 'no', 1)"; */
-
-	/* sql_query($sqlSendPMToDonater); */
-	/* $Cache->delete_value('user_'.$donaterId.'_unread_message_count'); */
-	/* $Cache->delete_value('user_'.$donaterId.'_inbox_count'); */
-
-	/* $sqlUpdatePMStatus = 'UPDATE users SET last_pm = NOW() WHERE id = '.$donaterId; */
-	/* sql_query($sqlUpdatePMStatus); */
-	// End send PM to donater ||
-	
 	// Send PM to receiver |->
-	$sqlSendPMToReceiver = 'INSERT INTO messages (sender, receiver, added, subject, msg, unread, saved, location)'
-	             .' VALUES'
-	             ." (0, {$receiverId}, '{$now}', '{$receiverSubject}', '{$receiverMessage}', 'yes', 'no', 1)";
+	send_pm(0, $receiverId, $receiverSubject, $receiverMessage);
 
-	sql_query($sqlSendPMToReceiver);
 	$Cache->delete_value('user_'.$receiverId.'_unread_message_count');
 	$Cache->delete_value('user_'.$receiverId.'_inbox_count');
 

@@ -342,16 +342,9 @@ $ruserid=0+$_GET["userid"];
 	sql_query("INSERT resreq (reqid , torrentid) VALUES ( '".$_POST["reqid"]."' , '".$_POST["torrentid"]."')");
 	
 	
-	$added = sqlesc(date("Y-m-d H:i:s"));
-			$subject = sqlesc("有人应求你的求种请求,请及时确认该应求");
-			$notifs = sqlesc("求种名称:[url=viewrequests.php?id=$arr[id]] " . $arr['request'] . "[/url],请及时确认该应求.");
-			sql_query("INSERT INTO messages (sender, receiver, subject, msg, added) VALUES(0, " . $arr['userid'] . ", $subject, $notifs, $added)") or sqlerr(__FILE__, __LINE__);
-	
-	
-	
-	
-	
-	
+	$subject = ("有人应求你的求种请求,请及时确认该应求");
+	$notifs = ("求种名称:[url=viewrequests.php?id=$arr[id]] " . $arr['request'] . "[/url],请及时确认该应求.");
+	send_pm(0, $arr['userid'], $subject, $notifs);
 		
 	stderr("成功","应求成功，<a href=viewrequests.php?action=view&id=".$_POST["reqid"].">点击这里返回</a>",0);
 	die;
@@ -418,10 +411,9 @@ $ruserid=0+$_GET["userid"];
 		
 		$owner[]=$row[0];
 		$added = sqlesc(date("Y-m-d H:i:s"));
-			$subject = sqlesc("你的种子被人应求");
-			$notifs = sqlesc("求种名称:[url=viewrequests.php?id=$arr[id]] " . $arr['request'] . "[/url].你获得: $amount 魔力值");
-			sql_query("INSERT INTO messages (sender, receiver, subject, msg, added) VALUES(0, " . $row[0] . ", $subject, $notifs, $added)") or sqlerr(__FILE__, __LINE__);
-		
+			$subject = ("你的种子被人应求");
+			$notifs = ("求种名称:[url=viewrequests.php?id=$arr[id]] " . $arr['request'] . "[/url].你获得: $amount 魔力值");
+			send_pm(0, $row[0], $subject, $notifs);
 		}
 	sql_query("UPDATE users SET seedbonus = seedbonus + $amount WHERE id = '".join("' OR id = '",$owner )."'")or sqlerr(__FILE__, __LINE__);
 		stderr("成功","确认成功，<a href=viewrequests.php?action=view&id=".$_POST["id"].">点击这里返回</a>",0);

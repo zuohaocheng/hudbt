@@ -25,10 +25,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	$lang = get_user_lang($receiver);
 	$subject = $lang_takemessage_target[$lang]['Bonus_point_added'];
 	$msg = sprintf($lang_takemessage_target[$lang]['msg'],$operator,$_POST["seedbonus"]);
-	$date = sqlesc(date("Y-m-d H:i:s"));
 	sql_query("UPDATE LOW_PRIORITY users SET seedbonus=seedbonus + $seedbonus WHERE username=$username") or sqlerr(__FILE__, __LINE__);
-	$msgsql = sprintf("INSERT INTO messages (sender, receiver, subject, added, msg) VALUES(0, %d, '%s',%s,'%s')",$receiver,$subject,$date,$msg);
-	sql_query($msgsql) or sqlerr(__FILE__, __LINE__);
+	send_pm(0, $receiver,$subject,$msg);
 	if (!$arr)
 	stderr("Error", "Unable to update account.");
   header("Location: " . get_protocol_prefix() . "$BASEURL/userdetails.php?id=".htmlspecialchars($arr[0]));

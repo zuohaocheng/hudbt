@@ -2457,8 +2457,8 @@ function loggedinorreturn3($mainpage = false) {
   }
 }
 
-function send_pm($from, $to, $subject, $msg) {
-  sql_query("INSERT INTO messages (sender, receiver, subject, msg, added) VALUES(?, ?, ?, ?, ?)", [$from, $to, $subject, $msg, date("Y-m-d H:i:s")]);
+function send_pm($from, $to, $subject, $msg, $save = 'no') {
+  sql_query("INSERT INTO messages (sender, receiver, subject, msg, added, saved) VALUES(?, ?, ?, ?, ?, ?)", [$from, $to, $subject, $msg, date("Y-m-d H:i:s"), $save]);
 }
 
 function pager($rpp, $count, $href, $opts = array(), $pagename = "page") {

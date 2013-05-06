@@ -185,10 +185,6 @@ class Torrent extends AppModel {
 
 	  $data = $this->data;
 	  require(get_langfile_path("delete.php",true));
-	  App::uses('Message', 'Model');
-
-	  $dt = sqlesc(date("Y-m-d H:i:s"));
-	  $Message = new Message();
 
 	  //send pm to downloaders & seeders
 
@@ -198,14 +194,7 @@ class Torrent extends AppModel {
 	    $subject = $lang_delete_target[$lang]['msg_torrent_deleted'];
 	    $msg = sprintf($lang_delete_target[$lang]['msg_torrent_downloaded'], $data['Torrent']['name'] , $CURUSER['id'], $this->reason);
 
-	    $Message->create();
-	    $Message->save(['Message' => [
-					  'sender' => 0,
-					  'receiver' => $uid,
-					  'subject' => $subject,
-					  'msg' => $msg,
-					  'dt' => $dt,
-					  ]]);
+	    send_pm(0, $uid, $subject, $msg);
 	  }
 
 	  //Send pm to torrent uploader
@@ -214,14 +203,7 @@ class Torrent extends AppModel {
 	    $lang = get_user_lang($uid);
 	    $subject = $lang_delete_target[$lang]['msg_torrent_deleted'];
 	    $msg = sprintf($lang_delete_target[$lang]['msg_torrent_uploaded'], $data['Torrent']['name'] , $CURUSER['id'], $this->reason);
-	    $Message->create();
-	    $Message->save(['Message' => [
-					  'sender' => 0,
-					  'receiver' => $uid,
-					  'subject' => $subject,
-					  'msg' => $msg,
-					  'dt' => $dt,
-					  ]]);
+	    send_pm(0, $uid, $subject, $msg);
 	  }
 
 	  //deduct bonus

@@ -192,7 +192,7 @@ if (get_user_class() >= $delownsub_class) {
 	    $msg = $CURUSER['username'].$lang_subtitles_target[get_user_lang($a['uppedby'])]['msg_deleted_your_sub']. $a['title'].($reason != "" ? $lang_subtitles_target[get_user_lang($a['uppedby'])]['msg_reason_is'].$reason : "");
 	    $subject = $lang_subtitles_target[get_user_lang($a['uppedby'])]['msg_your_sub_deleted'];
 	    $time = date("Y-m-d H:i:s");
-	    sql_query("INSERT INTO messages (sender, receiver, added, msg, subject) VALUES(0, $a[uppedby], '" . $time . "', " . sqlesc($msg) . ", ".sqlesc($subject).")") or sqlerr(__FILE__, __LINE__);
+	    send_pm(0, $a['uppedby'], $subject, $msg);
 	  }
 	  $res = sql_query("SELECT lang_name from language WHERE sub_lang=1 AND id = " . sqlesc($a["lang_id"])) or sqlerr(__FILE__, __LINE__);
 	  $arr = _mysql_fetch_assoc($res);

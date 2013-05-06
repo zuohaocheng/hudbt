@@ -22,7 +22,7 @@ if (!empty($_POST["usernw"]))
 $msg = sqlesc("Your Warning Has Been Removed By: " . $CURUSER['username'] . ".");
 $added = sqlesc(date("Y-m-d H:i:s"));
 $userid = implode(", ", $_POST[usernw]);
-//sql_query("INSERT INTO messages (sender, receiver, msg, added) VALUES (0, $userid, $msg, $added)") or sqlerr(__FILE__, __LINE__);
+# send_pm(0, $userid, $msg, $msg);
 
 $r = sql_query("SELECT modcomment FROM users WHERE id IN (" . implode(", ", $_POST[usernw]) . ")")or sqlerr(__FILE__, __LINE__);
 $user = _mysql_fetch_array($r);
