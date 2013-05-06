@@ -62,10 +62,7 @@ class HTML_BBCodeParser_Filter_Refs extends HTML_BBCodeParser_Filter {
   
  
   function nameCallback($keys) {
-    if(get_user_id_from_name($keys[1],0)=="NULL")
-  		return '(无此帐户)';
-    else
-    return get_username(get_user_id_from_name($keys[1],0));
+    return get_username(get_user_id_from_name($keys[1], false));
   }
   function topicCallback($keys) {
     $key = $keys[1];

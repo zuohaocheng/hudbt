@@ -215,7 +215,6 @@ $lang_functions = array
 	'title_staffbox' => "管理组信箱",
 	'title_sticky' => "置顶",
 	'text_new_news' => "条未读的重要消息",
-	'std_no_user_named' => "没有用户的名字是",
 	'text_banned' => "禁止",
 	'text_are' => "",
 	'text_is' => "",

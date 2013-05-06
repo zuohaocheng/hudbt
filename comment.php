@@ -83,6 +83,9 @@ if ($action == "add") {
 		  }
 		  $quoteduser = _mysql_fetch_array($res);
 		}
+		require('HTML/BBCodePreparser.php');
+		$preparser = new BBCodePreparser($text);
+		$text = $preparser->getText();
 		$values = array($CURUSER["id"], $parent_id, "'" . date("Y-m-d H:i:s") . "'", sqlesc($text), sqlesc($text), $quote);
 		if ($type == "torrent"){
 		  sql_query("INSERT INTO comments (user, torrent, added, text, ori_text, quote) VALUES (" . implode(',', $values) . ")");
@@ -107,12 +110,12 @@ if ($action == "add") {
 		  sql_query("UPDATE requests SET comments = comments + 1 WHERE id = $parent_id");
 		}
 
-		if($quoteduser["commentpm"] == 'yes' && $quoteduser['user'] != $CURUSER['id'] && $quoteduser['user'] != $arr['owner']) {
-		  $target = $quoteduser['user'];
-		  $content = $lang_comment_target[get_user_lang($target)]['msg_new_comment_quotation'] . '[url=' . href() . ']' . $arr['name'] . '[/url]';
+		/* if($quoteduser["commentpm"] == 'yes' && $quoteduser['user'] != $CURUSER['id'] && $quoteduser['user'] != $arr['owner']) { */
+		/*   $target = $quoteduser['user']; */
+		/*   $content = $lang_comment_target[get_user_lang($target)]['msg_new_comment_quotation'] . '[url=' . href() . ']' . $arr['name'] . '[/url]'; */
 
-		  send_pm($CURUSER['id'], $quoteduser['user'], $lang_comment_target[get_user_lang($target)]['msg_new_quotation'], $content);
-		}
+		/*   send_pm($CURUSER['id'], $quoteduser['user'], $lang_comment_target[get_user_lang($target)]['msg_new_quotation'], $content); */
+		/* } */
 
 		$ras = sql_query("SELECT commentpm FROM users WHERE id = $arr[owner]") or sqlerr(__FILE__,__LINE__);
 		$arg = _mysql_fetch_array($ras);
@@ -129,10 +132,14 @@ if ($action == "add") {
 		    $notifs = $lang_comment_target[get_user_lang($arr["owner"])]['msg_torrent_receive_comment'] .  " [url=" . href() . "] " . $arr['name'] . "[/url].";
 		  }
 
-		  send_pm($CURUSER['id'], $arr['owner'], $subject, $notifs);
+		  if ($quoteduser['user'] != $arr['owner']) {
+		    send_pm($CURUSER['id'], $arr['owner'], $subject, $notifs);
+		  }
 		  $Cache->delete_value('user_'.$arr['owner'].'_unread_message_count');
 		  $Cache->delete_value('user_'.$arr['owner'].'_inbox_count');
 		}
+
+		$preparser->setLink(href());
 
 		KPS("+",$addcomment_bonus,$CURUSER["id"]);
 
@@ -180,6 +187,7 @@ if ($action == "add") {
 		$res = sql_query("SELECT requests.request as name, userid as owner FROM requests WHERE id = $parent_id") or sqlerr(__FILE__,__LINE__);
 		$url="viewrequests.php?id=$parent_id&req_details=1";
 	}
+
 	$arr = _mysql_fetch_array($res);
 	if (!$arr)
 		stderr($lang_comment['std_error'], $lang_comment['std_no_torrent_id']);

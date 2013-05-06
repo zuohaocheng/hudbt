@@ -460,6 +460,10 @@ elseif ($action == "post") {
 			sql_query("UPDATE forums SET postcount=postcount+1 WHERE id=".sqlesc($forumid));
 //
 		}
+		require('HTML/BBCodePreparser.php');
+		$preparser = new BBCodePreparser($body);
+		$body = $preparser->getText();
+
 		$values = array($topicid, $userid, sqlesc($date), sqlesc($body), sqlesc($body), $quote);
 		sql_query("INSERT INTO posts (topicid, userid, added, body, ori_body, quote) VALUES (" . implode(',', $values) . ')') or sqlerr(__FILE__, __LINE__);
 		$postid = _mysql_insert_id() or die($lang_forums['std_post_id_not_available']);
@@ -469,11 +473,11 @@ elseif ($action == "post") {
 		$Cache->delete_value('topic_'.$topicid.'_post_count');
 		$Cache->delete_value('user_'.$userid.'_post_count');
 
-		if ($quote != 'NULL') {
-		  $content = '你的帖子 [post=' . $quote . '] 被[user=' . $CURUSER['id'] . ']引用了，[post=' . $postid . ']。';
-		  send_pm($CURUSER['id'], $quoteduser, '帖子被引用', $content);
-		}
-
+		/* if ($quote != 'NULL') { */
+		/*   $content = '你的帖子 [post=' . $quote . '] 被[user=' . $CURUSER['id'] . ']引用了，[post=' . $postid . ']。'; */
+		/*   send_pm($CURUSER['id'], $quoteduser, '帖子被引用', $content); */
+		/* } */
+		$preparser->setLink('[post=' . $postid . ']');
 
 		if ($type == 'new') {
 			// update the first post of topic

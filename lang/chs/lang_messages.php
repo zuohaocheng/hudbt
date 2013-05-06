@@ -76,6 +76,6 @@ $lang_messages = array
 	'submit_mark_as_read' => "设为已读",
 	'std_cannot_mark_messages' => "短讯无法设为已读。",
 	'std_no_message_selected' => "请选中要操作的短讯。",
+	'std_no_user_named' => "没有用户的名字是",
 );
 
-?>
