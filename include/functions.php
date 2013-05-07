@@ -1441,72 +1441,46 @@ function get_user_row($id) {
   else return $row;
 }
 
-function userlogin() {
+function userlogin_core($cookie) {
   global $lang_functions;
-  global $Cache;
-  global $SITE_ONLINE, $oldip;
+  global $oldip;
   global $enablesqldebug_tweak, $sqldebug_tweak;
-  unset($GLOBALS["CURUSER"]);
 
   $ip = getip();
   $nip = ip2long($ip);
-  if ($nip) //$nip would be false for IPv6 address
-    {
-      
-      $res = sql_query("SELECT * FROM bans WHERE $nip >= first AND $nip <= last") or sqlerr(__FILE__, __LINE__);
-      if (_mysql_num_rows($res) > 0)
-	{
-	  header("HTTP/1.0 403 Forbidden");
-	  print("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body>".$lang_functions['text_unauthorized_ip']."</body></html>\n");
-	  die;
-	}
-      
+  if ($nip) { //$nip would be false for IPv6 address
+    if (sql_query("SELECT * FROM bans WHERE ? >= first AND ? <= last", [$nip, $nip])->rowCount() > 0) {
+      throw new Exception($lang_functions['text_unauthorized_ip'], 403);
     }
+  }
 
-  if (empty($_COOKIE["c_secure_pass"]) || empty($_COOKIE["c_secure_uid"]) || empty($_COOKIE["c_secure_login"]))
-    return;
-  if ($_COOKIE["c_secure_login"] == base64("yeah"))
-    {
-      //if (empty($_SESSION["s_secure_uid"]) || empty($_SESSION["s_secure_pass"]))
-      //return;
-    }
-  $b_id = base64($_COOKIE["c_secure_uid"],false);
+  if (empty($cookie["c_secure_pass"]) || empty($cookie["c_secure_uid"]) || empty($cookie["c_secure_login"])) {
+    return null;
+  }
+
+  $b_id = base64($cookie["c_secure_uid"],false);
   $id = 0 + $b_id;
-  if (!$id || !is_valid_id($id) || strlen($_COOKIE["c_secure_pass"]) != 32)
-    return;
+  if (!$id || !is_valid_id($id) || strlen($cookie["c_secure_pass"]) != 32) {
+    return null;
+  }
 
-  if ($_COOKIE["c_secure_login"] == base64("yeah"))
-    {
-      //if (strlen($_SESSION["s_secure_pass"]) != 32)
-      //return;
-    }
-
-  $res = sql_query("SELECT * FROM users WHERE users.id = ".sqlesc($id)." AND users.enabled='yes' AND users.status = 'confirmed' LIMIT 1");
-  $row = _mysql_fetch_array($res);
-  if (!$row)
-    return;
+  $row = sql_query("SELECT * FROM users WHERE users.id = ? AND users.enabled='yes' AND users.status = 'confirmed' LIMIT 1", [$id])->fetch();
+  if (!$row) {
+    return null;
+  }
 
   $sec = hash_pad($row["secret"]);
-
-  //die(base64_decode($_COOKIE["c_secure_login"]));
-
-  if ($_COOKIE["c_secure_login"] == base64("yeah"))
-    {
-
-      if ($_COOKIE["c_secure_pass"] != md5($row["passhash"].$_SERVER["REMOTE_ADDR"]))
-	return;
+  if ($cookie["c_secure_login"] == base64("yeah")) { //Check IP
+    if ($cookie["c_secure_pass"] != md5($row["passhash"].$_SERVER["REMOTE_ADDR"])) {
+      return null;
     }
-  else
-    {
-      if ($_COOKIE["c_secure_pass"] !== md5($row["passhash"]))
-	return;
+  }
+  else {
+    if ($cookie["c_secure_pass"] !== md5($row["passhash"])) {
+      return null;
     }
+  }
 
-  if ($_COOKIE["c_secure_login"] == base64("yeah"))
-    {
-      //if ($_SESSION["s_secure_pass"] !== md5($row["passhash"].$_SERVER["REMOTE_ADDR"]))
-      //return;
-    }
   if (!$row["passkey"]){
     $passkey = md5($row['username'].date("Y-m-d H:i:s").$row['passhash']);
     sql_query("UPDATE users SET passkey = ".sqlesc($passkey)." WHERE id=" . sqlesc($row["id"]));// or die(_mysql_error());
@@ -1518,8 +1492,32 @@ function userlogin() {
   if ($usergroups !=NULL) {
     $row['usergroups'] = $usergroups;
   }
-  $GLOBALS["CURUSER"] = $row;//initialize global $CURUSER which will be used frequently in other operations//noted by bluemonster 20111107
-  if (array_key_exists('clearcache', $_GET) && $_GET['clearcache'] && get_user_class() >= UC_MODERATOR) {
+
+  return $row;
+}
+
+function userlogin() {
+  global $Cache;
+  global $enablesqldebug_tweak, $sqldebug_tweak;
+  unset($GLOBALS["CURUSER"]);
+
+  try {
+    $row = userlogin_core($_COOKIE);
+
+  } catch (Exception $e) {
+    header("HTTP/1.0 " . $e->getCode() . " Forbidden");
+    print("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body>".$e->getMessage()."</body></html>\n");
+    die;
+  }
+
+  if (is_null($row)) {
+    return;
+  }
+  $GLOBALS["CURUSER"] = $row;
+  //initialize global $CURUSER which will be used frequently in other operations
+  //noted by bluemonster 20111107
+
+  if (array_key_exists('purge', $_GET) && $_GET['purge'] && get_user_class() >= UC_MODERATOR) {
     $Cache->setClearCache(1);
   }
   if ($enablesqldebug_tweak == 'yes' && get_user_class() >= $sqldebug_tweak) {
@@ -2458,7 +2456,18 @@ function loggedinorreturn3($mainpage = false) {
 }
 
 function send_pm($from, $to, $subject, $msg, $save = 'no') {
+  static $client;
+
   sql_query("INSERT INTO messages (sender, receiver, subject, msg, added, saved) VALUES(?, ?, ?, ?, ?, ?)", [$from, $to, $subject, $msg, date("Y-m-d H:i:s"), $save]);
+
+  if (!$client) {
+    require_once('ws/class.websocket_client.php');
+    $client = new WebsocketClient;
+    $client->connect('127.0.0.1', 12345, '/newpm', 'hudbt.local');
+  }
+  if ($client->isConnected()) {
+    $client->sendData(strval($to));
+  }
 }
 
 function pager($rpp, $count, $href, $opts = array(), $pagename = "page") {
