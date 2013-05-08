@@ -101,7 +101,8 @@ function smarty($cachetime=300, $debug = false) {
 
 function get_langfolder_cookie() {
   global $deflang;
-  if (!isset($_COOKIE["c_lang_folder"])) {
+  return $deflang;
+  /*if (!isset($_COOKIE["c_lang_folder"])) {
     return $deflang;
   } else {
     $langfolder_array = get_langfolder_list();
@@ -111,7 +112,7 @@ function get_langfolder_cookie() {
 	  return $_COOKIE["c_lang_folder"];
       }
     return $deflang;
-  }
+    }*/
 }
 
 function get_langlist() {
@@ -4565,7 +4566,8 @@ function get_torrent_promotion_append_sub($promotion = 1,$forcemode = "",$showti
 }
 
 function lang_choice_before_login($extra='') {
-  global $lang_functions;
+  return;
+  /*  global $lang_functions;
 
   $s = "<select name=\"sitelanguage\" onchange='submit()'>\n";
 
@@ -4581,7 +4583,7 @@ function lang_choice_before_login($extra='') {
 
   print($extra);
   print('<div id="lang-choice">'.$lang_functions['text_select_lang']. $s . "</div>");
-  echo ('</form>');
+  echo ('</form>');*/
 }
 
 function a_to_z_index($letter='', $query = '') {

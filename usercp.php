@@ -520,7 +520,7 @@ echo '<dl class="table">';
 			dl_item($lang_usercp['row_stylesheet'], "<select id=\"stylesheet\" name=\"stylesheet\">\n$stylesheets\n</select>&nbsp;&nbsp;<font class=small>".$lang_usercp['text_stylesheet_note']."<a href=\"aboutnexus.php#stylesheet\" ><b>".$lang_usercp['text_stylesheet_link']."</b></a></font>.",1);
 			dl_item($lang_usercp['row_category_icons'], "<select id==\"caticon\" name=\"caticon\">".$categoryicons."</select>",1);
 
-			$s = "<select name=\"sitelanguage\">\n";
+			/*			$s = "<select name=\"sitelanguage\">\n";
 
 			$langs = langlist("site_lang");
 
@@ -531,7 +531,7 @@ echo '<dl class="table">';
 			}
 			$s .= "\n</select>&nbsp;&nbsp;<font class=small>".$lang_usercp['text_translation_note']."<a href=\"aboutnexus.php#translation\"><b>".$lang_usercp['text_translation_link']."</b></a></font>.</td></tr>";
 
-			dl_item($lang_usercp['row_site_language'], $s,1);
+			dl_item($lang_usercp['row_site_language'], $s,1);*/
 
 			dl_item($lang_usercp['row_pm_boxes'], $lang_usercp['text_show']."<input type=text name=pmnum size=5 value=".$CURUSER['pmnum']." >".$lang_usercp['text_pms_per_page'], 1);
 if ($showshoutbox_main == "yes") //system side setting for shoutbox
