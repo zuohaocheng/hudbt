@@ -730,7 +730,14 @@ $categ = '';
 else
 $categ = "WHERE offers.category = " . $categ;
 
-$res = sql_query("SELECT count(offers.id) FROM offers inner join categories on offers.category = categories.id inner join users on offers.userid = users.id  $categ $search") or sqlerr(__FILE__, __LINE__);
+if (isset($_REQUEST['published'])) {
+  $published = '';
+}
+else {
+  $published = 'AND ISNULL(offers.torrent_id)';
+}
+
+$res = sql_query("SELECT count(offers.id) FROM offers inner join categories on offers.category = categories.id inner join users on offers.userid = users.id $published $categ $search") or sqlerr(__FILE__, __LINE__);
 $row = _mysql_fetch_array($res);
 $count = $row[0];
 
@@ -742,7 +749,7 @@ list($pagertop, $pagerbottom, $limit) = pager($perpage, $count, $_SERVER["PHP_SE
 if($sort == "")
 $sort =  "ORDER BY added desc ";
 
-$res = sql_query("SELECT offers.id, offers.userid, offers.name, offers.added, offers.allowedtime, offers.comments, offers.yeah, offers.against, offers.torrent_id, offers.category as cat_id, offers.allowed, categories.name as cat FROM offers INNER JOIN categories ON offers.category = categories.id $categ $search $sort $limit") or sqlerr(__FILE__,__LINE__);
+$res = sql_query("SELECT offers.id, offers.userid, offers.name, offers.added, offers.allowedtime, offers.comments, offers.yeah, offers.against, offers.torrent_id, offers.category as cat_id, offers.allowed, categories.name as cat FROM offers INNER JOIN categories ON offers.category = categories.id $published $categ $search $sort $limit") or sqlerr(__FILE__,__LINE__);
 $num = _mysql_num_rows($res);
 
 stdhead($lang_offers['head_offers']);
@@ -773,14 +780,14 @@ foreach ($rule_args as $k => $v) {
 }
 
 print("</ul></div>");
-print("<div align=\"center\"><form method=\"get\" action=\"?\">".$lang_offers['text_search_offers']."&nbsp;&nbsp;<input type=\"text\" id=\"specialboxg\" name=\"search\" />&nbsp;&nbsp;");
+print("<div class=\"center\"><form method=\"get\" action=\"?\">".$lang_offers['text_search_offers']."&nbsp;&nbsp;<input type=\"search\" id=\"specialboxg\" name=\"search\" />&nbsp;&nbsp;");
 $cats = genrelist($browsecatmode);
 $catdropdown = "";
 foreach ($cats as $cat) {
 	$catdropdown .= "<option value=\"" . $cat["id"] . "\"";
 	$catdropdown .= ">" . htmlspecialchars($cat["name"]) . "</option>\n";
 }
-print("<select name=\"category\"><option value=\"0\">".$lang_offers['select_show_all']."</option>".$catdropdown."</select>&nbsp;&nbsp;<input type=\"submit\" class=\"btn\" value=\"".$lang_offers['submit_search']."\" /></form></div>");
+print("<select name=\"category\"><option value=\"0\">".$lang_offers['select_show_all']."</option>".$catdropdown."</select>&nbsp;&nbsp;<input type=\"submit\" class=\"btn\" value=\"".$lang_offers['submit_search']."\" /></form><a href=\"?published=1\">显示已发布的</a></div>");
 
 print('</div>');
 

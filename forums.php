@@ -74,7 +74,7 @@ function get_topic_image($status= "read"){
 	global $lang_forums;
 	switch($status){
 		case "read": {
-			return "<img class=\"unlocked\" src=\"pic/trans.gif\" alt=\"read\" title=\"".$lang_forums['title_read']."\" />";
+			return "<img class=\"unlocked \" src=\"pic/trans.gif\" alt=\"read\" title=\"".$lang_forums['title_read']."\" />";
 			break;
 			}
 		case "unread": {
@@ -416,18 +416,21 @@ elseif ($action == "post") {
 			if ($forum_last_replied_topic_row && $forum_last_replied_topic_row['id'] == $topicid)
 				$Cache->delete_value('forum_'.$forumid.'_last_replied_topic_content');
 		}		
-		$editnotseen = empty($_REQUEST['editnotseen'])?'0':$_REQUEST['editnotseen'];
-		$editnotseen = $editnotseen + 0;
-		if ((!checkprivilege(["Posts","editnotseen"]))&& $editnotseen==1){
+		$editnotseen = isset($_REQUEST['editnotseen']) ? (0+$_REQUEST['editnotseen']) : 0;
+		if ((!checkprivilege(["Posts","editnotseen"]))&& $editnotseen){
 			permissiondenied();
-		permissiondenied();
 		}
 		$forum_row = get_forum_row($forumid);
 		if($forum_row["minclassread"]>=$confiforumlog_class)
 			$permi = "high";
 		else
 			$permi = "normal";
-		sql_query("UPDATE posts SET body=".sqlesc($body).", editdate=".sqlesc($date).", editedby=".sqlesc($CURUSER[id]).",editnotseen = ".$editnotseen." WHERE id=".sqlesc($id)) or sqlerr(__FILE__, __LINE__);
+
+		require_once('HTML/BBCodePreparser.php');
+		$preparser = new BBCodePreparser($body);
+		$body = $preparser->getText();
+
+		sql_query("UPDATE posts SET body=?, editdate=?, editedby=?,editnotseen = ? WHERE id=?", [$body, $date, $CURUSER['id'], $editnotseen, $id]);
 		if(_mysql_affected_rows())
 			write_forum_log("Post:$id in Topic:$topicid was edited by $CURUSER[username].", $permi);
 		$postid = $id;
@@ -1210,7 +1213,7 @@ elseif ($action == "viewforum") {
 	print("</div></div>\n");
 	if ($numtopics > 0)
 	{
-		print("<table border=\"1\" cellspacing=\"0\" cellpadding=\"5\" style=\"width:95%\"><thead>");
+		print("<table class=\"topics no-vertical-line\"><thead>");
 
 		print("<tr><th style=\"width:1%;\"></th><th style=\"width:99%\">".$lang_forums['col_topic']."</th>");
 		if ($_REQUEST["sort"] == 'firstpostdesc') {
@@ -1336,14 +1339,14 @@ elseif ($action == "viewforum") {
 			
 			$topictime = substr($arr['added'],0,10);
 			if (strtotime($arr['added']) +  86400 > TIMENOW)
-				$topictime = "<font class=\"new small\">".$topictime."</font>";
+				$topictime = "<span class=\"new small\">".$topictime."</span>";
 			else
-				$topictime = "<font color=\"gray\" class=\"small\">".$topictime."</font>";
+				$topictime = "<span class=\"notem small\">".$topictime."</span>";
 
-			print("<tr>" . "<td style=\"padding:0;\">".$img .
-			"</td><td style=\"text-align:left;\">\n" .
-			$subject."</td><td class=\"rowfollow\" align=\"center\">".get_username($fpuserid)."<br />".$topictime."</td><td class=\"rowfollow\" align=\"center\">".$replies." / <font color=\"gray\">".$views."</font></td>\n" .
-			"<td class=\"rowfollow nowrap\">".$lpadded."<br />".$lpusername."</td>\n");
+			print("<tr>" . "<td class=\"icon\">".$img .
+			"</td><td>\n" .
+			$subject."</td><td class=\"center nowrap\"><div>".get_username($fpuserid)."</div><div>".$topictime."</div></td><td class=\"center\">".$replies." / <span class=\"notem\">".$views."</span></td>\n" .
+			"<td class=\"nowrap center\"><div>".$lpadded."</div><div>".$lpusername."</div></td>\n");
 
 			print("</tr>\n");
 			$counter++;

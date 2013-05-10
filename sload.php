@@ -31,7 +31,7 @@ function css() {
   foreach (get_css_rows() as $obj) {
     $uri = get_css_uri('', $obj['id']);
     $jqui = 'styles/jqui/' . $obj['jqui'];
-    $themes['theme' . $obj['id']] = [$uri . 'theme.css', $uri . 'DomTT.css', $jqui . '/jquery-ui.min.css', $jqui . '/jquery.ui.theme.css'];
+    $themes['theme' . $obj['id']] = [$uri . 'theme.css', $jqui . '/jquery-ui.min.css', $jqui . '/jquery.ui.theme.css'];
   }
 
   $caticons = [];
@@ -48,14 +48,7 @@ function css() {
 
   foreach (array_kronecker_product([$themes, $caticons, $langs], '-', ['' => $basics]) as $filename =>$files) {
     $out = load_files($files, 'css', true);
-    $fd = fopen('cache/css' . $filename . '.css', 'w');
-    fwrite($fd, $out);
-    fclose($fd);
-
-    /* $out = load_files($files, 'css', true, false); */
-    /* $fd = fopen('load/css' . $filename . '-debug.css', 'w'); */
-    /* fwrite($fd, $out); */
-    /* fclose($fd); */
+    write_file('cache/css' . $filename . '.css', $out);
   }
 }
 
@@ -73,12 +66,15 @@ function js() {
     $o = $out . ";\n/* constants */\nhb.constant = (";
     include($rootpath . get_langfile_path("functions.php", false, $lang));
     $o .= json_encode(['torrentmanage_class' => $torrentmanage_class, 'cat_class' => get_category_row(), 'lang' => $lang_functions, 'pr' => $promotion_text, 'url' =>['base' => $BASEURL, 'cake' => $CAKEURL]]) . ');';
-    $fd = fopen('cache/js-common-' . $lang . '.js', 'w');
-    fwrite($fd, $o);
-    fclose($fd);
+    write_file('cache/js-common-' . $lang . '.js', $o);
   }
+}
 
-  
+function write_file($f, $content) {
+  $ref = file_get_contents($f);
+  if ($ref != $content) {
+    file_put_contents($f, $content);
+  }
 }
 
 

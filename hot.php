@@ -5,7 +5,6 @@ if ($args) {
   $args = '&' . $args;
 }
 
-header("Location: //$BASEURL/torrents.php?hot=1$args");
+header("Location: //$BASEURL/torrents.php?hot=1$args", true, 301);
 
-?>
 

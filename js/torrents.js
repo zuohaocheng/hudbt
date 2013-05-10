@@ -9,6 +9,7 @@ $(function() {
     $document = $(document),
     $window = $(window),
     ie = $.browser.msie,
+    jqxhr, abortflag = false,
 
     History = !ie,
     errCount = 0,
@@ -29,6 +30,9 @@ $(function() {
     }).end());
 
     $(document).ajaxError(function(event, jqxhr, settings) {
+	if (abortflag) {
+	    return;
+	}
 	errCount += 1;
 	if (errCount > 5 && (('onLine' in navigator) && navigator.onLine)) {
 	    jqui_confirm('哎呀','好像有点问题，刷新看看?', function() {
@@ -159,15 +163,13 @@ $(function() {
     loader = (function() {
 	var $loader = $('#loader'),
 	loaderInt,
-	step = 0,
-	lock = false;
+	step = 0;
 	return function(show) {
 	    if (show) {
-		if(lock) {
-		    return false;
-		}
-		else {
-		    lock = true;
+		if (jqxhr) {
+		    abortflag = true;
+		    jqxhr.abort();
+		    abortflag = false;
 		}
 
 		$loader.show();
@@ -183,7 +185,7 @@ $(function() {
 	    else {
 		$loader.hide();
 		clearInterval(loaderInt);
-		lock = false;
+		jqxhr = null;
 	    }
 	    return true;
 	};
@@ -292,7 +294,7 @@ $(function() {
 		var loc = $document.scrollTop() + $window.height();
 		if(loc > targetH && loader(true)) {
 		    args = argsFromUri(uri);
-		    $.getJSON(uri, {
+		    jqxhr = $.getJSON(uri, {
 			counter: target.children().length
 		    }, get_func);
 		    $window.off('scroll.autopage');
@@ -314,7 +316,7 @@ $(function() {
 	    if(loc > targetH && loader(true)) {
 		var uri = hb.nextpage + surfix;
 		args = argsFromUri(uri);
-		$.getJSON(uri, {
+		jqxhr = $.getJSON(uri, {
 		    counter: target.children().length
 		}, function(res) {
 		    $('#pagerbottom').remove();
@@ -334,7 +336,7 @@ $(function() {
 	tooltip.children().remove();
 	table.hide();
 	$('#stderr').remove();
-	$.getJSON('?' + $.param(uri) + surfix, function(result) {
+	jqxhr = $.getJSON('?' + $.param(uri) + surfix, function(result) {
 	    var targ = $('#outer');
 	    if (result.torrents.length) {
 		table.before(result.pager.top);

@@ -1,3 +1,10 @@
-<?php stdhead($title_for_layout) ?>
-<?php echo $content_for_layout ?>
-<?php stdfoot() ?>
+<?php
+if (function_exists('sqlerr')) {
+  stdhead($title_for_layout);
+}
+echo $content_for_layout;
+
+if (function_exists('stdfoot')) {
+  stdfoot();
+}
+?>

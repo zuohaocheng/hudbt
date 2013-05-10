@@ -233,14 +233,16 @@ elseif ($action == "edit")
 
 			if ($text == "")
 				stderr($lang_comment['std_error'], $lang_comment['std_comment_body_empty']);
-			$text = sqlesc($text);
-			$editdate = sqlesc(date("Y-m-d H:i:s"));
-			$editnotseen = empty($_REQUEST['editnotseen'])?'0':$_REQUEST['editnotseen'];
-			$editnotseen = $editnotseen + 0;
-			if ((!checkprivilege(["Posts","editnotseen"])) && $editnotseen==1){
+			require_once('HTML/BBCodePreparser.php');
+			$preparser = new BBCodePreparser($text);
+			$text = $preparser->getText();
+
+			$editdate = date("Y-m-d H:i:s");
+			$editnotseen = isset($_REQUEST['editnotseen']) ? (0+$_REQUEST['editnotseen']) : 0;
+			if ((!checkprivilege(["Posts","editnotseen"])) && $editnotseen){
 				permissiondenied();
 			}
-			sql_query("UPDATE comments SET text=".$text.", editdate=".$editdate.", editedby=".$CURUSER[id].",editnotseen = ".$editnotseen." WHERE id=".sqlesc($commentid)) or sqlerr(__FILE__, __LINE__);
+			sql_query("UPDATE comments SET text=?, editdate=?, editedby=?, editnotseen = ? WHERE id=?", [$text, $editdate, $CURUSER['id'], $editnotseen, $commentid]);
 			if($type == "torrent")
 				$Cache->delete_value('torrent_'.$arr['parent_id'].'_last_comment_content');
 			elseif ($type == "offer")

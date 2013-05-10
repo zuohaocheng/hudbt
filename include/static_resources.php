@@ -68,6 +68,7 @@ function load_file($name, $type, $fullpath=false, $minify = true, $basepath = ''
 function css_remap($s, $path) {
   $p = preg_replace('/^(.*\/)[^\/]+$/', '\1', $path);
   $s = CSSMin::remap($s, false, $p);
+  $s = rtrim($s, ';');
   return $s;
 }
 

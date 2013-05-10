@@ -180,7 +180,7 @@ function load_files_cache($name, $type, $debug, $purge) {
       $css_uri = get_css_uri('', $theme);
       global $css_files;
       $jqui = 'styles/jqui/' . jqui_css_name($theme);
-      $files = array_merge($css_files, array(get_forum_pic_folder().'/forumsprites.css', $css_uri."theme.css", $css_uri."DomTT.css", 'pic/' . get_cat_folder(401, $caticon) . "sprite.css",  $jqui . '/jquery-ui.min.css', $jqui . '/jquery.ui.theme.css'));   
+      $files = array_merge($css_files, array(get_forum_pic_folder().'/forumsprites.css', $css_uri."theme.css", 'pic/' . get_cat_folder(401, $caticon) . "sprite.css",  $jqui . '/jquery-ui.min.css', $jqui . '/jquery.ui.theme.css'));   
       $out .= load_files($files, $type, $debug, $purge, true);
 
       if ($CURUSER){

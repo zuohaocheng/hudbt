@@ -5,7 +5,7 @@
  */
 
 ?>
-<div class="post-donation table">
+<div class="post-donation">
 	<div id="to_donate">
 <?php
 if($userid != $arr['userid']) {
@@ -16,11 +16,11 @@ if($userid != $arr['userid']) {
 		echo "<p class=\"donate_note\">你已经于 {$donated['action_date']} 对楼主捐赠过 {$donated['amount']} 魔力值，谢谢你！</p>";
 	} else {
 	?>
-			<a class="donate donate-0" title="向楼主捐赠 8 魔力">8</a>
-			<a class="donate donate-1" title="向楼主捐赠 16 魔力">16</a>
-			<a class="donate donate-2" title="向楼主捐赠 32 魔力">32</a>
-			<a class="donate donate-3" title="向楼主捐赠 64 魔力">64</a>
-			<a class="donate donate-4" title="绝对支持楼主！">128</a>
+			<a class="donate donate-0" href="#" title="向楼主捐赠 8 魔力">8</a>
+			<a class="donate donate-1" href="#" title="向楼主捐赠 16 魔力">16</a>
+			<a class="donate donate-2" href="#" title="向楼主捐赠 32 魔力">32</a>
+			<a class="donate donate-3" href="#" title="向楼主捐赠 64 魔力">64</a>
+			<a class="donate donate-4" href="#" title="绝对支持楼主！">128</a>
 	<?php 
 	}
 }

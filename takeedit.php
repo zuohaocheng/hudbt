@@ -63,8 +63,13 @@ elseif ($nfoaction == "remove"){
 $catid = (0 + $type);
 if (!is_valid_id($catid))
 bark($lang_takeedit['std_missing_form_data']);
-if (!$name || !$descr)
-bark($lang_takeedit['std_missing_form_data']);
+if (!$name || !$descr) {
+  bark($lang_takeedit['std_missing_form_data']);
+}
+require_once('HTML/BBCodePreparser.php');
+$preparser = new BBCodePreparser($descr);
+$descr = $preparser->getText();
+
 $newcatmode = get_single_value("categories","mode","WHERE id=".sqlesc($catid));
 if ($enablespecial == 'yes' && get_user_class() >= $movetorrent_class)
 	$allowmove = true; //enable moving torrent to other section

@@ -235,7 +235,7 @@ function get_row_count($table, $suffix = "", $args = []) {
 }
 
 function get_row_sum($table, $field, $suffix = "", $args = []) {
-  $r = sql_query("SELECT SUM($field) FROM $table $suffix", $args)->fetch();
+  $a = sql_query("SELECT SUM($field) FROM $table $suffix", $args)->fetch();
   return $a[0];
 }
 
@@ -423,10 +423,12 @@ function sqlerr($file = '', $line = '', $stack = true, $q = '', $args = [], $e =
   echo _mysql_error() . ($file != '' && $line != '' ? "<p>in $file, line $line</p>" : "") . "</div></div>";
 
   $msg = ob_get_flush() . "\n\n---------------------------------\n\n";
-  $h = fopen('log/sqlerr.log', 'a');
-  if ($h) {
-    fwrite($h, $msg);
-    fclose($h);
+  if ($pdo->errorInfo()[1] != 2006) { // 2006: MySQL server has gone away
+    $h = fopen('log/sqlerr.log', 'a');
+    if ($h) {
+      fwrite($h, $msg);
+      fclose($h);
+    }
   }
   die;
 }
@@ -1815,10 +1817,7 @@ function menu ($selected = "home") {
   echo navbar_item('subtitles.php', $lang_functions['text_subtitles'], $selected == "subtitles");
  // echo navbar_item('usercp.php', $lang_functions['text_user_cp'], $selected == "usercp");
   echo navbar_item('topten.php', $lang_functions['text_top_ten'], $selected == "topten");
-  global $log_class;
-  if (get_user_class() >= $log_class) {
-    echo navbar_item('log.php', $lang_functions['text_log'], $selected == "log");
-  }
+  echo navbar_item('log.php', $lang_functions['text_log'], $selected == "log");
   echo navbar_item('rules.php', $lang_functions['text_rules'], $selected == "rules");
   echo navbar_item('faq.php', $lang_functions['text_faq'], $selected == "faq");
   echo navbar_item('staff.php', $lang_functions['text_staff'], $selected == "staff");
@@ -1973,6 +1972,14 @@ function stdhead($title = "", $msgalert = true, $script = "", $place = "") {
   global $tstart;
   global $Cache;
   global $Advertisement;
+
+  static $called = false;
+  if ($called) {
+    return;
+  }
+  else {
+    $called = true;
+  }
 
   $Cache->setLanguage($CURLANGDIR);
 
@@ -2801,7 +2808,7 @@ function post_body_toolbox($postid, $privilege, $type='', $pid = '', $extra='') 
   }
 
   if ($toolbox_post) {
-    return '<div class="forum-post-toolbox-container"><div class="forum-post-toolbox minor-list horizon-compact"><ul style="float:right">' . $toolbox_post . '</ul>' . $extra . '</div></div>';
+    return '<div class="forum-post-toolbox-container"><div class="forum-post-toolbox minor-list horizon-compact"><ul>' . $toolbox_post . '</ul></div>' . $extra . '</div>';
   }
   return '';
 }
@@ -3273,7 +3280,7 @@ foreach($rows as $row)
     $title = '';
     if ($row['owner'] == $CURUSER['id']) {
       $color = 'uploaded';
-      $width = 200;
+      $width = 125;
       $title = '由我上传';
       if (isset($progress[$row['id']])) {
 	$p = $progress[$row['id']];
@@ -3286,7 +3293,7 @@ foreach($rows as $row)
     else if (isset($progress[$row['id']])) {
       $p = $progress[$row['id']];
       if ($p['finished'] == 'yes') {
-	$width = 200;
+	$width = 125;
 	if ($p['peer_id']) {
 	  $color = 'seeding';
 	  $title = '正在做种';
@@ -3298,7 +3305,7 @@ foreach($rows as $row)
       }
       else if ($p['to_go'] == 0) {
 	// 未下载，只做种
-	$width = 200;
+	$width = 125;
 	if ($p['peer_id']) {
 	  $color = 'seeding';
 	  $title = '正在做种';

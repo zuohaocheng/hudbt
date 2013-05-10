@@ -33,6 +33,7 @@
  * In development mode, you need to click the flash message to continue.
  */
 	Configure::write('debug', 0);
+Configure::write('log', 0); 
 
 Configure::write('Config.language', 'zh-Hans');
 
@@ -52,8 +53,8 @@ Configure::write('Config.language', 'zh-Hans');
  */
 	Configure::write('Error', array(
 		'handler' => 'ErrorHandler::handleError',
-		'level' => E_ALL & ~E_DEPRECATED & ~E_STRICT & ~E_NOTICE,
-		'trace' => true
+		'level' => 0,
+		'trace' => false
 	));
 
 /**
@@ -75,7 +76,7 @@ Configure::write('Config.language', 'zh-Hans');
 	Configure::write('Exception', array(
 		'handler' => 'ErrorHandler::handleException',
 		'renderer' => 'ExceptionRenderer',
-		'log' => true
+		'log' => false
 	));
 
 /**
@@ -112,7 +113,7 @@ Configure::write('Config.language', 'zh-Hans');
  *	`manager_index()` and `/manager/controller/index`
  *
  */
-Configure::write('Routing.prefixes', array('admin'));
+	//Configure::write('Routing.prefixes', array('admin'));
 
 /**
  * Turn off all caching application-wide.
@@ -241,12 +242,14 @@ Configure::write('Routing.prefixes', array('admin'));
  *       Please check the comments in boostrap.php for more info on the cache engines available 
  *       and their setttings.
  */
-$engine = 'File';
-if (extension_loaded('memcache')) {
+if (extension_loaded('apc') && function_exists('apc_dec') && (php_sapi_name() !== 'cli' || ini_get('apc.enable_cli'))) {
+	$engine = 'Apc';
+}
+else if (extension_loaded('memcache')) {
   $engine = 'Memcache';
 }
-else if (extension_loaded('apc') && function_exists('apc_dec') && (php_sapi_name() !== 'cli' || ini_get('apc.enable_cli'))) {
-	$engine = 'Apc';
+else {
+  $engine = 'File';
 }
 
 // In development mode, caches should expire quickly.
@@ -272,6 +275,7 @@ Cache::config('_cake_core_', array(
 			   '127.0.0.1:11211' // localhost, default port 11211
 			   ), //[optional]
 	'persistent' => true, // [optional] set this to false for non-persistent connections
+
 ));
 
 /**
@@ -288,5 +292,7 @@ Cache::config('_cake_model_', array(
 			   '127.0.0.1:11211' // localhost, default port 11211
 			   ), //[optional]
 	'persistent' => true, // [optional] set this to false for non-persistent connections
+
 ));
+
 

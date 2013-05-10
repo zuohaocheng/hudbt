@@ -339,12 +339,22 @@ if ($action == "moveordel") {
 $pm_id = (int) $_POST['id'];
 $pm_box = (int) $_POST['box'];
 $pm_messages = $_POST['messages'];
+
+if (!$pm_id && empty($pm_messages)) {
+  if ($format == 'json') {
+    echo json_encode(['success' => true]);
+  }
+  else {
+    header("Location: messages.php?action=viewmailbox&box=" . $pm_box);
+  }
+}
+
 if ($_POST['markread']) {
 	if ($pm_id) {
 //Mark a single message as read
 	@sql_query("UPDATE messages SET unread='no' WHERE id=" . sqlesc($pm_id) . " AND receiver=" . $CURUSER['id'] . " LIMIT 1");
 	}
-	else if (!empty($pm_messages)) {
+	else {
 // Mark multiple messages as read
 	@sql_query("UPDATE messages SET unread='no' WHERE id IN (" . implode(", ", array_map("sqlesc",$pm_messages)) . ") AND receiver=" .$CURUSER['id']);
 	}
@@ -369,7 +379,7 @@ elseif ($_POST['move']) {
     @sql_query("UPDATE messages SET location=" . sqlesc($pm_box) . " WHERE id=" . sqlesc($pm_id) . " AND receiver=" . $CURUSER['id'] . " LIMIT 1");
 
   }
-  else {
+  else  {
     // Move multiple messages
     @sql_query("UPDATE messages SET location=" . sqlesc($pm_box) . " WHERE id IN (" . implode(", ", array_map("sqlesc",$pm_messages)) . ') AND receiver=' .$CURUSER['id']);
   }

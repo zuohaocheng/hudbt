@@ -27,7 +27,16 @@ class BBCodePreparser {
       }, $this->text);
 
     $t = preg_replace('/\[quote(=[a-z0-9\'"\[\]=]+)?\].*\[\/quote\]/smi', '\1', $this->text);
-    preg_match_all('!\[user=([0-9]+)\]!i', $t, $this->ids, PREG_SET_ORDER);
+    preg_match_all('!\[user=([0-9]+)\]!i', $t, $ids, PREG_SET_ORDER);
+
+    $this->ids = array_unique(array_map(function($o) {
+	  return 0 + $o[1];
+	}, $ids));
+
+    if (count($this->ids) > 10) {
+      $this->ids = [];
+      $this->text .= "\n\n[hr/]\n不要太丧失了，一次最多@十个噢\n    by 蝴蝶娘";
+    }
   }
 
   function getText() {
@@ -36,10 +45,8 @@ class BBCodePreparser {
 
   function setLink($link) {
     global $CURUSER;
-    $ids = array_unique(array_map(function($o) {
-	  return 0 + $o[1];
-	}, $this->ids));
-    foreach ($ids as $id) {
+    
+    foreach ($this->ids as $id) {
       if (get_user_row($id) && $id != $CURUSER['id']) {
 	send_pm($CURUSER['id'], $id, '我在帖子中提到了你', '快去看看吧~' . $link);
       }

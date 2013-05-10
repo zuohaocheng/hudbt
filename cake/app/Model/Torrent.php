@@ -224,7 +224,7 @@ class Torrent extends AppModel {
 	    else {
 	      $username = $CURUSER['username'];
 	    }
-	    write_log("Torrent " . $this->id . ' (' . $data['Torrent']['name'] . ") was deleted by " . $username . $this->reason,'normal');
+	    write_log("Torrent " . $this->id . ' (' . $data['Torrent']['name'] . ") was deleted by " . $username . '. ' . $this->reason,'normal');
 	  }
 	}	  
 }

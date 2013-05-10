@@ -70,8 +70,12 @@ if ($nfofile['name'] != '') {
 $small_descr = add_space_between_words(unesc($_POST["small_descr"]));
 
 $descr = unesc($_POST["descr"]);
-if (!$descr)
-bark($lang_takeupload['std_blank_description']);
+if (!$descr) {
+  bark($lang_takeupload['std_blank_description']);
+}
+require_once('HTML/BBCodePreparser.php');
+$preparser = new BBCodePreparser($descr);
+$descr = $preparser->getText();
 
 $catid = (0 + $_POST["type"]);
 $sourceid = (0 + $_POST["source_sel"]);
