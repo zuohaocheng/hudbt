@@ -56,13 +56,15 @@ if ($showsubcat){
   if ($showaudiocodec) $audiocodecs = searchbox_item_list("audiocodecs");
 }
 
-$searchstr_ori = htmlspecialchars(trim($_GET["search"]));
-$searchstr = trim($_GET["search"]);
-
 $args = [];
 
+$searchstr = trim($_GET["search"]);
 if (empty($searchstr)) {
   unset($searchstr);
+}
+else {
+  $searchstr_ori = htmlspecialchars($searchstr);
+  $searchstr = add_space_between_words($searchstr);
 }
 
 // sorting by MarkoStamcar
@@ -749,8 +751,7 @@ if ($showaudiocodec){
 
 $wherebase = $wherea;
 
-if (isset($searchstr))
-  {
+if (isset($searchstr)) {
     if (!$_GET['notnewword']){
       insert_suggest($searchstr, $CURUSER['id']);
       $notnewword="";
@@ -789,10 +790,10 @@ if (isset($searchstr))
       return $allAlnum;
     };
     
-    $addToken = function($token, $exact = false) use ($canMatch) {
+    $addToken = function($token, $exact_flag = false) use ($canMatch) {
       global $matches, $likes, $exact;
-      if ($exact) {
-	$exatc[] = $token;
+      if ($exact_flag) {
+	$exact[] = $token;
       }
       else if ($canMatch($token)) {
 	$matches[] = $token;

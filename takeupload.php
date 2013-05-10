@@ -67,7 +67,7 @@ if ($nfofile['name'] != '') {
 }
 
 
-$small_descr = unesc($_POST["small_descr"]);
+$small_descr = add_space_between_words(unesc($_POST["small_descr"]));
 
 $descr = unesc($_POST["descr"]);
 if (!$descr)
@@ -243,6 +243,8 @@ foreach ($promotionrules_torrent as $rule)
 										}
 }
 }
+
+$torrent = add_space_between_words($torrent);
 
 sql_query("INSERT INTO torrents (filename, owner, visible, anonymous, name, size, numfiles, type, url, small_descr, descr, ori_descr, category, source, medium, codec, audiocodec, standard, processing, team, save_as, sp_state, added, last_action, nfo, info_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [$fname, $CURUSER["id"], 'yes', $anonymous, $torrent, $totallen, count($filelist), $type, $url, $small_descr, $descr, $descr, $catid, $sourceid, $mediumid, $codecid, $audiocodecid, $standardid, $processingid, $teamid, $dname, $sp_state, date("Y-m-d H:i:s"), date("Y-m-d H:i:s"), $nfo, stripslashes($infohash)]);
 

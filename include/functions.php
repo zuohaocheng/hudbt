@@ -4786,3 +4786,32 @@ function strip_local_domain($link) {
   $regpre = '!^https?://(?:' . implode('|', $possibleUrls) . ')/!i';
   return preg_replace($regpre, '/', $link);
 }
+
+function add_space_between_words($str) {
+  $oldEncoding = mb_internal_encoding();
+  mb_internal_encoding('UTF-8');
+  $l = mb_strlen($str);
+  if ($l <= 1) {
+    $out = $str;
+  }
+  else {
+    $out = mb_substr($str, 0, 1);
+    $lch = $out;
+    $flag = (strlen($out) > 1);
+    for ($i =1; $i<$l; $i += 1) {
+      $ch = mb_substr($str, $i, 1);
+      $f = (strlen($ch) > 1);
+      if ($f != $flag) {
+	if ((!$f && ctype_alnum($ch)) ||
+	    ($f && ctype_alnum($lch))) {
+	  $out .= ' ';
+	}
+	$flag = $f;
+      }
+      $lch = $ch;
+      $out .= $ch;
+    }
+  }
+  mb_internal_encoding($oldEncoding);
+  return $out;
+}

@@ -32,6 +32,7 @@ if ($CURUSER["id"] != $row["owner"] && get_user_class() < $torrentmanage_class)
 $oldcatmode = get_single_value("categories","mode","WHERE id=".sqlesc($row['category']));
 
 $updateset = array();
+$args = [];
 
 //$fname = $row["filename"];
 //preg_match('/^(.+)\.torrent$/si', $fname, $matches);
@@ -71,10 +72,12 @@ else $allowmove = false;
 if ($oldcatmode != $newcatmode && !$allowmove)
 	bark($lang_takeedit['std_cannot_move_torrent']);
 $updateset[] = "anonymous = '" . ($_POST["anonymous"] ? "yes" : "no") . "'";
-$updateset[] = "name = " . sqlesc($name);
+$updateset[] = "name = ?";
+$args[]= add_space_between_words($name);
 $updateset[] = "descr = " . sqlesc($descr);
 $updateset[] = "url = " . sqlesc($url);
-$updateset[] = "small_descr = " . sqlesc($_POST["small_descr"]);
+$updateset[] = "small_descr = ?";
+$args[]= add_space_between_words($_POST["small_descr"]);
 //$updateset[] = "ori_descr = " . sqlesc($descr);
 $updateset[] = "category = " . sqlesc($catid);
 $updateset[] = "source = " . sqlesc(0 + $_POST["source_sel"]);
@@ -192,8 +195,8 @@ if(get_user_class()>=$torrentmanage_class && $CURUSER['picker'] == 'yes')
 	}
 }
 
-
-sql_query("UPDATE torrents SET " . join(",", $updateset) . " WHERE id = $id") or sqlerr(__FILE__, __LINE__);
+$args[]= $id;
+sql_query("UPDATE torrents SET " . join(",", $updateset) . " WHERE id = ?", $args);
 if($destoring===true){
 	$updateList_res = sql_query("SELECT keeper_id FROM storing_records WHERE torrent_id = $id AND checkout = 0") or sqlerr(__FILE__,__LINE__);
 	if(_mysql_num_rows($updateList_res)!=0){
