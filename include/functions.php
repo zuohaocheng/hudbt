@@ -85,7 +85,7 @@ function smarty($cachetime=300, $debug = false) {
     $smarty = new Smarty;
     global $enable_memcached;
     if ($enable_memcached) {
-      $smarty->caching_type = 'apc';
+      $smarty->caching_type = 'memcache';
     }
     $smarty->setCaching(Smarty::CACHING_LIFETIME_SAVED);
   }
