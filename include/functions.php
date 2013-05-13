@@ -83,12 +83,15 @@ function smarty($cachetime=300, $debug = false) {
   static $smarty;
   if (!$smarty) {
     $smarty = new Smarty;
-    global $enable_memcached;
-    if ($enable_memcached) {
+    if (extension_loaded('memcache')) {
       $smarty->caching_type = 'memcache';
+    }
+    else if (extension_loaded('apc') && function_exists('apc_dec') && (php_sapi_name() !== 'cli' || ini_get('apc.enable_cli'))) {
+      $smarty->caching_type = 'apc';
     }
     $smarty->setCaching(Smarty::CACHING_LIFETIME_SAVED);
   }
+  
   $smarty->debugging = $debug;
   if (!$debug && $cachetime) {
     $smarty->setCacheLifetime($cachetime);

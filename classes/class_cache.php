@@ -1,8 +1,8 @@
 <?php
 //Caching class (Based on file From ProjectGazelle)
-#require('classes/class_apccache.php');
-#class NPCache extends APECache {
-class NPCache extends Memcache {
+// Depends on Cake Cache
+
+class NPCache {
 	var $isEnabled;
 	var $clearCache = 0;
 	var $language = 'en';
@@ -16,16 +16,11 @@ class NPCache extends Memcache {
 	var $keyHits = array();
 	var $languageFolderArray = array();
 
-	function __construct($host = 'localhost', $port = 11211) {
-		$success = $this->connect($host, $port); // Connect to memcache
-		if ($success) {
-			$this->isEnabled = 1;
-		} else {
-			$this->isEnabled = 0;
-		}
+	function __construct() {
+	  $this->isEnabled = Cache::isInitialized();
 
-		$this->keyHits['read'] = array();
-		$this->keyHits['write'] = array();
+	  $this->keyHits['read'] = array();
+	  $this->keyHits['write'] = array();
 	}
 	
 	function getIsEnabled() {
@@ -167,7 +162,9 @@ class NPCache extends Memcache {
 
 	// Wrapper for Memcache::set, with the zlib option removed and default duration of 1 hour
 	function cache_value($Key, $Value, $Duration = 3600){
-		$this->set($Key,$Value, 0, $Duration);
+	  Cache::set('duration', $Duration);
+	  Cache::write($Key, $Value);
+
 		$this->cacheWriteTimes++;
 		
 		if (array_key_exists($Key, $this->keyHits['write'])) {
@@ -239,7 +236,7 @@ class NPCache extends Memcache {
 			sleep(2);
 		}*/
 
-		$Return = $this->get($Key);
+		$Return = Cache::read($Key);
 		$this->cacheReadTimes++;
 		if (array_key_exists($Key, $this->keyHits['read'])) {
 		  $this->keyHits['read'][$Key] += 1;
@@ -254,11 +251,12 @@ class NPCache extends Memcache {
 	function delete_value($Key, $AllLang = false){
 		if ($AllLang){
 			$langfolder_array = $this->getLanguageFolderArray();
-			foreach($langfolder_array as $lf)
-				$this->delete($lf."_".$Key);
+			foreach($langfolder_array as $lf) {
+				Cache::delete($lf."_".$Key);
+			}
 		}
 		else {
-			$this->delete($Key);
+		  Cache::delete($Key);
 		}
 	}
 

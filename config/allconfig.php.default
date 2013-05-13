@@ -150,7 +150,6 @@ $BASIC=array(	'SITENAME' => '蝴蝶-HUDBT',
 	'BASEDIR' => '',
 	'CAKEDIR' => 'cake',
 	'announce_url' => 'hudbt/announce.php',
-	'enable_memcached' => true,
 	'possible_urls' => ['kmgtp.org', 'sp-pt.hust.edu.cn(?:\:81)?'],
 );
 $BONUS=array(	'donortimes' => '1.5',

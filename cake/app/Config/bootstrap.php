@@ -23,20 +23,7 @@
  * @since         CakePHP(tm) v 0.10.8.2117
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
-
-// Setup a 'default' cache configuration for use in the application.
-//Cache::config('default', array('engine' => 'File'));
-Cache::config('default', array(
- 		'engine' => 'Memcache', //[required]
- 		'duration'=> 3600, //[optional]
- 		'probability'=> 100, //[optional]
-  		'prefix' => Inflector::slug(APP_DIR) . '_', //[optional]  prefix every cache file with this string
-  		'servers' => array(
-  			'127.0.0.1:11211' // localhost, default port 11211
-  		), //[optional]
-  		'persistent' => true, // [optional] set this to false for non-persistent connections
-  		'compress' => false, // [optional] compress data in Memcache (slower, but uses less memory)
- 	));
+require(dirname(__FILE__) . '/cache.php');
 
 /**
  * The settings below can be used to set additional paths to models, views and controllers.

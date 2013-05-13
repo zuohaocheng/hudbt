@@ -5,13 +5,7 @@ define('TIMENOWSTART',microtime(1));
 include_once($rootpath . 'include/config.php');
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
-if (!$enable_memcached) {
-  require_once($rootpath . 'classes/class_filecache.php'); //Fake a memcache
-}
-require_once($rootpath . 'classes/class_cache.php'); //Require the caching class
 
-$Cache = NEW NPCache(/* 'unix:/tmp/memcached.sock', 0 */); //Load the caching class
-$Cache->setLanguageFolderArray(get_langfolder_list());
 define('TIMENOW', time());
 $USERUPDATESET = array();
 $query_name=array();
@@ -44,7 +38,9 @@ function get_langfolder_list() {
 	return array("en", "chs", "cht", "ko", "ja");
 }
 
-if (defined('ANNOUNCE')) {
+if (defined('ANNOUNCE') && extension_loaded('memcache')) {
+  // NOTE: CakePHP can't be used in announce because of performance
+  // Use Cake if memcache is not loaded, because class_cache.php needs it
   require('cake/app/Config/database.php');
   try {
     $config = new DATABASE_CONFIG();
@@ -54,6 +50,8 @@ if (defined('ANNOUNCE')) {
   } catch (PDOException $e) {
     die('dbconn: mysql_pconnect: ' . $e->getMessage());
   }
+  //Require the fake caching class of cake
+  require_once($rootpath . 'classes/class_cakecache.php'); 
 }
 else {
   if (!defined('HB_CAKE')) {
@@ -63,6 +61,11 @@ else {
   $datasource = ConnectionManager::getDataSource('default');
   $pdo = $datasource->getConnection();
 }
+//Require the caching class
+require_once($rootpath . 'classes/class_cache.php'); 
+$Cache = new NPCache(); //Load the caching class
+$Cache->setLanguageFolderArray(get_langfolder_list());
+
 
 // Set this will cause named parameters can't be use
 //$pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);

@@ -71,14 +71,9 @@ if (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] != '127.0.0.1') {
 else {
   $BASEURL = $BASIC['BASEURL'];
 }
+$cakedir = $BASIC['CAKEDIR'];
 $CAKEURL = $BASIC['BASEURL'] . '/' . $BASIC['CAKEDIR'];
 $announce_urls = [$BASIC['announce_url']];
-if (array_key_exists('enable_memcached', $BASIC)) {
-  $enable_memcached = $BASIC['enable_memcached'];
-}
-else {
-  $enable_memcached = true;
-}
 $possibleUrls = array_merge([$BASEURL], $BASIC['possible_urls']);
 
 $SITE_ONLINE = $MAIN['site_online'];
