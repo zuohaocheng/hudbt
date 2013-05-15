@@ -254,6 +254,8 @@ sql_query("INSERT INTO torrents (filename, owner, visible, anonymous, name, size
 
 $id = _mysql_insert_id();
 
+$Cache->cache_value('torrent_max_id', $id, 86400);
+
 $write_torrent($id);
 
 sql_query("DELETE FROM files WHERE torrent = ?", [$id]);

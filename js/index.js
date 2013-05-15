@@ -1,10 +1,11 @@
 $(function() {
-    $('#funvote').find('form').submit(function(e) {
+    $('#funvote form').submit(function(e) {
 	e.preventDefault();
 	$.post(this.action + '&format=json' , $(this).serialize(), function(res) {
 	    if (res.success) {
-		$("#funvote").hide();
-		$("#voteaccept").show();
+		$("#funvote-total").text(res.total);
+		$("#funvote-fun").text(res.fun);
+		$("#funvote-form").hide();
 	    }
 	});
     });

@@ -10,22 +10,36 @@ loggedinorreturn();
 $id = 0 + $_GET["id"];
 
 int_check($id);
-$storingKeeperList = storing_keeper_list($id);
 
-if (!isset($id) || !$id)
-  die();
-
-$res = sql_query("SELECT torrents.cache_stamp, torrents.storing, torrents.sp_state, torrents.url, torrents.small_descr, torrents.seeders, torrents.banned, torrents.leechers, torrents.info_hash, torrents.filename, nfo, LENGTH(torrents.nfo) AS nfosz, torrents.last_action, torrents.name, torrents.owner, torrents.save_as, torrents.descr, torrents.visible, torrents.size, torrents.added, torrents.promotion_time_type, torrents.promotion_until, torrents.views, torrents.hits, torrents.times_completed, torrents.id, torrents.type, torrents.numfiles, torrents.anonymous, torrents.startseed, torrents.category, categories.name AS cat_name, sources.name AS source_name, medium, media.name AS medium_name, codec, codecs.name AS codec_name, standard, standards.name AS standard_name, processings.name AS processing_name, team, teams.name AS team_name, audiocodecs.name AS audiocodec_name FROM torrents LEFT JOIN categories ON torrents.category = categories.id LEFT JOIN sources ON torrents.source = sources.id LEFT JOIN media ON torrents.medium = media.id LEFT JOIN codecs ON torrents.codec = codecs.id LEFT JOIN standards ON torrents.standard = standards.id LEFT JOIN processings ON torrents.processing = processings.id LEFT JOIN teams ON torrents.team = teams.id LEFT JOIN audiocodecs ON torrents.audiocodec = audiocodecs.id WHERE torrents.id = $id LIMIT 1")
-  or sqlerr();
-$row = _mysql_fetch_array($res);
-
-if (!$row)
+if (!$id) {
+  header("HTTP/1.1 400 Bad Request");
   stderr($lang_details['std_error'], $lang_details['std_no_torrent_id']);
+}
+
+$max_id = $Cache->get_value('torrent_max_id');
+if ($max_id === false) {
+  $max_id = get_single_value('torrents', 'MAX(id)');
+  $Cache->cache_value('torrent_max_id', $max_id, 86400);
+}
+
+if ($id > $max_id) {
+  header("HTTP/1.1 404 Not Found");
+  stderr($lang_details['std_error'], $lang_details['std_no_torrent_id']);  
+}
+
+$row = sql_query("SELECT torrents.cache_stamp, torrents.storing, torrents.sp_state, torrents.url, torrents.small_descr, torrents.seeders, torrents.banned, torrents.leechers, torrents.info_hash, torrents.filename, nfo, LENGTH(torrents.nfo) AS nfosz, torrents.last_action, torrents.name, torrents.owner, torrents.save_as, torrents.descr, torrents.visible, torrents.size, torrents.added, torrents.promotion_time_type, torrents.promotion_until, torrents.views, torrents.hits, torrents.times_completed, torrents.id, torrents.type, torrents.numfiles, torrents.anonymous, torrents.startseed, torrents.category, categories.name AS cat_name, sources.name AS source_name, medium, media.name AS medium_name, codec, codecs.name AS codec_name, standard, standards.name AS standard_name, processings.name AS processing_name, team, teams.name AS team_name, audiocodecs.name AS audiocodec_name FROM torrents LEFT JOIN categories ON torrents.category = categories.id LEFT JOIN sources ON torrents.source = sources.id LEFT JOIN media ON torrents.medium = media.id LEFT JOIN codecs ON torrents.codec = codecs.id LEFT JOIN standards ON torrents.standard = standards.id LEFT JOIN processings ON torrents.processing = processings.id LEFT JOIN teams ON torrents.team = teams.id LEFT JOIN audiocodecs ON torrents.audiocodec = audiocodecs.id WHERE torrents.id = ? LIMIT 1", [$id])->fetch();
+
+if (!$row) {
+  header("HTTP/1.1 410 Gone");  
+  stderr($lang_details['std_error'], $lang_details['std_no_torrent_id']);
+}
 // BruceWolf Added at 2011-04-22
 // elseif ($row['banned'] == 'yes' && get_user_class() < $seebanned_class)
 elseif ($row['banned'] == 'yes' && get_user_class() < $seebanned_class && $CURUSER['id'] != $row['owner'])
   permissiondenied();
 else {
+  $storingKeeperList = storing_keeper_list($id);
+
   if ($_GET["hit"]) {
     sql_query("UPDATE LOW_PRIORITY torrents SET views = views + 1 WHERE id = $id");
   }
@@ -177,7 +191,7 @@ else {
       print("<table border=\"0\" cellspacing=\"0\">");
 	while($a = _mysql_fetch_assoc($r)) {
 	    $lang = "<tr><td class=\"embedded\"><img border=\"0\" src=\"pic/flag/". $a["flagpic"] . "\" alt=\"" . $a["lang_name"] . "\" title=\"" . $a["lang_name"] . "\" style=\"padding-bottom: 4px\" /></td>";
-	    $lang .= "<td class=\"embedded\">&nbsp;&nbsp;<a href=\"downloadsubs.php?torrentid=".$a[torrent_id]."&subid=".$a[id]."\">". $a["title"]. "</a>".(get_user_class() >= $submanage_class || (get_user_class() >= $delownsub_class && $a["uppedby"] == $CURUSER["id"]) ? " <font class=\"small\"><a href=\"subtitles.php?delete=".$a[id]."\">[".$lang_details['text_delete']."]</a></font>" : ""). "<a href=\"report.php?subtitle=$a[id]\">[$lang_details[report]]</a>"."</td><td class=\"embedded\">&nbsp;&nbsp;".($a["anonymous"] == 'yes' ? $lang_details['text_anonymous'] . (get_user_class() >= $viewanonymous_class ? get_username($a['uppedby'],false,true,true,false,true) : "") : get_username($a['uppedby'])).'</dd>';
+	    $lang .= "<td class=\"embedded\">&nbsp;&nbsp;<a href=\"downloadsubs.php?torrentid=".$a['torrent_id']."&subid=".$a['id']."\">". $a["title"]. "</a>".(get_user_class() >= $submanage_class || (get_user_class() >= $delownsub_class && $a["uppedby"] == $CURUSER["id"]) ? " <font class=\"small\"><a href=\"subtitles.php?delete=".$a['id']."\">[".$lang_details['text_delete']."]</a></font>" : ""). "<a href=\"report.php?subtitle=$a[id]\">[$lang_details[report]]</a>"."</td><td class=\"embedded\">&nbsp;&nbsp;".($a["anonymous"] == 'yes' ? $lang_details['text_anonymous'] . (get_user_class() >= $viewanonymous_class ? get_username($a['uppedby'],false,true,true,false,true) : "") : get_username($a['uppedby'])).'</dd>';
 	    print($lang);
 	}
 	print("</table>");
@@ -188,7 +202,7 @@ else {
     
     print("<table border=\"0\" cellspacing=\"0\"><tr>");
 
-    print("<td class=\"embedded\"><form method=\"get\" action=\"http://shooter.cn/sub/\" target=\"_blank\"><input type=\"search\" name=\"searchword\" id=\"keyword\" style=\"width: 250px\" value=\"".$moviename."\" /><input type=\"submit\" value=\"".$lang_details['submit_search_at_shooter']."\" /><input type=\"submit\" formaction=\"http://www.opensubtitles.org/en/search2/\" value=\"" . $lang_details['submit_search_at_opensubtitles'] . "\" /></form></td>\n");
+    print("<td class=\"embedded\"><form method=\"get\" action=\"http://shooter.cn/sub/\" target=\"_blank\"><input type=\"search\" name=\"searchword\" id=\"keyword\" style=\"width: 250px\" value=\"".$row['name']."\" /><input type=\"submit\" value=\"".$lang_details['submit_search_at_shooter']."\" /><input type=\"submit\" formaction=\"http://www.opensubtitles.org/en/search2/\" value=\"" . $lang_details['submit_search_at_opensubtitles'] . "\" /></form></td>\n");
     print("</tr></table>");
     echo '</dd>';
 
@@ -217,7 +231,7 @@ else {
       if ($Advertisement->enable_ad() && $torrentdetailad) {
 	dl_item("", "<div align=\"left\" style=\"margin-bottom: 10px\" id=\"ad_torrentdetail\">".$torrentdetailad[0]."</div>", 1);
       }
-      dl_item("<a href=\"javascript: klappe_news('descr')\"><span class=\"nowrap\"><img class=\"minus\" src=\"pic/trans.gif\" alt=\"Show/Hide\" id=\"picdescr\" title=\"".$lang_detail['title_show_or_hide']."\" /> ".$lang_details['row_description']."</span></a>", "<div id='kdescr'>".format_comment($row["descr"])."</div>", 1);
+      dl_item("<a href=\"javascript: klappe_news('descr')\"><span class=\"nowrap\"><img class=\"minus\" src=\"pic/trans.gif\" alt=\"Show/Hide\" id=\"picdescr\" title=\"".$lang_details['title_show_or_hide']."\" /> ".$lang_details['row_description']."</span></a>", "<div id='kdescr'>".format_comment($row["descr"])."</div>", 1);
     }
 
     if (get_user_class() >= $viewnfo_class && $row["nfosz"] > 0){
@@ -226,7 +240,7 @@ else {
 	$nfo = code($row["nfo"], $view == "magic");
 	$Cache->cache_value('nfo_block_torrent_id_'.$id, $nfo, 604800);
       }
-      dl_item("<a href=\"javascript: klappe_news('nfo')\"><img class=\"plus\" src=\"pic/trans.gif\" alt=\"Show/Hide\" id=\"picnfo\" title=\"".$lang_detail['title_show_or_hide']."\" /> ".$lang_details['text_nfo']."</a><br /><a href=\"viewnfo.php?id=".$row['id']."\" class=\"sublink\">". $lang_details['text_view_nfo']. "</a>", "<div id='knfo' style=\"display: none;\"><pre style=\"font-size:10pt; font-family: 'Courier New', monospace;\">".$nfo."</pre></div><div style=\"clear:both;\"\n", 1);
+      dl_item("<a href=\"javascript: klappe_news('nfo')\"><img class=\"plus\" src=\"pic/trans.gif\" alt=\"Show/Hide\" id=\"picnfo\" title=\"".$lang_details['title_show_or_hide']."\" /> ".$lang_details['text_nfo']."</a><br /><a href=\"viewnfo.php?id=".$row['id']."\" class=\"sublink\">". $lang_details['text_view_nfo']. "</a>", "<div id='knfo' style=\"display: none;\"><pre style=\"font-size:10pt; font-family: 'Courier New', monospace;\">".$nfo."</pre></div><div style=\"clear:both;\"\n", 1);
     }
 
     if ($imdb_id && $showextinfo['imdb'] == 'yes')

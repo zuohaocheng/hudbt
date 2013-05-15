@@ -49,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 
 	$sec = mksecret();
 
-	sql_query("UPDATE LOW_PRIORITY users SET editsecret=? WHERE id=?", [$sec, $arr['id']]);
+	update_user($arr['id'], 'editsecret=?', [$sec]);
 	if (!_mysql_affected_rows())
 	stderr($lang_recover['std_error'], $lang_recover['std_database_error']);
 
@@ -60,6 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 	$body = <<<EOD
 {$lang_recover['mail_one']}($email){$lang_recover['mail_two']}$ip{$lang_recover['mail_three']}
 <b><a href="$link" onclick="window.open('$link');return false"> {$lang_recover['mail_this_link']} </a></b><br />
+$link
 {$lang_recover['mail_four']}
 EOD;
 
@@ -95,7 +96,7 @@ elseif($_SERVER["REQUEST_METHOD"] == "GET" && $take_recover && isset($_GET["id"]
 
 	$newpasshash = md5($sec . $newpassword . $sec);
 
-	sql_query("UPDATE LOW_PRIORITY users SET secret=" . sqlesc($sec) . ", editsecret='', passhash=" . sqlesc($newpasshash) . " WHERE id=" . sqlesc($id)." AND editsecret=" . sqlesc($arr["editsecret"])) or sqlerr(__FILE__, __LINE__);
+	update_user($id, "secret=?, editsecret='', passhash=?", [$sec, $newpasshash]);
 
 	if (!_mysql_affected_rows())
 	stderr($lang_recover['std_error'], $lang_recover['std_unable_updating_user_data']);
@@ -106,6 +107,7 @@ elseif($_SERVER["REQUEST_METHOD"] == "GET" && $take_recover && isset($_GET["id"]
 {$lang_recover['mail_two_two']}$newpassword
 {$lang_recover['mail_two_three']}
 <b><a href="$link" onclick="window.open('$link');return false">{$lang_recover['mail_here']}</a></b>
+$link
 {$lang_recover['mail_two_four']}
 
 EOD;

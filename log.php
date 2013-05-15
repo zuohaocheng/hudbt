@@ -109,7 +109,7 @@ else {
     }
 
     if($query_raw){
-      $wherea .= ($wherea ? " AND " : " WHERE ")." txt LIKE :query ";
+      $wherea .= ($wherea ? " AND " : " WHERE ")." txt LIKE ? ";
       $addparam .= "query=".rawurlencode($query_raw)."&";
     }
 
@@ -117,13 +117,13 @@ else {
     $opt = array (all => $lang_log['text_all'], normal => $lang_log['text_normal'], mod => $lang_log['text_mod']);
     searchtable($lang_log['text_search_log'], 'dailylog',$opt);
 
-    $count = get_row_count('sitelog', $wherea, [':query' => $query]);
+    $count = get_row_count('sitelog', $wherea, [$query]);
 
     $perpage = 50;
 
     list($pagertop, $pagerbottom, $limit) = pager($perpage, $count, "log.php?action=dailylog&".$addparam);
 
-    $res = sql_query("SELECT added, txt FROM sitelog $wherea ORDER BY added DESC $limit", [':query' => $query]) or sqlerr(__FILE__, __LINE__);
+    $res = sql_query("SELECT added, txt FROM sitelog $wherea ORDER BY added DESC $limit", [$query]);
     if (_mysql_num_rows($res) == 0)
       print($lang_log['text_log_empty']);
     else
@@ -307,7 +307,7 @@ else {
     $query_raw = trim($_GET["query"]);
     $query = '%' . $query_raw . '%';
     if($query_raw){
-      $wherea=" WHERE txt LIKE :query ";
+      $wherea=" WHERE txt LIKE ? ";
       $addparam = "query=".rawurlencode($query_raw)."&";
     }
     else{
@@ -337,12 +337,12 @@ else {
       }
     }
 
-    $count = get_row_count('chronicle', $wherea, [':query' => $query]);
+    $count = get_row_count('chronicle', $wherea, [$query]);
 
     $perpage = 50;
 
     list($pagertop, $pagerbottom, $limit) = pager($perpage, $count, "log.php?action=chronicle&".$addparam);
-    $res = sql_query("SELECT id, added, txt FROM chronicle $wherea ORDER BY added DESC $limit", [':query' => $query]) or sqlerr(__FILE__, __LINE__);
+    $res = sql_query("SELECT id, added, txt FROM chronicle $wherea ORDER BY added DESC $limit", [$query]) or sqlerr(__FILE__, __LINE__);
     if (_mysql_num_rows($res) == 0)
       print($lang_log['text_chronicle_empty']);
     else

@@ -24,9 +24,7 @@ $confirm_sec = hash_pad($row["secret"]);
 if ($confirm_md5 != md5($confirm_sec))
 	httperr();
 
-sql_query("UPDATE LOW_PRIORITY users SET status='confirmed', editsecret='' WHERE id=".sqlesc($id)." AND status='pending'") or sqlerr(__FILE__, __LINE__);
-
-if (!_mysql_affected_rows())
+if (!update_user($id, "status='confirmed', editsecret=''"))
 	httperr();
 
 	
@@ -44,4 +42,4 @@ logincookie($row["id"], $passh,1,0x7fffffff,$securelogin_indentity_cookie);
 //sessioncookie($row["id"], $passh,false);
 
 header("Refresh: 0; url=ok.php?type=confirm");
-?>
+

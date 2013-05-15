@@ -4,18 +4,6 @@ if(!defined('IN_TRACKER'))
 	die('Hacking attempt!');
 include_once($rootpath . 'include/globalfunctions.php');
 
-function dbconn_announce() {
-
-}
-
-function hash_where_arr($name, $hash_arr) {
-	$new_hash_arr = Array();
-	foreach ($hash_arr as $hash) {
-	  $new_hash_arr[] = sqlesc(stripslashes(urldecode($hash)));
-	}
-	return $name." IN ( ".implode(", ",$new_hash_arr)." )";
-}
-
 function emu_getallheaders() {
 	foreach($_SERVER as $name => $value)
 		if(substr($name, 0, 5) == 'HTTP_')
@@ -73,7 +61,7 @@ function check_cheater($userid, $torrentid, $uploaded, $downloaded, $anctime, $s
 	{
 		$comment = "User account was automatically disabled by system";
 		_mysql_query("INSERT INTO cheaters (added, userid, torrentid, uploaded, downloaded, anctime, seeders, leechers, comment) VALUES (".sqlesc($time).", $userid, $torrentid, $uploaded, $downloaded, $anctime, $seeders, $leechers, ".sqlesc($comment).")") or err("Tracker error 51");
-		_mysql_query("UPDATE users SET enabled = 'no' WHERE id=$userid") or err("Tracker error 50"); //automatically disable user account;
+		update_user($userid, "enabled = 'no'");
 		err("We believe you're trying to cheat. And your account is disabled.");
 		return true;
 	}
@@ -316,3 +304,13 @@ function check_client($peer_id, $agent) {
   }
 }
 
+function torrent_for_infohash ($infohash) {
+  global $Cache;
+  return $Cache->get_value('torrent_hash_'.$infohash.'_content', 350, function() use ($infohash) {
+      $r = sql_query("SELECT id, owner, sp_state, seeders, leechers, promotion_time_type, promotion_until, added, UNIX_TIMESTAMP(added) AS ts, banned, times_completed FROM torrents WHERE " . hash_where("info_hash", $infohash))->fetch();
+      if (!$r) {
+	$r = [];
+      }
+      return $r;
+    });
+}

@@ -19,7 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 	elseif ($type == 'client')
 	{
 		if ($hidenotice){
-			sql_query("UPDATE LOW_PRIORITY users SET showclienterror='no' WHERE id=".sqlesc($CURUSER['id']));
+			update_user($CURUSER['id'], "showclienterror='no'");
 		}
 		header("Location: " . get_protocol_prefix() . "$BASEURL/download.php?id=".$torrentid."&letdown=1");
 		die;

@@ -14,14 +14,13 @@ function bark($msg)
 $id = 0 + $_GET['id'];
 int_check($id,true);
 
-if (get_user_class() >= UC_MODERATOR || $CURUSER[id] == "$id")
+if (get_user_class() >= UC_MODERATOR || $CURUSER['id'] == $id)
 {  
    $deadtime = deadtime();
-   sql_query("DELETE FROM peers WHERE last_action < FROM_UNIXTIME($deadtime) AND userid=" . sqlesc($id));
-   $effected = _mysql_affected_rows();
-
-   sql_query("delete from peers where id in (select min_id from (select min(id) as min_id, torrent, count(1) as cnt from peers where userid =".sqlesc($id)." group by torrent, ip, port) as org where cnt >1)");
-   $effected += _mysql_affected_rows();
+   $effected = sql_query("DELETE FROM peers WHERE userid=?",[$id])->rowCount();
+   $Cache->delete_value('user_'.$CURUSER["id"].'_active_seed_count');
+   $Cache->delete_value('user_'.$CURUSER["id"].'_active_leech_count');
+   
    stderr($lang_takeflush['std_success'], "$effected ".$lang_takeflush['std_ghost_torrents_cleaned']);
 }
 else

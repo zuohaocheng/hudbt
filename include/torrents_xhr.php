@@ -19,11 +19,13 @@ $tooltips = torrenttable($rows, ['swap_headings' => $swap_headings,
 $out = array('torrents' => ob_get_clean(),
 	     'tooltips' => $tooltips);
 
-if ($next_page_href != '') {
+if (isset($next_page_href)) {
   $out['continue'] = $next_page_href;
 }
 
-$out['pager'] = array('top' => $pagertop, 'bottom' => $pagerbottom);
+if (isset($pagertop)) {
+  $out['pager'] = array('top' => $pagertop, 'bottom' => $pagerbottom);
+}
 
 print(json_encode($out));
 

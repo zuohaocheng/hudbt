@@ -56,7 +56,7 @@ if ($iplog1 == "yes") {
 	sql_query("INSERT INTO iplog (ip, userid, access) VALUES (" . sqlesc($CURUSER['ip']) . ", " . $CURUSER['id'] . ", '" . $CURUSER['last_access'] . "')");
 }
 //User may choose to download torrent from RSS. So update his last_access and ip when downloading torrents.
-sql_query("UPDATE LOW_PRIORITY users SET last_access = ".sqlesc(date("Y-m-d H:i:s")).", ip = ".sqlesc($CURUSER['ip'])."  WHERE id = ".sqlesc($CURUSER['id']));
+update_user($CURUSER['id'], 'last_access =?, ip=?', [date("Y-m-d H:i:s"), $CURUSER['ip']]);
 
 /*
 @ini_set('zlib.output_compression', 'Off');
@@ -101,7 +101,7 @@ require_once "include/benc.php";
 
 if (strlen($CURUSER['passkey']) != 32) {
 	$CURUSER['passkey'] = md5($CURUSER['username'].date("Y-m-d H:i:s").$CURUSER['passhash']);
-	sql_query("UPDATE LOW_PRIORITY users SET passkey=".sqlesc($CURUSER['passkey'])." WHERE id=".sqlesc($CURUSER['id']));
+	update_user($CURUSER['id'], 'passkey = ?', [$CURUSER['passkey']]);
 }
 
 /*

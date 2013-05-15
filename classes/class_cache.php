@@ -163,7 +163,7 @@ class NPCache {
 	// Wrapper for Memcache::set, with the zlib option removed and default duration of 1 hour
 	function cache_value($Key, $Value, $Duration = 3600){
 	  Cache::set('duration', $Duration);
-	  Cache::write($Key, $Value);
+	  $ret = Cache::write($Key, $Value);
 
 		$this->cacheWriteTimes++;
 		
@@ -173,6 +173,8 @@ class NPCache {
 		else {
 		  $this->keyHits['write'][$Key] = 1;
 		}
+
+		return $ret;
 	}
 
 	//---------- Getting functions ----------//
@@ -225,7 +227,7 @@ class NPCache {
 	}
 
 	// Wrapper for Memcache::get. Why? Because wrappers are cool.
-	function get_value($Key) {
+	function get_value($Key, $duration = 3600, $v_block = null) {
 		if($this->getClearCache()){
 			$this->delete_value($Key);
 			return false;
@@ -244,6 +246,12 @@ class NPCache {
 		else {
 		  $this->keyHits['read'][$Key] = 1;
 		}
+
+		if ($Return === false && is_callable($v_block)) {
+		  $Return = call_user_func($v_block);
+		  $this->cache_value($Key, $Return, $duration);
+		}
+		
 		return $Return;
 	}
 

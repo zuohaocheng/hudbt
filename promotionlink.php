@@ -31,7 +31,7 @@ if ($key)
 elseif(($updatekey || !$CURUSER['promotion_link']) && $CURUSER)
 {
 	$promotionkey=md5($CURUSER['email'].date("Y-m-d H:i:s").$CURUSER['passhash']);
-	sql_query("UPDATE LOW_PRIORITY users SET promotion_link=".sqlesc($promotionkey)." WHERE id=".sqlesc($CURUSER['id']));
+	update_user($CURUSER['id'], 'promotion_link=?', [$promotionkey]);
 	header("Location: " . get_protocol_prefix() . $BASEURL."/promotionlink.php");
 }
 else

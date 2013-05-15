@@ -6,12 +6,16 @@ init = function() {
     ws = new WebSocket(self.name + "/ws/pm");
     ws.onopen = function() {
 	connected = true;
+	failCount = 0;
     };
     ws.onclose = function() {
 	connected = false;
 	++failCount;
 	if (failCount < 5) {
 	    setTimeout(init, 5000);
+	}
+	else {
+	    setTimeout(init, 120000);
 	}
     };
     ws.onmessage = function(e) {

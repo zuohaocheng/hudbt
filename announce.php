@@ -62,7 +62,8 @@ foreach(array("numwant", "num want", "num_want") as $k) {
 $seeder = ($left == 0) ? "yes" : "no";
 
 // check passkey
-if (!$az = $Cache->get_value('user_passkey_'.$passkey.'_content')){
+$az = $Cache->get_value('user_passkey_'.$passkey.'_content');
+if ($az === false) {
   $az = sql_query('SELECT id, downloadpos, enabled, uploaded, downloaded, class, parked, clientselect, showclienterror FROM users WHERE passkey= ? LIMIT 1', [$passkey])->fetch();
   $Cache->cache_value('user_passkey_'.$passkey.'_content', $az, 950);
 }
@@ -72,24 +73,18 @@ $userid = 0+$az['id'];
 //3. CHECK IF CLIENT IS ALLOWED
 list($clicheck_res, $client_familyid) = check_client($peer_id,$agent);
 if($clicheck_res){
-  if ($az['showclienterror'] == 'no')
-    {
-      sql_query("UPDATE LOW_PRIORITY users SET showclienterror = 'yes' WHERE id = ".sqlesc($userid));
-      $Cache->delete_value('user_passkey_'.$passkey.'_content');
+  if ($az['showclienterror'] == 'no') {
+      update_user($userid, "showclienterror = 'yes'");
     }
   err($clicheck_res);
 }
 elseif ($az['showclienterror'] == 'yes'){
   $USERUPDATESET[] = "showclienterror = 'no'";
-  $Cache->delete_value('user_passkey_'.$passkey.'_content');
+  $Cache->delete_value('user_passkey_'. $passkey .'_content');
 }
 
 // check torrent based on info_hash
-if (!$torrent = $Cache->get_value('torrent_hash_'.$info_hash.'_content')){
-  $res = sql_query("SELECT id, owner, sp_state, seeders, leechers, promotion_time_type, promotion_until, added, UNIX_TIMESTAMP(added) AS ts, banned FROM torrents WHERE " . hash_where("info_hash", $info_hash));
-  $torrent = _mysql_fetch_array($res);
-  $Cache->cache_value('torrent_hash_'.$info_hash.'_content', $torrent, 350);
-}
+$torrent = torrent_for_infohash($info_hash);
 if (!$torrent) err("torrent not registered with this tracker");
 elseif ($torrent['banned'] == 'yes' && $az['class'] < $seebanned_class) err("torrent banned");
 // select peers info from peers table for this torrent
@@ -344,7 +339,7 @@ if($client_familyid != 0 && $client_familyid != $az['clientselect']) {
 }
 
 if(count($USERUPDATESET) && $userid) {
-  sql_query("UPDATE LOW_PRIORITY users SET " . join(",", $USERUPDATESET) . " WHERE id = ".$userid);
+  update_user($userid, join(",", $USERUPDATESET), [], false);
 }
 benc_resp_raw($resp);
-?>
+

@@ -97,7 +97,7 @@ class Tcategory extends AppModel {
 		)
 	);
 
-	public function afterFind($results, $primary) {
+	public function afterFind($results, $primary = false) {
 	  if (!$primary) {
 	    return $results;
 	  }

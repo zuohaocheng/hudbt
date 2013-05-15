@@ -3,11 +3,16 @@ require_once("include/static_resources.php");
 require_once("include/bittorrent.php");
 dbconn(true);
 
-$debug = $_REQUEST['debug'];
-$purge = $_REQUEST['purge'];
+$debug = isset($_REQUEST['debug']);
+$purge = isset($_REQUEST['purge']);
 $fullname = strtolower($_REQUEST['name']);
 $format = strtolower($_REQUEST['format']);
-$user = 0 + $_REQUEST['user'];
+if (isset($_REQUEST['user'])) {
+  $user = 0 + $_REQUEST['user'];
+}
+else {
+  $user = null;
+}
 
 $tokens = preg_split('/\./', $fullname);
 $type = array_pop($tokens);
@@ -16,6 +21,9 @@ $name = implode('.', $tokens);
 if ($type == 'php' || $fullname == '') {
   $multifile = true;
   $type = $format;
+}
+else {
+  $multifile = false;
 }
 
 if ($type == 'js') {
@@ -85,7 +93,7 @@ else {
   $out = load_file_cache($name, $type, $debug, $purge);
 }
 
-if (!$lastMode && !$debug) {
+if (!$lastMod && !$debug) {
   $stamp = $Cache->get_value($cache_key . '_md');
   header("Last-Modified: " . $stamp);
   header('Etag: ' . $cache_key);
@@ -113,6 +121,7 @@ function generate_key($name, $type, $multiple, $user = null) {
 function load_files_cache($name, $type, $debug, $purge) {
   global $Cache;
   global $cache_key, $user;
+  global $rootpath, $SITENAME;
   $key = $cache_key;
   if (!$debug) {
     if ($purge) {
@@ -144,13 +153,13 @@ function load_files_cache($name, $type, $debug, $purge) {
       }
       else {
 	global $js_files;
-	$out .= load_files($js_files, $type, $debug, $purge);
+	$out = load_files($js_files, $type, $debug, $purge);
 	$out .= ";/* constants */";
 	$out .= load_constant();
       }
     }
     else {
-      $out .= load_files(dependence($name), $type, $debug, $purge);
+      $out = load_files(dependence($name), $type, $debug, $purge);
       $out .= load_files(array($name), $type, $debug, $purge);
 
       $langfile = $rootpath . get_langfile_path($name) . '.php';

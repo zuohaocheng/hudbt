@@ -26,12 +26,12 @@ else{
   loggedinorreturn(true);
 }
 
+$userid = $CURUSER['id'];
+
 if ($showextinfo['imdb'] == 'yes')
   require_once ("imdb/imdb.class.php");
-if ($_SERVER["REQUEST_METHOD"] == "POST")
-  {
-    if ($showpolls_main == "yes")
-      {
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if ($showpolls_main == "yes") {
 	$choice = $_POST["choice"];
 	if ($CURUSER && $choice != "" && $choice < 256 && $choice == floor($choice))
 	  {
@@ -42,9 +42,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 	    $hasvoted = get_row_count("pollanswers","WHERE pollid=".sqlesc($pollid)." && userid=".sqlesc($CURUSER["id"]));
 	    if ($hasvoted)
 	      stderr($lang_index['std_error'],$lang_index['std_duplicate_votes_denied']);
-	    sql_query("INSERT INTO pollanswers VALUES(0, ".sqlesc($pollid).", ".sqlesc($CURUSER["id"]).", ".sqlesc($choice).")") or sqlerr(__FILE__, __LINE__);
+	    sql_query("INSERT INTO pollanswers (pollid, userid, selection) VALUES(?, ?, ?)", [$pollid, $userid, $choice]);
 	    $Cache->delete_value('current_poll_content');
 	    $Cache->delete_value('current_poll_result', true);
+	    $Cache->cache_value('poll_vote_' . $pollid .'_' . $userid, ['selection' => $choice], 3600);
 	    if (_mysql_affected_rows() != 1)
 	      stderr($lang_index['std_error'], $lang_index['std_vote_not_counted']);
 	    //add karma
@@ -186,18 +187,17 @@ if ($showfunbox_main == "yes"){
       print('<h2 class="page-titles">'.$lang_index['text_funbox'].(get_user_class() >= $newfunitem_class ? "<font class=\"small\"> - [<a class=\"altlink\" href=\"fun.php?action=new\"><b>".$lang_index['text_new_fun']."</b></a>]</font>" : "")."</h2>");
     }
   else {
-      $totalvote = $Cache->get_value('current_fun_vote_count');
-      if ($totalvote == ""){
-	$totalvote = get_row_count("funvotes", "WHERE funid = ".sqlesc($funid));
-	$Cache->cache_value('current_fun_vote_count', $totalvote, 756);
-      }
-      $funvote = $Cache->get_value('current_fun_vote_funny_count');
-      if ($funvote == ""){
-	$funvote = get_row_count("funvotes", "WHERE funid = ".sqlesc($funid)." AND vote='fun'");
-	$Cache->cache_value('current_fun_vote_funny_count', $funvote, 756);
-      }
+    $totalvote = $Cache->get_value('current_fun_vote_count', 756, function() use($funid) {
+	return get_row_count("funvotes", "WHERE funid = ?", [$funid]);
+      });
+
+    $funvote = $Cache->get_value('current_fun_vote_funny_count', 756, function() use ($funid) {
+	return get_row_count("funvotes", "WHERE funid = ? AND vote='fun'", [$funid]);
+      });
       //check whether current user has voted
-      $funvoted = get_row_count("funvotes", "WHERE funid = ".sqlesc($funid)." AND userid=".sqlesc($CURUSER['id']));
+    $funvoted = $Cache->get_value('funvote_'.$funid . '_' . $userid, 1800, function() use ($funid, $userid) {
+	return get_row_count("funvotes", "WHERE funid = ? AND userid= ?", [$funid, $userid]);
+      });
       print ('<h2 class="page-titles">'.$lang_index['text_funbox']);
       if ($CURUSER) {
 	  print("<font class=\"small\">".(get_user_class() >= $log_class ? " - [<a class=\"altlink\" href=\"log.php?action=funbox\"><b>".$lang_index['text_more_fun']."</b></a>]": "").($neednew && get_user_class() >= $newfunitem_class ? " - [<a class=\"altlink\" href=\"fun.php?action=new\"><b>".$lang_index['text_new_fun']."</b></a>]" : "" ).( ($CURUSER['id'] == $owner || get_user_class() >= $funmanage_class) ? " - [<a class=\"altlink\" href=\"fun.php?action=edit&amp;id=".$funid."&amp;returnto=index.php\"><b>".$lang_index['text_edit']."</b></a>]" : "").(get_user_class() >= $funmanage_class ? " - [<a class=\"altlink\" href=\"fun.php?action=delete&amp;id=".$funid."&amp;returnto=index.php\"><b>".$lang_index['text_delete']."</b></a>] - [<a class=\"altlink\" href=\"fun.php?action=ban&amp;id=".$funid."&amp;returnto=index.php\"><b>".$lang_index['text_ban']."</b></a>]" : "")."</font>");
@@ -210,17 +210,16 @@ if ($showfunbox_main == "yes"){
 
       if ($CURUSER) {
 	echo '<div id="funvote" class="minor-list compact">';
-	print("<b>".$funvote."</b>" . $lang_index['text_out_of'] . $totalvote . $lang_index['text_people_found_it']);
+	print('<span id="funvote-fun">'.$funvote."</span>" . $lang_index['text_out_of'] . '<span id="funvote-total">' . $totalvote . '</span>' . $lang_index['text_people_found_it']);
 
 	if (!$funvoted) {
-	  echo "<span class=\"striking\">".$lang_index['text_your_opinion']."</span>";
+	  echo "<span id=\"funvote-form\"><span class=\"striking\">".$lang_index['text_your_opinion']."</span>";
 
 	  $id = $funid;
 	  echo '<ul>';
 	  echo '<li><form action="fun.php?action=vote" method="post"><input type="hidden" name="id" value="' . $id . '" /><input type="hidden" name="yourvote" value="fun" /><input type="submit" class="btn" value="' . $lang_index['submit_fun'] . '" /></form></li>';
 	  echo '<li><form action="fun.php?action=vote" method="post"><input type="hidden" name="id" value="' . $id . '" /><input type="hidden" name="yourvote" value="dull" /><input type="submit" class="btn" value="' . $lang_index['submit_dull'] . '" /></form></li>';
-	  echo '</ul></div>';
-	  echo "<div id=\"voteaccept\" style=\"display: none;\">" . $lang_index['text_vote_accepted'];
+	  echo '</ul></span>';
 	}
 	echo '</div>';
       }
@@ -263,60 +262,66 @@ if ($showlastxforumposts_main == "yes" && $CURUSER) {
 // ------------- start: latest torrents ------------------//
 
 if ($showlastxtorrents_main == "yes") {
-  $result = sql_query("SELECT * FROM torrents where visible='yes' ORDER BY added DESC LIMIT 5") or sqlerr(__FILE__, __LINE__);
-  if(_mysql_num_rows($result) != 0 )
-    {
-      print ('<h2 class="page-titles">'.$lang_index['text_last_five_torrent']."</h2>");
-      print ("<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"5\"><tr><td class=\"colhead\" width=\"100%\">".$lang_index['col_name']."</td><td class=\"colhead\" align=\"center\">".$lang_index['col_seeder']."</td><td class=\"colhead\" align=\"center\">".$lang_index['col_leecher']."</td></tr>");
+  $result = $Cache->get_value('index_latest_torrents', 300, function() {
+      return sql_query("SELECT * FROM torrents where visible='yes' ORDER BY added DESC LIMIT 5")->fetchAll();
+    });
+  if ($result) {
+    print ('<h2 class="page-titles">'.$lang_index['text_last_five_torrent']."</h2>");
+    print ("<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"5\"><tr><td class=\"colhead\" width=\"100%\">".$lang_index['col_name']."</td><td class=\"colhead\" align=\"center\">".$lang_index['col_seeder']."</td><td class=\"colhead\" align=\"center\">".$lang_index['col_leecher']."</td></tr>");
 
-      while( $row = _mysql_fetch_assoc($result) )
-	{
-	  print ("<tr><a href=\"details.php?id=". $row['id'] ."&amp;hit=1\"><td><a href=\"details.php?id=". $row['id'] ."&amp;hit=1\"><b>" . htmlspecialchars($row['name']) . "</b></td></a><td align=\"center\">" . $row['seeders'] . "</td><td align=\"center\">" . $row['leechers'] . "</td></tr>");
-	}
-      print ("</table>");
+    foreach ($result as $row) {
+      print ("<tr><a href=\"details.php?id=". $row['id'] ."&amp;hit=1\"><td><a href=\"details.php?id=". $row['id'] ."&amp;hit=1\"><b>" . htmlspecialchars($row['name']) . "</b></td></a><td align=\"center\">" . $row['seeders'] . "</td><td align=\"center\">" . $row['leechers'] . "</td></tr>");
     }
+    print ("</table>");
+  }
 }
 // ------------- end: latest torrents ------------------//
 // ------------- start: polls ------------------//
 if ($CURUSER && $showpolls_main == "yes")
   {
     // Get current poll
-    if (!$arr = $Cache->get_value('current_poll_content')){
-      $res = sql_query("SELECT * FROM polls ORDER BY id DESC LIMIT 1") or sqlerr(__FILE__, __LINE__);
-      
-      $arr = _mysql_fetch_array($res);
-      $Cache->cache_value('current_poll_content', $arr, 7226);
+    $arr = $Cache->get_value('current_poll_content', 7226, function() {
+	return sql_query("SELECT * FROM polls ORDER BY id DESC LIMIT 1")->fetchAll();
+      });
+    if ($arr) {
+      $pollexists = true;
+      $arr = $arr[0];
     }
-    if (!$arr)
+    else {
       $pollexists = false;
-    else $pollexists = true;
+    }
 
     print('<h2 class="page-titles">'.$lang_index['text_polls']);
 
     if (get_user_class() >= $pollmanage_class) {
       print("<font class=\"small\"> - [<a class=\"altlink\" href=\"makepoll.php?returnto=main\"><b>".$lang_index['text_new']."</b></a>]\n");
       if ($pollexists) {
-	print(" - [<a class=\"altlink\" href=\"makepoll.php?action=edit&amp;pollid=".$arr[id]."&amp;returnto=main\"><b>".$lang_index['text_edit']."</b></a>]\n");
-	print(" - [<a class=\"altlink\" href=\"log.php?action=poll&amp;do=delete&amp;pollid=".$arr[id]."&amp;returnto=main\"><b>".$lang_index['text_delete']."</b></a>]");
-	print(" - [<a class=\"altlink\" href=\"polloverview.php?id=".$arr[id]."\"><b>".$lang_index['text_detail']."</b></a>]");
+	print(" - [<a class=\"altlink\" href=\"makepoll.php?action=edit&amp;pollid=".$arr['id']."&amp;returnto=main\"><b>".$lang_index['text_edit']."</b></a>]\n");
+	print(" - [<a class=\"altlink\" href=\"log.php?action=poll&amp;do=delete&amp;pollid=".$arr['id']."&amp;returnto=main\"><b>".$lang_index['text_delete']."</b></a>]");
+	print(" - [<a class=\"altlink\" href=\"polloverview.php?id=".$arr['id']."\"><b>".$lang_index['text_detail']."</b></a>]");
       }
       print("</font>");
     }
     print("</h2>");
     if ($pollexists) {
       $pollid = 0+$arr["id"];
-      $userid = 0+$CURUSER["id"];
       $question = $arr["question"];
 
       print('<div class="text table td" id="poll">');
       print('<h3 class="page-titles">'.$question.'</h3>');
 
       // Check if user has already voted
-      $res = sql_query("SELECT selection FROM pollanswers WHERE pollid=".sqlesc($pollid)." AND userid=".sqlesc($CURUSER["id"])) or sqlerr();
-      $voted = _mysql_fetch_assoc($res);
+      $voted = $Cache->get_value('poll_vote_' . $pollid .'_' . $userid, 3600, function() use ($pollid, $userid) {
+	  $r = sql_query("SELECT selection FROM pollanswers WHERE pollid=? AND userid=?", [$pollid, $userid])->fetch();
+	  if ($r === false) {
+	    $r = [];
+	  }
+	  return $r;
+	});
+      
       if ($voted) { //user has already voted
 	$uservote = $voted["selection"];
-	$cache_key = 'current_poll_result_' + $uservote;
+	$cache_key = 'current_poll_result_' . $uservote;
 	$out = $Cache->get_value($cache_key);
 	if (!$out) {
 	  $out = votes($arr, $uservote);
@@ -329,11 +334,10 @@ if ($CURUSER && $showpolls_main == "yes")
 	  print('<form method="post" action="index.php"><div class="minor-list-vertical"><ul>');
 	  $i = 0;
 	  while ($a = $arr['option' . $i]) {
-	    print('<li><input type="radio" name="choice" value="'.$i.'">'.$a.'</li>');
+	    print('<li><label><input type="radio" name="choice" value="'.$i.'">'.$a.'</label></li>');
 	    ++$i;
 	  }
-	  print("<li></li>");
-	  print("<li><input type=\"radio\" name=\"choice\" value=\"255\">".$lang_index['radio_blank_vote']."</li></ul></div>");
+	  print("<li><label><input type=\"radio\" name=\"choice\" value=\"255\">".$lang_index['radio_blank_vote']."</li></label></ul></div>");
 	  print("<div class=\"center\"><input type=\"submit\" class=\"btn\" value=\"".$lang_index['submit_vote']."\" /></div></form>");
 	}
 

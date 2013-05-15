@@ -23,7 +23,7 @@ $lang_donate = array
 	'text_donate_with_alipay' => "使用支付宝捐赠",
 	'text_donate_alipay_note_one' => "1. 点击支付宝按钮。<br />2. 选择“向陌生卖家付款”。<br />3. 在“收款方支付宝账户”中填写我们的支付宝账号",
 	'text_donate_alipay_note_two' => "。<br />4. 继续直到完成付款。",
-	'text_after_donation_note_one' => "在完成捐赠后，请一定一定将你的<b>付款信息</b>通过站短",
+	'text_after_donation_note_one' => "在完成捐赠后，请一定一定将你的<b>付款信息截图</b>通过站短",
 	'text_send_us' => "发送给我们",
 	'text_after_donation_note_two' => "，方便我们确认你的捐赠。",
 );

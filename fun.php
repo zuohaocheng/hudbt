@@ -221,23 +221,27 @@ else if ($action == 'vote') {
       if ($_POST["yourvote"] == 'dull')
 	$vote = 'dull';
       else $vote = 'fun';
-      $sql = "INSERT INTO funvotes (funid, userid, added, vote) VALUES (".sqlesc($id).",".$CURUSER['id'].",".sqlesc(date("Y-m-d H:i:s")).",".sqlesc($vote).")";
-      sql_query($sql) or sqlerr(__FILE__,__LINE__);
+      
+      sql_query("INSERT INTO funvotes (funid, userid, added, vote) VALUES (?, ?, ?, ?)", [$id, $CURUSER['id'], date("Y-m-d H:i:s"), $vote]);
       KPS("+",$funboxvote_bonus,$CURUSER['id']); //voter gets 1.0 bonus per vote
+
+      $Cache->delete_value('funvote_'.$id . '_' . $CURUSER['id']);
       $totalvote = $Cache->get_value('current_fun_vote_count');
-      if ($totalvote == ""){
-	$totalvote = get_row_count("funvotes", "WHERE funid = ".sqlesc($row['id']));
+      if ($totalvote === false){
+	$totalvote = get_row_count("funvotes", "WHERE funid = ?", [$id]);
       }
       else $totalvote++;
       $Cache->cache_value('current_fun_vote_count', $totalvote, 756);
+
       $funvote = $Cache->get_value('current_fun_vote_funny_count');
-      if ($funvote == ""){
-	$funvote = get_row_count("funvotes", "WHERE funid = ".sqlesc($row['id'])." AND vote='fun'");
+      if ($funvote === false){
+	$funvote = get_row_count("funvotes", "WHERE funid = ? AND vote='fun'", [$id]);
       }
-      elseif($vote == 'fun') {
+      else if ($vote == 'fun') {
 	$funvote++;
       }
       $Cache->cache_value('current_fun_vote_funny_count', $funvote, 756);
+
       if ($totalvote) $ratio = $funvote / $totalvote; else $ratio = 1;
       if ($totalvote >= 20){
 	if ($ratio > 0.75){
@@ -285,7 +289,9 @@ else if ($action == 'vote') {
 
   if ($format == 'json') {
     header('Content-type: application/json');
-    echo php_json_encode(array('success' => true));
+    echo json_encode(['success' => true,
+		      'total' => $totalvote,
+		      'fun' => $funvote]);
   }
   else {
     header("Location: index.php");

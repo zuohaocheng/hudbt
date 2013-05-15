@@ -9,6 +9,8 @@ if($action == "regimage")
 		$sql = sql_query($query);
 		$regimage = _mysql_fetch_array($sql);
 		$imagestring = $regimage['imagestring'];
+		$newstring = '';
+		$space = '';
 		for($i=0;$i<strlen($imagestring);$i++)
 		{
 			$newstring .= $space.$imagestring[$i];
@@ -31,13 +33,12 @@ if($action == "regimage")
 		$textposh = ($imgwidth-$textwidth)/2;
 		$textposv = ($imgheight-$textheight)/2;		
 		
-			$dots = $imgheight*$imgwidth/35;
-			for($i=1;$i<=$dots;$i++)
-			{
-				imagesetpixel($im, rand(0, $imgwidth), rand(0, $imgheight), $textcolor);
-			}
-		
+		$dots = $imgheight*$imgwidth/35;
 		$textcolor = imagecolorallocate($im, 0, 0, 0);
+		for($i=1;$i<=$dots;$i++) {
+		  imagesetpixel($im, rand(0, $imgwidth), rand(0, $imgheight), $textcolor);
+		}
+		
 		imagestring($im, 5, $textposh, $textposv, $imagestring, $textcolor);
 	
 		// output the image

@@ -4,12 +4,30 @@ use Wrench\Application\Application;
 use Wrench\Application\NamedApplication;
 
 require(__DIR__ . '/../include/bittorrent.php');
+$pdo->query("SET wait_timeout=7200;");
 
 class PmApplication extends Application {
   protected $users = array();
 
   public function onConnect($client) {
+    global $pdo;
     $cookie = $client->cookie;
+    try {
+      $pdo->query('SELECT 1');
+    } catch (PDOException $e) {
+      require('cake/app/Config/database.php');
+      try {
+	$config = new DATABASE_CONFIG();
+	$default = $config->default;
+	$dsn = 'mysql:dbname=' . $default['database'] . ';host=' . $default['host'];
+	$pdo = new PDO($dsn, $default['login'], $default['password']);
+	$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+      } catch (PDOException $e) {
+	die('dbconn: mysql_pconnect: ' . $e->getMessage());
+      }
+      echo "Reconnected\n";
+    }
+    
     try {
       $row = userlogin_core($this->parseCookie($cookie));
     } catch (Exception $e) {

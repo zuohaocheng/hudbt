@@ -25,6 +25,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && get_user_class() >= UC_ADMINISTRATOR
 	$comment = sqlesc($comment);
 	$added = sqlesc(date("Y-m-d H:i:s"));
 	sql_query('INSERT INTO bans (added, addedby, first, last, comment) VALUES(?, ?, ?, ?, ?)', [$added, $CURUSER['id'], $firstlong, $lastlong, $comment]);
+	for ($i = $firstlong; $i <= $lastlong; $i += 1) {
+	  $key = 'banned_ip_' . $i;
+	  $Cahce->delete_value($key);
+	}
 	header("Location: $_SERVER[REQUEST_URI]");
 	die;
 }

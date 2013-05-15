@@ -32,7 +32,7 @@ if (get_user_class() < UC_MODERATOR) {
 }
 sql_query("INSERT INTO staffmessages (sender, added, msg, subject) VALUES($userid, $added, $message, $subject)") or sqlerr(__FILE__, __LINE__);
 // Update Last PM sent...
-sql_query("UPDATE LOW_PRIORITY users SET last_staffmsg = NOW() WHERE id = ".sqlesc($CURUSER['id'])) or sqlerr(__FILE__, __LINE__);
+update_user($CURUSER['id'], 'last_staffmsg = NOW()');
 $Cache->delete_value('staff_message_count');
 $Cache->delete_value('staff_new_message_count');
 if ($_POST["returnto"])
@@ -45,4 +45,4 @@ stdhead();
 stdmsg($lang_takecontact['std_succeeded'], $lang_takecontact['std_message_succesfully_sent']);
 stdfoot();
 exit;
-?>
+

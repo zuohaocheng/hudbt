@@ -19,16 +19,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	$username = sqlesc($_POST["username"]);
 	$seedbonus = sqlesc($_POST["seedbonus"]);
 	$operator = $CURUSER["username"];
-	$res = sql_query("SELECT id FROM users WHERE username=$username");
-	$arr = _mysql_fetch_row($res);
-	$receiver = $arr[0];
+	$receiver = get_user_id_from_name($username);
 	$lang = get_user_lang($receiver);
 	$subject = $lang_takemessage_target[$lang]['Bonus_point_added'];
 	$msg = sprintf($lang_takemessage_target[$lang]['msg'],$operator,$_POST["seedbonus"]);
-	sql_query("UPDATE LOW_PRIORITY users SET seedbonus=seedbonus + $seedbonus WHERE username=$username") or sqlerr(__FILE__, __LINE__);
+	KPS('+', $seedbonus, $receiver);
 	send_pm(0, $receiver,$subject,$msg);
-	if (!$arr)
-	stderr("Error", "Unable to update account.");
+
   header("Location: " . get_protocol_prefix() . "$BASEURL/userdetails.php?id=".htmlspecialchars($arr[0]));
 	die;
 }

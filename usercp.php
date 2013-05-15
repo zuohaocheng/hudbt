@@ -129,11 +129,7 @@ if ($action){
 
 				$updateset[] = "info = " . sqlesc($info);
 
-				$query = "UPDATE LOW_PRIORITY users SET " . implode(",", $updateset) . " WHERE id = ".sqlesc($CURUSER["id"]);
-				$result = sql_query($query);
-				if (!$result)
-				sqlerr(__FILE__,__LINE__);
-				else
+				update_user($CURUSER['id'], implode(",", $updateset));
 				header("Location: usercp.php?action=personal&type=saved");
 			}
 			stdhead($lang_usercp['head_control_panel'].$lang_usercp['head_personal_settings'],true);
@@ -307,10 +303,8 @@ dl_item($lang_usercp['row_school'], "<select name=school>$schools</select>", 1);
 				$updateset[] = "shownfo = " . sqlesc($shownfo);
 				}
 
+				update_user($CURUSER['id'], implode(",", $updateset));
 
-				$query = "UPDATE users SET " . implode(",", $updateset) . " WHERE id =".sqlesc($CURUSER["id"]);
-				//stderr("",$query);
-				$result = sql_query($query) or sqlerr(__FILE__,__LINE__);
 #				header("Location: usercp.php?action=tracker&type=saved", true, 303);
 				header( "Refresh:0.2;url=usercp.php?action=tracker&type=saved" );die;
 			}
@@ -555,11 +549,7 @@ echo '</dl>';
 				$signature = trim($_POST["signature"]);
 				$updateset[] = "signature = " . sqlesc($signature);
 
-				$query = "UPDATE LOW_PRIORITY users SET " . implode(",", $updateset) . " WHERE id =".sqlesc($CURUSER["id"]);
-				$result = sql_query($query);
-				if (!$result)
-				sqlerr(__FILE__,__LINE__);
-				else
+				update_user($CURUSER['id'], implode(",", $updateset));
 				header("Location: usercp.php?action=forum&type=saved");
 			}
 			stdhead($lang_usercp['head_control_panel'].$lang_usercp['head_forum_settings'],true);
@@ -698,8 +688,7 @@ EOD;
 				$updateset[] = "privacy = " . sqlesc($privacy);
 				if ($CURUSER['privacy'] != $privacy) $privacyupdated = 1;
 
-				$user = $CURUSER["id"];
-				$result = sql_query("UPDATE LOW_PRIORITY users SET " . implode(",", $updateset) . " WHERE id =?", [$user]);
+				update_user($CURUSER['id'], implode(",", $updateset));
 				$to = "usercp.php?action=security&type=saved";
 				if ($changedemail == 1)
 				$to .= "&mail=1";

@@ -62,7 +62,7 @@ class HTML_BBCodeParser_Filter_Refs extends HTML_BBCodeParser_Filter {
   
  
   function nameCallback($keys) {
-    return get_username(get_user_id_from_name($keys[1], false));
+    return get_username(get_user_id_from_name($keys[1]));
   }
   function topicCallback($keys) {
     $key = $keys[1];

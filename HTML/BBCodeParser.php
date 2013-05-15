@@ -468,7 +468,7 @@ class HTML_BBCodeParser
                 }
             }
 
-	    if (isset($this->_definedTags[$tag['tag']]['notext']) || $tagArray[3]) {
+	    if (isset($this->_definedTags[$tag['tag']]['notext']) || (isset($tagArray[3]) && $tagArray[3])) {
 	      $tag = [$tag, $this->_buildTag('[/' . $tag['tag'] . ']')];
 	    }
             return $tag;
@@ -480,11 +480,17 @@ class HTML_BBCodeParser
       $k_buf = '';
       $v_buf = '';
       $status = 0;
-      $len = strlen($sargs) + 2;
+      $olen = strlen($sargs);
+      $len = $olen + 2;
 
       try {
 	for ($i = 0; $i < $len; ++$i) {
-	  $ch = $sargs[$i];
+	  if ($i < $olen) {
+	    $ch = $sargs[$i];
+	  }
+	  else {
+	    $ch = null;
+	  }
 	  switch ($status) {
 	  case 0: // Waiting for key
 	    if ($k_buf != '') {

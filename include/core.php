@@ -47,6 +47,7 @@ if (defined('ANNOUNCE') && extension_loaded('memcache')) {
     $default = $config->default;
     $dsn = 'mysql:dbname=' . $default['database'] . ';host=' . $default['host'];
     $pdo = new PDO($dsn, $default['login'], $default['password']);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
   } catch (PDOException $e) {
     die('dbconn: mysql_pconnect: ' . $e->getMessage());
   }
@@ -83,8 +84,28 @@ function _mysql_query($q, $args=[]) {
     }
   }
   catch (PDOException $e) {
-    if (function_exists('sqlerr')) {
+    if ($e->errorInfo[1] != 2006) { // 2006: MySQL server has gone away
+      ob_start();
+      echo date('d M Y H:i:s'), "\n";
+      var_dump($q);
+      var_dump($args);
+      var_dump($e);
+      var_dump($_SERVER);
+      debug_print_backtrace();
+      $msg = ob_get_clean() . "\n\n---------------------------------\n\n";
+      
+      $h = fopen('log/sqlerr.log', 'a');
+      if ($h) {
+	fwrite($h, $msg);
+	fclose($h);
+      }
+    }
+
+    if (function_exists('sqlerr') && (php_sapi_name() !== 'cli')) {
       sqlerr(__FILE__, __LINE__, true, $q, $args, $e);
+    }
+    else if (function_exists('err')) {
+      err('Tracker error');
     }
   }
   return $lastStmt;

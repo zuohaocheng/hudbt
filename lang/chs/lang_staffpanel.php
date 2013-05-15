@@ -13,7 +13,6 @@ $lang_staffpanel = [
 		    'location' => ['name' => '位置信息', 'desc' => '管理位置信息和速度'],
 		    'amountupload' => ['name' => '加上传', 'desc' => '给特定级别的人加上传量'],
 		    'adduser' => ['name' => '造人', 'desc' => '造一个人'],
-		    'reset' => ['name' => '重置密码', 'desc' => '重置密码'],
 		    'staffmess' => ['name' => '群PM', 'desc' => '群发PM'],
 		    'polloverview' => ['name' => '投票', 'desc' => '管理投票'],
 		    'makepoll' => ['name' => '新建投票', 'desc' => '研究一下大家在想什么'],

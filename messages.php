@@ -347,6 +347,7 @@ if (!$pm_id && empty($pm_messages)) {
   else {
     header("Location: messages.php?action=viewmailbox&box=" . $pm_box);
   }
+  die;
 }
 
 if ($_POST['markread']) {

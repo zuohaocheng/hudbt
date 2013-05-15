@@ -102,7 +102,7 @@ if ($_SERVER["REQUEST_METHOD"] != "POST")
 	$msgid=_mysql_insert_id();
 	$date=date("Y-m-d H:i:s");
 	// Update Last PM sent...
-	sql_query("UPDATE LOW_PRIORITY users SET last_pm = NOW() WHERE id = ".sqlesc($CURUSER['id'])) or sqlerr(__FILE__, __LINE__);
+update_user($CURUSER['id'], 'last_pm = NOW()');
 
 	// Send notification email.
 if ($emailnotify_smtp=='yes' && $smtptype != 'none'){
@@ -142,7 +142,12 @@ EOD;
 
 	}
 }
-	$delete = $_REQUEST["delete"];
+if (isset($_REQUEST["delete"])) {
+  $delete = $_REQUEST["delete"];
+}
+else {
+  $delete = '';
+}
 
 	if ($origmsg)
 	{

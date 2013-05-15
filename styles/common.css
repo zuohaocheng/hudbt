@@ -1058,3 +1058,10 @@ div.attach .contents strong {
     color:#0099CC;
     font-weight:bold;
 }
+
+.invites .pending {
+    color: #ca0226;
+}
+.invites .confirmed {
+    color: #1f7309;
+}

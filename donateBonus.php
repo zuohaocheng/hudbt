@@ -88,26 +88,18 @@ if(!empty($CURUSER['username'])) {
 					$status = 7; // Loged the donate
 
 					// Update the user details of donater  |->
-					$sqlReceiverInfo = 'SELECT username FROM users WHERE id='.$receiverId;
-					$result = _mysql_query($sqlReceiverInfo);
-					$receiverInfo = _mysql_fetch_assoc($result);
-					$receiver = $receiverInfo['username'];
+					$receiver = get_user_row($receiverId)['username'];
 					$dotanerBonusComment = date("Y-m-d")." - {$amount} Points as donate to {$receiver} on {$objectType} {$objectId}.\n";
 
-					$sqlUpdateDonaterInfo = "UPDATE users SET seedbonus=seedbonus-{$amount}, bonuscomment=CONCAT('{$dotanerBonusComment}', bonuscomment) WHERE id=".$donaterId;
-					sql_query($sqlUpdateDonaterInfo);
+					
 					// End update the user details of donater
 					
-					
-					if(_mysql_affected_rows()) {
+					if (update_user($donaterId, "seedbonus=seedbonus-?, bonuscomment=CONCAT(?, bonuscomment)", [$amount, $dotanerBonusComment])) {
 						$status = 8; // Reduced the bonus from donater
 						
 						$receiverBonusComment = date("Y-m-d")." + {$amount_after_tax} Points (after tax) as donate from {$donater} on {$objectType} {$objectId}.\n";
 						
-						$sqlUpdateReceiverInfo = "UPDATE users SET seedbonus=seedbonus+{$amount_after_tax}, bonuscomment=CONCAT('{$receiverBonusComment}', bonuscomment) WHERE id={$receiverId}"; // Successful;
-						sql_query($sqlUpdateReceiverInfo);
-						
-						if(_mysql_affected_rows()) {
+						if (update_user($receiverId, "seedbonus=seedbonus+?, bonuscomment=CONCAT(?, bonuscomment)", [$amount_after_tax, $receiverBonusComment])) {
 							$status = 9; // Successful
 				
 						}
@@ -162,12 +154,6 @@ MESSAGE;
 
 	// Send PM to receiver |->
 	send_pm(0, $receiverId, $receiverSubject, $receiverMessage);
-
-	$Cache->delete_value('user_'.$receiverId.'_unread_message_count');
-	$Cache->delete_value('user_'.$receiverId.'_inbox_count');
-
-	$sqlUpdatePMStatus = 'UPDATE users SET last_pm = NOW() WHERE id = '.$receiverId;
-	sql_query($sqlUpdatePMStatus);
 	// End send PM to receiver ||
 	
 	// End send private message. ||

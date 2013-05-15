@@ -19,7 +19,7 @@ if ($action == "confirmuser")
 {
 	$userid = $_POST["userid"];
 	$confirm = $_POST["confirm"];
-	sql_query('UPDATE `users` SET `status` = ?, `info` = NULL WHERE `id` = ? LIMIT 1;', [$confirm, $userid]);
+	update_user($userid, 'status = ?, info = NULL', [$confirm]);
 	header("Location: " . get_protocol_prefix() . "$BASEURL/unco.php?status=1");
 	die;
 }
@@ -159,6 +159,8 @@ break;
 			$subject = ($lang_modtask_target[get_user_lang($userid)]['msg_username_change']);
 			$msg = ($lang_modtask_target[get_user_lang($userid)]['msg_your_username_changed_from'].$arr['username'].$lang_modtask_target[get_user_lang($userid)]['msg_to_new'] . $username .$lang_modtask_target[get_user_lang($userid)]['msg_by'].$CURUSER['username']);
 			send_pm(0, $userid, $subject, $msg);
+			$Cache->delete_value('user_id_for_name_' . $arr['username']);
+			$Cache->delete_value('user_id_for_name_' . $username);
 		}
 		if ($ori_downloaded != $downloaded){
 			$updateset[] = "downloaded = " . sqlesc($downloaded);
@@ -288,11 +290,11 @@ break;
 			$modcomment = date("Y-m-d") . " - Enabled by " . $CURUSER['username']. ".\n". $modcomment;
 			if (get_single_value("users","class","WHERE id = ".sqlesc($userid)) == UC_PEASANT){
 				$length = 30*86400; // warn users until 30 days
-				$until = sqlesc(date("Y-m-d H:i:s",(strtotime(date("Y-m-d H:i:s")) + $length)));
-				sql_query("UPDATE LOW_PRIORITY users SET enabled='yes', leechwarn='yes', leechwarnuntil=$until WHERE id = ".sqlesc($userid));
+				$until = date("Y-m-d H:i:s",(strtotime(date("Y-m-d H:i:s")) + $length));
+				update_user($userid, "enabled='yes', leechwarn='yes', leechwarnuntil=?", [$until]);
 			}
 			else{
-				sql_query("UPDATE LOW_PRIORITY users SET enabled='yes', leechwarn='no' WHERE id = ".sqlesc($userid)) or sqlerr(__FILE__, __LINE__);
+			  update_user($userid, "enabled='yes', leechwarn='no'");
 			}
 		} else {
 			$modcomment = date("Y-m-d") . " - Disabled by " . $CURUSER['username']. ".\n". $modcomment;		
@@ -368,7 +370,7 @@ break;
 	
 	$updateset[] = "modcomment = " . sqlesc($modcomment);
 	
-	sql_query("UPDATE LOW_PRIORITY users SET  " . implode(", ", $updateset) . " WHERE id=$userid") or sqlerr(__FILE__, __LINE__);
+	update_user($userid, implode(", ", $updateset));
 	$returnto = htmlspecialchars($_POST["returnto"]);
 	header("Location: " . get_protocol_prefix() . "$BASEURL/$returnto");
 	die;

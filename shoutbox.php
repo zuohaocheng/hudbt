@@ -15,12 +15,13 @@ if (isset($_GET['del']))
 $where=$_GET["type"];
 $refresh = 120;
 ?>
+<!DOCTYPE html>
 <html><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="Refresh" content="<?php echo $refresh?>; url=<?php echo get_protocol_prefix() . $BASEURL?>/shoutbox.php?type=<?php echo $where?>">
 <?php
   echo get_load_uri('css');
-  echo get_load_uri('js');
+  echo get_load_uri('js', 'shoutbox.js');
 $startcountdown = "startcountdown(".$refresh.")";
 ?>
 </head>

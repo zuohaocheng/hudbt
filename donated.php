@@ -11,12 +11,12 @@ stderr("Error", "Missing form data.");
 $username = sqlesc($_POST["username"]);
 $donated = sqlesc($_POST["donated"]);
 
-sql_query("UPDATE LOW_PRIORITY users SET donated=$donated WHERE username=$username") or sqlerr(__FILE__, __LINE__);
-$res = sql_query("SELECT id FROM users WHERE username=$username");
-$arr = _mysql_fetch_row($res);
-if (!$arr)
-stderr("Error", "Unable to update account.");
-header("Location: " . get_protocol_prefix() . "$BASEURL/userdetails.php?id=$arr[0]");
+$id = get_user_id_from_name($username);
+if (!$id) {
+  stderr("Error", "Unable to update account.");
+}
+update_user($id, 'donated = ?', [$donated]);
+header("Location: " . get_protocol_prefix() . "$BASEURL/userdetails.php?id=$id");
 die;
 }
 stdhead("Update Users Donated Amounts");

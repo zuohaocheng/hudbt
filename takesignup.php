@@ -27,7 +27,7 @@ if ($iv == "yes")
 	check_code ($_POST['imagehash'], $_POST['imagestring']);
 }
 
-function isportopen($port)
+/*function isportopen($port)
 {
 	$sd = @fsockopen($_SERVER["REMOTE_ADDR"], $port, $errno, $errstr, 1);
 	if ($sd)
@@ -45,7 +45,7 @@ function isproxy()
 	for ($i = 0; $i < count($ports); ++$i)
 		if (isportopen($ports[$i])) return true;
 	return false;
-}
+	}*/
 if ($type=='invite')
 {
 $inviter =  $_POST["inviter"];
@@ -61,10 +61,6 @@ $inv = _mysql_fetch_assoc($res);
 if($inviter != $inv['inviter'] || !$inv)
 	bark("INVITER ERROR");
 // End add ||
-
-$res = sql_query("SELECT username FROM users WHERE id = $inviter") or sqlerr(__FILE__, __LINE__);
-$arr = _mysql_fetch_assoc($res);
-$invusername = $arr[username];
 }
 
 if (!mkglobal("wantusername:wantpassword:passagain:email"))
@@ -146,6 +142,7 @@ $wantpasshash = md5($secret . $wantpassword . $secret);
 $editsecret = ($verification == 'admin' ? '' : $secret);
 $invite_count = (int) $invite_count;
 
+$wantusername_org = $wantusername;
 $wantusername = sqlesc($wantusername);
 $wantpasshash = sqlesc($wantpasshash);
 $secret = sqlesc($secret);
@@ -156,9 +153,7 @@ $country = sqlesc($country);
 $gender = sqlesc($gender);
 $sitelangid = sqlesc(get_langid_from_langcookie());
 
-$res_check_user = sql_query("SELECT * FROM users WHERE username = " . $wantusername);
-
-if(_mysql_num_rows($res_check_user) == 1)
+if(get_user_id_from_name($wantusername_org))
   bark($lang_takesignup['std_username_exists']);
 
 $ret = sql_query("INSERT INTO users (username, passhash, secret, editsecret, email, country, gender, status, class, invites, ".($type == 'invite' ? "invited_by," : "")." added, last_access, lang, stylesheet".($showschool == 'yes' ? ", school" : "").", uploaded) VALUES (" . $wantusername . "," . $wantpasshash . "," . $secret . "," . $editsecret . "," . $email . "," . $country . "," . $gender . ", 'pending', ".$defaultclass_class.",". $invite_count .", ".($type == 'invite' ? "'$inviter'," : "") ." '". date("Y-m-d H:i:s") ."' , " . " '". date("Y-m-d H:i:s") ."' , ".$sitelangid . ",".$defcss.($showschool == 'yes' ? ",".$school : "").",".($iniupload_main > 0 ? $iniupload_main : 0).")") or sqlerr(__FILE__, __LINE__);
@@ -166,6 +161,8 @@ $id = _mysql_insert_id();
 $subject = ($lang_takesignup['msg_subject'].$SITENAME."!");
 $msg = ($lang_takesignup['msg_congratulations'].htmlspecialchars($wantusername).$lang_takesignup['msg_you_are_a_member']);
 send_pm(0, $id, $subject, $msg);
+
+$Cache->delete_value('user_id_for_name_' . $wantusername_org);
 
 //write_log("User account $id ($wantusername) was created");
 $res = sql_query("SELECT passhash, secret, editsecret, status FROM users WHERE id = ".sqlesc($id)) or sqlerr(__FILE__, __LINE__);

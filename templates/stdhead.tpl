@@ -43,7 +43,6 @@
       {else}
       {nocache}
       {menu()}
-      {/nocache}
       <div id="header-info" class="table td">
 	<div id="header-icons" class="medium">
 	<div class="minor-list list-seperator compact">
@@ -97,7 +96,7 @@
 	      <li>{maxslots()}</li>
 	    </ul>
 	  </div>
-	</div>
+	</div>{/nocache}
       </div>
 
       {if $belownavad}

@@ -270,7 +270,7 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 		tr_small($lang_userdetails['row_ip_address'], $user[ip].$locationinfo, 1);
 	}
 
-	$res = sql_query("SELECT agent, peer_id, ip, port FROM peers WHERE userid = $user[id] GROUP BY agent") or sqlerr();
+	$res = sql_query("SELECT agent, peer_id, ip, ipv6, port FROM peers WHERE userid = $user[id] GROUP BY agent") or sqlerr();
 	if (_mysql_num_rows($res) > 0)
 	{
 		$first = true;
@@ -280,8 +280,13 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 			$clientselect .= ($first == true ? "" : " ; ") . get_agent($arr["peer_id"], $arr["agent"]);
 			$first = false;
 
-			if (get_user_class() >= $userprofile_class ||  $user["id"] == $CURUSER["id"])
-			$clientselect .= " (" . $arr["ip"] . ":" . $arr["port"] . ")";
+			if (get_user_class() >= $userprofile_class ||  $user["id"] == $CURUSER["id"]) {
+			      $clientselect .= " (" . $arr["ip"] . ":" . $arr["port"];
+			      if ($arr['ipv6']) {
+				$clientselect .= ", [" . inet_ntop($arr["ipv6"]) . "]:" . $arr["port"];
+			      }
+			      $clientselect .= ")";
+			}
 		}
 	}
 	if ($clientselect)

@@ -47,10 +47,12 @@ Hi,
 	'std_only' => "只有",
 	'std_or_above_can_invite' => "及以上的用户才能发送邀请。",
 	'text_email_restriction_note' => "你只能发送邀请给以下邮箱：",
+	'text_action'=> "行为",
+	'text_resend_mail'=> "重发邮件",
 	'text_recover'=> "回收",
 	'std_recover'=>"回收邀请",
 	'std_recoversentto'=>"你成功地回收了发给",
 	'std_s_invite'=>"的邀请。",
 );
 
-?>
+

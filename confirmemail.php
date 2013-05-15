@@ -26,10 +26,8 @@ if (preg_match('/^ *$/s', $sec))
 if ($md5 != md5($sec . $email . $sec))
 	httperr();
 
-sql_query("UPDATE LOW_PRIORITY users SET editsecret='', email=" . sqlesc($email) . " WHERE id=$id AND editsecret=" . sqlesc($row["editsecret"]));
-
-if (!_mysql_affected_rows())
+if (!update_user($id, "editsecret='', email=?", [$email]))
 	httperr();
 
 header("Refresh: 0; url=" . get_protocol_prefix() . "$BASEURL/usercp.php?action=security&type=saved");
-?>
+

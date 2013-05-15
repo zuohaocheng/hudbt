@@ -19,6 +19,7 @@ $lang_takeinvite = array
 	'mail_six' => "如果你根本不认识邀请者，请将此邮件转发至".$REPORTMAIL."<br /><br />------<br />".$SITENAME."网站",
 	'std_error' => "错误",
 	'std_invite_denied' => "你的用户等级不允许发送邀请。你怎么到这来的？",
+	'std_err_conflict' => '请勿重复提交，请<a href="invites.php">确认邀请状态并重试</a>。',
 	'std_email_address_banned' => "邮箱地址被禁用！",
 	'std_wrong_email_address_domains' => "不允许发送邀请给此邮箱地址！请使用以下邮箱：",
 	'std_no_invite' => "你没有剩余邀请名额。你怎么到这来的？",
@@ -26,4 +27,4 @@ $lang_takeinvite = array
 	'std_await_user_registeration' => "已收到过邀请函，请勿重复发送。请等待用户注册。",
 );
 
-?>
+

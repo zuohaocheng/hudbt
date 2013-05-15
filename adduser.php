@@ -18,10 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 	
 	if (!validusername($username))
 		stderr("Error","Invalid username.");
-	$username = sqlesc($username);
-	$res = sql_query("SELECT id FROM users WHERE username=$username");
-	$arr = _mysql_fetch_row($res);
-	if ($arr)
+	if (get_user_id_from_name($username))
 		stderr("Error","Username already exists!");
 	$password = $_POST["password"];
 	$email = sqlesc($_POST["email"]);
@@ -33,10 +30,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 	$passhash = sqlesc(md5($secret . $password . $secret));
 	$secret = sqlesc($secret);
 
-	sql_query("INSERT INTO users (added, last_access, secret, username, passhash, status, stylesheet, class,email) VALUES(NOW(), NOW(), $secret, $username, $passhash, 'confirmed', ".$defcss.",".$defaultclass_class.",$email)") or sqlerr(__FILE__, __LINE__);
-	$res = sql_query("SELECT id FROM users WHERE username=$username");
-	$arr = _mysql_fetch_row($res);
-	if (!$arr)
+	sql_query("INSERT INTO users (added, last_access, secret, username, passhash, status, stylesheet, class,email) VALUES(NOW(), NOW(), $secret, ?, $passhash, 'confirmed', ".$defcss.",".$defaultclass_class.",$email)", [$username]);
+	if (!get_user_id_from_name($username))
 	stderr("Error", "Unable to create the account. The user name is possibly already taken.");
 	header("Location: " . get_protocol_prefix() . "$BASEURL/userdetails.php?id=".htmlspecialchars($arr[0]));
 	die;

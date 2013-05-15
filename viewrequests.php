@@ -280,9 +280,9 @@ $ruserid=0+$_GET["userid"];
 	if($amount>10000)stderr("出错了！","发布求种赏金不得大于10000个魔力值！<a href=viewrequests.php?action=new>点击这里返回</a>",0);
 	$amount += 100;
 	if($amount+100>$CURUSER['seedbonus'])stderr("出错了！","你没有那么多魔力值！！！<a href=viewrequests.php?action=new>点击这里返回</a>",0);
-	if(get_user_class() >= 2)
-		{
-	sql_query("UPDATE users SET seedbonus = seedbonus - ".$amount." WHERE id = ".$CURUSER['id'] );
+	if(get_user_class() >= 2) {
+		KPS('-', $amount, $CURUSER['id']);
+
 		sql_query("INSERT requests ( request , descr, ori_descr ,amount , ori_amount , userid ,added ) VALUES ( ".sqlesc($_POST["request"])." , ".sqlesc($_POST["descr"])." , ".sqlesc($_POST["descr"])." , ".sqlesc($_POST["amount"])." , ".sqlesc($_POST["amount"])." , ".sqlesc($CURUSER['id'])." , '".date("Y-m-d H:i:s")."' )") or sqlerr(__FILE__, __LINE__);
 		
 		stderr("成功","新增求种成功，<a href=viewrequests.php?action=view&id="._mysql_insert_id().">点击这里返回</a>",0);
@@ -364,7 +364,7 @@ $ruserid=0+$_GET["userid"];
 	if($amount>5000)stderr("出错了！","追加悬赏赏金不得大于5000个魔力值！");
 	$amount += 25;
 	if($amount >$CURUSER['seedbonus'])stderr("出错了！","你没有那么多魔力值！");
-	sql_query("UPDATE users SET seedbonus = seedbonus - ".$amount." WHERE id = ".$CURUSER['id'] );
+	KPS('-', $amount, $CURUSER['id']);
 	sql_query("UPDATE requests SET amount = amount + ".$_POST["amount"]." WHERE id = ".$_POST["reqid"]);
 	stderr("成功","追加悬赏成功，<a href=viewrequests.php?action=view&id=".$_POST["reqid"].">点击这里返回</a>",0);
 	die;
@@ -408,14 +408,14 @@ $ruserid=0+$_GET["userid"];
 		sql_query("DELETE FROM resreq WHERE reqid ='".$_POST["id"]."' AND chosen = 'no'") or sqlerr(__FILE__, __LINE__);
 		$res=sql_query("SELECT owner FROM torrents WHERE ( id = '".join("' OR id = '",$torrentid )."' ) ")or sqlerr(__FILE__, __LINE__);
 		while($row = _mysql_fetch_array($res)){
-		
-		$owner[]=$row[0];
-		$added = sqlesc(date("Y-m-d H:i:s"));
-			$subject = ("你的种子被人应求");
-			$notifs = ("求种名称:[url=viewrequests.php?id=$arr[id]] " . $arr['request'] . "[/url].你获得: $amount 魔力值");
-			send_pm(0, $row[0], $subject, $notifs);
+		  $owner=$row[0];
+		  $added = sqlesc(date("Y-m-d H:i:s"));
+		  $subject = ("你的种子被人应求");
+		  $notifs = ("求种名称:[url=viewrequests.php?id=$arr[id]] " . $arr['request'] . "[/url].你获得: $amount 魔力值");
+		  send_pm(0, $owner, $subject, $notifs);
+		  KPS('+', $amount, $owner);
 		}
-	sql_query("UPDATE users SET seedbonus = seedbonus + $amount WHERE id = '".join("' OR id = '",$owner )."'")or sqlerr(__FILE__, __LINE__);
+
 		stderr("成功","确认成功，<a href=viewrequests.php?action=view&id=".$_POST["id"].">点击这里返回</a>",0);
 		
 		}

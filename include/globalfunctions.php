@@ -147,4 +147,13 @@ function hash_where2($name, $hash) {
 	return "($name = " . $hash . " OR $name = " . $shhash . ")";
 }
 
+function update_user($id, $fields, $args=[], $clear_cache=true) {
+  global $Cache;
+  $args[] = $id;
+  if ($clear_cache) {
+    $key = 'user_' . $id . '_content';
+    $Cache->delete_value($key);
+  }
+  return (sql_query('UPDATE users SET ' . $fields . ' WHERE id=?', $args)->rowCount() > 0);
+}
 

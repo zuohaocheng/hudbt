@@ -52,7 +52,6 @@ $privilegeConfig = ['Maintenance'=>['staticResources' => UC_MODERATOR],
 				       'location' => UC_SYSOP,
 				       'amountupload' => UC_SYSOP,
 				       'adduser' => UC_ADMINISTRATOR,
-				       'reset' => UC_ADMINISTRATOR,
 				       'staffmess' => UC_ADMINISTRATOR,
 				       'polloverview' => $pollmanage_class,
 				       'makepoll' => $pollmanage_class,
@@ -128,9 +127,12 @@ function get_langlist() {
 }
 
 function get_user_lang($user_id) {
-  $lang_res = sql_query("SELECT site_lang_folder FROM language LEFT JOIN users ON language.id = users.lang WHERE language.site_lang=1 AND users.id= ". sqlesc($user_id) ." LIMIT 1") or sqlerr(__FILE__, __LINE__);
-  $lang = _mysql_fetch_assoc($lang_res);
-  return $lang['site_lang_folder'];
+  global $deflang;
+  return $deflang;
+
+  /* $lang_res = sql_query("SELECT site_lang_folder FROM language LEFT JOIN users ON language.id = users.lang WHERE language.site_lang=1 AND users.id= ". sqlesc($user_id) ." LIMIT 1") or sqlerr(__FILE__, __LINE__); */
+  /* $lang = _mysql_fetch_assoc($lang_res); */
+  /* return $lang['site_lang_folder']; */
 }
 
 function get_load_uri($type, $script_name ="", $absolute = true) {
@@ -165,10 +167,9 @@ function get_load_uri($type, $script_name ="", $absolute = true) {
       else {
 	$lang = get_langfolder_cookie();
 	$hrefs[] ='//' . $BASEURL . '/cache/js-common-' . $lang . '.js';
-
-	$filename = preg_replace('/\.php$/i', '.js', $name);
       }
     }
+    $filename = preg_replace('/\.php$/i', '.js', $name);
 
     if (file_exists('js/' . $filename)) {
       $hrefs[] = $pagename . '?format=js&amp;name=' . $name . $addition;
@@ -321,16 +322,23 @@ function permissionAuth($needle,$usergroups,$userclass){
 }
 
 function get_user_group($userid){
-	$user_groups_r = sql_query("SELECT gp.group_name,u_gp.role,u_gp.removed_by,u_gp.removed_date FROM users_usergroups AS u_gp JOIN usergroups AS gp ON u_gp.usergroup_id = gp.group_id WHERE u_gp.user_id =".sqlesc($userid)) or sqlerr(__FILE__, __LINE__);
-	while($row = _mysql_fetch_assoc($user_groups_r)){
-		if($row['removed_by']==NULL){
-			$user_groups[$row['group_name']] = array('role' => $row['role']);
-		}
-		else{
-			$user_groups[$row['group_name']] = array('role' => $row['role'],'removed' => array('removed_by' => $row['removed_by'], 'removed_date' => $row['removed_date'] ));
-		}
-	}
-	return $user_groups;
+  global $Cache;
+  $key = 'user_groups_' . $userid;
+  $user_groups = $Cache->get_value($key);
+  if ($user_groups === false) {
+    $user_groups = sql_query("SELECT gp.group_name,u_gp.role,u_gp.removed_by,u_gp.removed_date FROM users_usergroups AS u_gp JOIN usergroups AS gp ON u_gp.usergroup_id = gp.group_id WHERE u_gp.user_id = ?", [$userid])->fetchAll();
+    $Cache->cache_value($key, $user_groups, 120);
+  }
+
+  foreach ($user_groups as $row) {
+    if($row['removed_by']==NULL){
+      $user_groups[$row['group_name']] = array('role' => $row['role']);
+    }
+    else{
+      $user_groups[$row['group_name']] = array('role' => $row['role'],'removed' => array('removed_by' => $row['removed_by'], 'removed_date' => $row['removed_date'] ));
+    }
+  }
+  return $user_groups;
 }
 
 function checkPrivilege($item, $opts = null) {
@@ -397,7 +405,6 @@ function stderr($heading, $text, $htmlstrip = true, $head = true, $foot = true, 
 
 function sqlerr($file = '', $line = '', $stack = true, $q = '', $args = [], $e = null) {
   echo "<div style=\"font-family: menlo, monaco, courier, monospace; background: blue;color:white;position:fixed;overflow-y:scroll;width:100%;height:100%;top: 0%;left: 0%;\"><h1>出错啦，出错啦</h1><p>请保存此页面(菜单/文件/保存，<span style=\"font-size:xx-large\">请勿截图</span>)，<a href=\"sendmessage.php?receiver=26058\" style=\"color:yellow\">点此发送给管理员</a>，多谢!</p><div style=\"display:none\">";
-  ob_start();
   echo '<h2>', date('d M Y H:i:s'), '</h2>';
   if ($q) {
     echo '<h2>SQL Statement</h2><p>' , $q;
@@ -412,27 +419,14 @@ function sqlerr($file = '', $line = '', $stack = true, $q = '', $args = [], $e =
     echo '</pre>';
   }
 
-  echo '<h2>$_SERVER</h2><pre>';
-  var_dump($_SERVER);
-  echo '</pre>';
-
   if ($stack) {
     echo '<h2>Stack</h2><pre>';
     debug_print_backtrace();
     echo '</pre>';
   }
-#  echo str_replace("\n", '<br/>', ob_get_clean());
 
   echo _mysql_error() . ($file != '' && $line != '' ? "<p>in $file, line $line</p>" : "") . "</div></div>";
 
-  $msg = ob_get_flush() . "\n\n---------------------------------\n\n";
-  if ($pdo->errorInfo()[1] != 2006) { // 2006: MySQL server has gone away
-    $h = fopen('log/sqlerr.log', 'a');
-    if ($h) {
-      fwrite($h, $msg);
-      fclose($h);
-    }
-  }
   die;
 }
 
@@ -499,75 +493,86 @@ function get_user_class() {
 }
 
 function get_user_class_name($class, $compact = false, $b_colored = false, $I18N = false) {
-  static $en_lang_functions;
-  static $current_user_lang_functions;
-  if (!$en_lang_functions) {
-    require(get_langfile_path("functions.php",false,"en"));
-    $en_lang_functions = $lang_functions;
-  }
+  global $Cache, $CURLANGDIR;
+  $key = 'user_class_name_' . $class . '_' . $compact . '_' . $b_colored . '_' . $I18N . '_' . $CURLANGDIR;
+  return $Cache->get_value($key, 86400*365, function() use ($class, $compact, $b_colored, $I18N) {
+      static $en_lang_functions;
+      static $current_user_lang_functions;
+      if (!$en_lang_functions) {
+	require(get_langfile_path("functions.php",false,"en"));
+	$en_lang_functions = $lang_functions;
+      }
 
-  if(!$I18N) {
-    $this_lang_functions = $en_lang_functions;
-  } else {
-    if (!$current_user_lang_functions) {
-      require(get_langfile_path("functions.php"));
-      $current_user_lang_functions = $lang_functions;
-    }
-    $this_lang_functions = $current_user_lang_functions;
-  }
-  
-  $class_name = "";
-  switch ($class) {
-    case UC_PEASANT: {$class_name = $this_lang_functions['text_peasant']; break;}
-    case UC_USER: {$class_name = $this_lang_functions['text_user']; break;}
-    case UC_POWER_USER: {$class_name = $this_lang_functions['text_power_user']; break;}
-    case UC_ELITE_USER: {$class_name = $this_lang_functions['text_elite_user']; break;}
-    case UC_CRAZY_USER: {$class_name = $this_lang_functions['text_crazy_user']; break;}
-    case UC_INSANE_USER: {$class_name = $this_lang_functions['text_insane_user']; break;}
-    case UC_VETERAN_USER: {$class_name = $this_lang_functions['text_veteran_user']; break;}
-    case UC_EXTREME_USER: {$class_name = $this_lang_functions['text_extreme_user']; break;}
-    case UC_ULTIMATE_USER: {$class_name = $this_lang_functions['text_ultimate_user']; break;}
-    case UC_NEXUS_MASTER: {$class_name = $this_lang_functions['text_nexus_master']; break;}
-    case UC_VIP: {$class_name = $this_lang_functions['text_vip']; break;}
-    case UC_UPLOADER: {$class_name = $this_lang_functions['text_uploader']; break;}
-    case UC_RETIREE: {$class_name = $this_lang_functions['text_retiree']; break;}
-    case UC_FORUM_MODERATOR: {$class_name = $this_lang_functions['text_forum_moderator']; break;}
-    case UC_MODERATOR: {$class_name = $this_lang_functions['text_moderators']; break;}
-    case UC_ADMINISTRATOR: {$class_name = $this_lang_functions['text_administrators']; break;}
-    case UC_SYSOP: {$class_name = $this_lang_functions['text_sysops']; break;}
-    case UC_STAFFLEADER: {$class_name = $this_lang_functions['text_staff_leader']; break;}
-    }
-  
-  switch ($class) {
-    case UC_PEASANT: {$class_name_color = $en_lang_functions['text_peasant']; break;}
-    case UC_USER: {$class_name_color = $en_lang_functions['text_user']; break;}
-    case UC_POWER_USER: {$class_name_color = $en_lang_functions['text_power_user']; break;}
-    case UC_ELITE_USER: {$class_name_color = $en_lang_functions['text_elite_user']; break;}
-    case UC_CRAZY_USER: {$class_name_color = $en_lang_functions['text_crazy_user']; break;}
-    case UC_INSANE_USER: {$class_name_color = $en_lang_functions['text_insane_user']; break;}
-    case UC_VETERAN_USER: {$class_name_color = $en_lang_functions['text_veteran_user']; break;}
-    case UC_EXTREME_USER: {$class_name_color = $en_lang_functions['text_extreme_user']; break;}
-    case UC_ULTIMATE_USER: {$class_name_color = $en_lang_functions['text_ultimate_user']; break;}
-    case UC_NEXUS_MASTER: {$class_name_color = $en_lang_functions['text_nexus_master']; break;}
-    case UC_VIP: {$class_name_color = $en_lang_functions['text_vip']; break;}
-    case UC_UPLOADER: {$class_name_color = $en_lang_functions['text_uploader']; break;}
-    case UC_RETIREE: {$class_name_color = $en_lang_functions['text_retiree']; break;}
-    case UC_FORUM_MODERATOR: {$class_name_color = $en_lang_functions['text_forum_moderator']; break;}
-    case UC_MODERATOR: {$class_name_color = $en_lang_functions['text_moderators']; break;}
-    case UC_ADMINISTRATOR: {$class_name_color = $en_lang_functions['text_administrators']; break;}
-    case UC_SYSOP: {$class_name_color = $en_lang_functions['text_sysops']; break;}
-    case UC_STAFFLEADER: {$class_name_color = $en_lang_functions['text_staff_leader']; break;}
-    }
-  
-  $class_name = ( $compact == true ? str_replace(" ", "",$class_name) : $class_name);
-  if ($class_name) return ($b_colored == true ? "<span class='" . str_replace(" ", "",$class_name_color) . "_Name'>" . $class_name . "</span>" : $class_name);
+      if(!$I18N) {
+	$this_lang_functions = $en_lang_functions;
+      } else {
+	if (!$current_user_lang_functions) {
+	  require(get_langfile_path("functions.php"));
+	  $current_user_lang_functions = $lang_functions;
+	}
+	$this_lang_functions = $current_user_lang_functions;
+      }
+      
+      switch ($class) {
+      case UC_PEASANT: {$class_name = $this_lang_functions['text_peasant']; break;}
+      case UC_USER: {$class_name = $this_lang_functions['text_user']; break;}
+      case UC_POWER_USER: {$class_name = $this_lang_functions['text_power_user']; break;}
+      case UC_ELITE_USER: {$class_name = $this_lang_functions['text_elite_user']; break;}
+      case UC_CRAZY_USER: {$class_name = $this_lang_functions['text_crazy_user']; break;}
+      case UC_INSANE_USER: {$class_name = $this_lang_functions['text_insane_user']; break;}
+      case UC_VETERAN_USER: {$class_name = $this_lang_functions['text_veteran_user']; break;}
+      case UC_EXTREME_USER: {$class_name = $this_lang_functions['text_extreme_user']; break;}
+      case UC_ULTIMATE_USER: {$class_name = $this_lang_functions['text_ultimate_user']; break;}
+      case UC_NEXUS_MASTER: {$class_name = $this_lang_functions['text_nexus_master']; break;}
+      case UC_VIP: {$class_name = $this_lang_functions['text_vip']; break;}
+      case UC_UPLOADER: {$class_name = $this_lang_functions['text_uploader']; break;}
+      case UC_RETIREE: {$class_name = $this_lang_functions['text_retiree']; break;}
+      case UC_FORUM_MODERATOR: {$class_name = $this_lang_functions['text_forum_moderator']; break;}
+      case UC_MODERATOR: {$class_name = $this_lang_functions['text_moderators']; break;}
+      case UC_ADMINISTRATOR: {$class_name = $this_lang_functions['text_administrators']; break;}
+      case UC_SYSOP: {$class_name = $this_lang_functions['text_sysops']; break;}
+      case UC_STAFFLEADER: {$class_name = $this_lang_functions['text_staff_leader']; break;}
+      default: {return ''; break;}
+      }
+      
+      if ($compact) {
+	$class_name = str_replace(" ", "",$class_name);
+      }
+      
+      if ($b_colored) {
+	switch ($class) {
+	case UC_PEASANT: {$class_name_color = $en_lang_functions['text_peasant']; break;}
+	case UC_USER: {$class_name_color = $en_lang_functions['text_user']; break;}
+	case UC_POWER_USER: {$class_name_color = $en_lang_functions['text_power_user']; break;}
+	case UC_ELITE_USER: {$class_name_color = $en_lang_functions['text_elite_user']; break;}
+	case UC_CRAZY_USER: {$class_name_color = $en_lang_functions['text_crazy_user']; break;}
+	case UC_INSANE_USER: {$class_name_color = $en_lang_functions['text_insane_user']; break;}
+	case UC_VETERAN_USER: {$class_name_color = $en_lang_functions['text_veteran_user']; break;}
+	case UC_EXTREME_USER: {$class_name_color = $en_lang_functions['text_extreme_user']; break;}
+	case UC_ULTIMATE_USER: {$class_name_color = $en_lang_functions['text_ultimate_user']; break;}
+	case UC_NEXUS_MASTER: {$class_name_color = $en_lang_functions['text_nexus_master']; break;}
+	case UC_VIP: {$class_name_color = $en_lang_functions['text_vip']; break;}
+	case UC_UPLOADER: {$class_name_color = $en_lang_functions['text_uploader']; break;}
+	case UC_RETIREE: {$class_name_color = $en_lang_functions['text_retiree']; break;}
+	case UC_FORUM_MODERATOR: {$class_name_color = $en_lang_functions['text_forum_moderator']; break;}
+	case UC_MODERATOR: {$class_name_color = $en_lang_functions['text_moderators']; break;}
+	case UC_ADMINISTRATOR: {$class_name_color = $en_lang_functions['text_administrators']; break;}
+	case UC_SYSOP: {$class_name_color = $en_lang_functions['text_sysops']; break;}
+	case UC_STAFFLEADER: {$class_name_color = $en_lang_functions['text_staff_leader']; break;}
+	}
+	$style_class = str_replace(" ", "",$class_name_color);
+	$class_name = "<span class='" . $style_class . "_Name'>" . $class_name . '</span>';
+      }
+      
+      return $class_name;
+    });
 }
 
 function is_valid_user_class($class) {
   return is_numeric($class) && floor($class) == $class && $class >= UC_PEASANT && $class <= UC_STAFFLEADER;
 }
 
-function int_check($value,$stdhead = false, $stdfood = true, $die = true, $log = true) {
+function int_check($value,$stdhead = false, $stdfoot = true, $die = true, $log = true) {
   global $lang_functions;
   global $CURUSER;
   if (is_array($value))
@@ -588,7 +593,7 @@ function int_check($value,$stdhead = false, $stdfood = true, $die = true, $log =
 	    print ("<h2>".$lang_functions['std_error']."</h2><table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"10\"><tr><td class=\"text\">");
 	    print ($lang_functions['std_invalid_id']."</td></tr></table>");
 	  }
-	if ($stdfood)
+	if ($stdfoot)
 	  stdfoot();
 	if ($die)
 	  die;
@@ -915,18 +920,17 @@ function cur_user_check ($redir = '') {
       exit(0);
     }
     else {
-      sql_query("UPDATE users SET lang=" . get_langid_from_langcookie() . " WHERE id = ". $CURUSER['id']);
+      update_user($CURUSER['id'], 'lang=?', [get_langid_from_langcookie()]);
       stderr ($lang_functions['std_permission_denied'], $lang_functions['std_already_logged_in']);
     }  
   }
 }
 
-function KPS($type = "+", $point = "1.0", $id = "") {
+function KPS($type, $point, $id) {
   global $bonus_tweak;
   if ($point != 0){
-    $point = sqlesc($point);
     if ($bonus_tweak == "enable" || $bonus_tweak == "disablesave"){
-      sql_query("UPDATE users SET seedbonus = seedbonus$type$point WHERE id = ".sqlesc($id)) or sqlerr(__FILE__, __LINE__);
+      update_user($id, "seedbonus = seedbonus $type ?", [$point]);
     }
   }
   else return;
@@ -940,7 +944,7 @@ function EmailBanned($newEmail) {
   $newEmail = trim(strtolower($newEmail));
   $sql = sql_query("SELECT * FROM bannedemails") or sqlerr(__FILE__, __LINE__);
   $list = _mysql_fetch_array($sql);
-  $addresses = explode(' ', preg_replace("/[[:space:]]+/", " ", trim($list[value])) );
+  $addresses = explode(' ', preg_replace("/[[:space:]]+/", " ", trim($list['value'])) );
 
   if(count($addresses) > 0) {
     foreach ( $addresses as $email) {
@@ -1056,7 +1060,7 @@ function check_email ($email) {
     return false;
 }
 
-function sent_mail($to,$fromname,$fromemail,$subject,$body,$type = "confirmation",$showmsg=true,$multiple=false,$multiplemail='',$hdr_encoding = 'UTF-8', $specialcase = '') {
+function sent_mail_core($to,$fromname,$fromemail,$subject,$body,$type = "confirmation",$showmsg=true,$multiple=false,$multiplemail='',$hdr_encoding = 'UTF-8', $specialcase = '') {
   global $lang_functions;
   global $rootpath,$SITENAME,$SITEEMAIL,$smtptype,$smtp,$smtp_host,$smtp_port,$smtp_from,$smtpaddress,$smtpport,$accountname,$accountpassword;
   # Is the OS Windows or Mac or Linux?
@@ -1071,7 +1075,9 @@ function sent_mail($to,$fromname,$fromemail,$subject,$body,$type = "confirmation
   if ($smtptype == 'none')
     return false;
   if ($smtptype == 'default') {
-    @mail($to, "=?".$hdr_encoding."?B?".base64_encode($subject)."?=", $body, "From: ".$SITEEMAIL.$eol."Content-type: text/html; charset=".$hdr_encoding.$eol, "-f$SITEEMAIL") or stderr($lang_functions['std_error'], $lang_functions['text_unable_to_send_mail']);
+    if (! @mail($to, "=?".$hdr_encoding."?B?".base64_encode($subject)."?=", $body, "From: ".$SITEEMAIL.$eol."Content-type: text/html; charset=".$hdr_encoding.$eol, "-f$SITEEMAIL")) {
+      throw new Exception('Can\'t send mail');
+    }
   }
   elseif ($smtptype == 'advanced') {
     $mid = md5(getip() . $fromname);
@@ -1099,7 +1105,9 @@ function sent_mail($to,$fromname,$fromemail,$subject,$body,$type = "confirmation
 	ini_set('sendmail_from', $smtp_from);
     }
 
-    @mail($to,"=?".$hdr_encoding."?B?".base64_encode($subject)."?=",$body,$headers) or stderr($lang_functions['std_error'], $lang_functions['text_unable_to_send_mail']);
+    if (!@mail($to,"=?".$hdr_encoding."?B?".base64_encode($subject)."?=",$body,$headers)) {
+	throw new Exception('Can\'t send mail');
+      }
 
     ini_restore(SMTP);
     ini_restore(smtp_port);
@@ -1127,7 +1135,10 @@ function sent_mail($to,$fromname,$fromemail,$subject,$body,$type = "confirmation
     $mail->mime_charset('text/html', $hdr_encoding);
     $mail->subject($subject);
     $mail->body($body);
-    $mail->send() or stderr($lang_functions['std_error'], $lang_functions['text_unable_to_send_mail']);
+    if (!$mail->send()) {
+      $mail->close();
+      throw new Exception('Can\'t send mail');
+    }
     $mail->close();
   }
   if ($showmsg) {
@@ -1139,6 +1150,15 @@ function sent_mail($to,$fromname,$fromemail,$subject,$body,$type = "confirmation
 	     $lang_functions['std_please_wait'],false);
   }else
     return true;
+}
+
+function sent_mail($to,$fromname,$fromemail,$subject,$body,$type = "confirmation",$showmsg=true,$multiple=false,$multiplemail='',$hdr_encoding = 'UTF-8', $specialcase = '') {
+  try {
+    sent_mail_core($to,$fromname,$fromemail,$subject,$body,$type,$showmsg,$multiple,$multiplemail,$hdr_encoding, $specialcase);
+  } catch (Exception $e) {
+    global $lang_functions;
+    stderr($lang_functions['std_error'], $lang_functions['text_unable_to_send_mail']);
+  }
 }
 
 function failedloginscheck ($type = 'Login') {
@@ -1244,7 +1264,7 @@ function registration_check($type = "invitesystem", $maxuserscheck = true, $ipch
 
 function random_str($length="6") {
   $set = array("A","B","C","D","E","F","G","H","P","R","M","N","1","2","3","4","5","6","7","8","9");
-  $str;
+  $str = '';
   for($i=1;$i<=$length;$i++)
     {
       $ch = rand(0, count($set)-1);
@@ -1346,9 +1366,10 @@ function validip_format($ip) {
 function maxslots () {
   global $lang_functions;
   global $CURUSER, $maxdlsystem;
-  $gigs = $CURUSER["downloaded"] / (1024*1024*1024);
-  $ratio = (($CURUSER["downloaded"] > 0) ? ($CURUSER["uploaded"] / $CURUSER["downloaded"]) : 1);
-  $max = get_maxslots($downloaded, $ratio);
+  $downloaded = $CURUSER["downloaded"];
+  $gigs = $downloaded / (1024*1024*1024);
+  $ratio = (($downloaded > 0) ? ($CURUSER["uploaded"] / $downloaded) : 1);
+  $max = get_maxslots($gigs, $ratio);
   if ($maxdlsystem == "yes") {
     if (get_user_class() < UC_VIP) {
       if ($max > 0)
@@ -1423,43 +1444,31 @@ function dbconn($autoclean = false, $test = false) {
     register_shutdown_function("autoclean");
   }
 }
-function get_user_row($id) {
-  global $Cache, $CURUSER;
-  static $curuserRowUpdated = false;
-  static $neededColumns = array('id', 'noad', 'class', 'enabled', 'privacy', 'avatar', 'signature', 'uploaded', 'downloaded', 'last_access', 'username', 'donor', 'leechwarn', 'warned', 'title','color');
-  if ($id == $CURUSER['id']) {
-    $row = array();
-    foreach($neededColumns as $column) {
-      $row[$column] = $CURUSER[$column];
-    }
-    if (!$curuserRowUpdated) {
-      $Cache->cache_value('user_'.$CURUSER['id'].'_content', $row, 900);
-      $curuserRowUpdated = true;
-    }
-  } elseif (!$row = $Cache->get_value('user_'.$id.'_content')){
-    $res = sql_query("SELECT ".implode(',', $neededColumns)." FROM users WHERE id = ".sqlesc($id)) or sqlerr(__FILE__,__LINE__);
-    $row = _mysql_fetch_array($res);
-    $Cache->cache_value('user_'.$id.'_content', $row, 900);
-  }
 
-  if (!$row)
-    return false;
-  else return $row;
+function cache_user_row() {
+  global $Cache, $CURUSER;
+  $id = $CURUSER['id'];
+  $key = 'user_' . $id . '_content';
+
+  $Cache->cache_value($key, $CURUSER, 900);
+}
+
+function get_user_row($id = null) {
+  global $Cache;
+
+  $key = 'user_' . $id . '_content';
+  $row = $Cache->get_value($key);
+  if ($row === false) {
+    $row = sql_query("SELECT * FROM users WHERE users.id = ? LIMIT 1", [$id])->fetch();
+    $Cache->cache_value($key, $row, 900);
+  }
+  if (!$row) {
+    return null;
+  }
+  return $row;
 }
 
 function userlogin_core($cookie) {
-  global $lang_functions;
-  global $oldip;
-  global $enablesqldebug_tweak, $sqldebug_tweak;
-
-  $ip = getip();
-  $nip = ip2long($ip);
-  if ($nip) { //$nip would be false for IPv6 address
-    if (sql_query("SELECT * FROM bans WHERE ? >= first AND ? <= last", [$nip, $nip])->rowCount() > 0) {
-      throw new Exception($lang_functions['text_unauthorized_ip'], 403);
-    }
-  }
-
   if (empty($cookie["c_secure_pass"]) || empty($cookie["c_secure_uid"]) || empty($cookie["c_secure_login"])) {
     return null;
   }
@@ -1470,8 +1479,8 @@ function userlogin_core($cookie) {
     return null;
   }
 
-  $row = sql_query("SELECT * FROM users WHERE users.id = ? AND users.enabled='yes' AND users.status = 'confirmed' LIMIT 1", [$id])->fetch();
-  if (!$row) {
+  $row = get_user_row($id);
+  if (!$row || $row['enabled'] != 'yes' || $row['status'] != 'confirmed') {
     return null;
   }
 
@@ -1489,14 +1498,7 @@ function userlogin_core($cookie) {
 
   if (!$row["passkey"]){
     $passkey = md5($row['username'].date("Y-m-d H:i:s").$row['passhash']);
-    sql_query("UPDATE users SET passkey = ".sqlesc($passkey)." WHERE id=" . sqlesc($row["id"]));// or die(_mysql_error());
-  }
-
-  $oldip = $row['ip'];
-  $row['ip'] = $ip;
-  $usergroups = get_user_group($id);
-  if ($usergroups !=NULL) {
-    $row['usergroups'] = $usergroups;
+    update_user($row['id'], 'passkey = ?', [$passkey]);
   }
 
   return $row;
@@ -1504,9 +1506,24 @@ function userlogin_core($cookie) {
 
 function userlogin() {
   global $Cache;
+  global $oldip, $iplog1, $USERUPDATESET;
   global $enablesqldebug_tweak, $sqldebug_tweak;
   unset($GLOBALS["CURUSER"]);
 
+  $ip = getip();
+  $nip = ip2long($ip);
+  if ($nip) { //$nip would be false for IPv6 address
+    $key = 'banned_ip_' . $nip;
+    $count = $Cache->get_value($key);
+    if ($count === false) {
+      $count = sql_query("SELECT * FROM bans WHERE ? >= first AND ? <= last", [$nip, $nip])->rowCount();
+      $Cache->cache_value($key, $count, 365 * 86400);
+    }
+    if ($count > 0) {
+      throw new Exception($lang_functions['text_unauthorized_ip'], 403);
+    }
+  }
+  
   try {
     $row = userlogin_core($_COOKIE);
 
@@ -1519,16 +1536,39 @@ function userlogin() {
   if (is_null($row)) {
     return;
   }
-  $GLOBALS["CURUSER"] = $row;
+
+  $key = 'user_ip_'.$row['id'];
+  $oldip = $Cache->get_value($key);
+  if ($oldip === false) {
+    $oldip = $row['ip'];
+  }
+
+  if ($oldip != $ip) {
+    $Cache->cache_value($key, $ip, 900);
+    $row['ip'] = $ip;
+
+  //Insert old ip into iplog
+    $USERUPDATESET[] = "ip = ".sqlesc($row['ip']);
+    if ($iplog1 == "yes" && $oldip) {
+      sql_query("INSERT INTO iplog (ip, userid, access) VALUES (?, ?, ?)", [$oldip, $row['id'], $row['last_access']]);
+    }
+  }
+  $USERUPDATESET[] = "last_access = ".sqlesc(date("Y-m-d H:i:s"));
+  
+  $usergroups = get_user_group($row['id']);
+  if ($usergroups !=NULL) {
+    $row['usergroups'] = $usergroups;
+  }
+
   //initialize global $CURUSER which will be used frequently in other operations
   //noted by bluemonster 20111107
+  $GLOBALS["CURUSER"] = $row;
 
   if (array_key_exists('purge', $_GET) && $_GET['purge'] && get_user_class() >= UC_MODERATOR) {
     $Cache->setClearCache(1);
   }
   if ($enablesqldebug_tweak == 'yes' && get_user_class() >= $sqldebug_tweak) {
-    // ~E_2048 for BBCodeParser
-    error_reporting(E_ALL & ~E_NOTICE & ~'E_2048');
+    error_reporting(E_ALL);
   }
 }
 
@@ -1551,6 +1591,10 @@ function autoclean() {
   if (!_mysql_affected_rows()) {
     return false;
   }
+
+  /* if (php_sapi_name() == 'fpm-fcgi') { */
+  /*   fastcgi_finish_request(); */
+  /* } */
   require_once($rootpath . 'include/cleanup.php');
   return docleanup();
 }
@@ -1716,7 +1760,7 @@ function dl_item($title, $desc, $noesc = false, $class = '', $id = '') {
   echo '>' . $desc .  '</dd>';
 }
 
-function twotd($x,$y,$nosec=0) {
+function twotd($x,$y,$noesc=0) {
   if ($noesc)
     $a = $y;
   else {
@@ -1764,7 +1808,6 @@ function menu ($selected = "home") {
   global $lang_functions;
   global $BASEURL,$CURUSER;
   global $enableoffer, $enablerequest, $enablespecial, $enableextforum, $extforumurl;
-  global $USERUPDATESET;
   $script_name = $_SERVER["SCRIPT_FILENAME"];
 
   if (preg_match("/index/i", $script_name) && ! preg_match('/cake/i', $script_name)) {
@@ -1948,7 +1991,8 @@ function navbar_item($href, $text, $selected, $selected_a = true) {
 
 function no_login_navbar() {
   global $lang_functions;
-  $file = array_pop(explode('/', $_SERVER['PHP_SELF']));
+  $t = explode('/', $_SERVER['PHP_SELF']);
+  $file = array_pop($t);
   return join('', [
 	  navbar_item('login.php', $lang_functions['text_login'], ($file == 'login.php')),
 	  navbar_item('signup.php', $lang_functions['text_signup'], ($file == 'signup.php')),
@@ -1971,7 +2015,7 @@ function msgalert($url, $text, $bgcolor = '', $id='') {
 
 function stdhead($title = "", $msgalert = true, $script = "", $place = "") {
   global $lang_functions;
-  global $CURUSER, $CURLANGDIR, $USERUPDATESET, $iplog1, $oldip, $SITE_ONLINE, $FUNDS, $SITENAME, $SLOGAN, $logo_main, $BASEURL, $offlinemsg, $showversion,$enabledonation, $staffmem_class, $titlekeywords_tweak, $metakeywords_tweak, $metadescription_tweak, $cssdate_tweak, $deletenotransfertwo_account, $neverdelete_account, $iniupload_main;
+  global $CURUSER, $CURLANGDIR, $SITE_ONLINE, $FUNDS, $SITENAME, $SLOGAN, $logo_main, $BASEURL, $offlinemsg, $showversion,$enabledonation, $staffmem_class, $titlekeywords_tweak, $metakeywords_tweak, $metadescription_tweak, $cssdate_tweak, $deletenotransfertwo_account, $neverdelete_account, $iniupload_main;
   global $tstart;
   global $Cache;
   global $Advertisement;
@@ -1991,15 +2035,6 @@ function stdhead($title = "", $msgalert = true, $script = "", $place = "") {
   // Variable for Start Time
   $tstart = getmicrotime(); // Start time
 
-  //Insert old ip into iplog
-  if ($CURUSER){
-    if ($iplog1 == "yes") {
-      if (($oldip != $CURUSER["ip"]) && $CURUSER["ip"])
-	sql_query("INSERT INTO iplog (ip, userid, access) VALUES (" . sqlesc($CURUSER['ip']) . ", " . $CURUSER['id'] . ", '" . $CURUSER['last_access'] . "')");
-    }
-    $USERUPDATESET[] = "last_access = ".sqlesc(date("Y-m-d H:i:s"));
-    $USERUPDATESET[] = "ip = ".sqlesc($CURUSER['ip']);
-  }
   header("Content-Type: text/html; charset=utf-8; Cache-control:private");
   //header("Pragma: No-cache");
   if ($title == "")
@@ -2039,17 +2074,38 @@ function stdhead($title = "", $msgalert = true, $script = "", $place = "") {
   }
   $meta .= '<meta name="generator" content="' . PROJECTNAME . '" />';
 
+  $s->assign(array(
+		   'lang' => $lang_functions,
+		   'meta' => $meta,
+		   'title' => $title,
+		   'SITENAME' => $SITENAME,
+		   'SLOGAN' => $SLOGAN,
+		   'BASEURL' => $BASEURL,
+		   'UC_MODERATOR' => UC_MODERATOR,
+		   'UC_SYSOP' => UC_SYSOP,
+		   'staffmem_class' => $staffmem_class,
+		   'forum_pic' => get_forum_pic_folder(),
+		   'logo_main' => $logo_main,
+		   'enabledonation' => ($enabledonation == 'yes'),
+		   ));
+  if ($Advertisement->enable_ad()) {
+    $s->assign(array(
+		     'headerad' => $Advertisement->get_ad('header'),
+		     'belownavad' => $Advertisement->get_ad('belownav')
+		     ));
+  }
+  
   if ($CURUSER) {
     $ratio = get_ratio($CURUSER['id']);
 
     //// check every 15 minutes //////////////////
     $messages = $Cache->get_value('user_'.$CURUSER["id"].'_inbox_count');
-    if ($messages == ""){
+    if ($messages === false){
       $messages = get_row_count("messages", "WHERE receiver=" . sqlesc($CURUSER["id"]) . " AND location<>0");
       $Cache->cache_value('user_'.$CURUSER["id"].'_inbox_count', $messages, 900);
     }
     $outmessages = $Cache->get_value('user_'.$CURUSER["id"].'_outbox_count');
-    if ($outmessages == ""){
+    if ($outmessages === false){
       $outmessages = get_row_count("messages","WHERE sender=" . sqlesc($CURUSER["id"]) . " AND saved='yes'");
       $Cache->cache_value('user_'.$CURUSER["id"].'_outbox_count', $outmessages, 900);
     }
@@ -2070,77 +2126,44 @@ function stdhead($title = "", $msgalert = true, $script = "", $place = "") {
 
     //// check every 60 seconds //////////////////
     $activeseed = $Cache->get_value('user_'.$CURUSER["id"].'_active_seed_count');
-    if ($activeseed == ""){
+    if ($activeseed === false){
       $activeseed = get_row_count("peers","WHERE userid=" . sqlesc($CURUSER["id"]) . " AND seeder='yes'");
       $Cache->cache_value('user_'.$CURUSER["id"].'_active_seed_count', $activeseed, 60);
     }
     $activeleech = $Cache->get_value('user_'.$CURUSER["id"].'_active_leech_count');
-    if ($activeleech == ""){
+    if ($activeleech === false){
       $activeleech = get_row_count("peers","WHERE userid=" . sqlesc($CURUSER["id"]) . " AND seeder='no'");
       $Cache->cache_value('user_'.$CURUSER["id"].'_active_leech_count', $activeleech, 60);
     }
     $unread = $Cache->get_value('user_'.$CURUSER["id"].'_unread_message_count');
-    if ($unread == ""){
+    if ($unread === false){
       $unread = get_row_count("messages","WHERE receiver=" . sqlesc($CURUSER["id"]) . " AND unread='yes'");
       $Cache->cache_value('user_'.$CURUSER["id"].'_unread_message_count', $unread, 60);
     }
-  }
-  
-  $s->assign(array(
-		   'lang' => $lang_functions,
-		   'meta' => $meta,
-		   'title' => $title,
-		   'SITENAME' => $SITENAME,
-		   'SLOGAN' => $SLOGAN,
-		   'BASEURL' => $BASEURL,
-		   'CURUSER' => $CURUSER,
-		   'UC_MODERATOR' => UC_MODERATOR,
-		   'UC_SYSOP' => UC_SYSOP,
-		   'staffmem_class' => $staffmem_class,
-		   'forum_pic' => get_forum_pic_folder(),
-		   'logo_main' => $logo_main,
-		   'enabledonation' => ($enabledonation == 'yes'),
-		   'id' => $CURUSER['id'],
-		   'activeseed' => $activeseed,
-		   ));
-  if ($Advertisement->enable_ad()) {
-    $s->assign(array(
-		     'headerad' => $Advertisement->get_ad('header'),
-		     'belownavad' => $Advertisement->get_ad('belownav')
-		     ));
-  }
 
-  if (get_user_class() >= $staffmem_class){
-    $totalreports = $Cache->get_value('staff_report_count');
-    if ($totalreports == ""){
-      $totalreports = get_row_count("reports");
-      $Cache->cache_value('staff_report_count', $totalreports, 900);
-    }
-    $totalsm = $Cache->get_value('staff_message_count');
-    if ($totalsm == ""){
-      $totalsm = get_row_count("staffmessages");
-      $Cache->cache_value('staff_message_count', $totalsm, 900);
-    }
-    $totalcheaters = $Cache->get_value('staff_cheater_count');
-    if ($totalcheaters == ""){
-      $totalcheaters = get_row_count("cheaters");
-      $Cache->cache_value('staff_cheater_count', $totalcheaters, 900);
-    }
-    $s->assign(array('totalreports' => $totalreports,
-		     'totalsm' => $totalsm,
-		     'totalcheaters' => $totalcheaters));
-  }
+    $s->assign(compact('activeseed', 'messages', 'unread', 'outmessages', 'ratio', 'activeleech', 'connectable'));
 
-  $s->assign(array(
-		   'messages' => $messages,
-		   'unread' => $unread, 
-		   'outmessages' => $outmessages,
-		   'ratio' => $ratio,
-		   'activeleech' => $activeleech,
-		   'connectable' => $connectable,
-		   ));
+    if (get_user_class() >= $staffmem_class){
+      $totalreports = $Cache->get_value('staff_report_count');
+      if ($totalreports === false){
+	$totalreports = get_row_count("reports");
+	$Cache->cache_value('staff_report_count', $totalreports, 900);
+      }
+      $totalsm = $Cache->get_value('staff_message_count');
+      if ($totalsm === false){
+	$totalsm = get_row_count("staffmessages");
+	$Cache->cache_value('staff_message_count', $totalsm, 900);
+      }
+      $totalcheaters = $Cache->get_value('staff_cheater_count');
+      if ($totalcheaters === false){
+	$totalcheaters = get_row_count("cheaters");
+	$Cache->cache_value('staff_cheater_count', $totalcheaters, 900);
+      }
+      $s->assign(array('totalreports' => $totalreports,
+		       'totalsm' => $totalsm,
+		       'totalcheaters' => $totalcheaters));
+    }
 
-  if ($CURUSER) {
     $alerts = array();
     if ($msgalert) {
       if ($CURUSER['leechwarn'] == 'yes') {
@@ -2200,7 +2223,7 @@ function stdhead($title = "", $msgalert = true, $script = "", $place = "") {
       if (!preg_match("/index/i", $settings_script_name))
 	{
 	  $new_news = $Cache->get_value('user_'.$CURUSER["id"].'_unread_news_count');
-	  if ($new_news == ""){
+	  if ($new_news === false){
 	    $new_news = get_row_count("news","WHERE notify = 'yes' AND added > ".sqlesc($CURUSER['last_home']));
 	    $Cache->cache_value('user_'.$CURUSER["id"].'_unread_news_count', $new_news, 300);
 	  }
@@ -2214,7 +2237,7 @@ function stdhead($title = "", $msgalert = true, $script = "", $place = "") {
 
       if (get_user_class() >= $staffmem_class) {
 	$numreports = $Cache->get_value('staff_new_report_count');
-	if ($numreports == "") {
+	if ($numreports === false) {
 	  $numreports = get_row_count("reports","WHERE dealtwith=0");
 	  $Cache->cache_value('staff_new_report_count', $numreports, 900);
 	}
@@ -2225,7 +2248,7 @@ function stdhead($title = "", $msgalert = true, $script = "", $place = "") {
 			    'color' => "blue");
 	}
 	$nummessages = $Cache->get_value('staff_new_message_count');
-	if ($nummessages == "") {
+	if ($nummessages === false) {
 	  $nummessages = get_row_count("staffmessages","WHERE answered='no'");
 	  $Cache->cache_value('staff_new_message_count', $nummessages, 900);
 	}
@@ -2236,7 +2259,7 @@ function stdhead($title = "", $msgalert = true, $script = "", $place = "") {
 			    'color' => "blue");
 	}
 	$numcheaters = $Cache->get_value('staff_new_cheater_count');
-	if ($numcheaters == "") {
+	if ($numcheaters === false) {
 	  $numcheaters = get_row_count("cheaters","WHERE dealtwith=0");
 	  $Cache->cache_value('staff_new_cheater_count', $numcheaters, 900);
 	}
@@ -2255,7 +2278,10 @@ function stdhead($title = "", $msgalert = true, $script = "", $place = "") {
 			'color' => "white");		  
     }
   
-    $s->assign('alerts', $alerts);
+    $s->assign(['alerts'=> $alerts,
+	       'id' => $CURUSER['id'],
+	       'CURUSER' => $CURUSER,
+	       ]);
   }
   
   if ($CURUSER) {
@@ -2265,15 +2291,13 @@ function stdhead($title = "", $msgalert = true, $script = "", $place = "") {
     $key = '0';
   }
   $s->display('stdhead.tpl', $key);
-  ob_flush();
-  flush();
 }
 
 function stdfoot() {
   global $SITENAME,$BASEURL,$Cache,$datefounded,$tstart,$icplicense_main,$add_key_shortcut,$query_name, $USERUPDATESET, $CURUSER, $enablesqldebug_tweak, $sqldebug_tweak, $Advertisement, $analyticscode_tweak, $VERSION, $icplicense, $cnzz;
 
-  if ($CURUSER){
-    sql_query("UPDATE LOW_PRIORITY users SET " . join(",", $USERUPDATESET) . " WHERE id = ".$CURUSER['id']);
+  if ($CURUSER && $USERUPDATESET){
+    update_user($CURUSER['id'], implode(",", $USERUPDATESET), [], false);
   }
   // Variables for End Time
   $tend = getmicrotime();
@@ -2341,7 +2365,7 @@ function logincookie($id, $passhash, $updatedb = 1, $expires = 0x7fffffff, $secu
   setcookie("c_secure_login", base64("nope"), $expires, "/");
 
   if ($updatedb)
-  sql_query("UPDATE LOW_PRIORITY users SET last_login = NOW(), lang=" . sqlesc(get_langid_from_langcookie()) . " WHERE id = ".sqlesc($id));
+    update_user($id, "last_login = NOW(), lang=?", [get_langid_from_langcookie()]);
 }
 
 function set_langfolder_cookie($folder, $expires = 0x7fffffff)
@@ -2468,8 +2492,12 @@ function loggedinorreturn3($mainpage = false) {
 
 function send_pm($from, $to, $subject, $msg, $save = 'no') {
   static $client;
+  global $Cache;
 
   sql_query("INSERT INTO messages (sender, receiver, subject, msg, added, saved) VALUES(?, ?, ?, ?, ?, ?)", [$from, $to, $subject, $msg, date("Y-m-d H:i:s"), $save]);
+
+  $Cache->delete_value('user_'.$to.'_unread_message_count');
+  $Cache->delete_value('user_'.$to.'_inbox_count');
 
   if (!$client) {
     require_once('ws/class.websocket_client.php');
@@ -2944,11 +2972,8 @@ function commenttable($rows, $type, $parent_id, $review = false, $offset=0) {
   }
   
   foreach ($rows as $row) {
-    if ($count>=1) {
-      if ($Advertisement->enable_ad()) {
-	if (array_key_exists($count-1, $commentad))
-	  echo '<div class="forum-ad table td" id="ad_comment_'.$count."\">".$commentad[$count-1]."</div>";
-      }
+    if ($count>=1 && isset($commentad) && isset($commentad[$count - 1])) {
+      echo '<div class="forum-ad table td" id="ad_comment_'.$count."\">".$commentad[$count-1]."</div>";
     }
 
     $floor = $offset+$count+1;
@@ -3017,30 +3042,18 @@ function linkcolor($num) {
 }
 
 function writecomment($userid, $comment) {
-  $res = sql_query("SELECT modcomment FROM users WHERE id = '$userid'") or sqlerr(__FILE__, __LINE__);
-  $arr = _mysql_fetch_assoc($res);
-
-  $modcomment = date("d-m-Y") . " - " . $comment . "" . ($arr[modcomment] != "" ? "\n\n" : "") . "$arr[modcomment]";
-  $modcom = sqlesc($modcomment);
-
-  return sql_query("UPDATE LOW_PRIORITY users SET modcomment = $modcom WHERE id = '$userid'") or sqlerr(__FILE__, __LINE__);
+  $modcomment = date("d-m-Y") . " - " . $comment . "\n\n";
+  return update_user($userid, 'modcomment = CONCAT(modcomment, ?)', [$modcomment]);
 }
 
-function return_torrent_bookmark_array($userid)
-{
+function return_torrent_bookmark_array($userid) {
   global $Cache;
   static $ret;
-  if (!$ret){
-    if (!$ret = $Cache->get_value('user_'.$userid.'_bookmark_array')){
-      $ret = array();
-      $res = sql_query("SELECT * FROM bookmarks WHERE userid=" . sqlesc($userid));
-      if (_mysql_num_rows($res) != 0){
-        while ($row = _mysql_fetch_array($res))
-          $ret[] = $row['torrentid'];
-        $Cache->cache_value('user_'.$userid.'_bookmark_array', $ret, 132800);
-      } else {
-        $Cache->cache_value('user_'.$userid.'_bookmark_array', array(0), 132800);
-      }
+  if ($ret === false){
+    $ret = $Cache->get_value('user_'.$userid.'_bookmark_array');
+    if ($ret === false){
+      $ret = sql_query("SELECT * FROM bookmarks WHERE userid=?", [$userid])->fetchAll();
+      $Cache->cache_value('user_'.$userid.'_bookmark_array', $ret, 132800);
     }
   }
   return $ret;
@@ -3073,11 +3086,7 @@ function torrentTableCake($torrents) {
     $ids[] = $torrent['Torrent']['id'];
   }
   $query = 'SELECT torrents.id, torrents.sp_state, torrents.promotion_time_type, torrents.promotion_until, torrents.banned, torrents.picktype, torrents.pos_state, torrents.category, torrents.source, torrents.medium, torrents.codec, torrents.standard, torrents.processing, torrents.team, torrents.audiocodec, torrents.leechers, torrents.seeders, torrents.name, torrents.small_descr, torrents.times_completed, torrents.size, torrents.added, torrents.comments,torrents.anonymous,torrents.owner,torrents.url,torrents.cache_stamp,torrents.oday FROM torrents WHERE id IN (' . implode(',', $ids) . ') ORDER BY pos_state DESC, torrents.id DESC';
-  $res = sql_query($query) or die(_mysql_error());
-  $rows = [];
-  while ($row = _mysql_fetch_assoc($res)) {
-    $rows[] = $row;
-  }
+  $rows = sql_query($query)->fetchAll();
   torrenttable($rows);
 }
 
@@ -3092,7 +3101,9 @@ function torrenttable($rows, $var) {
   // Filter banned torrents
   global $seebanned_class;
   global $torrent_tooltip, $BASEURL;
+  global $USERUPDATESET;
 
+  $forcemode = 0;
   $variant = "torrent";
   $swap_headings = false;
   $onlyhead=false;
@@ -3100,6 +3111,7 @@ function torrenttable($rows, $var) {
   $header = true;
   $splitcomment = false;
   $progress = [];
+  $is_new = false;
   extract($var);
   
   if ($variant == "torrent"){
@@ -3377,8 +3389,10 @@ foreach($rows as $row)
 			}
     }
     
-    if (strtotime($row["added"]) >= $last_browse)
+    if (strtotime($row["added"]) >= $last_browse) {
       print("<li>(<span class='new'>".$lang_functions['text_new_uppercase']."</span>)</li>");
+      $is_new = true;
+    }
 
     $banned_torrent = ($row["banned"] == 'yes' ? " <li>(<span class=\"striking\">".$lang_functions['text_banned']."</span>)</li>" : "");
     print($banned_torrent.$picked_torrent.$sp_torrent .'</ul></div><div class="torrent-title">' );
@@ -3387,8 +3401,8 @@ foreach($rows as $row)
       $escape_desc = htmlspecialchars($dissmall_descr);
       print($dissmall_descr == "" ? "<h3 class='placeholder'></h3>" : '<h3 title="' . $escape_desc . '">'. $escape_desc . '</h3>');
     }
-    print('<ul class="prs">' . $sp_torrent_sub . '</ul></div></div>');
-
+    echo '</div>';
+    
       $act = "";
       if ($CURUSER["downloadpos"] != "no")
       $act .= "<li><a href=\"//$BASEURL/download.php?id=".$id."\"><img class=\"download\" src=\"//$BASEURL/pic/trans.gif\" style='padding-bottom: 2px;' alt=\"download\" title=\"".$lang_functions['title_download_torrent']."\" /></a></li>" ;
@@ -3440,6 +3454,9 @@ foreach($rows as $row)
         $onmouseover = "";
       }
       print("<b><a href=\"//$BASEURL/details.php?id=".$id."&amp;hit=1&amp;cmtpage=1#startcomments\" ".$onmouseover.">". ($hasnewcom ? "<span class='new'>" : ""). $row["comments"] .($hasnewcom ? "</span>" : ""). "</a></b>");
+      if ($hasnewcom) {
+	$is_new = true;
+      }
     }
 
     print("</td>");
@@ -3475,7 +3492,7 @@ foreach($rows as $row)
       print("<td class=\"rowfollow\">0</td>\n");
 
     if ($row["times_completed"] >=1)
-    print("<td class=\"rowfollow\"><a href=\"//$BASEURL/viewsnatches.php?id=".$row[id]."\"><b>" . number_format($row["times_completed"]) . "</b></a></td>\n");
+    print("<td class=\"rowfollow\"><a href=\"//$BASEURL/viewsnatches.php?id=".$row['id']."\"><b>" . number_format($row["times_completed"]) . "</b></a></td>\n");
     else
     print("<td class=\"rowfollow\">" . number_format($row["times_completed"]) . "</td>\n");
 
@@ -3515,12 +3532,27 @@ if ($header) {
   echo '</tbody></table>';
 }
 
+if ($is_new) {
+  if($variant == "music"){
+    $USERUPDATESET[] = "last_music = ".TIMENOW;
+    $CURUSER['last_music'] = TIMENOW;
+  }
+  else {
+    $USERUPDATESET[] = "last_browse = ".TIMENOW;
+    $CURUSER['last_browse'] = TIMENOW;
+  }
+  cache_user_row();
+}
+
 if($enabletooltip_tweak == 'yes') {
   if ($splitcomment) {
     ob_start();
   }
-  create_tooltip_container($lastcom_tooltip, 400);
-  #create_tooltip_container($torrent_tooltip, 500);
+
+  if (isset($lastcom_tooltip)) {
+    create_tooltip_container($lastcom_tooltip, 400);
+  }
+
   if ($splitcomment) {
     return ob_get_clean();
   }
@@ -4120,8 +4152,11 @@ if ($mode == 'icon') {
   return $ret;
 }
 
-function get_user_id_from_name($username,$sqlerrorreturn=1){
-  return get_single_value('users', 'id', "WHERE LOWER(username)=LOWER(?)", [$username]);
+function get_user_id_from_name($username){
+  global $Cache;
+  return $Cache->get_value('user_id_for_name_' . $username, 7*86400, function() use ($username) {
+      return get_single_value('users', 'id', "WHERE LOWER(username)=?", [strtolower($username)]);
+    });
 }
 
 function is_forum_moderator($id, $in = 'post'){
@@ -4247,12 +4282,11 @@ function is_or_are($num)
 }
 
 function getmicrotime(){
-  list($usec, $sec) = explode(" ",microtime());
-  return ((float)$usec + (float)$sec);
+  return microtime(true);
 }
 
 function get_user_class_image($class){
-  $UC = array(
+  static $UC = array(
     "Staff Leader" => "pic/staffleader.gif",
     "SysOp" => "pic/sysop.gif",
     "Administrator" => "pic/administrator.gif",
@@ -4782,13 +4816,9 @@ function get_fun($id = 0, $pager_count = null) {
 }
 
 function storing_keeper_list($torrentid){
-	$list_res = sql_query("SELECT keeper_id FROM storing_records WHERE checkout = 0 AND torrent_id = $torrentid") or sqlerr(__FILE__, __LINE__);
-	if(_mysql_num_rows($list_res)!=0){
-		while($keeperid = _mysql_fetch_assoc($list_res)){
-			$list[] = $keeperid['keeper_id'];
-		}
-	}
-	return $list;
+  return array_map(function($keeperid) {
+      return $keeperid['keeper_id'];
+    }, sql_query("SELECT keeper_id FROM storing_records WHERE checkout = 0 AND torrent_id = ?", [$torrentid])->fetchAll());
 }
 
 function strip_local_domain($link) {

@@ -14,7 +14,7 @@ if ($allsec != 1 || $enablespecial != 'yes'){ //do not print searchbox if showin
       <?php
   foreach($mainCatsName as $catNo => $name) {
     ?>
-    <li><input type="checkbox" value="1" id="cat<?php echo $catNo; ?>" name="cat<?php echo $catNo; ?>" <?php echo ($selectedMainCat[$catNo] ? ' checked="checked"': ''); ?>/><a href="?cat=<?php echo $catNo; ?>"><?php echo $name; ?></a></li>
+    <li><input type="checkbox" value="1" id="cat<?php echo $catNo; ?>" name="cat<?php echo $catNo; ?>" <?php echo (isset($selectedMainCat[$catNo]) ? ' checked="checked"': ''); ?>/><a href="?cat=<?php echo $catNo; ?>"><?php echo $name; ?></a></li>
 <?php
   }
 ?>
@@ -155,7 +155,9 @@ echo $Cache->next_row();
 
 if ($Advertisement->enable_ad()){
   $belowsearchboxad = $Advertisement->get_ad('belowsearchbox');
-  echo "<div align=\"center\" style=\"margin-top: 10px\" id=\"ad_belowsearchbox\">".$belowsearchboxad[0]."</div>";
+  if (isset($belowsearchboxad[0])) {
+    echo "<div align=\"center\" style=\"margin-top: 10px\" id=\"ad_belowsearchbox\">".$belowsearchboxad[0]."</div>";
+  }
 }
 
 if($inclbookmarked == 1) {
@@ -198,11 +200,6 @@ else {
 <div id="loader" style="display: none; "></div>
 <?php
 
-if ($CURUSER){
-	if ($sectiontype == $browsecatmode)
-		$USERUPDATESET[] = "last_browse = ".TIMENOW;
-	else	$USERUPDATESET[] = "last_music = ".TIMENOW;
-}
 echo '<script type="text/javascript">hb.nextpage = "'. $next_page_href .'";';
 echo 'hb.config.torrents_query = (' . php_json_encode($_SERVER['QUERY_STRING']) . ');';
 echo 'hb.constant.maincats = ' . php_json_encode($mainCats) . ';</script>';
@@ -239,8 +236,3 @@ function hotmenu(){
 </ul></div>
 <?php
 }
-?>
-
-
-
-
