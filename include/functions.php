@@ -1164,36 +1164,41 @@ function sent_mail($to,$fromname,$fromemail,$subject,$body,$type = "confirmation
 function failedloginscheck ($type = 'Login') {
   global $lang_functions;
   global $maxloginattempts;
-  $total = 0;
-  $ip = sqlesc(getip());
-  $Query = sql_query("SELECT SUM(attempts) FROM loginattempts WHERE ip=$ip") or sqlerr(__FILE__, __LINE__);
-  list($total) = _mysql_fetch_array($Query);
+  $ip = getip();
+  $total = get_row_sum('loginattempts', 'attempts', 'WHERE ip=?', [$ip]);
   if ($total >= $maxloginattempts) {
-    sql_query("UPDATE loginattempts SET banned = 'yes' WHERE ip=$ip") or sqlerr(__FILE__, __LINE__);
+    sql_query("UPDATE loginattempts SET banned = 'yes' WHERE ip=?", [$ip]);
     stderr($type.$lang_functions['std_locked'].$type.$lang_functions['std_attempts_reached'], $lang_functions['std_your_ip_banned']);
+  }
+  else {
+    return $total;
   }
 }
 
 function failedlogins ($type = 'login', $recover = false, $head = true) {
   global $lang_functions;
-  $ip = sqlesc(getip());
-  $added = sqlesc(date("Y-m-d H:i:s"));
-  $a = (@_mysql_fetch_row(@sql_query("select count(*) from loginattempts where ip=$ip"))) or sqlerr(__FILE__, __LINE__);
-  if ($a[0] == 0)
-    sql_query("INSERT INTO loginattempts (ip, added, attempts) VALUES ($ip, $added, 1)") or sqlerr(__FILE__, __LINE__);
-  else
-    sql_query("UPDATE loginattempts SET attempts = attempts + 1 where ip=$ip") or sqlerr(__FILE__, __LINE__);
-  if ($recover)
-    sql_query("UPDATE loginattempts SET type = 'recover' WHERE ip = $ip") or sqlerr(__FILE__, __LINE__);
+  $ip = getip();
+  $added = date("Y-m-d H:i:s");
+  $a = get_row_count('loginattempts', 'WHERE ip=?', [$ip]);
+  if ($a == 0)
+    sql_query("INSERT INTO loginattempts (ip, added, attempts) VALUES (?, ?, 1)", [$ip, $added]);
+  else {
+    $sql = "UPDATE loginattempts SET attempts = attempts + 1";
+    if ($recover) {
+      $sql .= ",type = 'recover'";
+    }
+    $sql .= " where ip=?";
+    sql_query($sql, [$ip]);
+  }
+
   if ($type == 'silent')
     return;
-  elseif ($type == 'login')
-    {
-      stderr($lang_functions['std_login_failed'],$lang_functions['std_login_failed_note'],false);
-    }
-  else
+  elseif ($type == 'login') {
+    stderr($lang_functions['std_login_failed'],$lang_functions['std_login_failed_note'],false);
+  }
+  else {
     stderr($lang_functions['std_failed'],$type,false, $head);
-
+  }
 }
 
 function login_failedlogins($type = 'login', $recover = false, $head = true) {
@@ -1219,10 +1224,7 @@ function login_failedlogins($type = 'login', $recover = false, $head = true) {
 
 function remaining ($type = 'login') {
   global $maxloginattempts;
-  $total = 0;
-  $ip = sqlesc(getip());
-  $Query = sql_query("SELECT SUM(attempts) FROM loginattempts WHERE ip=$ip") or sqlerr(__FILE__, __LINE__);
-  list($total) = _mysql_fetch_array($Query);
+  $total = get_row_sum('loginattempts', 'attempts', 'WHERE ip=?', [getip()]);
   $remaining = $maxloginattempts - $total;
   if ($remaining <= 2 )
     $remaining = "<font color=\"red\" size=\"2\">[".$remaining."]</font>";

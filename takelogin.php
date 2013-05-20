@@ -5,7 +5,7 @@ if (!mkglobal("username:password"))
 	die();
 dbconn();
 require_once(get_langfile_path("", false, get_langfolder_cookie()));
-failedloginscheck ();
+$attempts = failedloginscheck ();
 cur_user_check () ;
 
 function bark($text = "")
@@ -14,7 +14,7 @@ function bark($text = "")
   $text =  ($text == "" ? $lang_takelogin['std_login_fail_note'] : $text);
   stderr($lang_takelogin['std_login_fail'], $text,false);
 }
-if ($iv == "yes")
+if ($iv == "yes" && $attempts > 0)
 	check_code ($_POST['imagehash'], $_POST['imagestring'],'login.php',true);
 $res = sql_query("SELECT id, passhash, secret, enabled, status FROM users WHERE username = " . sqlesc($username));
 $row = _mysql_fetch_array($res);

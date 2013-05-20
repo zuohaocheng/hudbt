@@ -13,7 +13,8 @@ if ($langid)
 	}
 }
 require_once(get_langfile_path("", false, $CURLANGDIR));
-failedloginscheck ();
+$attempts = failedloginscheck ();
+$remaining = $maxloginattempts - $attempts;
 
 unset($returnto);
 if (!empty($_GET["returnto"])) {
@@ -45,7 +46,7 @@ else {
 <h3 class="page-titles">（本校用户可使用南六楼网络中心申请的锐捷账号通过联盟认证登录）</h3>
 <div class="hints center"><ul><li><?php echo $lang_login['p_need_cookies_enables']?></li>
 <li>[<b><?php echo $maxloginattempts;?></b>] <?php echo $lang_login['p_fail_ban']?></li>
-<li><?php echo $lang_login['p_you_have']?> <b><?php echo remaining ();?></b> <?php echo $lang_login['p_remaining_tries']?></li></ul></div>
+<li><?php echo $lang_login['p_you_have']?> <b><?php echo $remaining;?></b> <?php echo $lang_login['p_remaining_tries']?></li></ul></div>
 <?php
 echo '<div id="sns" class="minor-list text center"><ul>';
 foreach ($sns as $s) {
@@ -61,7 +62,9 @@ echo '</ul></div>';
 <tr><td class="rowhead"><?php echo $lang_login['rowhead_username']?></td><td class="rowfollow" align="left"><input type="text" name="username" style="width: 180px; border: 1px solid gray" /></td></tr>
 <tr><td class="rowhead"><?php echo $lang_login['rowhead_password']?></td><td class="rowfollow" align="left"><input type="password" name="password" style="width: 180px; border: 1px solid gray"/></td></tr>
 <?php
-show_image_code ();
+  if ($attempts > 0) {
+    show_image_code ();
+  }
 if ($securelogin == "yes") 
 	$sec = "checked=\"checked\" disabled=\"disabled\"";
 elseif ($securelogin == "no")
