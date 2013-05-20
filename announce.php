@@ -1,21 +1,34 @@
 <?php
 require_once('include/bittorrent_announce.php');
 require_once('include/benc.php');
-dbconn_announce();
+
+//detect server supports ipv6
+$server_ipv6 = (strpos($_SERVER['SERVER_ADDR'], ':') === false);
 
 //1. BLOCK ACCESS WITH WEB BROWSERS AND CHEATS!
 $agent = $_SERVER["HTTP_USER_AGENT"];
 block_browser();
 //2. GET ANNOUNCE VARIABLES
 // get string type passkey, info_hash, peer_id, event, ip from client
-foreach (array("passkey","info_hash","peer_id","event") as $x) {
-  if(isset($_GET["$x"])) {
+foreach (array("passkey","info_hash","peer_id","event", 'ipv6') as $x) {
+  if(isset($_GET[$x])) {
     $GLOBALS[$x] = $_GET[$x];
   }
 }
+
+// Find private address
+if (!isset($ipv6) || strtolower($ipv6[0]) == 'f') {
+  $ipv6 = null;
+}
+else {
+  $ipv6 = inet_pton($ipv6); // convert to binary
+}
+
 // get integer type port, downloaded, uploaded, left from client
 foreach (array("port","downloaded","uploaded","left","compact","no_peer_id") as $x) {
-  $GLOBALS[$x] = 0 + $_GET[$x];
+  if (isset($_GET[$x])) {
+    $GLOBALS[$x] = 0 + $_GET[$x];
+  }
 }
 
 //check info_hash, peer_id and passkey
@@ -139,6 +152,12 @@ while ($row = _mysql_fetch_assoc($res)) {
       benc_str("ip") . benc_str($row["ip"]) .
       benc_str("port") . "i" . $row["port"] . "e" .
       "e";
+    if ($ipv6 && $row['ipv6']) {
+      $peer_list .= "d" .
+	benc_str("ip") . benc_str(inet_ntop($row["ipv6"])) .
+	benc_str("port") . "i" . $row["port"] . "e" .
+	"e";
+    }
   }
   else {
     $peer_list .= "d" .
@@ -146,6 +165,14 @@ while ($row = _mysql_fetch_assoc($res)) {
       benc_str("peer id") . benc_str($row["peer_id"]) .
       benc_str("port") . "i" . $row["port"] . "e" .
       "e";
+    
+    if ($ipv6 && $row['ipv6']) {
+      $peer_list .= "d" .
+	benc_str("ip") . benc_str(inet_ntop($row["ipv6"])) .
+	benc_str("peer id") . benc_str($row["peer_id"]) .
+	benc_str("port") . "i" . $row["port"] . "e" .
+	"e";
+    }
   }
 }
 
@@ -262,6 +289,7 @@ else { // continue an existing session
   }
 }
 
+$date = date("Y-m-d H:i:s");
 $dt = sqlesc(date("Y-m-d H:i:s"));
 $updateset = array();
 // set non-type event
@@ -288,7 +316,7 @@ elseif(isset($self)) {
     $finished_snatched = '';
   }
 
-  sql_query("UPDATE peers SET ip = ".sqlesc($ip).", port = $port, uploaded = $uploaded, downloaded = $downloaded, to_go = $left, prev_action = last_action, last_action = $dt, seeder = '$seeder', agent = ".sqlesc($agent)." $finished WHERE $selfwhere") or err("PL Err 1");
+  sql_query("UPDATE peers SET ip = ".sqlesc($ip).", port = $port, uploaded = $uploaded, downloaded = $downloaded, to_go = $left, prev_action = last_action, last_action = $dt, seeder = '$seeder', agent = ".sqlesc($agent)." $finished, ipv6=? WHERE $selfwhere", [$ipv6]) or err("PL Err 1");
 
   if (_mysql_affected_rows()) {
     if ($seeder <> $self["seeder"])
@@ -298,21 +326,34 @@ elseif(isset($self)) {
 }
 else {
   if(strpos($ip, '2001:') !== false) {
-    $check_ip = '['.$ip.']';
+    if (!$server_ipv6) {
+      $check_ip = null;
+    }
+    else {
+      $check_ip = '['.$ip.']';
+    }
   } else {
     $check_ip = $ip;
   }
 
-  $sockres = @pfsockopen($check_ip, $port, $errno, $errstr, 5);
-  
-  if (!$sockres) {
-    $connectable = "no";
+  if ($check_ip) {
+    $connectable = $Cache->get_value('peer_connectable_' . $check_ip . '_' . $port, 1800, function() use ($check_ip, $port){
+	$sockres = @pfsockopen($check_ip, $port, $errno, $errstr, 5);
+	
+	if (!$sockres) {
+	  return "no";
+	}
+	else {
+	  @fclose($sockres);
+	  return 'yes';
+	}
+      });
   }
   else {
     $connectable = "yes";
-    @fclose($sockres);
   }
-  sql_query("INSERT INTO peers (torrent, userid, peer_id, ip, port, connectable, uploaded, downloaded, to_go, started, last_action, seeder, agent, downloadoffset, uploadoffset, passkey) VALUES ($torrentid, $userid, ".sqlesc($peer_id).", ".sqlesc($ip).", $port, '$connectable', $uploaded, $downloaded, $left, $dt, $dt, '$seeder', ".sqlesc($agent).", $downloaded, $uploaded, ".sqlesc($passkey).")") or err("PL Err 2");
+  
+  sql_query("INSERT INTO peers (torrent, userid, peer_id, ip, port, connectable, uploaded, downloaded, to_go, started, last_action, seeder, agent, downloadoffset, uploadoffset, passkey, ipv6) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [$torrentid, $userid, $peer_id, $ip, $port, $connectable, $uploaded, $downloaded, $left, $date, $date, $seeder, $agent, $downloaded, $uploaded, $passkey, $ipv6]) or err("PL Err 2");
 
   if (_mysql_affected_rows()) {
     $updateset[] = ($seeder == "yes" ? "seeders = seeders + 1" : "leechers = leechers + 1");
