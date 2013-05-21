@@ -2,9 +2,9 @@
 # IMPORTANT: Do not edit below unless you know what you are doing!
 if(!defined('IN_TRACKER'))
   die('Hacking attempt!');
-include_once($rootpath . 'include/globalfunctions.php');
-include_once($rootpath . 'classes/class_advertisement.php');
-include($rootpath . get_langfile_path("functions.php"));
+require_once($rootpath . 'include/globalfunctions.php');
+require_once($rootpath . 'classes/class_advertisement.php');
+require($rootpath . get_langfile_path("functions.php"));
 
 $privilegeConfig = ['Maintenance'=>['staticResources' => UC_MODERATOR],
 		    'Tcategory' => ['lock' => UC_UPLOADER,'delete' => UC_VIP,],
@@ -430,16 +430,26 @@ function sqlerr($file = '', $line = '', $stack = true, $q = '', $args = [], $e =
   die;
 }
 
-function format_comment($text, $strip_html = true, $xssclean = false, $newtab = false, $imageresizer = true, $image_max_width = 0, $enableimage = true, $enableflash = true , $imagenum = -1, $image_max_height = 0, $adid = 0) {
+function format_comment($text, $args = true, $null0 = null, $newtab = false, $null1 = null, $image_max_width = 0, $enableimage = true, $enableflash = true , $null2 = null, $image_max_height = 0, $null3 = null) {
   global $Cache;
-  $is_cache = ($image_max_width == 0 && $image_max_height == 0 && $newtab == false);
-  if ($is_cache) {
-    $key = 'bbcode-' . md5($text);
-    if (!isset($_REQUEST['purge'])) {
-      $html = $Cache->get_value($key);
-      if ($html) {
-	return $html;
-      }
+
+  $cnt_args = func_num_args();
+  if ($cnt_args > 1) {
+    $arg = func_get_args()[$cnt_args - 1]; // Last argument is a hash
+    if (is_array($arg)) {
+      $defaults = [[], [], ['newtab' => false], [], ['image_max_width' => 0], ['enableimage' => true], ['enableflash' => true ], [], ['image_max_height' => 0], []];
+
+      extract($defaults[$cnt_args - 2]); //Restore default
+      extract($arg);
+    }
+  }
+
+  $md5 = md5($text);
+  $key = 'bbcode-' . implode('-', [$enableimage, $enableflash, $image_max_width, $image_max_height, $newtab]) . '-' . $md5;
+  if (!isset($_REQUEST['purge'])) {
+    $html = $Cache->get_value($key);
+    if ($html) {
+      return $html;
     }
   }
   
@@ -469,9 +479,7 @@ function format_comment($text, $strip_html = true, $xssclean = false, $newtab = 
   }
   $parser = new HTML_BBCodeParser($opts);
   $out = '<div class="bbcode">' . $parser->qparse($text) . '</div>';
-  if ($is_cache) {
-    $Cache->cache_value($key, $out, 86400 * 7);
-  }
+  $Cache->cache_value($key, $out, 86400 * 7);
   return $out;
 }
 
@@ -2031,7 +2039,6 @@ function stdhead($title = "", $msgalert = true, $script = "", $place = "") {
   }
 
   $Cache->setLanguage($CURLANGDIR);
-
   $Advertisement = new ADVERTISEMENT($CURUSER['id']);
   $cssupdatedate = $cssdate_tweak;
   // Variable for Start Time
@@ -2307,9 +2314,16 @@ function stdfoot() {
   $alltotaltime=0+($tend-TIMENOWSTART);
   $year = substr($datefounded, 0, 4);
   $yearfounded = ($year ? $year : 2007);
+
+  if (isset($Advertisement)) {
+    $ad = $Advertisement->get_ad('footer');
+  }
+  else {
+    $ad = '';
+  }
   
   $s = smarty();
-  $s->assign(array('footerad' => $Advertisement->get_ad('footer'),
+  $s->assign(array('footerad' => $ad,
 		   'SITENAME' => $SITENAME,
 		   'BASEURL' => $BASEURL,
 		   'VERSION' => $VERSION,
@@ -2326,9 +2340,6 @@ function stdfoot() {
 		   'cnzz' => $cnzz
 		   ));
   $s->display('stdfoot.tpl');
-  if (isset($_SESSION)) {
-    unset($_SESSION['queries']);
-  }
 }
 
 function mksecret($len = 20) {
@@ -4710,12 +4721,17 @@ function votes($poll, $uservote = 255) {
 }
 
 function get_fun($id = 0, $pager_count = null) {
-  global $Cache, $lang_fun, $BASEURL;
+  global $Cache, $BASEURL, $lang_functions, $CURUSER;
 
   $is_cache = false;
+  $https = (isset($_SERVER['HTTPS']) && $_SERVER["HTTPS"] == "on");
   if ($id == 0) {
     if (is_null($pager_count)) {
-      $content = $Cache->get_value('current_fun_content');
+      $key = 'current_fun_content';
+      if ($https) {
+	$key .= '_https';
+      }
+      $content = $Cache->get_value($key);
       $id = $Cache->get_value('current_fun_content_id');
       $is_cache = true;
     }
@@ -4723,11 +4739,11 @@ function get_fun($id = 0, $pager_count = null) {
     $sql = "SELECT fun.*, IF(ADDTIME(added, '1 0:0:0') < NOW(),true,false) AS neednew FROM fun WHERE status != 'banned' AND status != 'dull' ORDER BY added DESC LIMIT 1";
   }
   else {
-    $content = null;
     $sql = "SELECT * FROM fun WHERE id = ". $id;
   }
+  $content = null;
 
-  if (!$content || !$id) {
+  if (!$content) {
     $result = sql_query($sql)  or sqlerr(__FILE__,__LINE__);
     $row = _mysql_fetch_array($result);
 
@@ -4737,20 +4753,38 @@ function get_fun($id = 0, $pager_count = null) {
 
     $id = $row['id'];
     $username = get_username($row["userid"],false,true,true,true,false,false,"",false);
-    $time = $lang_fun['text_on'].$row['added'];
+    $time = $lang_functions['text_on'].$row['added'];
 
-    $content = '<div class="page-titles"><h3><a href="//' . $BASEURL . '/fun.php?id=' . $id . '">'.$row['title'].'</a></h3><h4>'.$lang_fun['text_posted_by'];
+    $content = '<div class="page-titles"><h3><a href="//' . $BASEURL . '/fun.php?id=' . $id . '">'.$row['title'].'</a></h3><h4>'.$lang_functions['text_posted_by'];
     $content .= $username . $time;
     $content .= '</h4></div>';
-    if (is_null($pager_count)) {
+    if (is_null($pager_count) && !$https) {
       $content .= '<div id="funbox-content">';
     }
-    $content .= format_comment($row['body'], true, true, true);
-    if (is_null($pager_count)) {
+    $body = format_comment($row['body'], true, true, true);
+    if ($https) {
+      $filename = 'cache/funbox-' . $id . '.html';
+      if (!is_null($pager_count)) {
+	$height = '700px';
+      }
+      else {
+	$height = '360px';
+      }
+      $content .= '<iframe id="funbox-content" style="height:'.$height.'" src="http://' . $BASEURL . '/' . $filename . '?' . md5($row['body']) . '" ></iframe>';
+      if (!file_exists($filename)) {
+	$h = '<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><link rel="stylesheet" href="../styles/common.css" type="text/css" media="screen" /><link rel="stylesheet" href="../styles/font.css" type="text/css" media="screen" /></head><body style="background-color:transparent;background-image:none">' . $body . '</body></html>';
+	file_put_contents($filename, $h);
+      }
+    }
+    else {
+      $content .= $body;
+    }
+    
+    if (is_null($pager_count) && !$https) {
       $content .= "</div>";
     }
     if ($is_cache) {
-      $Cache->cache_value('current_fun_content', $content, 900);
+      $Cache->cache_value($key, $content, 900);
       $Cache->cache_value('current_fun_content_id', $id, 900);
       $Cache->cache_value('current_fun_content_neednew', $row['neednew'], 900);
     }
@@ -4800,7 +4834,7 @@ function get_fun($id = 0, $pager_count = null) {
       }
       dl_item(get_username($subrow['userid'],false,true,true,true,false,false,"",false).$del, format_comment($subrow['text'],true,false,true,true,600,false,false), true);
     }
-    $funcomment .= ob_get_clean ();
+    $funcomment .= ob_get_clean();
     $funcomment .= "</dl>";
     if (isset($pb)) {
       $funcomment .= $pb;
@@ -4814,7 +4848,37 @@ function get_fun($id = 0, $pager_count = null) {
 	$Cache->cache_value($key, $funcomment, 900);
       }
   }
-  return $content . $funcomment;
+
+  {
+    $userid = $CURUSER['id'];
+    $totalvote = $Cache->get_value('fun_vote_count_'.$id, 756, function() use($id) {
+	return get_row_count("funvotes", "WHERE funid = ?", [$id]);
+      });
+
+    $funvote = $Cache->get_value('fun_vote_funny_count_'.$id, 756, function() use ($id) {
+	return get_row_count("funvotes", "WHERE funid = ? AND vote='fun'", [$id]);
+      });
+    //check whether current user has voted
+    $funvoted = $Cache->get_value('funvote_'.$id . '_' . $userid, 1800, function() use ($id, $userid) {
+	return get_row_count("funvotes", "WHERE funid = ? AND userid= ?", [$id, $userid]);
+      });
+
+    
+    $content_vote = '<div id="funvote" class="minor-list compact">';
+    $content_vote .= '<span id="funvote-fun">'.$funvote."</span>" . $lang_functions['text_out_of'] . '<span id="funvote-total">' . $totalvote . '</span>' . $lang_functions['text_people_found_it'];
+
+    if (!$funvoted) {
+      $content_vote .= "<span id=\"funvote-form\"><span class=\"striking\">".$lang_functions['text_your_opinion']."</span>";
+
+      $content_vote .= '<ul>';
+      $content_vote .= '<li><form action="fun.php?action=vote" method="post"><input type="hidden" name="id" value="' . $id . '" /><input type="hidden" name="yourvote" value="fun" /><input type="submit" class="btn" value="' . $lang_functions['submit_fun'] . '" /></form></li>';
+      $content_vote .= '<li><form action="fun.php?action=vote" method="post"><input type="hidden" name="id" value="' . $id . '" /><input type="hidden" name="yourvote" value="dull" /><input type="submit" class="btn" value="' . $lang_functions['submit_dull'] . '" /></form></li>';
+      $content_vote .= '</ul></span>';
+    }
+    $content_vote .= '</div>';
+  }
+  
+  return $content . $funcomment . $content_vote;
 }
 
 function storing_keeper_list($torrentid){

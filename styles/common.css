@@ -868,9 +868,13 @@ input.a:hover {
     color:red;
     cursor:pointer;
 }
-#funbox-content {
+div#funbox-content {
     max-height:360px;
     overflow-y:scroll;
+}
+iframe#funbox-content {
+    width: 100%;
+    border: none;
 }
 #nav-reg-signup {
     margin:0 auto;

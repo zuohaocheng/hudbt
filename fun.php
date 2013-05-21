@@ -1,16 +1,22 @@
 <?php
 require_once("include/bittorrent.php");
 dbconn();
+loggedinorreturn();
 require_once(get_langfile_path());
 require_once(get_langfile_path("",true));
-loggedinorreturn();
-
 $id = 0 + $_REQUEST['id'];
 if (array_key_exists('action', $_REQUEST)) {
   $action=$_REQUEST["action"];
 }
 else {
   $action = 'view';
+}
+
+function delete_file_cache($id) {
+  $filename = 'cache/funbox-' . $id . '.html';
+  if (file_exists($filename)) {
+    unlink($filename);
+  }
 }
 
 if (array_key_exists('returnto', $_REQUEST)) {
@@ -63,9 +69,9 @@ else if ($action == 'delete') {
   sql_query("DELETE FROM fun WHERE id=".sqlesc($id)) or sqlerr(__FILE__, __LINE__);
   sql_query("DELETE FROM funcomment WHERE funid=".sqlesc($id));
   $Cache->delete_value('current_fun_content');
+  $Cache->delete_value('current_fun_content_https');
+  delete_file_cache($id);
   $Cache->delete_value('current_fun', true);
-  $Cache->delete_value('current_fun_vote_count');
-  $Cache->delete_value('current_fun_vote_funny_count');
   $Cache->delete_value('current_fun_content_comment');
   $Cache->delete_value('current_fun_content_comment_delete');
 
@@ -104,12 +110,11 @@ else if ($action == 'add') {
     $sql = "INSERT INTO fun (userid, added, body, title, status) VALUES (".sqlesc($CURUSER['id']).",".sqlesc(date("Y-m-d H:i:s")).",".sqlesc($body).",".sqlesc($title).", 'normal')";
     sql_query($sql) or sqlerr(__FILE__, __LINE__);
     $Cache->delete_value('current_fun_content');
+    $Cache->delete_value('current_fun_content_https');
     $Cache->delete_value('current_fun_content_id');
     $Cache->delete_value('current_fun_content_neednew');
     $Cache->delete_value('current_fun_content_owner');
     $Cache->delete_value('current_fun', true);
-    $Cache->delete_value('current_fun_vote_count');
-    $Cache->delete_value('current_fun_vote_funny_count');
     $Cache->delete_value('current_fun_content_comment');
     $Cache->delete_value('current_fun_content_comment_delete');
 
@@ -152,6 +157,8 @@ else if ($action == 'edit') {
     $title = sqlesc($title);
     sql_query("UPDATE fun SET body=$body, title=$title WHERE id=".sqlesc($id)) or sqlerr(__FILE__, __LINE__);
     $Cache->delete_value('current_fun_content');
+    $Cache->delete_value('current_fun_content_https');
+    delete_file_cache($id);
     $Cache->delete_value('current_fun', true);
     header("Location: " . $returnto);
   }
@@ -185,9 +192,9 @@ else if ($action == 'ban') {
       sql_query("UPDATE fun SET status='banned' WHERE id=".sqlesc($id)) or sqlerr(__FILE__, __LINE__);
 
       $Cache->delete_value('current_fun_content');
+      $Cache->delete_value('current_fun_content_https');
+      delete_file_cache($id);
       $Cache->delete_value('current_fun', true);
-      $Cache->delete_value('current_fun_vote_count');
-      $Cache->delete_value('current_fun_vote_funny_count');
       $Cache->delete_value('current_fun_content_comment');
       $Cache->delete_value('current_fun_content_comment_delete');
 
@@ -225,22 +232,22 @@ else if ($action == 'vote') {
       sql_query("INSERT INTO funvotes (funid, userid, added, vote) VALUES (?, ?, ?, ?)", [$id, $CURUSER['id'], date("Y-m-d H:i:s"), $vote]);
       KPS("+",$funboxvote_bonus,$CURUSER['id']); //voter gets 1.0 bonus per vote
 
-      $Cache->delete_value('funvote_'.$id . '_' . $CURUSER['id']);
-      $totalvote = $Cache->get_value('current_fun_vote_count');
+      $Cache->cache_value('funvote_'.$id . '_' . $CURUSER['id'], true, 1800);
+      $totalvote = $Cache->get_value('fun_vote_count_'.$id);
       if ($totalvote === false){
 	$totalvote = get_row_count("funvotes", "WHERE funid = ?", [$id]);
       }
       else $totalvote++;
-      $Cache->cache_value('current_fun_vote_count', $totalvote, 756);
+      $Cache->cache_value('fun_vote_count_'.$id, $totalvote, 756);
 
-      $funvote = $Cache->get_value('current_fun_vote_funny_count');
+      $funvote = $Cache->get_value('fun_vote_funny_count_'.$id);
       if ($funvote === false){
 	$funvote = get_row_count("funvotes", "WHERE funid = ? AND vote='fun'", [$id]);
       }
       else if ($vote == 'fun') {
 	$funvote++;
       }
-      $Cache->cache_value('current_fun_vote_funny_count', $funvote, 756);
+      $Cache->cache_value('fun_vote_funny_count_'.$id, $funvote, 756);
 
       if ($totalvote) $ratio = $funvote / $totalvote; else $ratio = 1;
       if ($totalvote >= 20){

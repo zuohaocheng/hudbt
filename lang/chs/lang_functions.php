@@ -304,6 +304,11 @@ $lang_functions = array
 	'text_poll_votes' => "投票数：",
 	'text_until' => "至",
 	'text_keepers' => "保种组",
+	'submit_fun' => "有趣",
+	'submit_dull' => "无聊",
+	'text_out_of' => "个用户（共",
+	'text_people_found_it' => "票）认为它有趣。",
+	'text_your_opinion' => "你觉得呢？",
 );
 
-?>
+

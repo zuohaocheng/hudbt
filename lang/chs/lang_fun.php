@@ -15,10 +15,8 @@ $lang_fun = array
 	'text_submit_new_fun' => "提交新趣味内容",
 	'text_new_compose' => "新撰写",
 	'head_fun' => "趣味内容",
-	'text_on' => "于",
 	'text_blank' => "发布于",
 	'text_ago' => "以前",
-	'text_posted_by' => "由",
 	'text_not_funny' => "无聊",
 	'text_funny' => "有趣",
 	'text_very_funny' => "爆笑",
@@ -41,4 +39,3 @@ $lang_fun = array
 	'std_cannot_give_bonus' => "系统无法给趣味内容发布者奖励魔力值。请将该问题报告给管理员。",
 );
 
-?>
