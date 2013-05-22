@@ -527,7 +527,6 @@ if (!$all) {
 
 if (isset($searchstr)) {
   if (!$_GET['notnewword']){
-    insert_suggest($searchstr, $CURUSER['id']);
     $notnewword="";
   }
   else{
@@ -892,6 +891,9 @@ if ($count) {
 
   //将置顶的种子和非置顶种子合并
   $rows = array_merge($stickyrows, $normalrows);
+
+  // insert suggest only if there's result
+  insert_suggest($searchstr, $CURUSER['id']);
 }
 else {
   $rows = [];
