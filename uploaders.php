@@ -11,12 +11,6 @@ $year=date('Y');
 $month=0+$_GET['month'];
 if (!$month || $month<=0 || $month>12)
 $month=date('m');
-$order=$_GET['order'];
-if (!in_array($order, array('username', 'torrent_size', 'torrent_count')))
-	$order='username';
-if ($order=='username')
-	$order .=' ASC';
-else $order .= ' DESC';
 stdhead($lang_uploaders['head_uploaders']);
 
 $year2 = substr($datefounded, 0, 4);
@@ -64,35 +58,18 @@ else {
 	print("<th>".$lang_uploaders['col_last_upload_time']."</th>");
 	print("<th>".$lang_uploaders['col_last_upload']."</th>");
 	print("</tr></thead><tbody>");
-	$res = sql_query("SELECT users.id AS userid, users.username AS username, COUNT(torrents.id) AS torrent_count, SUM(torrents.size) AS torrent_size FROM torrents LEFT JOIN users ON torrents.owner=users.id WHERE users.class >= ".UC_UPLOADER." AND torrents.added > ".sqlesc($sqlstarttime)." AND torrents.added < ".sqlesc($sqlendtime)." GROUP BY userid ORDER BY ".$order);
-	$hasupuserid=array();
+	$res = sql_query('SELECT users.id AS userid, COUNT(1) AS torrent_count, SUM(torrents.size) AS torrent_size FROM users LEFT JOIN torrents ON users.id=torrents.owner AND torrents.added >? AND torrents.added <? WHERE users.class>=? GROUP BY users.id ORDER BY torrent_count DESC', [$sqlstarttime, $sqlendtime, UC_UPLOADER]);
 	while($row = _mysql_fetch_array($res))
 	{
 		$res2 = sql_query("SELECT torrents.id, torrents.name, torrents.added FROM torrents WHERE owner=".$row['userid']." ORDER BY id DESC LIMIT 1");
 		$row2 = _mysql_fetch_array($res2);
 		print("<tr>");
-		print("<td class=\"colfollow\">".get_username($row['userid'], false, true, true, false, false, true)."</td>");
+		print("<td class=\"colfollow\">".get_username($row['userid'])."</td>");
 		print("<td class=\"colfollow\">".($row['torrent_size'] ? mksize($row['torrent_size']) : "0")."</td>");
 		print("<td class=\"colfollow\">".$row['torrent_count']."</td>");
 		print("<td class=\"colfollow\">".($row2['added'] ? gettime($row2['added']) : $lang_uploaders['text_not_available'])."</td>");
 		print("<td class=\"colfollow\">".($row2['name'] ? "<a href=\"details.php?id=".$row2['id']."\">".htmlspecialchars($row2['name'])."</a>" : $lang_uploaders['text_not_available'])."</td>");
 		print("</tr>");
-		$hasupuserid[]=$row['userid'];
-		unset($row2);
-	}
-	$res3=sql_query("SELECT users.id AS userid, users.username AS username, 0 AS torrent_count, 0 AS torrent_size FROM users WHERE class >= ".UC_UPLOADER.(count($hasupuserid) ? " AND users.id NOT IN (".implode(",",$hasupuserid).")" : "")." ORDER BY username ASC") or sqlerr(__FILE__, __LINE__);
-	while($row = _mysql_fetch_array($res3))
-	{
-		$res2 = sql_query("SELECT torrents.id, torrents.name, torrents.added FROM torrents WHERE owner=".$row['userid']." ORDER BY id DESC LIMIT 1");
-		$row2 = _mysql_fetch_array($res2);
-		print("<tr>");
-		print("<td class=\"colfollow\">".get_username($row['userid'], false, true, true, false, false, true)."</td>");
-		print("<td class=\"colfollow\">".($row['torrent_size'] ? mksize($row['torrent_size']) : "0")."</td>");
-		print("<td class=\"colfollow\">".$row['torrent_count']."</td>");
-		print("<td class=\"colfollow\">".($row2['added'] ? gettime($row2['added']) : $lang_uploaders['text_not_available'])."</td>");
-		print("<td class=\"colfollow\">".($row2['name'] ? "<a href=\"details.php?id=".$row2['id']."\">".htmlspecialchars($row2['name'])."</a>" : $lang_uploaders['text_not_available'])."</td>");
-		print("</tr>");
-		$count++;
 		unset($row2);
 	}
 	print("</tbody></table>");
@@ -107,8 +84,9 @@ else {
   print("<table cellpadding=\"5\" class=\"no-vertical-line\" id=\"mods-works\"><thead><tr>");
   print("<th>".$lang_uploaders['col_username']."</th>");
   print("<th>".$lang_uploaders['col_log_num']."</th>");
-  /* print("<th>".$lang_uploaders['col_last_upload_time']."</th>"); */
-  /* print("<th>".$lang_uploaders['col_last_upload']."</th>"); */
+  print("<th>管理组信箱</th>");
+  print("<th>举报</th>");
+  print("<th>作弊</th>");
   print("</tr></thead><tbody>");
   $res = sql_query("SELECT id, username FROM users WHERE class >= ".UC_MODERATOR) or sqlerr(__FILE__, __LINE__);
 
@@ -116,7 +94,11 @@ else {
   while($row = _mysql_fetch_assoc($res)) {
     $username = $row['username'];
     $r = get_row_count('sitelog', "WHERE added > ".sqlesc($sqlstarttime)." AND added < ".sqlesc($sqlendtime)." AND txt LIKE '%" . $username . "%'");
-    echo '<tr><td>', get_username($row['id'], false, true, true, false, false, true), '</td><td><a href="log.php?query=' . $username . '">' . $r . '</a></td></tr>';
+    $msg = get_row_count('staffmessages', 'WHERE answeredby = ? AND added > ? AND added < ?', [$row['id'], $sqlstarttime, $sqlendtime]);
+    $reports = get_row_count('reports', 'WHERE dealtby = ? AND added > ? AND added < ?', [$row['id'], $sqlstarttime, $sqlendtime]);
+    $cheaters = get_row_count('cheaters', 'WHERE dealtby = ? AND added > ? AND added < ?', [$row['id'], $sqlstarttime, $sqlendtime]);
+	
+    echo '<tr><td>', get_username($row['id']), '</td><td><a href="log.php?action=dailylog&amp;query=' . $username . '">' . $r . '</a></td><td>' . $msg . '</td><td>' . $reports . '</td><td>' . $cheaters . '</td></tr>';
   }
   echo '</tbody></table>';
 }

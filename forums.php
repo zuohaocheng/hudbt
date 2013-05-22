@@ -721,18 +721,18 @@ SELECT id, rownum FROM (SELECT @x:=@x+1 AS rownum, id, userid FROM (SELECT @x:=0
 		print('<div id="forum-toolbox" class="minor-list"><ul>');
 		print("<li><form method=\"post\" action=\"?action=setsticky\">\n");
 		print("<input type=\"hidden\" name=\"topicid\" value=\"".$topicid."\" />\n");
-		print("<input type=\"hidden\" name=\"returnto\" value=\"".htmlspecialchars($_SERVER[REQUEST_URI])."\" />\n");
+		print("<input type=\"hidden\" name=\"returnto\" value=\"".htmlspecialchars($_SERVER['REQUEST_URI'])."\" />\n");
 		print("<input type=\"hidden\" name=\"value\" value=\"".($sticky ? 'no' : 'yes')."\" /><input type=\"submit\" class=\"medium\" value=\"".($sticky ? $lang_forums['submit_unsticky'] : $lang_forums['submit_sticky'])."\" /></form></li>\n");
 		
 		echo '<li><form method="POST" action="?action=setselected">';
 		print("<input type=\"hidden\" name=\"topicid\" value=\"".$topicid."\" />\n");
-		print("<input type=\"hidden\" name=\"returnto\" value=\"".htmlspecialchars($_SERVER[REQUEST_URI])."\" />\n");
+		print("<input type=\"hidden\" name=\"returnto\" value=\"".htmlspecialchars($_SERVER['REQUEST_URI'])."\" />\n");
 		print("<input type=\"hidden\" name=\"value\" value=\"".($selected ? 'no' : 'yes')."\" /><input type=\"submit\" class=\"medium\" value=\"".($selected ? $lang_forums['submit_unselected'] : $lang_forums['submit_selected'])."\" /></form></li>\n");
 		echo '</form></li>';
 		
 		print("<li><form method=\"post\" action=\"?action=setlocked\">\n");
 		print("<input type=\"hidden\" name=\"topicid\" value=\"".$topicid."\" />\n");
-		print("<input type=\"hidden\" name=\"returnto\" value=\"".htmlspecialchars($_SERVER[REQUEST_URI])."\" />\n");
+		print("<input type=\"hidden\" name=\"returnto\" value=\"".htmlspecialchars($_SERVER['REQUEST_URI'])."\" />\n");
 		print("<input type=\"hidden\" name=\"locked\" value=\"".($locked ? 'no' : 'yes')."\" /><input type=\"submit\" class=\"medium\" value=\"".($locked ? $lang_forums['submit_unlock'] : $lang_forums['submit_lock'])."\" /></form></li>\n");
 
 		print("<li><form method=\"get\" action=\"?\">\n");
@@ -801,7 +801,7 @@ SELECT id, rownum FROM (SELECT @x:=@x+1 AS rownum, id, userid FROM (SELECT @x:=0
 <option style='background-color: plum' value=\"39\">Plum</option>
 <option style='background-color: white' value=\"40\">White</option>");
 		print("</select>");
-		print("<input type=\"hidden\" name=\"returnto\" value=\"".htmlspecialchars($_SERVER[REQUEST_URI])."\" />\n");
+		print("<input type=\"hidden\" name=\"returnto\" value=\"".htmlspecialchars($_SERVER['REQUEST_URI'])."\" />\n");
 		print("<input type=\"submit\" class=\"medium\" value=\"".$lang_forums['submit_change']."\" /></form></li>");
 		print('</ul></div>');	
 }

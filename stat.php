@@ -2,6 +2,9 @@
 // Check usage of something
 // Can be used in JavaScript like
 // `$.get('stat.php?type=xxx&arg[]=yyy&arg=zzz')`
+// Or in html(php)
+// <a href="stat.php?type=xxx&arg[]=yyy&redir=target.php%3Faction..."
+// PHP: <a href="{make_stat_url('target.php?action...', 'xxx', ['yyy', 'zzz'])}"
 // Time & args will be recorded in `log/xxx.log`
 
 $filename = $_REQUEST['type'];
@@ -30,3 +33,6 @@ if (!$h) {
 fwrite($h, $text);
 fclose($h);
 
+if (isset($_REQUEST['redir'])) {
+  header("Location: ".$_REQUEST['redir']);
+}

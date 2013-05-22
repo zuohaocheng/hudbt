@@ -10,7 +10,7 @@ function printProgress($msg) {
     echo '<br />';
   }
   else {
-    echo "\n";
+    echo ' ' . microtime(true) . "\n";
   }
   ob_flush();
   flush();
@@ -40,8 +40,6 @@ function docleanup($forceAll = 0, $printProgress = false) {
 		printProgress('update peer status');
 	}
 //11.calculate seeding bonus
-	$res = sql_query("SELECT DISTINCT userid FROM peers WHERE seeder = 'yes'") or sqlerr(__FILE__, __LINE__);
-	if (_mysql_num_rows($res) > 0)
 	{
 		$sqrtof2 = sqrt(2);
 		$logofpointone = log(0.1);
@@ -49,30 +47,22 @@ function docleanup($forceAll = 0, $printProgress = false) {
 		$pi = 3.141592653589793;
 		$valuetwo = $bzero_bonus * ( 2 / $pi);
 		$valuethree = $logofpointone / ($nzero_bonus - 1);
-		$timenow = TIMENOW;
-		$sectoweek = 7*24*60*60;
-		while ($arr = _mysql_fetch_assoc($res))	//loop for different users
-		{
-			$A = 0;
-			$count = 0;
-			$all_bonus = 0;
-			$torrentres = sql_query("select torrents.added, torrents.size, torrents.seeders from torrents LEFT JOIN peers ON peers.torrent = torrents.id WHERE peers.userid = $arr[userid] AND peers.seeder ='yes'")  or sqlerr(__FILE__, __LINE__);
-			while ($torrent = _mysql_fetch_array($torrentres))
-			{
-				$weeks_alive = ($timenow - strtotime($torrent[added])) / $sectoweek;
-				$gb_size = $torrent[size] / 1073741824;
-				$temp = (1 - exp($valueone * $weeks_alive)) * $gb_size * (1 + $sqrtof2 * exp($valuethree * ($torrent[seeders] - 1)));
-				$A += $temp;
-				$count++;
-			}
-			if ($count > $maxseeding_bonus)
-				$count = $maxseeding_bonus;
-			$all_bonus = ($valuetwo * atan($A / $l_bonus) + ($perseeding_bonus * $count)) / (3600 / $autoclean_interval_one);
-			$is_donor = get_single_value("users","donor","WHERE id=".$arr['userid']);
-			if ($is_donor == 'yes' && $donortimes_bonus > 0)
-				$all_bonus = $all_bonus * $donortimes_bonus;
-			KPS("+",$all_bonus,$arr["userid"]);
-		}
+
+		$args = compact(['valueone', 'valuetwo', 'valuethree', 'l_bonus', 'perseeding_bonus',  'maxseeding_bonus', 'donortimes_bonus']);
+		$args['aio'] = 3600/$autoclean_interval_one;
+		$args['sqrt'] = sqrt(2);
+		
+		sql_query('UPDATE users dest, (SELECT (((:valuetwo * ATAN(
+ SUM((1- EXP(:valueone - 
+       (UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(torrents.added))/604800)
+       ) * (torrents.size / 1073741824) *
+       (1 + :sqrt * EXP(:valuethree * (torrents.seeders - 1))))
+/ :l_bonus)) + 
+       (:perseeding_bonus * LEAST(COUNT(1), :maxseeding_bonus))) / :aio) AS bonus,
+       peers.userid AS id
+   FROM torrents LEFT JOIN peers ON peers.torrent = torrents.id 
+   WHERE peers.seeder ="yes" GROUP BY peers.userid) src 
+SET dest.seedbonus = dest.seedbonus + src.bonus * IF(dest.donor = "yes", :donortimes_bonus, 1) WHERE dest.id = src.id', $args);
 	}
 	if ($printProgress) {
 		printProgress('calculate seeding bonus');
@@ -113,37 +103,9 @@ function docleanup($forceAll = 0, $printProgress = false) {
 	}
 
 	//4.update count of seeders, leechers, comments for torrents
-	$torrents = array();
-	$res = sql_query("SELECT torrent, seeder, COUNT(*) AS c FROM peers GROUP BY torrent, seeder") or sqlerr(__FILE__, __LINE__);
-	while ($row = _mysql_fetch_assoc($res)) {
-		if ($row["seeder"] == "yes")
-		$key = "seeders";
-		else
-		$key = "leechers";
-		$torrents[$row["torrent"]][$key] = $row["c"];
-	}
-
-	$res = sql_query("SELECT torrent, COUNT(*) AS c FROM comments GROUP BY torrent") or sqlerr(__FILE__, __LINE__);
-	while ($row = _mysql_fetch_assoc($res)) {
-		$torrents[$row["torrent"]]["comments"] = $row["c"];
-	}
-	$fields = explode(":", "comments:leechers:seeders");
-	$res = sql_query("SELECT id, seeders, leechers, comments FROM torrents") or sqlerr(__FILE__, __LINE__);
-	while ($row = _mysql_fetch_assoc($res)) {
-		$id = $row["id"];
-		$torr = $torrents[$id];
-		foreach ($fields as $field) {
-			if (!isset($torr[$field]))
-			$torr[$field] = 0;
-		}
-		$update = array();
-		foreach ($fields as $field) {
-			if ($torr[$field] != $row[$field])
-			$update[] = "$field = " . $torr[$field];
-		}
-		if (count($update))
-		sql_query("UPDATE torrents SET " . implode(",", $update) . " WHERE id = $id") or sqlerr(__FILE__, __LINE__);
-	}
+	sql_query('UPDATE LOW_PRIORITY torrents dest, (SELECT torrent, COUNT(1) AS c FROM comments GROUP BY torrent) src SET dest.comments = src.c WHERE dest.id = src.torrent');
+	sql_query('UPDATE LOW_PRIORITY torrents dest, (SELECT torrent, COUNT(1) AS c FROM peers WHERE seeder="yes" GROUP BY torrent) src SET dest.seeders = src.c WHERE dest.id = src.torrent');
+	sql_query('UPDATE LOW_PRIORITY torrents dest, (SELECT torrent, COUNT(1) AS c FROM peers WHERE seeder="no" GROUP BY torrent) src SET dest.leechers = src.c WHERE dest.id = src.torrent');
 	if ($printProgress) {
 		printProgress("update count of seeders, leechers, comments for torrents");
 	}
@@ -585,18 +547,7 @@ function user_to_peasant($down_floor_gb, $minratio){
 	}
 
 	//17.update total seeding and leeching time of users
-	$res = sql_query("SELECT * FROM users") or sqlerr(__FILE__, __LINE__);
-	while($arr = _mysql_fetch_assoc($res))
-	{
-		//die("s" . $arr['id']);
-		$res2 = sql_query("SELECT SUM(seedtime) as st, SUM(leechtime) as lt FROM snatched where userid = " . $arr['id'] . " LIMIT 1") or sqlerr(__FILE__, __LINE__);
-		$arr2 = _mysql_fetch_assoc($res2) or sqlerr(__FILE__, __LINE__);
-		
-		//die("ss" . $arr2['st']);
-		//die("sss" . "UPDATE users SET seedtime = " . $arr2['st'] . ", leechtime = " . $arr2['lt'] . " WHERE id = " . $arr['id']);
-		
-		sql_query("UPDATE users SET seedtime = " . intval($arr2['st']) . ", leechtime = " . intval($arr2['lt']) . " WHERE id = " . $arr['id']) or sqlerr(__FILE__, __LINE__);
-	}
+	sql_query("UPDATE LOW_PRIORITY users dest, (SELECT userid, SUM(seedtime) AS st, SUM(leechtime) AS lt FROM snatched GROUP BY userid) src SET dest.seedtime = src.st, dest.leechtime = src.lt WHERE dest.id = src.userid");
 	if ($printProgress) {
 		printProgress("update total seeding and leeching time of users");
 	}
@@ -606,7 +557,7 @@ function user_to_peasant($down_floor_gb, $minratio){
 		$length = $deldeadtorrent_torrent*86400;
 		$until = date("Y-m-d H:i:s",(TIMENOW - $length));
 		$dt = sqlesc(date("Y-m-d H:i:s"));
-		$res = sql_query("SELECT id, name, owner FROM torrents WHERE visible = 'no' AND last_action < ".sqlesc($until)." AND seeders = 0 AND leechers = 0") or sqlerr(__FILE__, __LINE__);
+		$res = sql_query("SELECT id FROM torrents WHERE visible = 'no' AND last_action < ".sqlesc($until)." AND seeders = 0 AND leechers = 0") or sqlerr(__FILE__, __LINE__);
 		App::uses('Torrent', 'Model');
 		while($arr = _mysql_fetch_assoc($res)) {
 		  $Torrent = new Torrent();
@@ -755,8 +706,9 @@ while($updateList = _mysql_fetch_assoc($updateList_res)){
 		$delids = array();
 		while ($row = _mysql_fetch_array($res)) {
 			$id = $row[0];
-			if ($ar[$id])
-			continue;
+			if (isset($ar[$id]) && $ar[$id]) {
+			  continue;
+			}
 			$delids[] = $id;
 		}
 		if (count($delids))

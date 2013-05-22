@@ -9,7 +9,7 @@
       <div style="margin-top: 10px; margin-bottom: 30px; text-align: center;" id="tech-stats">
 	(c) <a href="{get_protocol_prefix()}{$BASEURL}" target="_self">{$SITENAME}</a>{$icplicense_main}{if date("Y") != $yearfounded}{$yearfounded}-{/if}{$smarty.now|date_format:"%Y"} {$VERSION}<br /><br />
       {nocache}
-	[page created in <b> {$totaltime} @ {$alltotaltime} </b> sec with <b>{count($queries)}</b> db queries, <b>{$Cache->getCacheReadTimes()}</b> reads and <b>{$Cache->getCacheWriteTimes()} </b> writes of memcached and <b>{mksize(memory_get_usage())}</b> ram]
+	[page created in <b> {$totaltime} @ {$alltotaltime} </b> sec with <b>{count($queries)}</b> db queries, <b>{$Cache->getCacheReadTimes()}</b> reads and <b>{$Cache->getCacheWriteTimes()} </b> writes of memcached and <b>{mksize(memory_get_peak_usage(true))}</b> ram]
       </div>
       {if $details}
       <div id="sql_debug">

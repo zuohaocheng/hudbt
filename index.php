@@ -132,7 +132,7 @@ if ($showextinfo['imdb'] == 'yes' && ($showmovies['hot'] == "yes" || $showmovies
 		    $allImdb = array();
 		    while($array = _mysql_fetch_array($res))
 		      {
-			$pro_torrent = get_torrent_promotion_append($array[sp_state],'word');
+			$pro_torrent = get_torrent_promotion_append($array['sp_state'],'word');
 			if ($imdb_id = parse_imdb_id($array["url"]))
 			  {
 			    if (array_search($imdb_id, $allImdb) !== false) { //a torrent with the same IMDb url already exists

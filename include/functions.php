@@ -2045,6 +2045,8 @@ function stdhead($title = "", $msgalert = true, $script = "", $place = "") {
   $tstart = getmicrotime(); // Start time
 
   header("Content-Type: text/html; charset=utf-8; Cache-control:private");
+  header('X-Frame-Options:SAMEORIGIN');
+  header('X-UA-Compatible:edge');
   //header("Pragma: No-cache");
   if ($title == "")
     $title = $SITENAME;
@@ -2671,13 +2673,13 @@ function user_class_image($class) {
 function post_author_toolbox($arr2) {
   global $lang_functions;
   global $BASEURL;
-  
   $secs = 900;
   $dt = sqlesc(date("Y-m-d H:i:s",(TIMENOW - $secs))); // calculate date.
 
   $online_status = ("'".$arr2['last_access']."'") > $dt ? "<img class=\"f_online\" src=\"//$BASEURL/pic/trans.gif\" alt=\"Online\" title=\"".$lang_functions['title_online']."\" />":"<img class=\"f_offline\" src=\"//$BASEURL/pic/trans.gif\" alt=\"Offline\" title=\"".$lang_functions['title_offline']."\" />";
-	  
-  $toolbox_user = '<li>' . $online_status . "</li><li><a href=\"sendmessage.php?receiver=".htmlspecialchars(trim($arr2["id"]))."\"><img class=\"f_pm\" src=\"//$BASEURL/pic/trans.gif\" alt=\"PM\" title=\"".$lang_functions['title_send_message_to'].htmlspecialchars($arr2["username"])."\" /></a></li>";
+
+  $url = 'sendmessage.php?receiver='.$arr2["id"];
+  $toolbox_user = '<li>' . $online_status . "</li><li><a href=\"".htmlspecialchars($url)."\"><img class=\"f_pm\" src=\"//$BASEURL/pic/trans.gif\" alt=\"PM\" title=\"".$lang_functions['title_send_message_to'].htmlspecialchars($arr2["username"])."\" /></a></li>";
   return $toolbox_user;
 }
 
@@ -3446,8 +3448,9 @@ foreach($rows as $row)
     if (!$row["comments"]) {
       print("<a href=\"//$BASEURL/comment.php?action=add&amp;pid=".$id."&amp;type=torrent\" title=\"".$lang_functions['title_add_comments']."\">" . $row["comments"] .  "</a>");
     } else {
-      if ($enabletooltip_tweak == 'yes')
-      {
+      $onmouseover = "";
+
+      if ($enabletooltip_tweak == 'yes') {
         if (!$lastcom = $Cache->get_value('torrent_'.$id.'_last_comment_content')){
           $res2 = sql_query("SELECT user, added, text FROM comments WHERE torrent = $id ORDER BY id DESC LIMIT 1");
           $lastcom = _mysql_fetch_array($res2);
@@ -3464,7 +3467,6 @@ foreach($rows as $row)
         }
       } else {
         $hasnewcom = false;
-        $onmouseover = "";
       }
       print("<b><a href=\"//$BASEURL/details.php?id=".$id."&amp;hit=1&amp;cmtpage=1#startcomments\" ".$onmouseover.">". ($hasnewcom ? "<span class='new'>" : ""). $row["comments"] .($hasnewcom ? "</span>" : ""). "</a></b>");
       if ($hasnewcom) {
@@ -4152,16 +4154,7 @@ function get_torrent_promotion_append($promotion = 1,$forcemode = "",$showtimele
   $prDict = $promotion_text[$pr_state -1];
   $text = $lang_functions[$prDict['lang']];
 
-  if ($forcemode != '') {
-    $mode = $forcemode;
-  }
-  else {
-    $mode = 'icon';
-  }
-
-if ($mode == 'icon') {
-    $ret = '<img class="' . $prDict['name'] . '" alt="' . $text .'"title="'.$cexpire.'" src="//' . $BASEURL . '/pic/trans.gif" />';
-  }
+  $ret = '<img class="' . $prDict['name'] . '" alt="' . $text .'"title="'.$cexpire.'" src="//' . $BASEURL . '/pic/trans.gif" />';
   return $ret;
 }
 
@@ -4756,13 +4749,12 @@ function get_fun($id = 0, $pager_count = null) {
     $time = $lang_functions['text_on'].$row['added'];
 
     $content = '<div class="page-titles"><h3><a href="//' . $BASEURL . '/fun.php?id=' . $id . '">'.$row['title'].'</a></h3><h4>'.$lang_functions['text_posted_by'];
-    $content .= $username . $time;
+    $content .= $username . ' ' . $time;
     $content .= '</h4></div>';
-    if (is_null($pager_count) && !$https) {
-      $content .= '<div id="funbox-content">';
-    }
     $body = format_comment($row['body'], true, true, true);
-    if ($https) {
+
+    // embed tag of http in https is often not allowed
+    if ($https && strstr($body, '<embed') && strstr($body, 'src="http://')) {
       $filename = 'cache/funbox-' . $id . '.html';
       if (!is_null($pager_count)) {
 	$height = '700px';
@@ -4777,12 +4769,16 @@ function get_fun($id = 0, $pager_count = null) {
       }
     }
     else {
+      if (is_null($pager_count)) {
+	$content .= '<div id="funbox-content">';
+      }
       $content .= $body;
+      if (is_null($pager_count)) {
+	$content .= "</div>";
+      }
     }
     
-    if (is_null($pager_count) && !$https) {
-      $content .= "</div>";
-    }
+
     if ($is_cache) {
       $Cache->cache_value($key, $content, 900);
       $Cache->cache_value('current_fun_content_id', $id, 900);
@@ -4920,4 +4916,13 @@ function add_space_between_words($str) {
   }
   mb_internal_encoding($oldEncoding);
   return $out;
+}
+
+// Use for stat w/ stat.php
+function make_stat_url($url, $type, $args=[]) {
+  global $BASEURL;
+  $a = ['redir' => $url,
+	'type' => $type,
+	'arg' => $args];
+  return '//' . $BASEURL . '/stat.php?' . http_build_query($a);
 }

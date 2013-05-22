@@ -119,7 +119,7 @@ function generate_key($name, $type, $multiple, $user = null) {
 }
 
 function load_files_cache($name, $type, $debug, $purge) {
-  global $Cache;
+  global $Cache, $CURUSER;
   global $cache_key, $user;
   global $rootpath, $SITENAME;
   $key = $cache_key;
@@ -172,6 +172,7 @@ function load_files_cache($name, $type, $debug, $purge) {
     }
   }
   elseif ($type == 'css') {
+    $out = '';
     if ($user) {
       App::uses('User', 'Model');
       $User = new User;
@@ -179,9 +180,6 @@ function load_files_cache($name, $type, $debug, $purge) {
       $js = $User->read('Property.css', $User->id);
       if ($js) {
 	$out = $js['Property']['css'];
-      }
-      else {
-	$out = '';
       }
     }
     else {

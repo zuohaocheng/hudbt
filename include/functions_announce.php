@@ -287,7 +287,7 @@ function check_client($peer_id, $agent) {
 	return [0, $agent_familyid];
       }
       else {
-	return ["This client does not support https well, Please goto $BASEURL/faq.php#id29 for a list of proper clients"];
+	return ["This client does not support https well, Please goto $BASEURL/faq.php#id505 for a list of proper clients"];
       }
     }
     else {
@@ -299,7 +299,7 @@ function check_client($peer_id, $agent) {
       return [$low_version, $agent_familyid];
     }
     else {
-      return ["Banned Client, Please goto $BASEURL/faq.php#id29 for a list of acceptable clients"];
+      return ["Banned Client, Please goto $BASEURL/faq.php#id505 for a list of acceptable clients"];
     }
   }
 }

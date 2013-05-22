@@ -8,10 +8,10 @@ $(function() {
     isManager = (parseInt(hb.config.user['class']) >= hb.constant.torrentmanage_class),
     $document = $(document),
     $window = $(window),
-    ie = $.browser.msie,
+    ie = $.browser.msie && $.browser.version < 10,
     jqxhr, abortflag = false,
 
-    History = !ie,
+    History = ('pushState' in window.history),
     errCount = 0,
 
     args = argsFromUri(window.location.search),
@@ -191,24 +191,24 @@ $(function() {
 	};
     })(),
 
-    //Auto filling width
-    //CAUTION: This method have critical problems in performance under ie
-    setTitleWidth;
-    if (ie) {
-    	setTitleWidth = function(targets) {
-    	    return false;
-    	}
-    }
-    else {
-	var modifyCss = function(wThis, target, wDecorations) {
-	    var ref = wThis - wDecorations - 6;
-	    if (target[0].offsetWidth > ref) {
-		target.css('width', ref + 'px');
-	    }
+    queue = [],
+    modifyCss = function(wThis, target, wDecorations) {
+	var ref = wThis - wDecorations - 6;
+	if (target.offsetWidth > ref) {
+	    queue.push([target, ref]);
 	}
+    },
+    commit = function() {
+	$.each(queue, function() {
+	    var target = this[0], 
+	    ref = this[1];
+	    target.style.width = ref + 'px';
+	});
+	queue = [];
+    },
 
-	setTitleWidth = function(targets) {
-	    //console.profile();
+    setTitleWidth = function(targets) {
+	var t = function() {
 	    targets.each(function() {
 		var $this = $(this),
 		wThis = $this.width(),
@@ -230,12 +230,19 @@ $(function() {
 		    wDescD += pr1.offsetWidth;
 		}
 
-		modifyCss(wThis, $this.find('h2'), wTitleD);
+		modifyCss(wThis, $this.find('h2')[0], wTitleD);
 	    });
-	    //console.profileEnd();
+	    commit();
 	};
-	setTitleWidth($('td.torrent div.limit-width.minor-list'));
-    }
+	if (ie) {
+	    // This method costs a lot in IE
+	    setTimeout(t, 50);
+	}
+	else {
+	    t();
+	}
+    };
+    setTitleWidth($('td.torrent div.limit-width.minor-list'));
 
     //Handling quick delete
     if (isManager) {
@@ -281,9 +288,7 @@ $(function() {
 
 	loader(false);
 	var newRows = (tableLength == -1) ? target.find('tr') : target.find('tr:gt(' + tableLength + ')');
-	if (!ie) {
-	    setTitleWidth(newRows.find('div.limit-width.minor-list'));
-	}
+	setTitleWidth(newRows.find('div.limit-width.minor-list'));
 
 	var cont = res['continue'];
 	if (cont && !disableAutoPaging) {

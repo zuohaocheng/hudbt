@@ -228,23 +228,25 @@ class NPCache {
 
 	// Wrapper for Memcache::get. Why? Because wrappers are cool.
 	function get_value($Key, $duration = 3600, $v_block = null) {
-		if($this->getClearCache()){
-			$this->delete_value($Key);
-			return false;
-		}
-		// If we've locked it
-		// Xia Zuojie: we disable the following lock feature 'cause we don't need it and it doubles the time to fetch a value from a key
-		/*while($Lock = $this->get('lock_'.$Key)){
-			sleep(2);
-		}*/
-
-		$Return = Cache::read($Key);
-		$this->cacheReadTimes++;
-		if (array_key_exists($Key, $this->keyHits['read'])) {
-		  $this->keyHits['read'][$Key] += 1;
+		if ($this->getClearCache()) {
+		  $this->delete_value($Key);
+		  $Return = false;
 		}
 		else {
-		  $this->keyHits['read'][$Key] = 1;
+		  // If we've locked it
+		  // Xia Zuojie: we disable the following lock feature 'cause we don't need it and it doubles the time to fetch a value from a key
+		  /*while($Lock = $this->get('lock_'.$Key)){
+		    sleep(2);
+		    }*/
+
+		  $Return = Cache::read($Key);
+		  $this->cacheReadTimes++;
+		  if (array_key_exists($Key, $this->keyHits['read'])) {
+		    $this->keyHits['read'][$Key] += 1;
+		  }
+		  else {
+		    $this->keyHits['read'][$Key] = 1;
+		  }
 		}
 
 		if ($Return === false && is_callable($v_block)) {
