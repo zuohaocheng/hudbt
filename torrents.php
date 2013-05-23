@@ -65,7 +65,6 @@ if (empty($searchstr)) {
 }
 else {
   $searchstr_ori = htmlspecialchars($searchstr);
-  $searchstr = add_space_between_words($searchstr);
 }
 
 // sorting by MarkoStamcar
@@ -91,13 +90,13 @@ else {
 }
 
 if($column == "owner") {
-  $orderby = "ORDER BY torrents.anonymous, users.username " . $ascdesc;
+  $orderby[] = "torrents.anonymous, users.username " . $ascdesc;
 }
 else {
-  $orderby = "ORDER BY torrents." . $column . " " . $ascdesc;
+  $orderby[] = "torrents." . $column . " " . $ascdesc;
 }
 
-if ($_GET['sort'] && $_GET['type']) {
+if (isset($_GET['sort']) && isset($_GET['type'])) {
   $pagerlink = "sort=" . intval($_GET['sort']) . "&type=" . $linkascdesc . "&";
 }
 else {
@@ -525,37 +524,44 @@ if (!$all) {
 }
 
 
-if (isset($searchstr)) {
+if (isset($searchstr)) {  
   if (!$_GET['notnewword']){
     $notnewword="";
   }
   else{
     $notnewword="notnewword=1&";
   }
-  $search_mode = 0 + $_GET["search_mode"];
-  if (!in_array($search_mode,array(0,1,2,3)))
-    {
-      $search_mode = 0;
-      #	write_log("User " . $CURUSER["username"] . "," . $CURUSER["ip"] . " is hacking search_mode field in" . $_SERVER['SCRIPT_NAME'], 'mod');
-    }
 
   $search_area = 0 + $_GET["search_area"];
+  if (!in_array($search_area,array(0,1,3,4))) {
+    $search_area = 0;
+  }
 
-  if ($search_area == 4) {
-    $searchstr = (int)parse_imdb_id($searchstr);
+  if ($search_area < 2) {
+    // Expand only search title or descr
+    $searchstr = add_space_between_words($searchstr);
+    $search_mode = 0;
+  }
+  else {
+    if ($search_area == 3 || $search_area == 4) {
+      $search_mode = 3; // Use exact mode searching username or imdb
+      if ($search_area == 4) {
+	$searchstr = (int)parse_imdb_id($searchstr);
+      }
+    }
   }
 
   unset($like_expression_array);
   $matches = [];
   $likes = [];
   $exact = [];
-  $ANDOR = ($search_mode == 0 ? " AND " : " OR ");	// only affects mode 0 and mode 1
+
   function canMatch($a) {
     $len = strlen($a);
     $allAlnum = true;
     for ($i = 0; $i < $len; ++$i) {
       $ch = $a[$i];
-      if (!ctype_alnum($ch)) {
+      if (!ctype_alnum($ch) && $ch != '-') {
 	$allAlnum = false;
 	break;
       }
@@ -565,6 +571,9 @@ if (isset($searchstr)) {
     
   function addToken($token, $exact_flag = false) {
     global $matches, $likes, $exact;
+    if (empty($token)) {
+      return;
+    }
     if ($exact_flag) {
       $exact[] = $token;
     }
@@ -577,53 +586,131 @@ if (isset($searchstr)) {
   };
     
   function generateMatchSql($fields, $canUseMatch) {
-    global $matches, $likes, $exact, $args, $ANDOR;
+    global $matches, $likes, $exact;
+    $search_args = [];
     $out = [];
     $counter = 0;
+    $allnot = true;
     if ($canUseMatch) {
       if (count($matches)) {
-	if ($ANDOR == ' AND ') {
-	  $matches = array_map(function($o) {return '+' . $o;}, $matches);
+	$matches = array_filter(array_map(function($o) use (&$allnot) {
+	      if ($o[0] == '-') {
+		if (strlen($o) == 1) {
+		  return null;
+		}
+		$minus = true;
+		$o = substr($o, 1);
+	      }
+	      else {
+		$minus = false;
+	      }
+
+	      if (stopwords($o)) {
+		return null;
+	      }
+
+	      $single = Inflector::singularize($o);
+	      $plural = Inflector::pluralize($o);
+	      $both = ($single != $plural && ($single == $o || $plural == $o));
+
+	      if ($minus) {
+		if ($both) {
+		  return '-(' . $single . ' -' . $plural . ')';
+		}
+		else {
+		  return '-(' . $o . ')';
+		}
+	      }
+	      else {
+		$allnot = false;
+		if ($both) {
+		  if ($single == $o) {
+		    $o_other = $plural;
+		  }
+		  else if ($plural == $o) {
+		    $o_other = $single;
+		  }
+		}
+		
+		if ($both) {
+		  // Rank original search in first
+		  return '+(>' . $o . ',<' . $o_other . ')';
+		}
+		else {
+		  return '+(' . $o . ')';
+		}
+	      }
+	    }, $matches));
+
+	if (!empty($matches)) {
+	  $match = 'MATCH(' . implode(',', $fields) . ') AGAINST (:matches IN BOOLEAN MODE)';
+	  $out[] = $match;
+	  $search_args[':matches'] = implode(' ', $matches);
+	  global $column, $orderby;
+	  if ($column == 'id') {
+	    array_unshift($orderby, $match . ' DESC');
+	  }
 	}
-	$out[] = 'MATCH(' . implode(',', $fields) . ') AGAINST (:matches IN BOOLEAN MODE)';
-	$args[':matches'] = implode(' ', $matches);
       }
     }
     else {
       $likes = array_merge($matches, $likes);
     }
-    $likes = array_map(function($o) use (&$counter) {
-	global $args;
-	$key = ':like' . $counter;
-	$args[$key] = '%' . $o . '%';
-	$counter += 1;
-	return 'LIKE ' . $key;
+    $likes = array_map(function($o) use (&$counter, &$allnot, &$search_args) {
+	if ($o[0] == '-') {
+	  $o = substr($o, 1);
+	  $not =true;
+	}
+	else {
+	  $not = false;
+	  $allnot = false;
+	}
+	
+	if (strlen($o) > 0) {
+	  $key = ':like' . $counter;
+	  $search_args[$key] = '%' . $o . '%';
+	  $counter += 1;
+	  if ($not) {
+	    return 'NOT LIKE ' . $key ;
+	  }
+	  else {
+	    return 'LIKE ' . $key;
+	  }
+	}
+	return null;
       }, $likes);
-    $exact = array_map(function($o) use (&$counter) {
-	global $args;
+    $exact = array_map(function($o) use (&$counter, &$search_args) {
 	$key = ':eq' . $counter;
-	$args[$key] = '%' . $o . '%';
+	$search_args[$key] =  $o;
 	$counter += 1;
 	return '= ' . $key;
       }, $exact);
 
-    $likes_sql = implode($ANDOR, array_map(function($o) use ($fields) {
+    $likes_sql = implode('AND', array_map(function($o) use ($fields) {
 	  return '(' . implode(' OR ', array_map(function($field) use ($o) {
 		return $field . ' ' . $o;
 	      }, $fields)) . ')';
-	}, array_merge($likes, $exact)));
+	}, array_filter(array_merge($likes, $exact))));
+    
     if ($likes_sql) {
       $out[] = $likes_sql;
     }
-    return implode($ANDOR, $out);
+    
+    if (!$allnot || count($exact)) { // Don't output where if all keywords is negative
+      global $args;
+      $args = array_merge($args, $search_args);
+    }
+    else {
+      $out = [];
+    }
+
+    return implode('AND', $out);
   };
 
-    
   switch ($search_mode) {
-  case 0:	// AND, OR
-  case 1	:
-    {
-      $searchstr = str_replace(".", " ", $searchstr);
+  case 0:	// Normal
+    { 
+      $searchstr = preg_replace("![^-\w\d\s]!u", " ", $searchstr);
       $searchstr_exploded = explode(" ", $searchstr);
       $searchstr_exploded_count= 0;
       foreach ($searchstr_exploded as $searchstr_element) {
@@ -635,16 +722,11 @@ if (isset($searchstr)) {
       }
       break;
     }
-  case 2	: {	// single match
-    addToken($searchstr);
-    break;
-  }
-  case 3 : {	// exact
+  case 3 : {	// exact, using equal
     addToken($searchstr, true);
     break;
   }
   }
-
 
   switch ($search_area) {
   case 0 : {	// torrent name
@@ -655,13 +737,6 @@ if (isset($searchstr)) {
     $wherea[] =  generateMatchSql(['torrents.descr'], false);
     break;
   }
-    /*case 2	:	// torrent small description
-      {
-      foreach ($like_expression_array as &$like_expression_array_element)
-      $like_expression_array_element =  "torrents.small_descr". $like_expression_array_element;
-      $wherea[] =  implode($ANDOR, $like_expression_array);
-      break;
-      }*/
   case 3 : {	// torrent uploader
     $basic =  generateMatchSql(['users.username'], false);
     //show all for manager
@@ -692,7 +767,6 @@ if (isset($searchstr)) {
   }
   $addparam .= "search_area=" . $search_area . "&";
   $addparam .= "search=" . rawurlencode($searchstr) . "&".$notnewword;
-  $addparam .= "search_mode=".$search_mode."&";
 }
 else {
   $search_area = 0;
@@ -721,6 +795,10 @@ function generateWhere($wherea) {
 }
 $wherea = array_filter($wherea);
 $where = generateWhere($wherea);
+
+if (isset($orderby)) {
+  $orderby = 'ORDER BY ' . implode(',', $orderby);
+}
 
 $sql_extra = $joins . $where;
 $sql_args = $sql_extra . serialize($args);
@@ -893,7 +971,9 @@ if ($count) {
   $rows = array_merge($stickyrows, $normalrows);
 
   // insert suggest only if there's result
-  insert_suggest($searchstr, $CURUSER['id']);
+  if (isset($searchstr)) {
+    insert_suggest($searchstr, $CURUSER['id']);
+  }
 }
 else {
   $rows = [];
@@ -938,3 +1018,548 @@ else {
 /* 	echo $ttimer; */
 /* } */
 
+function stopwords($w) {
+  static $stopwords = [
+   "able" => true,
+   "about" => true,
+   "above" => true,
+   "according" => true,
+   "accordingly" => true,
+   "across" => true,
+   "actually" => true,
+   "after" => true,
+   "afterwards" => true,
+   "again" => true,
+   "against" => true,
+   "aint" => true,
+   "all" => true,
+   "allow" => true,
+   "allows" => true,
+   "almost" => true,
+   "alone" => true,
+   "along" => true,
+   "already" => true,
+   "also" => true,
+   "although" => true,
+   "always" => true,
+   "am" => true,
+   "among" => true,
+   "amongst" => true,
+   "an" => true,
+   "and" => true,
+   "another" => true,
+   "any" => true,
+   "anybody" => true,
+   "anyhow" => true,
+   "anyone" => true,
+   "anything" => true,
+   "anyway" => true,
+   "anyways" => true,
+   "anywhere" => true,
+   "apart" => true,
+   "appear" => true,
+   "appreciate" => true,
+   "appropriate" => true,
+   "are" => true,
+   "arent" => true,
+   "around" => true,
+   "as" => true,
+   "aside" => true,
+   "ask" => true,
+   "asking" => true,
+   "associated" => true,
+   "at" => true,
+   "available" => true,
+   "away" => true,
+   "awfully" => true,
+   "be" => true,
+   "became" => true,
+   "because" => true,
+   "become" => true,
+   "becomes" => true,
+   "becoming" => true,
+   "been" => true,
+   "before" => true,
+   "beforehand" => true,
+   "behind" => true,
+   "being" => true,
+   "believe" => true,
+   "below" => true,
+   "beside" => true,
+   "besides" => true,
+   "best" => true,
+   "better" => true,
+   "between" => true,
+   "beyond" => true,
+   "both" => true,
+   "brief" => true,
+   "but" => true,
+   "by" => true,
+   "cmon" => true,
+   "came" => true,
+   "can" => true,
+   "cannot" => true,
+   "cant" => true,
+   "cause" => true,
+   "causes" => true,
+   "certain" => true,
+   "certainly" => true,
+   "changes" => true,
+   "clearly" => true,
+   "co" => true,
+   "com" => true,
+   "come" => true,
+   "comes" => true,
+   "concerning" => true,
+   "consequently" => true,
+   "consider" => true,
+   "considering" => true,
+   "contain" => true,
+   "containing" => true,
+   "contains" => true,
+   "corresponding" => true,
+   "could" => true,
+   "couldnt" => true,
+   "course" => true,
+   "currently" => true,
+   "definitely" => true,
+   "described" => true,
+   "despite" => true,
+   "did" => true,
+   "didnt" => true,
+   "different" => true,
+   "do" => true,
+   "does" => true,
+   "doesnt" => true,
+   "doing" => true,
+   "dont" => true,
+   "done" => true,
+   "down" => true,
+   "downwards" => true,
+   "during" => true,
+   "each" => true,
+   "edu" => true,
+   "eg" => true,
+   "eight" => true,
+   "either" => true,
+   "else" => true,
+   "elsewhere" => true,
+   "enough" => true,
+   "entirely" => true,
+   "especially" => true,
+   "et" => true,
+   "etc" => true,
+   "even" => true,
+   "ever" => true,
+   "every" => true,
+   "everybody" => true,
+   "everyone" => true,
+   "everything" => true,
+   "everywhere" => true,
+   "ex" => true,
+   "exactly" => true,
+   "example" => true,
+   "except" => true,
+   "far" => true,
+   "few" => true,
+   "fifth" => true,
+   "first" => true,
+   "five" => true,
+   "followed" => true,
+   "following" => true,
+   "follows" => true,
+   "for" => true,
+   "former" => true,
+   "formerly" => true,
+   "forth" => true,
+   "four" => true,
+   "from" => true,
+   "further" => true,
+   "furthermore" => true,
+   "get" => true,
+   "gets" => true,
+   "getting" => true,
+   "given" => true,
+   "gives" => true,
+   "go" => true,
+   "goes" => true,
+   "going" => true,
+   "gone" => true,
+   "got" => true,
+   "gotten" => true,
+   "greetings" => true,
+   "had" => true,
+   "hadnt" => true,
+   "happens" => true,
+   "hardly" => true,
+   "has" => true,
+   "hasnt" => true,
+   "have" => true,
+   "havent" => true,
+   "having" => true,
+   "he" => true,
+   "hes" => true,
+   "hello" => true,
+   "help" => true,
+   "hence" => true,
+   "her" => true,
+   "here" => true,
+   "heres" => true,
+   "hereafter" => true,
+   "hereby" => true,
+   "herein" => true,
+   "hereupon" => true,
+   "hers" => true,
+   "herself" => true,
+   "hi" => true,
+   "him" => true,
+   "himself" => true,
+   "his" => true,
+   "hither" => true,
+   "hopefully" => true,
+   "how" => true,
+   "howbeit" => true,
+   "however" => true,
+   "id" => true,
+   "ill" => true,
+   "im" => true,
+   "ive" => true,
+   "ie" => true,
+   "if" => true,
+   "ignored" => true,
+   "immediate" => true,
+   "in" => true,
+   "inasmuch" => true,
+   "inc" => true,
+   "indeed" => true,
+   "indicate" => true,
+   "indicated" => true,
+   "indicates" => true,
+   "inner" => true,
+   "insofar" => true,
+   "instead" => true,
+   "into" => true,
+   "inward" => true,
+   "is" => true,
+   "isnt" => true,
+   "it" => true,
+   "itd" => true,
+   "itll" => true,
+   "its" => true,
+   "its" => true,
+   "itself" => true,
+   "just" => true,
+   "keep" => true,
+   "keeps" => true,
+   "kept" => true,
+   "know" => true,
+   "knows" => true,
+   "known" => true,
+   "last" => true,
+   "lately" => true,
+   "later" => true,
+   "latter" => true,
+   "latterly" => true,
+   "least" => true,
+   "less" => true,
+   "lest" => true,
+   "let" => true,
+   "lets" => true,
+   "like" => true,
+   "liked" => true,
+   "likely" => true,
+   "little" => true,
+   "look" => true,
+   "looking" => true,
+   "looks" => true,
+   "ltd" => true,
+   "mainly" => true,
+   "many" => true,
+   "may" => true,
+   "maybe" => true,
+   "me" => true,
+   "mean" => true,
+   "meanwhile" => true,
+   "merely" => true,
+   "might" => true,
+   "more" => true,
+   "moreover" => true,
+   "most" => true,
+   "mostly" => true,
+   "much" => true,
+   "must" => true,
+   "my" => true,
+   "myself" => true,
+   "name" => true,
+   "namely" => true,
+   "nd" => true,
+   "near" => true,
+   "nearly" => true,
+   "necessary" => true,
+   "need" => true,
+   "needs" => true,
+   "neither" => true,
+   "never" => true,
+   "nevertheless" => true,
+   "new" => true,
+   "next" => true,
+   "nine" => true,
+   "no" => true,
+   "nobody" => true,
+   "non" => true,
+   "none" => true,
+   "noone" => true,
+   "nor" => true,
+   "normally" => true,
+   "not" => true,
+   "nothing" => true,
+   "novel" => true,
+   "now" => true,
+   "nowhere" => true,
+   "obviously" => true,
+   "of" => true,
+   "off" => true,
+   "often" => true,
+   "oh" => true,
+   "ok" => true,
+   "okay" => true,
+   "old" => true,
+   "on" => true,
+   "once" => true,
+   "one" => true,
+   "ones" => true,
+   "only" => true,
+   "onto" => true,
+   "or" => true,
+   "other" => true,
+   "others" => true,
+   "otherwise" => true,
+   "ought" => true,
+   "our" => true,
+   "ours" => true,
+   "ourselves" => true,
+   "out" => true,
+   "outside" => true,
+   "over" => true,
+   "overall" => true,
+   "own" => true,
+   "particular" => true,
+   "particularly" => true,
+   "per" => true,
+   "perhaps" => true,
+   "placed" => true,
+   "please" => true,
+   "plus" => true,
+   "possible" => true,
+   "presumably" => true,
+   "probably" => true,
+   "provides" => true,
+   "que" => true,
+   "quite" => true,
+   "qv" => true,
+   "rather" => true,
+   "rd" => true,
+   "re" => true,
+   "really" => true,
+   "reasonably" => true,
+   "regarding" => true,
+   "regardless" => true,
+   "regards" => true,
+   "relatively" => true,
+   "respectively" => true,
+   "right" => true,
+   "said" => true,
+   "same" => true,
+   "saw" => true,
+   "say" => true,
+   "saying" => true,
+   "says" => true,
+   "second" => true,
+   "secondly" => true,
+   "see" => true,
+   "seeing" => true,
+   "seem" => true,
+   "seemed" => true,
+   "seeming" => true,
+   "seems" => true,
+   "seen" => true,
+   "self" => true,
+   "selves" => true,
+   "sensible" => true,
+   "sent" => true,
+   "serious" => true,
+   "seriously" => true,
+   "seven" => true,
+   "several" => true,
+   "shall" => true,
+   "she" => true,
+   "should" => true,
+   "shouldnt" => true,
+   "since" => true,
+   "six" => true,
+   "so" => true,
+   "some" => true,
+   "somebody" => true,
+   "somehow" => true,
+   "someone" => true,
+   "something" => true,
+   "sometime" => true,
+   "sometimes" => true,
+   "somewhat" => true,
+   "somewhere" => true,
+   "soon" => true,
+   "sorry" => true,
+   "specified" => true,
+   "specify" => true,
+   "specifying" => true,
+   "still" => true,
+   "sub" => true,
+   "such" => true,
+   "sup" => true,
+   "sure" => true,
+   "take" => true,
+   "taken" => true,
+   "tell" => true,
+   "tends" => true,
+   "th" => true,
+   "than" => true,
+   "thank" => true,
+   "thanks" => true,
+   "thanx" => true,
+   "that" => true,
+   "thats" => true,
+   "thats" => true,
+   "the" => true,
+   "their" => true,
+   "theirs" => true,
+   "them" => true,
+   "themselves" => true,
+   "then" => true,
+   "thence" => true,
+   "there" => true,
+   "theres" => true,
+   "thereafter" => true,
+   "thereby" => true,
+   "therefore" => true,
+   "therein" => true,
+   "theres" => true,
+   "thereupon" => true,
+   "these" => true,
+   "they" => true,
+   "theyd" => true,
+   "theyll" => true,
+   "theyre" => true,
+   "theyve" => true,
+   "think" => true,
+   "third" => true,
+   "this" => true,
+   "thorough" => true,
+   "thoroughly" => true,
+   "those" => true,
+   "though" => true,
+   "three" => true,
+   "through" => true,
+   "throughout" => true,
+   "thru" => true,
+   "thus" => true,
+   "to" => true,
+   "together" => true,
+   "too" => true,
+   "took" => true,
+   "toward" => true,
+   "towards" => true,
+   "tried" => true,
+   "tries" => true,
+   "truly" => true,
+   "try" => true,
+   "trying" => true,
+   "twice" => true,
+   "two" => true,
+   "un" => true,
+   "under" => true,
+   "unfortunately" => true,
+   "unless" => true,
+   "unlikely" => true,
+   "until" => true,
+   "unto" => true,
+   "up" => true,
+   "upon" => true,
+   "us" => true,
+   "use" => true,
+   "used" => true,
+   "useful" => true,
+   "uses" => true,
+   "using" => true,
+   "usually" => true,
+   "value" => true,
+   "various" => true,
+   "very" => true,
+   "via" => true,
+   "viz" => true,
+   "vs" => true,
+   "want" => true,
+   "wants" => true,
+   "was" => true,
+   "wasnt" => true,
+   "way" => true,
+   "we" => true,
+   "wed" => true,
+   "well" => true,
+   "were" => true,
+   "weve" => true,
+   "welcome" => true,
+   "well" => true,
+   "went" => true,
+   "were" => true,
+   "werent" => true,
+   "what" => true,
+   "whats" => true,
+   "whatever" => true,
+   "when" => true,
+   "whence" => true,
+   "whenever" => true,
+   "where" => true,
+   "wheres" => true,
+   "whereafter" => true,
+   "whereas" => true,
+   "whereby" => true,
+   "wherein" => true,
+   "whereupon" => true,
+   "wherever" => true,
+   "whether" => true,
+   "which" => true,
+   "while" => true,
+   "whither" => true,
+   "who" => true,
+   "whos" => true,
+   "whoever" => true,
+   "whole" => true,
+   "whom" => true,
+   "whose" => true,
+   "why" => true,
+   "will" => true,
+   "willing" => true,
+   "wish" => true,
+   "with" => true,
+   "within" => true,
+   "without" => true,
+   "wont" => true,
+   "wonder" => true,
+   "would" => true,
+   "wouldnt" => true,
+   "yes" => true,
+   "yet" => true,
+   "you" => true,
+   "youd" => true,
+   "youll" => true,
+   "youre" => true,
+   "youve" => true,
+   "your" => true,
+   "yours" => true,
+   "yourself" => true,
+   "yourselves" => true,
+   "zero" => true,
+];
+
+  return (isset($stopwords[$w]));
+}

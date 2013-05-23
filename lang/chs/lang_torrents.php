@@ -38,7 +38,6 @@ $lang_torrents = array
 	'select_and' => "与匹配",
 	'select_or' => "或匹配",
 	'select_exact' => "准确匹配",
-	'select_complete' => "完全匹配",
 	'select_parsed' => "语法",
 	'text_in' => " 范围：",
 	'text_with' => " 匹配模式：",

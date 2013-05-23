@@ -208,26 +208,23 @@ $(function() {
     },
 
     setTitleWidth = function(targets) {
-	var t = function() {
+	var wThis = 0,
+	t = function() {
 	    targets.each(function() {
 		var $this = $(this),
-		wThis = $this.width(),
+		wThis = wThis || $this.width(), // buffer width
 
 		$prs = $this.find('ul.prs'),
 		pr0 = $prs[0],
-		pr1 = $prs[1],
 		img = $this.find('img.sticky')[0],
 
-		wTitleD = 0,
-		wDescD = 0;
-		if (pr0) {
+		wTitleD = 0;
+
+		if (pr0 && pr0.children.length) {
 		    wTitleD += pr0.offsetWidth;
 		}
 		if (img) {
 		    wTitleD += img.offsetWidth;
-		}
-		if (pr1) {
-		    wDescD += pr1.offsetWidth;
 		}
 
 		modifyCss(wThis, $this.find('h2')[0], wTitleD);
@@ -470,16 +467,6 @@ $(function() {
 	catChecks.click(function() {
 	    catClicked(dictChecks[i]);
 	});
-    });
-
-    //Use exact in imdb & username
-    $('[name="search_area"]').change(function() {
-	if (parseInt(this.value) >= 3) {  //Username or imdb
-	    $('[name="search_mode"]').val('3');
-	}
-	else {
-	    $('[name="search_mode"]').val('0');
-	}
     });
 
     //Auto complete

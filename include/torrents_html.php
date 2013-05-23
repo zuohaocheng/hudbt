@@ -77,17 +77,7 @@ if ($allsec != 1 || $enablespecial != 'yes'){ //do not print searchbox if showin
 		    <option value="4"<?php print($_GET["search_area"] == 4 ? " selected=\"selected\"" : ""); ?>><?php echo $lang_torrents['select_imdb_url'] ?></option>
 		  </select>
 		</li>
-		<li>
-		  <select name="search_mode">
-		    <option value="0"><?php echo $lang_torrents['select_and'] ?></option>
-		    <option value="1"<?php echo $_GET["search_mode"] == 1 ? " selected=\"selected\"" : "" ?>><?php echo $lang_torrents['select_or'] ?></option>
-		    <option value="2"<?php echo $_GET["search_mode"] == 2 ? " selected=\"selected\"" : "" ?>><?php echo $lang_torrents['select_exact'] ?></option>
-		    <option value="3"<?php echo $_GET["search_mode"] == 3 ? " selected=\"selected\"" : "" ?>><?php echo $lang_torrents['select_complete'] ?></option>
-		  </select>
-		  <?php echo $lang_torrents['text_mode'] ?>
-		</li>
 		  <li>
-		    <span class="medium">
 		    <select class="med" name="incldead">
 		      <option value="0"><?php echo $lang_torrents['select_including_dead'] ?></option>
 		      <option value="1"<?php print($include_dead == 1 ? " selected=\"selected\"" : ""); ?>><?php echo $lang_torrents['select_active'] ?> </option>
@@ -109,15 +99,13 @@ if ($allsec != 1 || $enablespecial != 'yes'){ //do not print searchbox if showin
     echo '>' . $text . '</option>';
   }
   ?>
-</select></li>
-		   <li>
+</select></li><li>
 		    <input id="searchinput" placeholder="<?php echo $lang_torrents['text_search'] ?>" name="search" type="search" value="<?php echo  $searchstr_ori ?>" autocomplete="off" style="width: 200px"/ >
 		  </li>
 		<li>
 		  <input type="submit" class="btn" value="<?php echo $lang_torrents['submit_go'] ?>" />
-		</li>
-		  <li>
 		    <input type="checkbox" name="hot" value="1" <?php echo ($wherehot? 'checked="checked"':'') ?>/><a href="?hot=1"><?php echo $lang_torrents['text_hot'] ?></a>
+
 		    <input type="checkbox" name="storing" value="1" <?php echo ($wherestoring? 'checked="checked"':'') ?>/><a href="?storing=1"><?php echo $lang_torrents['text_storing'] ?></a>
 		  </li>
 </ul></div>
