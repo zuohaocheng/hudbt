@@ -144,6 +144,21 @@ class Torrent extends AppModel {
 			'finderQuery' => '',
 			'deleteQuery' => '',
 			'insertQuery' => ''
+				     ),
+		'BookmarkedUser' => array(
+			'className' => 'User',
+			'joinTable' => 'bookmarks',
+			'foreignKey' => 'torrentid',
+			'associationForeignKey' => 'userid',
+			'unique' => true,
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'finderQuery' => '',
+			'deleteQuery' => '',
+			'insertQuery' => ''
 		)
 	);
 

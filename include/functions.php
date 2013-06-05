@@ -3081,13 +3081,13 @@ function writecomment($userid, $comment) {
 
 function return_torrent_bookmark_array($userid) {
   global $Cache;
-  static $ret;
+  $ret = $Cache->get_value('user_'.$userid.'_bookmark_array');
   if ($ret === false){
-    $ret = $Cache->get_value('user_'.$userid.'_bookmark_array');
-    if ($ret === false){
-      $ret = sql_query("SELECT * FROM bookmarks WHERE userid=?", [$userid])->fetchAll();
-      $Cache->cache_value('user_'.$userid.'_bookmark_array', $ret, 132800);
-    }
+    $ret = array_fill_keys(array_map(function($a) {
+	  return $a['torrentid'];
+	}, sql_query("SELECT torrentid FROM bookmarks WHERE userid=?", [$userid])->fetchAll()), true);
+
+    $Cache->cache_value('user_'.$userid.'_bookmark_array', $ret, 132800);
   }
   return $ret;
 }
@@ -3095,9 +3095,8 @@ function return_torrent_bookmark_array($userid) {
 function get_is_torrent_bookmarked($userid, $torrentid) {
   $userid = 0 + $userid;
   $torrentid = 0 + $torrentid;
-  $ret = array();
   $ret = return_torrent_bookmark_array($userid);
-  return !(!count($ret) || !in_array($torrentid, $ret, false)); // already bookmarked
+  return isset($ret[$torrentid]); // already bookmarked
 }
 
 function get_torrent_bookmark_state($userid, $torrentid, $text = false) {

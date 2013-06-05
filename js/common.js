@@ -196,21 +196,6 @@ function ctrlenter(event,formname,submitname){
     }
 }
 
-// bookmark.js
-function bookmark(torrentid) {
-    $.getJSON('bookmark.php', {torrentid : torrentid}, function(result) {
-	var status = result.status,
-	html;
-	if (status=="added") {
-	    html = "<img class=\"bookmark\" src=\"pic/trans.gif\" alt=\"Bookmarked\" />";
-	}
-	else {
-	    html = "<img class=\"delbookmark\" src=\"pic/trans.gif\" alt=\"Unbookmarked\" />";
-	}
-	document.getElementById("bookmark"+torrentid).innerHTML = html;
-    });
-}
-
 // check.js
 var check = (function() {
     var checkflag = "false";
@@ -284,10 +269,18 @@ $(function() {
 	});
     }
 
-    $(document).on('click', '.bookmark', function(e) {
+    $(document).on('click', 'a.bookmark', function(e) {
 	e.preventDefault();
-	var self = this;
-	$.getJSON('bookmark.php', {torrentid : this.getAttribute('torrent')}, function(result) {
+	var self = this,
+	img = this.getElementsByTagName('img')[0];
+	if (!img) {
+	    return;
+	}
+	var action = (img.className == 'bookmark') ? 'del' : 'add';
+	$.post('bookmark.php', {
+	    torrentid : this.getAttribute('torrent'),
+	    action: action
+	}, function(result) {
 	    var status = result.status,
 	    html;
 	    if (status=="added") {

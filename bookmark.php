@@ -1,6 +1,7 @@
 <?php
 require "include/bittorrent.php";
 dbconn();
+checkHTTPMethod('POST');
 
 //Send some headers to keep the user's browser from caching the response.
 header("Expires: Mon, 26 Jul 1997 05:00:00 GMT" ); 
@@ -9,23 +10,21 @@ header("Cache-Control: no-cache, must-revalidate" );
 header("Pragma: no-cache" );
 header("Content-Type: application/json; charset=utf-8");
 
-$torrentid = 0 + $_GET['torrentid'];
-if(isset($CURUSER))
-{
-	$res_bookmark = sql_query("SELECT * FROM bookmarks WHERE torrentid=" . sqlesc($torrentid) . " AND userid=" . sqlesc($CURUSER['id']));
-	if (_mysql_num_rows($res_bookmark) == 1){
-		sql_query("DELETE FROM bookmarks WHERE torrentid=" . sqlesc($torrentid) . " AND userid=" . sqlesc($CURUSER['id'])) or sqlerr(__FILE__,__LINE__);
-		$Cache->delete_value('user_'.$CURUSER['id'].'_bookmark_array');
-		$result = "deleted";
-		}
-	else{
-		sql_query("INSERT INTO bookmarks (torrentid, userid) VALUES (" . sqlesc($torrentid) . "," . sqlesc($CURUSER['id']) . ")") or sqlerr(__FILE__,__LINE__);
-		$Cache->delete_value('user_'.$CURUSER['id'].'_bookmark_array');
-		$result = "added";
-	}
+$torrentid = 0 + $_REQUEST['torrentid'];
+if (isset($CURUSER)) {
+  if ($_REQUEST['action'] == 'del'){
+    sql_query("DELETE FROM bookmarks WHERE torrentid= ? AND userid=?", [$torrentid, $CURUSER['id']]);
+    $result = "deleted";
+  }
+  else {
+    sql_query("INSERT INTO bookmarks (torrentid, userid) VALUES (?, ?)", [$torrentid, $CURUSER['id']]);
+    $result = "added";
+  }
+  $Cache->delete_value('user_'.$CURUSER['id'].'_bookmark_array');
 }
 else {
+  header('HTTP/1.1 401 Unauthorized');
   $result = "failed";
 }
-echo php_json_encode(array('status' => $result));
-?>
+echo json_encode(array('status' => $result));
+
