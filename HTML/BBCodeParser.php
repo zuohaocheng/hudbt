@@ -145,6 +145,8 @@ class HTML_BBCodeParser
      */
     var $_filters       = array();
 
+    var $_warnings = [];
+
     /**
      * Constructor, initialises the options and filters
      *
@@ -378,7 +380,7 @@ class HTML_BBCodeParser
                 } else {
                     // possible valid tag
                     $newPos = $closePos + 1;
-                    $newTag = $this->_buildTag(substr($str, $strPos, $closePos - $strPos + 1));
+                    $newTag = $this->_buildTag(substr($str, $strPos, $closePos - $strPos + 1), $strPos, $closePos - $strPos + 1);
                     if (($newTag !== false)) {
                         $tag = $newTag;
                     } else {
@@ -427,9 +429,13 @@ class HTML_BBCodeParser
      * @see      _buildTagArray()
      * @author   Stijn de Reede  <sjr@gmx.co.uk>
      */
-    function _buildTag($str)
+    function _buildTag($str, $pos = null, $len = null)
     {
         $tag = array('text' => $str, 'attributes' => array());
+	if ($pos !== null) {
+	  $tag['pos'] = $pos;
+	  $tag['length'] = $len;
+	}
 
         if (substr($str, 1, 1) == '/') {        // closing tag
 
@@ -613,7 +619,7 @@ class HTML_BBCodeParser
             $prevTag = end($newTagArray);
             switch ($tag['type']) {
             case 0:
-                if (($child = $this->_childNeeded(end($openTags), 'text')) &&
+                if (($child = $this->_childNeeded(end($openTags)['tag'], 'text')) &&
                     $child !== false &&
                     /*
                      * No idea what to do in this case: A child is needed, but
@@ -627,7 +633,7 @@ class HTML_BBCodeParser
                         continue;
                     }
                     $newTagArray[] = $child;
-                    $openTags[] = $child['tag'];
+                    $openTags[] = $child;
                 }
                 if ($prevTag['type'] === 0) {
                     $tag['text'] = $prevTag['text'].$tag['text'];
@@ -637,9 +643,9 @@ class HTML_BBCodeParser
                 break;
 
             case 1:
-                if (!$this->_isAllowed(end($openTags), $tag['tag']) ||
-                   ($parent = $this->_parentNeeded(end($openTags), $tag['tag'])) === true ||
-                   ($child  = $this->_childNeeded(end($openTags),  $tag['tag'])) === true) {
+                if (!$this->_isAllowed(end($openTags)['tag'], $tag['tag']) ||
+                   ($parent = $this->_parentNeeded(end($openTags)['tag'], $tag['tag'])) === true ||
+                   ($child  = $this->_childNeeded(end($openTags)['tag'],  $tag['tag'])) === true) {
                     $tag['type'] = 0;
                     if ($prevTag['type'] === 0) {
                         $tag['text'] = $prevTag['text'].$tag['text'];
@@ -655,30 +661,34 @@ class HTML_BBCodeParser
                          * a sibling. To add as a sibling, we need to close the
                          * current tag.
                          */
-                        if ($tag['tag'] == end($openTags)){
+                        if ($tag['tag'] == end($openTags)['tag']){
                             $newTagArray[] = $this->_buildTag('[/'.$tag['tag'].']');
                             array_pop($openTags);
                         } else {
                             $newTagArray[] = $parent;
-                            $openTags[] = $parent['tag'];
+                            $openTags[] = $parent;
                         }
                     }
                     if ($child) {
                         $newTagArray[] = $child;
-                        $openTags[] = $child['tag'];
+                        $openTags[] = $child;
                     }
-                    $openTags[] = $tag['tag'];
+                    $openTags[] = $tag;
                 }
                 $newTagArray[] = $tag;
                 break;
 
             case 2:
-                if (($tag['tag'] == end($openTags) || $this->_isAllowed(end($openTags), $tag['tag']))) {
-                    if (in_array($tag['tag'], $openTags)) {
-                        $tmpOpenTags = array();
-                        while (end($openTags) != $tag['tag']) {
-                            $newTagArray[] = $this->_buildTag('[/'.end($openTags).']');
-                            $tmpOpenTags[] = end($openTags);
+                if (($tag['tag'] == end($openTags)['tag'] || $this->_isAllowed(end($openTags)['tag'], $tag['tag']))) {
+		  if (in_array($tag['tag'], array_map(function($a) {
+			  return $a['tag'];
+			}, $openTags))) {
+#                        $tmpOpenTags = array();
+                        while (end($openTags)['tag'] != $tag['tag']) {
+			  $t = end($openTags);
+			  $this->_warnings[] = ['message' => '未关闭的<code>[' . $t['tag'] . ']</code>标签', 'pos' => $t['pos'], 'length' => $t['length']];
+                            $newTagArray[] = $this->_buildTag('[/'.end($openTags)['tag'].']');
+#                            $tmpOpenTags[] = end($openTags)['tag'];
                             array_pop($openTags);
                         }
                         $newTagArray[] = $tag;
@@ -693,6 +703,9 @@ class HTML_BBCodeParser
                             array_pop($tmpOpenTags);
                         }*/
                     }
+		    else {
+		      $this->_warnings[] = ['message' => '多余的<code>[/' . $tag['tag'] . ']</code>标签', 'pos' => $tag['pos'], 'length' => $tag['length']];
+		    }
                 } else {
                     $tag['type'] = 0;
                     if ($prevTag['type'] === 0) {
@@ -704,10 +717,15 @@ class HTML_BBCodeParser
                 break;
             }
         }
-        while (end($openTags)) {
-            $newTagArray[] = $this->_buildTag('[/'.end($openTags).']');
+	if (!empty($openTags)) {
+	  while (end($openTags)) {
+            $newTagArray[] = $this->_buildTag('[/'.end($openTags)['tag'].']');
+	    $t = end($openTags);
+	    $this->_warnings[] = ['message' => '未关闭的<code>[' . $t['tag'] . ']</code>标签', 'pos' => $t['pos'], 'length' => $t['length']];
             array_pop($openTags);
-        }
+	  }
+	}
+
         $this->_tagArray = $newTagArray;
     }
 
@@ -965,6 +983,20 @@ class HTML_BBCodeParser
         $this->_buildTagArray();
         $this->_validateTagArray();
         $this->_buildParsedString();
+    }
+
+    function check() {
+      $this->_preparse();
+      $this->_buildTagArray();
+      $this->_validateTagArray();
+    }
+    
+    function getWarnings() {
+      return $this->_warnings;
+    }
+
+    function getTree() {
+      return $this->_tagArray;
     }
 
     /**

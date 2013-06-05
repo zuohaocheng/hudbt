@@ -599,6 +599,19 @@ pre, code {font-family:Menlo, Monaco, 'DejaVu Sans Mono', 'Bitstream Vera Sans M
     line-height:150%;
 }
 .bbcode dt:after {content:': '}
+.bbcode :link {color: #0645AD;}  
+.bbcode :visited{color:#0B0080} 
+.bbcode :link:hover{text-decoration:underline}
+
+.bbcode-warnings {
+    margin-top: 1em;
+    border-top: silver dashed 1px;
+}
+
+.bbcode-warnings .warning {
+    color: red;
+}
+
 .codebuttons {
     font-size:11px;
     margin-right:3px;

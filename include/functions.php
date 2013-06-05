@@ -430,9 +430,10 @@ function sqlerr($file = '', $line = '', $stack = true, $q = '', $args = [], $e =
   die;
 }
 
-function format_comment($text, $args = true, $null0 = null, $newtab = false, $null1 = null, $image_max_width = 0, $enableimage = true, $enableflash = true , $null2 = null, $image_max_height = 0, $null3 = null) {
+function format_comment($text, $null0 = null, $null1 = null, $newtab = false, $null2 = null, $image_max_width = 0, $enableimage = true, $enableflash = true , $null3 = null, $image_max_height = 0, $null4 = null) {
   global $Cache;
 
+  extract(['warnings' => false, 'cachekey' => false, $cache = true]);
   $cnt_args = func_num_args();
   if ($cnt_args > 1) {
     $arg = func_get_args()[$cnt_args - 1]; // Last argument is a hash
@@ -446,40 +447,57 @@ function format_comment($text, $args = true, $null0 = null, $newtab = false, $nu
 
   $md5 = md5($text);
   $key = 'bbcode-' . implode('-', [$enableimage, $enableflash, $image_max_width, $image_max_height, $newtab]) . '-' . $md5;
-  if (!isset($_REQUEST['purge'])) {
-    $html = $Cache->get_value($key);
-    if ($html) {
-      return $html;
+  if (!isset($_REQUEST['purge']) && $cache) {
+    $out = $Cache->get_value($key);
+  }
+  else {
+    $out = false;
+  }
+
+  if ($out === false) {
+    global $SITENAME, $BASEURL, $enableattach_attachment;
+    require_once('HTML/BBCodeParser.php');
+    $filters = [];
+    if ($enableimage) {
+      $filters[] = 'Template';
+      $filters[] = 'Span';
+    }
+    $filters = array_merge($filters, ['Extended', 'Basic', 'Email', 'Lists', 'Attachments', 'Refs', 'Smiles']);
+    if ($enableimage) {
+      $filters[] = 'Images';
+    }
+    if ($enableflash) {
+      $filters[] = 'Flash';
+    }
+    $filters[] = 'Links';
+
+    $text = htmlspecialchars($text, ENT_HTML401 | ENT_NOQUOTES);
+    $text = str_replace("\r", "", $text);
+    $text = str_replace("\n", " <br/>", $text); # There has to be a space before <br>
+
+    $opts = array('filters' => $filters, 'imgMaxW' => $image_max_width, 'imgMaxH' => $image_max_height);
+    if ($newtab) {
+      $opts['aTarget'] = '_blank';
+    }
+    $parser = new HTML_BBCodeParser($opts);
+    $out = '<div class="bbcode">' . $parser->qparse($text) . '</div>';
+    $Cache->cache_value($key, $out, 86400 * 7);
+  }
+
+  if ($warnings || $cachekey) {
+    require_once('classes/class_string.php');
+    $out = new HBString($out);
+    if ($warnings && isset($parser)) {
+      $warnings = $parser->getWarnings();
+      if ($warnings) {
+	$out->warnings = $warnings;
+      }
+    }
+    
+    if ($cachekey) {
+      $out->cachekey = $key;
     }
   }
-  
-  global $SITENAME, $BASEURL, $enableattach_attachment;
-  require_once('HTML/BBCodeParser.php');
-  $filters = [];
-  if ($enableimage) {
-    $filters[] = 'Template';
-    $filters[] = 'Span';
-  }
-  $filters = array_merge($filters, ['Extended', 'Basic', 'Email', 'Lists', 'Attachments', 'Refs', 'Smiles']);
-  if ($enableimage) {
-    $filters[] = 'Images';
-  }
-  if ($enableflash) {
-    $filters[] = 'Flash';
-  }
-  $filters[] = 'Links';
-
-  $text = htmlspecialchars($text, ENT_HTML401 | ENT_NOQUOTES);
-  $text = str_replace("\r", "", $text);
-  $text = str_replace("\n", " <br />", $text);
-
-  $opts = array('filters' => $filters, 'imgMaxW' => $image_max_width, 'imgMaxH' => $image_max_height);
-  if ($newtab) {
-    $opts['aTarget'] = '_blank';
-  }
-  $parser = new HTML_BBCodeParser($opts);
-  $out = '<div class="bbcode">' . $parser->qparse($text) . '</div>';
-  $Cache->cache_value($key, $out, 86400 * 7);
   return $out;
 }
 
@@ -4751,7 +4769,7 @@ function get_fun($id = 0, $pager_count = null) {
     $content = '<div class="page-titles"><h3><a href="//' . $BASEURL . '/fun.php?id=' . $id . '">'.$row['title'].'</a></h3><h4>'.$lang_functions['text_posted_by'];
     $content .= $username . ' ' . $time;
     $content .= '</h4></div>';
-    $body = format_comment($row['body'], true, true, true);
+    $body = format_comment($row['body'], ['cachekey' => true, 'newtab' => true]);
 
     // embed tag of http in https is often not allowed
     if ($https && strstr($body, '<embed') && strstr($body, 'src="http://')) {
@@ -4762,7 +4780,7 @@ function get_fun($id = 0, $pager_count = null) {
       else {
 	$height = '360px';
       }
-      $content .= '<iframe id="funbox-content" style="height:'.$height.'" src="http://' . $BASEURL . '/' . $filename . '?' . md5($row['body']) . '" ></iframe>';
+      $content .= '<iframe id="funbox-content" style="height:'.$height.'" src="http://' . $BASEURL . '/' . $filename . '?' . $body->cachekey . '" ></iframe>';
       if (!file_exists($filename)) {
 	$h = '<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><link rel="stylesheet" href="../styles/common.css" type="text/css" media="screen" /><link rel="stylesheet" href="../styles/font.css" type="text/css" media="screen" /></head><body style="background-color:transparent;background-image:none">' . $body . '</body></html>';
 	file_put_contents($filename, $h);
