@@ -16,7 +16,7 @@ class HTML_BBCodeParser_Filter_Attachments extends HTML_BBCodeParser_Filter {
   }
 
   public function attachmentFromId($dlkey) {
-    global $Cache, $httpdirectory_attachment;
+    global $Cache, $httpdirectory_attachment, $savedirectory_attachment;
     global $lang_functions;
     $enableimage = true;
 
@@ -35,14 +35,28 @@ class HTML_BBCodeParser_Filter_Attachments extends HTML_BBCodeParser_Filter {
 	if ($enableimage){
 	  $fullurl = '';
 	  if ($row['thumb'] == 1){
+	    $filename = $row['location'].".thumb.jpg";
 	    $url = $httpdirectory_attachment."/".$row['location'].".thumb.jpg";
 	    $fullurl = ' full="' . $httpdirectory_attachment."/".$row['location'] . '"';
 	  }
 	  else{
+	    $filename = $row['location'];
 	    $url = $httpdirectory_attachment."/".$row['location'];
+	    $fullurl = '';
 	  }
 
-	  $return = '[img' . $fullurl . ']' . $url . '[/img]';
+	  $file = $savedirectory_attachment . '/' . $filename;
+	  $size = getimagesize($file);
+	  if ($size) {
+	    $height = $size[1];
+	    if ($height > 800) {
+	      $height = 800;
+	    }
+	    $return = '[img h=' . $height . $fullurl . ']' . $url . '[/img]';
+	  }
+	  else {
+	    $return = '找不到图片:(';
+	  }
 	}
 	else $return = "";
       }
