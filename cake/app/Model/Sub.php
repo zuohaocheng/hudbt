@@ -48,7 +48,9 @@ class Sub extends AppModel {
 	public function beforeDelete($cascade = true) {
 	  global $SUBSPATH;
 	  $data = $this->read(['ext', 'torrent_id'], $this->id);
-	  unlink($SUBSPATH.'/'.$data['Sub']['torrent_id'].'/'.$this->id.'.'.$data['Sub']['ext']);
-	  var_dump($SUBSPATH.'/'.$data['Sub']['torrent_id'].'/'.$this->id.'.'.$data['Sub']['ext']);
+	  $filename = $SUBSPATH.'/'.$data['Sub']['torrent_id'].'/'.$this->id.'.'.$data['Sub']['ext'];
+	  if (file_exists($filename)) {
+	    unlink($filename);
+	  }
 	}
 }

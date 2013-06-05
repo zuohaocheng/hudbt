@@ -155,7 +155,7 @@ function get_last_read_post_id($topicid) {
 		}
 		else $Cache->cache_value('user_'.$CURUSER['id'].'_last_read_post_list', 'no record', 900);
 	}
-	if ($ret != "no record" && $ret[$topicid] && $CURUSER['last_catchup'] < $ret[$topicid]){
+	if ($ret != "no record" && isset($ret[$topicid]) && $CURUSER['last_catchup'] < $ret[$topicid]){
 		return $ret[$topicid];
 	}
 	elseif ($CURUSER['last_catchup'])
@@ -227,14 +227,14 @@ function insert_compose_frame($id, $type = 'new')
 	print("<input type=\"hidden\" name=\"id\" value=\"".$id."\" />");
 	print("<input type=\"hidden\" name=\"type\" value=\"".$type."\" />");
 	begin_compose($title, $type, $body, $hassubject, $subject);
-	if($type==edit){
+	if($type=='edit'){
 		$resedit=sql_query("SELECT editnotseen,userid FROM posts WHERE id = ".$id)or sqlerr(__FILE__, __LINE__);
  		$arredit = _mysql_fetch_assoc($resedit) or stderr($lang_forums['std_forum_error'], $lang_forums['std_topic_not_found']);
 	  $editnotseen=$arredit['editnotseen'];
 	  $owner =$arredit['userid'];
 		if(checkprivilege(["Posts","editnotseen"]) && ($CURUSER['id']==$owner)){
   		echo "<tr><td class=\"center\" colspan=\"2\"><label><input type=\"checkbox\" value=\"1\" name=\"editnotseen\"";
-			echo ($editnotseen?" checked=\"checked\"" : "" ).">".$lang_forums[text_editnotseen]."</label></td></tr>";
+			echo ($editnotseen?" checked=\"checked\"" : "" ).">".$lang_forums['text_editnotseen']."</label></td></tr>";
  		}	
  	}
 
@@ -658,7 +658,7 @@ SELECT id, rownum FROM (SELECT @x:=@x+1 AS rownum, id, userid FROM (SELECT @x:=0
 	while ($arr = _mysql_fetch_assoc($res)) {
 	  if ($pn>=1) {
 	    if ($Advertisement->enable_ad()) {
-	      if ($forumpostad[$pn-1])
+	      if (isset($forumpostad[$pn-1]))
 		echo '<div class="forum-ad table td" id="ad_forumpost_'.$pn."\">".$forumpostad[$pn-1]."</div>";
 	    }
 	  }
@@ -809,7 +809,9 @@ SELECT id, rownum FROM (SELECT @x:=@x+1 AS rownum, id, userid FROM (SELECT @x:=0
 	print($pagerbottom);
 	if ($maypost){
 		if(!$locked){
-			print('<div id="forum-reply-post" class="table td"><h2><a class="index" href="'.htmlspecialchars('?action=reply&topicid='.$topicid).'">'.$lang_forums['text_add_reply'].'</a></h2><form id="compose" name="compose" method="post" action="?action=post" onsubmit="return postvalid(this);"><input type="hidden" name="id" value='.$topicid.' /><input type="hidden" name="type" value="reply" />');
+		  print('<div id="forum-reply-post" class="table td"><h2><a class="index" href="'.htmlspecialchars('?action=reply&topicid='.$topicid).'">'.$lang_forums['text_add_reply'].'</a></h2>');
+		  echo '请勿发表纯表情、纯引用、纯符号等无意义回复';
+		  echo ('<form id="compose" name="compose" method="post" action="?action=post" onsubmit="return postvalid(this);"><input type="hidden" name="id" value='.$topicid.' /><input type="hidden" name="type" value="reply" /><br />');
 			quickreply('compose', 'body',$lang_forums['submit_add_reply']);
 			print("</form></div>");
 		}

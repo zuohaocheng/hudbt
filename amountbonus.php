@@ -16,8 +16,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	if ($_POST["username"] == "" || $_POST["seedbonus"] == "" || $_POST["seedbonus"] == "")
 	stderr("Error", "Missing form data.");
 	require_once(get_langfile_path("delete.php",true));
-	$username = sqlesc($_POST["username"]);
-	$seedbonus = sqlesc($_POST["seedbonus"]);
+	$username = $_POST["username"];
+	$seedbonus = $_POST["seedbonus"];
 	$operator = $CURUSER["username"];
 	$receiver = get_user_id_from_name($username);
 	$lang = get_user_lang($receiver);
@@ -26,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	KPS('+', $seedbonus, $receiver);
 	send_pm(0, $receiver,$subject,$msg);
 
-  header("Location: " . get_protocol_prefix() . "$BASEURL/userdetails.php?id=".htmlspecialchars($arr[0]));
+  header("Location: " . get_protocol_prefix() . "$BASEURL/userdetails.php?id=".htmlspecialchars($receiver));
 	die;
 }
 stdhead("Update Users Upload Amounts");

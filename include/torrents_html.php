@@ -163,7 +163,7 @@ if ($count) {
   }
 
   if ($sectiontype == $browsecatmode)
-    torrenttable($rows, compact('swap_headings', 'progress'));
+    torrenttable($rows, compact('progress'));
 //  elseif ($sectiontype == $specialcatmode) die('Error, Contact SYSOP');
 //    torrenttable($res, "music", $swap_headings);
 //  else die('') die('Error, Contact SYSOP');
@@ -220,7 +220,6 @@ function hotmenu(){
   echo '</a></li>';
 }?>
 </ul></li>
-<li><input type="checkbox" id="swaph" name="swaph" value="1" <?php if ($_GET['swaph']){echo 'checked="checked"';}?> /><a href="?swaph=1">中文主标题</a></li>
 </ul></div>
 <?php
 }

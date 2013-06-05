@@ -49,6 +49,9 @@ if (!$action) {
     if ($disabled) {
       $tag = ' disabled="disabled"';
     }
+    else {
+      $tag = '';
+    }
     return '<input type="submit" value="' . $text . '"' . $tag . ' />';
   }
 
@@ -146,8 +149,8 @@ if (!$action) {
     $out .= submit_b($i, $bonusarray['points']) . '</div>';
     $out .= '</h3>';
     $out .= $bonusarray['description'];
-    $opt = $otheroptions[$i];
-    if ($opt) {
+    if (isset($otheroptions[$i])) {
+      $opt = $otheroptions[$i];
       $out .= '<div class="bonus-opts minor-list">' . $opt . '</div>';
     }
     $out .= '</form></li>';

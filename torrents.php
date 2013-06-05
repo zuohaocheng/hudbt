@@ -116,7 +116,7 @@ if ($showsubcat){
   if ($showaudiocodec) $whereaudiocodecina = array();
 }
 //----------------- start whether show torrents from all sections---------------------//
-if ($_GET) {
+if (isset($_GET["allsec"])) {
   $allsec = 0 + $_GET["allsec"];
 }
 else {
@@ -128,7 +128,7 @@ if ($allsec == 1) {		//show torrents from all sections
 }
 // ----------------- end whether ignoring section ---------------------//
 // ----------------- start bookmarked ---------------------//
-if ($_GET) {
+if (isset($_GET["inclbookmarked"])) {
   $inclbookmarked = 0 + $_GET["inclbookmarked"];
 }
 elseif ($CURUSER['notifs']){
@@ -168,10 +168,6 @@ elseif ($inclbookmarked == 2)		//not bookmarked
 if (!isset($CURUSER))
   $wherea[] = "banned != 'yes'";
 
-if ($_GET["swaph"]) {
-  $addparam .= "swaph=1&";
-}
-
 // ----------------- start include dead ---------------------//
 if (isset($_GET["incldead"]))
   $include_dead = 0 + $_GET["incldead"];
@@ -208,7 +204,7 @@ elseif ($include_dead == 3) {
   $wherea[] = "startseed = 'no'";
 }
 // ----------------- end include dead ---------------------//
-if ($_GET)
+if (isset($_GET["spstate"]))
   $special_state = 0 + $_GET["spstate"];
 elseif ($CURUSER['notifs']){
   if (strpos($CURUSER['notifs'], "[spstate=1]") !== false)
@@ -342,7 +338,7 @@ else {
   $wherestoring = false;
 }
 
-if ($_GET["indate"]) {
+if (isset($_GET["indate"])) {
   $indate = 0 + $_GET["indate"];
 
   if ($indate) {
@@ -855,7 +851,7 @@ if ($count) {
 
   $sql_extra_order_md5 = md5($sql_args . $orderby . $start);
   
-  $fields = 'torrents.id, torrents.sp_state, torrents.promotion_time_type, torrents.promotion_until, torrents.banned, torrents.picktype, torrents.pos_state, torrents.category, torrents.source, torrents.medium, torrents.codec, torrents.standard, torrents.processing, torrents.team, torrents.audiocodec, torrents.leechers, torrents.seeders, torrents.name, torrents.small_descr, torrents.times_completed, torrents.size, torrents.added, torrents.comments,torrents.anonymous,torrents.owner,torrents.url,torrents.cache_stamp,torrents.oday, torrents.storing, torrents.pos_state_until';
+  $fields = 'torrents.id, torrents.sp_state, torrents.promotion_time_type, torrents.promotion_until, torrents.banned, torrents.picktype, torrents.pos_state, torrents.category, torrents.source, torrents.medium, torrents.codec, torrents.standard, torrents.processing, torrents.team, torrents.audiocodec, torrents.leechers, torrents.seeders, torrents.name, torrents.small_descr, torrents.times_completed, torrents.size, torrents.added, torrents.comments,torrents.anonymous,torrents.owner,torrents.url,torrents.oday, torrents.storing, torrents.pos_state_until';
 
     //Modified by bluemonster 20111026 & by Eggsorer 20120517
   function extraByState($state, $eq = true) {
@@ -981,8 +977,6 @@ else {
 
 #$timer_3_end = microtime(true); // debug
 #$timer_4_start = microtime(true); // debug
-
-$swap_headings = !!$_GET["swaph"];
 
 $progress = [];
 if (isset($rows)) {

@@ -44,9 +44,7 @@ $monthselection.="</select>";
 </div>
 
 <?php
-$numres = sql_query("SELECT COUNT(users.id) FROM users WHERE class >= ".UC_UPLOADER) or sqlerr(__FILE__, __LINE__);
-$numrow = _mysql_fetch_array($numres);
-$num=$numrow[0];
+  $num = get_row_count('users', "WHERE class >= ?", [UC_UPLOADER]);
 if (!$num) {
 	print("<p align=\"center\">".$lang_uploaders['text_no_uploaders_yet']."</p>");
 }
@@ -61,6 +59,9 @@ else {
 	$res = sql_query('SELECT users.id AS userid, COUNT(1) AS torrent_count, SUM(torrents.size) AS torrent_size FROM users LEFT JOIN torrents ON users.id=torrents.owner AND torrents.added >? AND torrents.added <? WHERE users.class>=? GROUP BY users.id ORDER BY torrent_count DESC', [$sqlstarttime, $sqlendtime, UC_UPLOADER]);
 	while($row = _mysql_fetch_array($res))
 	{
+	  if ($row['torrent_size'] === null) {
+	    $row['torrent_count'] = 0;
+	  }
 		$res2 = sql_query("SELECT torrents.id, torrents.name, torrents.added FROM torrents WHERE owner=".$row['userid']." ORDER BY id DESC LIMIT 1");
 		$row2 = _mysql_fetch_array($res2);
 		print("<tr>");

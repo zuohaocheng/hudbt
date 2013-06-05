@@ -11,8 +11,7 @@ if (isset($_REQUEST['counter'])) {
 else {
   $counter = 0;
 }
-$tooltips = torrenttable($rows, ['swap_headings' => $swap_headings,
-				 'counter' => $counter,
+$tooltips = torrenttable($rows, ['counter' => $counter,
 				 'header' => false,
 				 'splitcomment' =>true,
 				 'progress' => $progress]);

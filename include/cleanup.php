@@ -518,7 +518,7 @@ function user_to_peasant($down_floor_gb, $minratio){
 	{
 		while ($arr = _mysql_fetch_assoc($res))
 		{
-			writecomment($arr[id],"Banned by System because of Leech Warning expired.");
+			writecomment($arr['id'],"Banned by System because of Leech Warning expired.");
 
 			sql_query("UPDATE users SET enabled = 'no', leechwarnuntil = '0000-00-00 00:00:00' WHERE id = $arr[id]") or sqlerr(__FILE__, __LINE__);
 		}

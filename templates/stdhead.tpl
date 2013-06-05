@@ -38,7 +38,7 @@
 	{/if}
     </div></header>
     <div id="page">
-      {if !$CURUSER} 
+      {if !isset($CURUSER)} 
       <div id="nav-reg-signup" class="big minor-list list-seperator minor-nav"><ul>{nocache}{no_login_navbar()}{/nocache}</ul></div>
       {else}
       {nocache}

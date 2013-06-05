@@ -71,8 +71,14 @@ function js() {
 }
 
 function write_file($f, $content) {
-  $ref = file_get_contents($f);
-  if ($ref != $content) {
+  if (file_exists($f)) {
+    $write = ($content != file_get_contents($f));
+  }
+  else {
+    $write = true;
+  }
+
+  if ($write) {
     file_put_contents($f, $content);
   }
 }

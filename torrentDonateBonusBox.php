@@ -46,7 +46,6 @@ if($Cache->get_value('sign_update_donate_bonus_torrent_'.$torrent_id) == 'no') {
 	$donaterRecodes  = array();
 	while($donateInfo = _mysql_fetch_assoc($result)) {
 		$donaterRecodes[] = $donateInfo;
-		$i++;
 	}
 	$Cache->cache_value('update_donate_bonus_torrent_'.$torrent_id, $donaterRecodes, 365 * 24 * 3600);
 	$Cache->cache_value('sign_update_donate_bonus_torrent_'.$torrent_id, 'no', 365 * 24 * 3600);

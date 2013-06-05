@@ -18,7 +18,7 @@ $id = 0 + $_GET["id"];
 int_check($id,true);
 
 	
-define(GUEST_UID, 43523);
+define('GUEST_UID', 43523);
 // define(GUEST_UID, 2);
 if($CURUSER['id'] == GUEST_UID && $id == GUEST_UID) {
 
@@ -92,10 +92,10 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 	if ($user["status"] == "pending")
 	stderr($lang_userdetails['std_sorry'], $lang_userdetails['std_user_not_confirmed']);
 
-	if ($user[added] == "0000-00-00 00:00:00")
+	if ($user['added'] == "0000-00-00 00:00:00")
 	$joindate = $lang_userdetails['text_not_available'];
 	else
-	$joindate = $user[added]." (" . gettime($user["added"], true, false, true).")";
+	$joindate = $user['added']." (" . gettime($user["added"], true, false, true).")";
 	$lastseen = $user["last_access"];
 	if ($lastseen == "0000-00-00 00:00:00")
 	$lastseen = $lang_userdetails['text_not_available'];
@@ -103,24 +103,24 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 	{
 		$lastseen .= " (" . gettime($lastseen, true, false, true).")";
 	}
-	$res = sql_query("SELECT COUNT(*) FROM comments WHERE user=" . $user[id]) or sqlerr();
+	$res = sql_query("SELECT COUNT(*) FROM comments WHERE user=" . $user['id']) or sqlerr();
 	$arr3 = _mysql_fetch_row($res);
 	$torrentcomments = $arr3[0];
-	$res = sql_query("SELECT COUNT(*) FROM posts WHERE userid=" . $user[id]) or sqlerr();
+	$res = sql_query("SELECT COUNT(*) FROM posts WHERE userid=" . $user['id']) or sqlerr();
 	$arr3 = _mysql_fetch_row($res);
 	$forumposts = $arr3[0];
 
-		$arr = get_country_row($user[country]);
-		$country = "<img src=\"pic/flag/".$arr[flagpic]."\" alt=\"".$arr[name]."\" style='margin-left: 8pt' />";
+		$arr = get_country_row($user['country']);
+		$country = "<img src=\"pic/flag/".$arr['flagpic']."\" alt=\"".$arr['name']."\" style='margin-left: 8pt' />";
 
-		$arr = get_downloadspeed_row($user[download]);
-		$download = "<img class=\"speed_down\" src=\"pic/trans.gif\" alt=\"Downstream Rate\" title=\"".$lang_userdetails['title_download'].$arr[name]."\" /> ".$arr[name];
+		$arr = get_downloadspeed_row($user['download']);
+		$download = "<img class=\"speed_down\" src=\"pic/trans.gif\" alt=\"Downstream Rate\" title=\"".$lang_userdetails['title_download'].$arr['name']."\" /> ".$arr['name'];
 
-		$arr = get_uploadspeed_row($user[upload]);
-		$upload = "<img class=\"speed_up\" src=\"pic/trans.gif\" alt=\"Upstream Rate\" title=\"".$lang_userdetails['title_upload'].$arr[name]."\" /> ".$arr[name];
+		$arr = get_uploadspeed_row($user['upload']);
+		$upload = "<img class=\"speed_up\" src=\"pic/trans.gif\" alt=\"Upstream Rate\" title=\"".$lang_userdetails['title_upload'].$arr['name']."\" /> ".$arr['name'];
 
-		$arr = get_isp_row($user[isp]);
-		$isp = $arr[name];
+		$arr = get_isp_row($user['isp']);
+		$isp = $arr['name'];
 
 	if ($user["gender"] == "Male")
 	$gender = "<img class='male' src='pic/trans.gif' alt='Male' title='".$lang_userdetails['title_male']."' style='margin-left: 4pt' />";
@@ -232,17 +232,17 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 		}
 	*/
 
-		if ($CURUSER[id] == $user[id] || get_user_class() >= $viewinvite_class){
+		if ($CURUSER['id'] == $user['id'] || get_user_class() >= $viewinvite_class){
 		if ($user["invites"] <= 0)
 		tr_small($lang_userdetails['row_invitation'], $lang_userdetails['text_no_invitation'], 1);
 		else
-		tr_small($lang_userdetails['row_invitation'], "<a href=\"invite.php?id=".$user[id]."\" title=\"".$lang_userdetails['link_send_invitation']."\">".$user[invites]."</a>", 1);}
+		tr_small($lang_userdetails['row_invitation'], "<a href=\"invite.php?id=".$user['id']."\" title=\"".$lang_userdetails['link_send_invitation']."\">".$user['invites']."</a>", 1);}
 		else{
-		if ($CURUSER[id] != $user[id] || get_user_class() != $viewinvite_class){
+		if ($CURUSER['id'] != $user['id'] || get_user_class() != $viewinvite_class){
 		if ($user["invites"] <= 0)
 		tr_small($lang_userdetails['row_invitation'], $lang_userdetails['text_no_invitation'], 1);
 		else
-		tr($lang_userdetails['row_invitation'], $user[invites], 1);}
+		tr($lang_userdetails['row_invitation'], $user['invites'], 1);}
 		}
 		if ($user["invited_by"] > 0) {
 			tr_small($lang_userdetails['row_invited_by'], get_username($user['invited_by']), 1);
@@ -250,7 +250,7 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 		tr_small($lang_userdetails['row_join_date'], $joindate, 1);
 		tr_small($lang_userdetails['row_last_seen'], $lastseen, 1);
 	if (get_user_class() >= $userprofile_class OR $user["privacy"] == "low") {
-		tr_small($lang_userdetails['row_email'], "<a href=\"mailto:".$user[email]."\">".$user[email]."</a>", 1);
+		tr_small($lang_userdetails['row_email'], "<a href=\"mailto:".$user['email']."\">".$user['email']."</a>", 1);
 	}
 	if (get_user_class() >= $userprofile_class) {
 		$resip = sql_query("SELECT ip FROM iplog WHERE userid =$id GROUP BY ip") or sqlerr(__FILE__, __LINE__);
@@ -263,18 +263,18 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 	if (get_user_class() >= $userprofile_class ||  $user["id"] == $CURUSER["id"])
 	{
 		if ($enablelocation_tweak == 'yes'){
-			list($loc_pub, $loc_mod) = get_ip_location($user[ip]);
+			list($loc_pub, $loc_mod) = get_ip_location($user['ip']);
 			$locationinfo = "<span title=\"" . $loc_mod . "\">[" . $loc_pub . "]</span>";
 		}
 		else $locationinfo = "";
-		tr_small($lang_userdetails['row_ip_address'], $user[ip].$locationinfo, 1);
+		tr_small($lang_userdetails['row_ip_address'], $user['ip'].$locationinfo, 1);
 	}
-
-	$res = sql_query("SELECT agent, peer_id, ip, ipv6, port FROM peers WHERE userid = $user[id] GROUP BY agent") or sqlerr();
+		
+		$res = sql_query("SELECT agent, peer_id, ip, ipv6, port FROM peers WHERE userid = $user[id] GROUP BY agent");
+		$clientselect = "";
 	if (_mysql_num_rows($res) > 0)
 	{
 		$first = true;
-		$clientselect = "";
 		while($arr = _mysql_fetch_assoc($res))
 		{
 			$clientselect .= ($first == true ? "" : " ; ") . get_agent($arr["peer_id"], $arr["agent"]);
@@ -319,19 +319,19 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 	tr_small($lang_userdetails['row_gender'], $gender, 1);
 
 	if (($user['donated'] > 0 || $user['donated_cny'] > 0 )&& (get_user_class() >= $userprofile_class || $CURUSER["id"] == $user["id"]))
-	tr_small($lang_userdetails['row_donated'], "$".htmlspecialchars($user[donated])."&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".htmlspecialchars($user[donated_cny]), 1);
+	tr_small($lang_userdetails['row_donated'], "$".htmlspecialchars($user['donated'])."&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".htmlspecialchars($user['donated_cny']), 1);
 
 	if ($user["avatar"])
 	tr_small($lang_userdetails['row_avatar'], return_avatar_image(htmlspecialchars(trim($user["avatar"]))), 1);
 	$uclass = get_user_class_image($user["class"]);
-	tr_small($lang_userdetails['row_class'], "<img alt=\"".get_user_class_name($user["class"],false,false,true)."\" title=\"".get_user_class_name($user["class"],false,false,true)."\" src=\"".$uclass."\" /> ".($user[title]!=="" ? "&nbsp;".htmlspecialchars(trim($user["title"]))."" :  ""), 1);
+	tr_small($lang_userdetails['row_class'], "<img alt=\"".get_user_class_name($user["class"],false,false,true)."\" title=\"".get_user_class_name($user["class"],false,false,true)."\" src=\"".$uclass."\" /> ".($user['title']!=="" ? "&nbsp;".htmlspecialchars(trim($user["title"]))."" :  ""), 1);
 
 	tr_small($lang_userdetails['row_torrent_comment'], ($torrentcomments && ($user["id"] == $CURUSER["id"] || get_user_class() >= $viewhistory_class) ? "<a href=\"userhistory.php?action=viewcomments&amp;id=".$id."\" title=\"".$lang_userdetails['link_view_comments']."\">".$torrentcomments."</a>" : $torrentcomments), 1);
 
 	tr_small($lang_userdetails['row_forum_posts'], ($forumposts && ($user["id"] == $CURUSER["id"] || get_user_class() >= $viewhistory_class) ? "<a href=\"userhistory.php?action=viewposts&amp;id=".$id."\" title=\"".$lang_userdetails['link_view_posts']."\">".$forumposts."</a>" : $forumposts), 1);
 
 	if ($user["id"] == $CURUSER["id"] || get_user_class() >= $viewhistory_class)
-	tr_small($lang_userdetails['row_karma_points'], htmlspecialchars($user[seedbonus]), 1);
+	tr_small($lang_userdetails['row_karma_points'], htmlspecialchars($user['seedbonus']), 1);
 
 	if ($user["ip"] && (get_user_class() >= $torrenthistory_class || $user["id"] == $CURUSER["id"])){
 
@@ -358,7 +358,7 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 	}
 	else
 	{
-		print("<tr><td align=\"left\" colspan=\"2\" class=\"text\"><font color=\"blue\">".$lang_userdetails['text_public_access_denied'].$user[username].$lang_userdetails['text_user_wants_privacy']."</font></td></tr>\n");
+		print("<tr><td align=\"left\" colspan=\"2\" class=\"text\"><font color=\"blue\">".$lang_userdetails['text_public_access_denied'].$user['username'].$lang_userdetails['text_user_wants_privacy']."</font></td></tr>\n");
 	}
 	if ($CURUSER["id"] != $user["id"])
 	if (get_user_class() >= $staffmem_class)
@@ -376,7 +376,7 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 	if ($CURUSER["id"] != $user["id"]){
 	print("<tr><td colspan=\"2\" align=\"center\">");
 	if ($showpmbutton)
-	print("<a href=\"sendmessage.php?receiver=".htmlspecialchars($user[id])."\"><img class=\"f_pm\" src=\"pic/trans.gif\" alt=\"PM\" title=\"".$lang_userdetails['title_send_pm']."\" /></a>");
+	print("<a href=\"sendmessage.php?receiver=".htmlspecialchars($user['id'])."\"><img class=\"f_pm\" src=\"pic/trans.gif\" alt=\"PM\" title=\"".$lang_userdetails['title_send_pm']."\" /></a>");
 
 	print("<a href=\"report.php?user=".htmlspecialchars($user['id'])."\"><img class=\"f_report\" src=\"pic/trans.gif\" alt=\"Report\" title=\"".$lang_userdetails['title_report_user']."\" /></a>");
 	print("</td></tr>");
@@ -401,7 +401,7 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 		if (get_user_class() == UC_STAFFLEADER)
 		{
 			tr($lang_userdetails['row_donor_status'], "<input type=\"radio\" name=\"donor\" value=\"yes\"" .($user["donor"] == "yes" ? " checked=\"checked\"" : "")." />".$lang_userdetails['radio_yes']." <input type=\"radio\" name=\"donor\" value=\"no\"" .($user["donor"] == "no" ? " checked=\"checked\"" : "").">".$lang_userdetails['radio_no'], 1);
-			tr($lang_userdetails['row_donated'], "USD: <input type=\"text\" size=\"5\" name=\"donated\" value=\"" . htmlspecialchars($user[donated]) . "\" />&nbsp;&nbsp;&nbsp;&nbsp;CNY: <input type=\"text\" size=\"5\" name=\"donated_cny\" value=\"" . htmlspecialchars($user[donated_cny]) . "\" />" . $lang_userdetails['text_transaction_memo'] . "<input type=\"text\" size=\"50\" name=\"donation_memo\" />", 1);
+			tr($lang_userdetails['row_donated'], "USD: <input type=\"text\" size=\"5\" name=\"donated\" value=\"" . htmlspecialchars($user['donated']) . "\" />&nbsp;&nbsp;&nbsp;&nbsp;CNY: <input type=\"text\" size=\"5\" name=\"donated_cny\" value=\"" . htmlspecialchars($user['donated_cny']) . "\" />" . $lang_userdetails['text_transaction_memo'] . "<input type=\"text\" size=\"50\" name=\"donation_memo\" />", 1);
 		}
 		if (get_user_class() == $prfmanage_class)
 			$maxclass = UC_VIP;
@@ -466,7 +466,7 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 
 
 		$elapsedlw = get_elapsed_time(strtotime($user["lastwarned"]));
-		print("<tr><td align=\"left\" class=\"rowfollow\">".$lang_userdetails['text_times_warned']."</td><td align=\"left\" class=\"rowfollow\">".$user[timeswarned]."</td></tr>\n");
+		print("<tr><td align=\"left\" class=\"rowfollow\">".$lang_userdetails['text_times_warned']."</td><td align=\"left\" class=\"rowfollow\">".$user['timeswarned']."</td></tr>\n");
 
 		if ($user["timeswarned"] == 0)
 		{
@@ -511,9 +511,9 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 		tr($lang_userdetails['row_no_ad_until'], "<input type=\"text\" name=\"noaduntil\" value=\"".htmlspecialchars($user["noaduntil"])."\" /> ".$lang_userdetails['text_no_ad_until_note'], 1);
 		if (get_user_class() >= $cruprfmanage_class)
 		{
-			tr($lang_userdetails['row_change_username'], "<input type=\"text\" size=\"25\" name=\"username\" value=\"" . htmlspecialchars($user[username]) . "\" />", 1);
+			tr($lang_userdetails['row_change_username'], "<input type=\"text\" size=\"25\" name=\"username\" value=\"" . htmlspecialchars($user['username']) . "\" />", 1);
 
-			tr($lang_userdetails['row_change_email'], "<input type=\"text\" size=\"80\" name=\"email\" value=\"" . htmlspecialchars($user[email]) . "\" />", 1);
+			tr($lang_userdetails['row_change_email'], "<input type=\"text\" size=\"80\" name=\"email\" value=\"" . htmlspecialchars($user['email']) . "\" />", 1);
 		}
 
 		tr($lang_userdetails['row_change_password'], "<input type=\"password\" name=\"chpassword\" size=\"50\" />", 1);
@@ -521,10 +521,10 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 
 		if (get_user_class() >= $cruprfmanage_class)
 		{
-			tr($lang_userdetails['row_amount_uploaded'], "<input type=\"text\" size=\"60\" name=\"uploaded\" value=\"" . htmlspecialchars($user[uploaded]) . "\" /><input type=\"hidden\" name=\"ori_uploaded\" value=\"" . htmlspecialchars($user[uploaded]) . "\" />", 1);
-			tr($lang_userdetails['row_amount_downloaded'], "<input type=\"text\" size=\"60\" name=\"downloaded\" value=\"" .htmlspecialchars($user[downloaded]) . "\" /><input type=\"hidden\" name=\"ori_downloaded\" value=\"" .htmlspecialchars($user[downloaded]) . "\" />", 1);
-			tr($lang_userdetails['row_seeding_karma'], "<input type=\"text\" size=\"60\" name=\"bonus\" value=\"" .htmlspecialchars($user[seedbonus]) . "\" /><input type=\"hidden\" name=\"ori_bonus\" value=\"" .htmlspecialchars($user[seedbonus]) . "\" />", 1);
-			tr($lang_userdetails['row_invites'], "<input type=\"text\" size=\"60\" name=\"invites\" value=\"" .htmlspecialchars($user[invites]) . "\" />", 1);
+			tr($lang_userdetails['row_amount_uploaded'], "<input type=\"text\" size=\"60\" name=\"uploaded\" value=\"" . htmlspecialchars($user['uploaded']) . "\" /><input type=\"hidden\" name=\"ori_uploaded\" value=\"" . htmlspecialchars($user['uploaded']) . "\" />", 1);
+			tr($lang_userdetails['row_amount_downloaded'], "<input type=\"text\" size=\"60\" name=\"downloaded\" value=\"" .htmlspecialchars($user['downloaded']) . "\" /><input type=\"hidden\" name=\"ori_downloaded\" value=\"" .htmlspecialchars($user['downloaded']) . "\" />", 1);
+			tr($lang_userdetails['row_seeding_karma'], "<input type=\"text\" size=\"60\" name=\"bonus\" value=\"" .htmlspecialchars($user['seedbonus']) . "\" /><input type=\"hidden\" name=\"ori_bonus\" value=\"" .htmlspecialchars($user['seedbonus']) . "\" />", 1);
+			tr($lang_userdetails['row_invites'], "<input type=\"text\" size=\"60\" name=\"invites\" value=\"" .htmlspecialchars($user['invites']) . "\" />", 1);
 		}
 		tr($lang_userdetails['row_passkey'], "<input name=\"resetkey\" value=\"yes\" type=\"checkbox\" />".$lang_userdetails['checkbox_reset_passkey'], 1);
 

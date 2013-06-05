@@ -303,7 +303,7 @@ function permissionAuth($needle,$usergroups,$userclass){
 		foreach ($usergroups as $groupname => $value) {
 			$userrole = $usergroups[$groupname]['role'];
 			$removed = $usergroups[$groupname]['removed'];
-			if(in_array($needle,$permissionConfig[$groupname][$userrole]) && $removed==NULL)
+			if(isset($permissionConfig[$groupname][$userrole]) && in_array($needle,$permissionConfig[$groupname][$userrole]) && $removed==NULL)
 				return true;
 		}
 	}
@@ -737,7 +737,7 @@ function get_elapsed_time($ts,$shortunit = false) {
   $months -= $years * 12;
   $t = "";
   if ($years > 0)
-    return $years.($shortunit ? $lang_functions['text_short_year'] : $lang_functions['text_year'] . add_s($year)) ."&nbsp;".$months.($shortunit ? $lang_functions['text_short_month'] : $lang_functions['text_month'] . add_s($months));
+    return $years.($shortunit ? $lang_functions['text_short_year'] : $lang_functions['text_year'] . add_s($years)) ."&nbsp;".$months.($shortunit ? $lang_functions['text_short_month'] : $lang_functions['text_month'] . add_s($months));
   if ($months > 0)
     return $months.($shortunit ?  $lang_functions['text_short_month'] : $lang_functions['text_month'] . add_s($months)) ."&nbsp;".$days2.($shortunit ? $lang_functions['text_short_day'] : $lang_functions['text_day'] . add_s($days2));
   if ($days > 0)
@@ -3100,7 +3100,7 @@ function torrentTableCake($torrents) {
   foreach($torrents as $torrent) {
     $ids[] = $torrent['Torrent']['id'];
   }
-  $query = 'SELECT torrents.id, torrents.sp_state, torrents.promotion_time_type, torrents.promotion_until, torrents.banned, torrents.picktype, torrents.pos_state, torrents.category, torrents.source, torrents.medium, torrents.codec, torrents.standard, torrents.processing, torrents.team, torrents.audiocodec, torrents.leechers, torrents.seeders, torrents.name, torrents.small_descr, torrents.times_completed, torrents.size, torrents.added, torrents.comments,torrents.anonymous,torrents.owner,torrents.url,torrents.cache_stamp,torrents.oday FROM torrents WHERE id IN (' . implode(',', $ids) . ') ORDER BY pos_state DESC, torrents.id DESC';
+  $query = 'SELECT torrents.id, torrents.sp_state, torrents.promotion_time_type, torrents.promotion_until, torrents.banned, torrents.picktype, torrents.pos_state, torrents.category, torrents.source, torrents.medium, torrents.codec, torrents.standard, torrents.processing, torrents.team, torrents.audiocodec, torrents.leechers, torrents.seeders, torrents.name, torrents.small_descr, torrents.times_completed, torrents.size, torrents.added, torrents.comments,torrents.anonymous,torrents.owner,torrents.url,torrents.oday FROM torrents WHERE id IN (' . implode(',', $ids) . ') ORDER BY pos_state DESC, torrents.id DESC';
   $rows = sql_query($query)->fetchAll();
   torrenttable($rows);
 }

@@ -4,7 +4,8 @@ use Wrench\Application\Application;
 use Wrench\Application\NamedApplication;
 
 require(__DIR__ . '/../include/bittorrent.php');
-$pdo->query("SET wait_timeout=7200;");
+
+$pdo->query("SET wait_timeout=7200");
 
 class PmApplication extends Application {
   protected $users = array();
@@ -15,7 +16,6 @@ class PmApplication extends Application {
     try {
       $pdo->query('SELECT 1');
     } catch (PDOException $e) {
-      require('cake/app/Config/database.php');
       try {
 	$config = new DATABASE_CONFIG();
 	$default = $config->default;
@@ -37,6 +37,7 @@ class PmApplication extends Application {
       $this->users[$row['id']] = $client;
       $client->userid = $row['id'];
     }
+    echo date('H:i:s '), ' connected ', $client->userid, "\n";
   }
   
   public function onDisconnect($client) {

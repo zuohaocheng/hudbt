@@ -439,22 +439,11 @@ else {
 		    $dispname=substr($dispname, 0, $max_lenght_of_torrent_name) . "..";
 		  }
 
-		if (isset($copy_row["source_name"]))
-		  $other_source_info = $copy_row[source_name].", ";
-		if (isset($copy_row["medium_name"]))
-		  $other_medium_info = $copy_row[medium_name].", ";
-		if (isset($copy_row["codec_name"]))
-		  $other_codec_info = $copy_row[codec_name].", ";
-		if (isset($copy_row["standard_name"]))
-		  $other_standard_info = $copy_row[standard_name].", ";
-		if (isset($copy_row["processing_name"]))
-		  $other_processing_info = $copy_row[processing_name].", ";
-
 		$sphighlight = get_torrent_bg_color($copy_row['sp_state']);
 		$sp_info = get_torrent_promotion_append($copy_row['sp_state']);
 
 		$s .= "<tr". $sphighlight."><td class=\"rowfollow nowrap\" valign=\"middle\" style='padding: 0px'>".return_category_image($copy_row["catid"], "torrents.php?allsec=1&amp;")."</td><td class=\"rowfollow\" align=\"left\"><a href=\"" . htmlspecialchars(get_protocol_prefix() . $BASEURL . "/details.php?id=" . $copy_row["id"]. "&hit=1")."\">" . $dispname ."</a>". $sp_info."</td>" .
-		  "<td class=\"rowfollow\" align=\"left\">" . rtrim(trim($other_source_info . $other_medium_info . $other_codec_info . $other_standard_info . $other_processing_info), ","). "</td>" .
+		  "<td class=\"rowfollow\" align=\"left\">" . implode(', ', array_filter([$copy_row['source_name'], $copy_row['medium_name'], $copy_row['codec_name'], $copy_row['standard_name'], $copy_row['processing_name']])). "</td>" .
 		  "<td class=\"rowfollow\" align=\"center\">" . mksize($copy_row["size"]) . "</td>" .
 		  "<td class=\"rowfollow nowrap\" align=\"center\">" . str_replace("&nbsp;", "<br />", gettime($copy_row["added"],false)). "</td>" .
 		  "<td class=\"rowfollow\" align=\"center\">" . $copy_row["seeders"] . "</td>" .
@@ -462,7 +451,7 @@ else {
 		  "</tr>\n";
 	      }
 	    $s .= "</table>\n";
-	    dl_item("<a href=\"javascript: klappe_news('othercopy')\"><span class=\"nowrap\"><img class=\"".($copies_count > 5 ? "plus" : "minus")."\" src=\"pic/trans.gif\" alt=\"Show/Hide\" id=\"picothercopy\" title=\"".$lang_detail['title_show_or_hide']."\" /> ".$lang_details['row_other_copies']."</span></a>", "<b>".$copies_count.$lang_details['text_other_copies']." </b><br /><div id='kothercopy' style=\"".($copies_count > 5 ? "display: none;" : "display: block;")."\">".$s."</div>",1);
+	    dl_item("<a href=\"javascript: klappe_news('othercopy')\"><span class=\"nowrap\"><img class=\"".($copies_count > 5 ? "plus" : "minus")."\" src=\"pic/trans.gif\" alt=\"Show/Hide\" id=\"picothercopy\" title=\"".$lang_details['title_show_or_hide']."\" /> ".$lang_details['row_other_copies']."</span></a>", "<b>".$copies_count.$lang_details['text_other_copies']." </b><br /><div id='kothercopy' style=\"".($copies_count > 5 ? "display: none;" : "display: block;")."\">".$s."</div>",1);
 	  }
       }
 

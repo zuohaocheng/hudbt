@@ -4,7 +4,7 @@ dbconn();
 require_once(get_langfile_path());
 loggedinorreturn();
 	
-define(GUEST_UID, 43523); // For CNGI users
+define('GUEST_UID', 43523); // For CNGI users
 function bark($msg) {
 	//stdhead();
 	global $lang_usercp;
@@ -358,14 +358,14 @@ echo '<dl class="table">';
 			if ($emailnotify_smtp=='yes' && $smtptype != 'none')
 				dl_item($lang_usercp['row_email_notification'], "<input type=checkbox name=pmnotif" . (strpos($CURUSER['notifs'], "[pm]") !== false ? " checked" : "") . " value=yes> ".$lang_usercp['checkbox_notification_received_pm']."<br />\n<input type=checkbox name=emailnotif" . (strpos($CURUSER['notifs'], "[email]") !== false ? " checked" : "") . " value=\"yes\" /> ".$lang_usercp['checkbox_notification_default_categories'], 1);
 
-			$categories = "<table>".($allowspecial ? "<tr><td class=embedded align=left><font class=big>".$lang_usercp['text_at_browse_page']."</font></td></tr></table><table>" : "")."<tr><td class=embedded align=left><b>".($brenablecatrow == true ? $brcatrow[0] : $lang_usercp['text_category'])."</b></td></tr><tr>";
+			$categories = "<table>".($allowspecial ? "<tr><td class=embedded align=left><font class=big>".$lang_usercp['text_at_browse_page']."</font></td></tr></table><table>" : "")."<tr><td class=embedded align=left><b>" . $lang_usercp['text_category']."</b></td></tr><tr>";
 			$i = 0;
 			foreach ($brcats as $cat)//print category list of Torrents section
 			{
 				$numinrow = $i % $catsperrow;
 				$rownum = (int)($i / $catsperrow);
 				if ($i && $numinrow == 0){
-					$categories .= "</tr>".($brenablecatrow ? "<tr><td class=embedded align=left><b>".$brcatrow[$rownum]."</b></td></tr>" : "")."<tr>";
+					$categories .= "</tr><tr>";
 				}
 				$categories .= "<td align=left class=bottom style=\"padding-bottom: 4px;padding-left: ".$catpadding."px\"><input class=checkbox name=cat".$cat['id']." type=\"checkbox\" " . (strpos($CURUSER['notifs'], "[cat".$cat['id']."]") !== false ? " checked" : "")." value='yes'>".return_category_image($cat['id'], "torrents.php?allsec=1&amp;")."</td>\n";
 				$i++;
@@ -501,12 +501,14 @@ echo '<dl class="table">';
 			}
 			ksort($ss_sa);
 			reset($ss_sa);
+			$stylesheets = '';
 			while (list($ss_name, $ss_id) = each($ss_sa))
 			{
 				if ($ss_id == $CURUSER["stylesheet"]) $ss = " selected"; else $ss = "";
 				$stylesheets .= "<option value=$ss_id$ss>$ss_name</option>\n";
 			}
 			$cires = sql_query("SELECT * FROM caticons ORDER BY name") or die;
+			$categoryicons = '';
 			while($caticon = _mysql_fetch_array($cires)){
 				if ($caticon['id'] == $CURUSER['caticon']) $sl = " selected"; else $sl = "";
 				$categoryicons .= "<option value=".$caticon['id'].$sl.">".$caticon['name']."</option>\n";
