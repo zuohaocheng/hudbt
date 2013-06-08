@@ -11,16 +11,28 @@ header("Pragma: no-cache" );
 header("Content-Type: application/json; charset=utf-8");
 
 $torrentid = 0 + $_REQUEST['torrentid'];
-if (isset($CURUSER)) {
+if ($torrentid == 0) {
+  header('HTTP/1.1 400 Bad Request');
+  $result = 'failed';
+}
+else if (isset($CURUSER)) {
   if ($_REQUEST['action'] == 'del'){
     sql_query("DELETE FROM bookmarks WHERE torrentid= ? AND userid=?", [$torrentid, $CURUSER['id']]);
     $result = "deleted";
+    $Cache->delete_value('user_'.$CURUSER['id'].'_bookmark_array');
   }
   else {
-    sql_query("INSERT INTO bookmarks (torrentid, userid) VALUES (?, ?)", [$torrentid, $CURUSER['id']]);
-    $result = "added";
+    if (get_row_count('bookmarks', 'WHERE torrentid=? AND userid=?', [$torrentid, $CURUSER['id']]) == 0) {
+      sql_query("INSERT INTO bookmarks (torrentid, userid) VALUES (?, ?)", [$torrentid, $CURUSER['id']]);
+      $result = "added";
+      $Cache->delete_value('user_'.$CURUSER['id'].'_bookmark_array');
+    }
+    else {
+      header('HTTP/1.1 409 Conflict');
+      $result = 'failed';
+    }
   }
-  $Cache->delete_value('user_'.$CURUSER['id'].'_bookmark_array');
+
 }
 else {
   header('HTTP/1.1 401 Unauthorized');

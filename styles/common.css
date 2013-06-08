@@ -882,7 +882,7 @@ input.a:hover {
     cursor:pointer;
 }
 div#funbox-content {
-    max-height:360px;
+    max-height:400px;
     overflow-y:scroll;
 }
 iframe#funbox-content {

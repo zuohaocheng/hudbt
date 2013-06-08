@@ -204,7 +204,5 @@ $subject = ($lang_takesignup_target[get_user_lang($inviter)]['msg_invited_user_h
 $msg = ($lang_takesignup_target[get_user_lang($inviter)]['msg_user_you_invited'].$usern.$lang_takesignup_target[get_user_lang($inviter)]['msg_has_registered']);
 //sql_query("UPDATE LOW_PRIORITY users SET uploaded = uploaded + 10737418240 WHERE id = $inviter"); //add 10GB to invitor's uploading credit
 send_pm(0, $inviter, $subject, $msg);
-$Cache->delete_value('user_'.$inviter.'_unread_message_count');
-$Cache->delete_value('user_'.$inviter.'_inbox_count');
 }
 

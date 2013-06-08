@@ -24,10 +24,11 @@ print ($lang_aboutnexus['text_authorization_note']);
 print ("<br /><br />");
 end_frame();
 unset($ppl);
+/*
 $res = sql_query("SELECT * FROM language ORDER BY trans_state") or sqlerr();
 while ($arr = _mysql_fetch_assoc($res))
 {
-	$ppl .= "<tr><td class=\"rowfollow\"><img width=\"24\" height=\"15\" src=\"pic/flag/".$arr[flagpic]."\" alt=\"".$arr[lang_name]."\" title=\"".$arr[lang_name]."\" style=\"padding-bottom:1px;\" /></td>
+	$ppl .= "<tr><td class=\"rowfollow\"><img width=\"24\" height=\"15\" src=\"pic/flag/".$arr['flagpic']."\" alt=\"".$arr['lang_name']."\" title=\"".$arr['lang_name']."\" style=\"padding-bottom:1px;\" /></td>
  <td class=\"rowfollow\">".$arr['lang_name']."</td>".
  "<td class=\"rowfollow\">".$arr['trans_state']."</td></tr>\n";
 }
@@ -38,8 +39,9 @@ print ($ppl);
 print ("</table>");
 print ("<br /><br />");
 end_frame();
-unset($ppl);
-$res = sql_query("SELECT * FROM stylesheets ORDER BY id") or sqlerr();
+unset($ppl);*/
+$res = sql_query("SELECT name, designer, comment FROM stylesheets ORDER BY id") or sqlerr();
+$ppl = '';
 while ($arr = _mysql_fetch_assoc($res))
 {
 	$ppl .= "<tr><td class=\"rowfollow\">".$arr['name']."</td>
@@ -62,4 +64,3 @@ print ("<br /><br />");
 end_frame();
 end_main_frame();
 stdfoot();
-?>

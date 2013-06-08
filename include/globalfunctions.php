@@ -56,12 +56,12 @@ function get_pr_state($promotion, $added = '', $promotionTimeType = 0, $promotio
 }
 
 function get_maxslots($downloaded, $ratio) {
+  $max = 0;
   if ($downloaded > 10) {
     if ($ratio < 0.5) $max = 1;
     elseif ($ratio < 0.65) $max = 2;
     elseif ($ratio < 0.8) $max = 3;
     elseif ($ratio < 0.95) $max = 4;
-    else $max = 0;
   }
   return $max;
 }

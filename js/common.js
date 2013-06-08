@@ -1,3 +1,8 @@
+// iframe detection
+if ( window.self !== window.top ) {
+    window.top.location = location;
+}
+
 //ua detection, from jQuery
 (function() {
     var rwebkit = /(webkit)[ \/]([\w.]+)/,

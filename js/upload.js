@@ -271,6 +271,5 @@ $(function() {
 
 	name.readOnly = !sel;
 	cat.disabled = !sel;
-	descr.readOnly = !sel;
     }).trigger('change');
 });

@@ -62,12 +62,7 @@ stdhead($lang_upload['head_upload']);
 	if ($enablenfo_main=='yes')
 	  dl_item($lang_upload['row_nfo_file'], "<input type=\"file\" class=\"file\" name=\"nfo\" /><br /><font class=\"medium\">".$lang_upload['text_only_viewed_by'].get_user_class_name($viewnfo_class,false,true,true).$lang_upload['text_or_above']."</font>", 1);
 	print('<dt class="required">' . $lang_upload['row_description'] . '</dt><dd>');
-	if ($uploadfreely || $allowspecial) {
-	  textbbcode("upload","descr","",false);
-	}
-	else {
-	  echo '<textarea class="bbcode" cols="100" style="width: 70%;" name="descr" id="descr" rows="20" readonly="readonly"></textarea>';
-	}
+	textbbcode("upload","descr","",false);
 	print("</dd>\n");
 
 	if ($allowtorrents){

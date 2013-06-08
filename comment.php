@@ -135,8 +135,6 @@ if ($action == "add") {
 		  if ($quoteduser['user'] != $arr['owner']) {
 		    send_pm($CURUSER['id'], $arr['owner'], $subject, $notifs);
 		  }
-		  $Cache->delete_value('user_'.$arr['owner'].'_unread_message_count');
-		  $Cache->delete_value('user_'.$arr['owner'].'_inbox_count');
 		}
 
 		$preparser->setLink(href());

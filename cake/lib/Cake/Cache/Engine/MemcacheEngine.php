@@ -74,7 +74,8 @@ class MemcacheEngine extends CacheEngine {
 			'engine' => 'Memcache',
 			'servers' => array('127.0.0.1'),
 			'compress' => false,
-			'persistent' => true
+			'persistent' => true,
+			'compressThreshold' => 0
 		);
 		parent::init($settings);
 
@@ -93,6 +94,10 @@ class MemcacheEngine extends CacheEngine {
 					$return = true;
 				}
 			}
+			if ($this->settings['compressThreshold']) {
+			  var_dump($this->_Memcache->setCompressThreshold($this->settings['compressThreshold']));
+			}
+
 			return $return;
 		}
 		return true;

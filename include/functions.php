@@ -37,9 +37,13 @@ $privilegeConfig = ['Maintenance'=>['staticResources' => UC_MODERATOR],
 	$data = $Sub->read(['uppedby'], $id);
 	return ($data['Sub']['uppedby'] == $CURUSER['id']);
       }]],
+// ---------------------------
 		    'Posts'=>['editnotseen'=>UC_MODERATOR,'seeeditnotseen'=>UC_UPLOADER,],
+// ---------------------------		    
 		    'Misc' => ['fun' => $funmanage_class],
-		    'ManagePanels' => ['deletedisabled' => UC_SYSOP,
+		    'ManagePanels' => [
+				       'staffPanel' => UC_UPLOADER,
+				       'deletedisabled' => UC_SYSOP,
 				       'forummanage' => $forummanage_class,
 				       'mysql_stats' => UC_SYSOP,
 				       'massmail' => UC_SYSOP,
@@ -72,9 +76,13 @@ $privilegeConfig = ['Maintenance'=>['staticResources' => UC_MODERATOR],
 				       'clearcache' => UC_MODERATOR,
 				       'hustip' => UC_MODERATOR,
 				       'ssh' => UC_SYSOP,
-				       'staffPanel' => UC_UPLOADER,
 				       'staffbox' => UC_UPLOADER,
-				       'settings' => UC_SYSOP,]
+				       'settings' => UC_SYSOP,
+				       'keepers' => function() {
+      global $CURUSER;
+      return permissionAuth('viewkeepers',$CURUSER['usergroups'],$CURUSER['class']);
+    },
+]
 		    ];
 
 function smarty($cachetime=300, $debug = false) {
@@ -369,7 +377,7 @@ function checkPrivilege($item, $opts = null) {
       return checkSubPrivilege($privilegeConfig[$item], $opts);
     }
   }
-  throw 'Invalid input';
+  throw new Exception('Invalid input');
 }
 
 function stdmsg($heading, $text, $htmlstrip = false) {
@@ -473,7 +481,9 @@ function format_comment($text, $null0 = null, $null1 = null, $newtab = false, $n
 
     $text = htmlspecialchars($text, ENT_HTML401 | ENT_NOQUOTES);
     $text = str_replace("\r", "", $text);
-    $text = str_replace("\n", " <br/>", $text); # There has to be a space before <br>
+    # There has to be a space before <br>
+    # It has to be exactly '<br />', not '<br>' or something else
+    $text = str_replace("\n", " <br />", $text); 
 
     $opts = array('filters' => $filters, 'imgMaxW' => $image_max_width, 'imgMaxH' => $image_max_height);
     if ($newtab) {
@@ -4777,9 +4787,9 @@ function get_fun($id = 0, $pager_count = null) {
 	$height = '700px';
       }
       else {
-	$height = '360px';
+	$height = '400px';
       }
-      $content .= '<iframe id="funbox-content" style="height:'.$height.'" src="http://' . $BASEURL . '/' . $filename . '?' . $body->cachekey . '" ></iframe>';
+      $content .= '<iframe seamless id="funbox-content" style="height:'.$height.'" src="http://' . $BASEURL . '/' . $filename . '?' . $body->cachekey . '" ></iframe>';
       if (!file_exists($filename)) {
 	$h = '<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><link rel="stylesheet" href="../styles/common.css" type="text/css" media="screen" /><link rel="stylesheet" href="../styles/font.css" type="text/css" media="screen" /></head><body style="background-color:transparent;background-image:none">' . $body . '</body></html>';
 	file_put_contents($filename, $h);
@@ -4942,4 +4952,12 @@ function make_stat_url($url, $type, $args=[]) {
 	'type' => $type,
 	'arg' => $args];
   return '//' . $BASEURL . '/stat.php?' . http_build_query($a);
+}
+
+function write_file_log($name, $content) {
+  $h = fopen('log/' . $name . '.log', 'a');
+  if ($h) {
+    fwrite($h, $content . "\n");
+    fclose($h);
+  }
 }

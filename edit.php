@@ -168,7 +168,7 @@ if (get_user_class()>= $torrentsticky_class || (get_user_class() >= $torrentmana
       $odaycheckbox = "<input type=\"checkbox\" id=sel_oday name=\"sel_oday\" checked=\"yes\" value=\"oday\"/>".$lang_edit['oday'];
     elseif($row['oday']=='no')
       $odaycheckbox = "<input type=\"checkbox\" id=sel_oday name=\"sel_oday\" value=\"oday\"/>".$lang_edit['oday'];
-    $pickcontent.=$odaycheckbox;
+    $pickcontent.= '<label>' . $odaycheckbox . '</label>';
   }
   //Added by Eggsorer 20120328
   if (permissionAuth("setstoring",$CURUSER['usergroups'],$CURUSER['class'])) {
@@ -176,15 +176,15 @@ if (get_user_class()>= $torrentsticky_class || (get_user_class() >= $torrentmana
       $storingcheckbox = "<input type=\"checkbox\" id=sel_storing name=\"sel_storing\" checked=\"yes\" value=\"storing\"/>".$lang_edit['text_storing'];
     elseif($row['storing']=='0')
       $storingcheckbox = "<input type=\"checkbox\" id=sel_storing name=\"sel_storing\" value=\"storing\"/>".$lang_edit['text_storing'];
-    $pickcontent.=$storingcheckbox;
+    $pickcontent.='<label>' . $storingcheckbox . '</label>';
   }
   if (get_user_class()>=$torrentmanage_class && $CURUSER["picker"] == 'yes') {
-    $pickcontent .= "<b>".$lang_edit['row_recommended_movie'].":&nbsp;</b>"."<select name=\"sel_recmovie\" style=\"width: 100px;\">" .
+    $pickcontent .= "<div><b>".$lang_edit['row_recommended_movie'].":&nbsp;</b>"."<select name=\"sel_recmovie\" style=\"width: 100px;\">" .
       "<option" . (($row["picktype"] == "normal") ? " selected=\"selected\"" : "" ) . " value=\"0\">".$lang_edit['select_normal']."</option>" .
       "<option" . (($row["picktype"] == "hot") ? " selected=\"selected\"" : "" ) . " value=\"1\">".$lang_edit['select_hot']."</option>" .
       "<option" . (($row["picktype"] == "classic") ? " selected=\"selected\"" : "" ) . " value=\"2\">".$lang_edit['select_classic']."</option>" .
       "<option" . (($row["picktype"] == "recommended") ? " selected=\"selected\"" : "" ) . " value=\"3\">".$lang_edit['select_recommended']."</option>" .
-      "</select>";
+      "</select></div>";
   }
   dl_item($lang_edit['row_pick'], $pickcontent, true, '', 'pr');
 }

@@ -23,7 +23,7 @@ $lang_offers_target = array
 	'chs' => array
 	(
 	'msg_has_allowed' => "允许你上传 ",
-	'msg_find_offer_option' => "你会在上传区找到新的选项。",
+	'msg_find_offer_option' => '请至[url="upload.php"]上传区[/url]发布你的种子。',
 	'msg_your_offer_allowed' => "你的候选被允许",
 	'msg_offer_voted_on' => "你的候选被投票允许。你可以上传 ",
 	'msg_offer_voted_off' => "你的候选被投票拒绝。你不可以上传 ",

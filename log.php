@@ -433,8 +433,8 @@ else {
     if($query_raw){
       switch ($search){
       case "title": $wherea=" WHERE title LIKE :query "; break;
-      case "body": $wherea=" WHERE body LIKE :query' "; break;
-      case "both": $wherea=" WHERE body LIKE :query' or title LIKE :query" ; break;
+      case "body": $wherea=" WHERE body LIKE :query "; break;
+      case "both": $wherea=" WHERE body LIKE :query or title LIKE :query" ; break;
       }
       $addparam = "search=".rawurlencode($search)."&query=".rawurlencode($query)."&";
     }

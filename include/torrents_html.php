@@ -199,7 +199,7 @@ function hotmenu(){
   global $lang_functions, $lang_torrents, $promotion_text;
   global $wherehot, $indate, $special_state;
 ?>
-  <div id="hotbox" class="table minor-list"><ul>
+  <div id="hotbox" class="minor-list"><ul>
 
 
 <li class="minor-list-vertical"><div class="title" style="margin-bottom:0;">促销:</div><ul>

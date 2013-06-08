@@ -178,6 +178,17 @@ class ErrorHandler {
 		if (error_reporting() === 0) {
 			return false;
 		}
+
+		//Edited
+		static $ignores = ['Non-static method PEAR::getStaticProperty()',
+				   'Undefined index'];
+		foreach ($ignores as $ignore) {
+		  if (strstr($description, $ignore)) {
+		    return '';
+		  }
+		}
+		//End edit
+		
 		$errorConfig = Configure::read('Error');
 		list($error, $log) = self::mapErrorCode($code);
 		if ($log === LOG_ERR) {

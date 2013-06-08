@@ -26,6 +26,7 @@ $lang_staffpanel = [
 		    'allagents' => ['name' => '查看客户端', 'desc' => '查看所有的客户端(目前在下载/上传/做种)'],
 		    'admanage' => ['name' => '广告管理', 'desc' => '抵制广告，从我做起'],
 		    'uploaders' => ['name' => '发布员和总版主', 'desc' => '看看有没有在努力干活'],
+		    'keepers' => ['name' => '保种员', 'desc' => '说好的松果呢'],
 		    'stats' => ['name' => '状态', 'desc' => 'Tracker状态'],
 		    'testip' => ['name' => '检测IP', 'desc' => '查看IP是否有效'],
 		    'amountbonus' => ['name' => '发福利', 'desc' => '给一个人或一群人发福利'],

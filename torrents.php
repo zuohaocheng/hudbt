@@ -392,7 +392,7 @@ if (!$all) {
       foreach ($keys as $key) {
 	$k = $key['id'];
 	$findme  = '['.$notifs_key. $k .']';
-	if (strpos($notifs, $findme)) {
+	if (strpos($notifs, $findme) !== false) {
 	  $_REQUEST[$req_key . $k] = true;
 	}
       }
@@ -714,7 +714,7 @@ if (isset($searchstr)) {
 	$searchstr_exploded_count++;
 	if ($searchstr_exploded_count > 10)	// maximum 10 keywords
 	  break;
-	addToken($searchstr_element);
+	addToken(mb_strtolower($searchstr_element, 'utf-8'));
       }
       break;
     }

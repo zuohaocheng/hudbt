@@ -95,8 +95,6 @@ if ($_SERVER["REQUEST_METHOD"] != "POST")
 
 	$subject = trim($_REQUEST['subject']);
         send_pm($CURUSER["id"], $receiver, $subject, $msg, $save);
-	$Cache->delete_value('user_'.$receiver.'_unread_message_count');
-	$Cache->delete_value('user_'.$receiver.'_inbox_count');
 	$Cache->delete_value('user_'.$CURUSER["id"].'_outbox_count');
 	
 	$msgid=_mysql_insert_id();
