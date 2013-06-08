@@ -307,7 +307,7 @@ function check_client($peer_id, $agent) {
 function torrent_for_infohash ($infohash) {
   global $Cache;
   return $Cache->get_value('torrent_hash_'.$infohash.'_content', 350, function() use ($infohash) {
-      $r = sql_query("SELECT id, owner, sp_state, seeders, leechers, promotion_time_type, promotion_until, added, UNIX_TIMESTAMP(added) AS ts, banned, times_completed FROM torrents WHERE " . hash_where("info_hash", $infohash))->fetch();
+      $r = sql_query("SELECT id, owner, sp_state, seeders, leechers, promotion_time_type, promotion_until, added, UNIX_TIMESTAMP(added) AS ts, banned, times_completed FROM torrents WHERE info_hash = ?", [$infohash])->fetch();
       if (!$r) {
 	$r = [];
       }

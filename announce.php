@@ -184,11 +184,12 @@ else {
 }
 
 $resp .= "e";
-$selfwhere = "torrent = $torrentid AND " . hash_where("peer_id", $peer_id);
+$selfwhere = "torrent = ? AND peer_id = ?";
+$selfwhere_args = [$torrentid, $peer_id];
 
 //no found in the above random selection
 if (!isset($self)) {
-  $res = sql_query("SELECT $fields FROM peers WHERE $selfwhere LIMIT 1");
+  $res = sql_query("SELECT $fields FROM peers WHERE $selfwhere LIMIT 1", $selfwhere_args);
   $row = _mysql_fetch_assoc($res);
   if ($row) {
     $self = $row;
@@ -316,7 +317,8 @@ elseif(isset($self)) {
     $finished_snatched = '';
   }
 
-  sql_query("UPDATE peers SET ip = ".sqlesc($ip).", port = $port, uploaded = $uploaded, downloaded = $downloaded, to_go = $left, prev_action = last_action, last_action = $dt, seeder = '$seeder', agent = ".sqlesc($agent)." $finished, ipv6=? WHERE $selfwhere", [$ipv6]) or err("PL Err 1");
+  $args = array_merge([$ip, $port, $uploaded, $downloaded, $left, $dt, $seeder, $agent, $ipv6], $selfwhere_args);
+  sql_query("UPDATE peers SET ip = ?, port = ?, uploaded = ?, downloaded = ?, to_go = ?, prev_action = last_action, last_action = ?, seeder = ?, agent = ? $finished, ipv6=? WHERE $selfwhere", $args) or err("PL Err 1");
 
   if (_mysql_affected_rows()) {
     if ($seeder <> $self["seeder"])

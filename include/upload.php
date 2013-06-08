@@ -134,7 +134,7 @@ list($ann, $info) = dict_check($dict, "announce(string):info");
 
 $infohash = pack("H*", sha1($info["string"]));
 
-$dupeid = get_single_value('torrents', 'id', 'WHERE info_hash= ?', [stripslashes($infohash)]);
+$dupeid = get_single_value('torrents', 'id', 'WHERE info_hash= ?', [$infohash]);
 
 if ($dupeid !== false) {
   $torrlink = sprintf($lang_takeupload['std_click_it'],$dupeid);

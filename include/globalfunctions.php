@@ -133,20 +133,6 @@ function hash_pad($hash) {
     return str_pad($hash, 20);
 }
 
-function hash_where($name, $hash) {
-  $hash = stripslashes($hash);
-	$shhash = preg_replace('/ *$/s', "", $hash);
-	return "($name = " . sqlesc($hash) . " OR $name = " . sqlesc($shhash) . ")";
-}
-
-// Added by BruceWOlf 2010-12-15
-function hash_where2($name, $hash) {
-	$shhash = preg_replace('/ *$/s', "", $hash);
-	$shhash = '0x'.bin2hex(stripslashes($shhash));
-	$hash = '0x'.bin2hex(stripslashes($hash));
-	return "($name = " . $hash . " OR $name = " . $shhash . ")";
-}
-
 function update_user($id, $fields, $args=[], $clear_cache=true) {
   global $Cache;
   $args[] = $id;
