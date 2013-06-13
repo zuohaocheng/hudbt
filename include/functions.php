@@ -40,6 +40,28 @@ $privilegeConfig = ['Maintenance'=>['staticResources' => UC_MODERATOR],
 // ---------------------------
 		    'Posts'=>['editnotseen'=>UC_MODERATOR,'seeeditnotseen'=>UC_UPLOADER,],
 // ---------------------------		    
+		    'Requests'=>[
+				 'deleteres' => [UC_FORUM_MODERATOR,
+						 function($args) {
+				     list($pre, $torrent) = $args;
+				     if (!$pre) {
+				       return false;
+				     }
+				     $owner = get_single_value('torrents', 'owner', 'WHERE id=?', [$torrent]);
+				     global $CURUSER;
+				     return ($CURUSER['id'] == $owner);
+				   }],
+				 'delete' => [UC_FORUM_MODERATOR, function($id) {
+				     if (is_null($id)) {
+				       return true;
+				     }
+				     global $CURUSER;
+				     $arr = sql_query('SELECT userid, finish, added FROM requests WHERE id = ?', [$id])->fetch();
+				     $result = ($arr['userid']==$CURUSER["id"] && $arr['finish']=='no' && (TIMENOW - strtotime($arr['added'])) > 7 * 86400);
+				     $result = $result && (get_row_count('resreq', 'WHERE reqid = ?', [$id]) == 0);
+				     return $result;
+				   }]],
+// ---------------------------
 		    'Misc' => ['fun' => $funmanage_class],
 		    'ManagePanels' => [
 				       'staffPanel' => UC_UPLOADER,
