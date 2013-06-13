@@ -1624,6 +1624,19 @@ function userlogin() {
   //noted by bluemonster 20111107
   $GLOBALS["CURUSER"] = $row;
 
+  $key = 'user_access_' . floor(time() / 10) . '_' . $row['id'];
+  $i = $Cache->get_value($key);
+  if ($i === false) {
+    $i = 1;
+  }
+  else {
+    $i += 1;
+  }
+  $Cache->cache_value($key, $i, 30);
+  if ($i > 10) {
+    write_file_log('access', implode(' ', [$key, $i]));
+  }
+
   if (array_key_exists('purge', $_GET) && $_GET['purge'] && get_user_class() >= UC_MODERATOR) {
     $Cache->setClearCache(1);
   }
