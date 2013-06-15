@@ -120,6 +120,7 @@ $showpolls_main = $MAIN['showpolls'];
 $showstats_main = $MAIN['showstats'];
 $stickylimit = (int)$MAIN['stickylimit'];
 $wechattoken = $MAIN['wechattoken'];
+$douban_apikey = $MAIN['douban_apikey'];
 //$showlastxforumposts_main = $MAIN['showlastxforumposts'];
 $showlastxtorrents_main = $MAIN['showlastxtorrents'];
 $showtrackerload = $MAIN['showtrackerload'];

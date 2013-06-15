@@ -266,6 +266,7 @@ $MAIN=array(	'site_online' => 'yes',
 	'logo' => 'pic/logo.png',
 	'stickylimit' => '7',
         'wechattoken' => '123456',
+	'douban_apikey' => '',
 );
 $SECURITY=array(	'securelogin' => 'op-yes',
 	'securetracker' => 'op',

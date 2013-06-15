@@ -381,7 +381,7 @@ else {
 		$cache_time = $movie->getcachetime();
 
 		$Cache->add_whole_row();
-		print("<dt><a href=\"javascript: klappe_ext('imdb')\"><span class=\"nowrap\"><img class=\"minus\" src=\"pic/trans.gif\" alt=\"Show/Hide\" id=\"picimdb\" title=\"".$lang_detail['title_show_or_hide']."\" /> ".$lang_details['text_imdb'] . $lang_details['row_info'] ."</span></a><div id=\"posterimdb\">".  $smallth."</div></dt>");
+		print("<dt><a href=\"javascript: klappe_ext('imdb')\"><span class=\"nowrap\"><img class=\"minus\" src=\"pic/trans.gif\" alt=\"Show/Hide\" id=\"picimdb\" title=\"".$lang_details['title_show_or_hide']."\" /> ".$lang_details['text_imdb'] . $lang_details['row_info'] ."</span></a><div id=\"posterimdb\">".  $smallth."</div></dt>");
 		$Cache->end_whole_row();
 		$Cache->add_row();
 		$Cache->add_part();
@@ -422,6 +422,65 @@ else {
 	  echo $Cache->next_row();
 	}
       }
+
+    if ($imdb_id && $showextinfo['imdb'] == 'yes') {
+      $key = 'douban-info-' . $imdb_id;
+      $val = $Cache->get_value($key);
+      if ($val === false) {
+	$filename = 'cache/douban/' . $imdb_id . '.json';
+	if (file_exists($filename)) {
+	  $val = file_get_contents($filename);
+	}
+	else {
+	  $quota_key = 'douban-quota-' . floor(time() / 60);
+	  $quota = $Cache->get_value($quota_key);
+	  if ($quota === false) {
+	    $quota = 30; # 30 requests per minute
+	  }
+	  $quota -= 1;
+	  if ($quota >= 0) {
+	    $Cache->cache_value($quota_key, $quota, 120);
+
+	    require_once ("HTTP/Request2.php");
+	    $url = 'http://api.douban.com/v2/movie/imdb/tt' . $imdb_id;
+	    if ($douban_apikey) {
+	      $url .= '?apikey=' . $douban_apikey;
+	    }
+	    $req = new HTTP_Request2($url);
+	    $res = $req->send();
+	    if ($res->getStatus() == 200) {
+	      $val = $res->getBody();
+	      $Cache->cache_value($key, $val, 86400 * 7);
+	      file_put_contents($filename, $val);
+	    }
+	  }
+	  else {
+	    $result = false;
+	    $val = false;
+	  }
+	}
+      }
+
+      if ($val) {
+	$data = json_decode($val, true);
+	$result = '<dl class="no-line"><dt>评分</dt><dd>' . $data['rating']['average'] . '/' .  $data['rating']['max'] . ' (共' .  $data['rating']['numRaters'] . '票)</dd>';
+	$result .= '<dt>简介</dt><dd>' . nl2br($data['summary']) . '</dd>';
+	#	$result .= '<dt></dt><dd></dd>';
+	$result .= '<dt>标签</dt><dd><div class="minor-list compact"><ul>' . implode(array_map(function($d) {
+	    return '<li>' . $d['name'] . ' (' . $d['count'] . ')</li>';
+	  }, $data['tags'])) . '</ul></div></dd>';
+	$link = str_replace('movie/', 'subject/', $data['alt']); # Api bug
+	$result .= '<dt><a href="http://www.douban.com"><img alt="豆瓣" src="pic/douban.png" /></a></dt><dd><a href="' . $link . '">去豆瓣电影查看详情</a></dd>';
+
+	$result .= '</dl>';
+
+	$title = '豆瓣<div><img src="' . $data['image'] . '" width="105"/></div>';
+      }
+
+      if ($result) {
+	dl_item($title, $result, true);
+      }
+    }
 
     if ($imdb_id) {
 	$where_area = " url = " . sqlesc((int)$imdb_id) ." AND torrents.id != ".sqlesc($id);

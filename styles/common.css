@@ -1,4 +1,4 @@
-.username .user-id, a.info span {display:none}
+username .user-id, a.info span {display:none}
 header {
     height:94px;
     position:relative;
@@ -406,6 +406,9 @@ dt.invalid {
     border-radius:3px;
 }
 input.invalid-ref, .invalid-ref input[type="text"], .invalid-ref a {background-color:yellow}
+dl {
+    margin: 0;
+}
 dl.table {
     width:940px;
     margin:0 auto;
@@ -418,21 +421,38 @@ dl dt {
     padding:5px;
     width:100px;
     text-align:right;
-    clear:both;
+    *clear:both;
 }
 dl.midt dt {width:20%}
-dl.midt dd {padding-left:22%}
+dl.midt dd {
+    padding-left:22%;
+    *padding-left:0;
+}
 dl.longt dt {width:40%}
-dl.longt dd {padding-left:42%}
+dl.longt dd {
+    padding-left:42%;
+    *padding-left:0;
+}
 dl dd {
     margin:0;
     padding:5px 0 5px 120px;
     border-top:1px silver dashed;
     min-height:1.1em;
+    *padding: 0;
 }
 dl dd.no-dt {
     margin-left:120px;
     padding-left:0;
+}
+dl.no-line dd {
+    border-top: none;
+}
+dl.clear > dd:after {
+    content:'.';
+    display:block;
+    clear:both;
+    visibility:hidden;
+    height:0;
 }
 #searchbox-right li {margin:1.5em 0}
 .alert-message-body {
