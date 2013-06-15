@@ -119,6 +119,7 @@ $restrictemaildomain = $MAIN['restrictemail'];
 $showpolls_main = $MAIN['showpolls'];
 $showstats_main = $MAIN['showstats'];
 $stickylimit = (int)$MAIN['stickylimit'];
+$wechattoken = $MAIN['wechattoken'];
 //$showlastxforumposts_main = $MAIN['showlastxforumposts'];
 $showlastxtorrents_main = $MAIN['showlastxtorrents'];
 $showtrackerload = $MAIN['showtrackerload'];

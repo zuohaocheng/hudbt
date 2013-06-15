@@ -265,6 +265,7 @@ $MAIN=array(	'site_online' => 'yes',
 	'startsubid' => NULL,
 	'logo' => 'pic/logo.png',
 	'stickylimit' => '7',
+        'wechattoken' => '123456',
 );
 $SECURITY=array(	'securelogin' => 'op-yes',
 	'securetracker' => 'op',

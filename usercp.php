@@ -129,6 +129,12 @@ if ($action){
 
 				$updateset[] = "info = " . sqlesc($info);
 
+				if (isset($_POST['unbind-wechat'])) {
+				  $oid = $CURUSER['wechat'];
+				  $Cache->delete_value('wechat_userid_' . $oid);
+				  $updateset[] = 'wechat = NULL';
+				}
+
 				update_user($CURUSER['id'], implode(",", $updateset));
 				header("Location: usercp.php?action=personal&type=saved");
 			}
@@ -155,6 +161,7 @@ if ($action){
 			$uploadspeed .= "<option value=".htmlspecialchars($us_b['id'])."" . (htmlspecialchars($CURUSER["upload"]) == htmlspecialchars($us_b['id']) ? " selected" : "") . ">".htmlspecialchars($us_b['name'])."</option>\n";
 			$ra=sql_query("SELECT * FROM bitbucket WHERE public = '1'");
 			$options='';
+			$text = '';
 			while ($sor=_mysql_fetch_array($ra))
 			{
 				$text.='<option value="'. get_protocol_prefix() . $BASEURL .'/bitbucket/'.$sor["name"].'">'.$sor["name"].'</option>';
@@ -195,6 +202,10 @@ dl_item($lang_usercp['row_school'], "<select name=school>$schools</select>", 1);
   </select><input type=text name=avatar style=\"width: 400px\" value=\"" . htmlspecialchars($CURUSER["avatar"]) .
   "\"><br />\n".$lang_usercp['text_avatar_note'].($enablebitbucket_main == 'yes' ? $lang_usercp['text_bitbucket_note'] : ""),1);
   dl_item($lang_usercp['row_info'], "<textarea name=\"info\" style=\"width:700px\" rows=\"10\" >" . htmlspecialchars($CURUSER["info"]) . "</textarea><br />".$lang_usercp['text_info_note'], 1);
+
+  if ($CURUSER['wechat']) {
+    dl_item('微信账号', '<label><input type="checkbox" name="unbind-wechat" value="1" />解除绑定</label>', true);
+  }
   submit();
   print("</dl>");
   stdfoot();

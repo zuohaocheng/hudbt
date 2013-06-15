@@ -4996,3 +4996,33 @@ function write_file_log($name, $content) {
     fclose($h);
   }
 }
+
+function torrent_get_poster($id) {
+  global $Cache;
+  return $Cache->get_value('torrent_poster_'.$id, 86400 * 7, function() use ($id) {
+      $r = sql_query('SELECT url, descr FROM torrents WHERE id=?', [$id])->fetch();
+      if (!$r) {
+	return '';
+      }
+      require_once("imdb/imdb.class.php");
+      $imdb = parse_imdb_id($r['url']);
+      if ($imdb) {
+	$movie = new imdb($imdb);
+	$poster = $movie->photo_localurl();
+      }
+      else {
+	$poster = false;
+      }
+
+      if ($poster === false) {
+	$bbcode = format_comment($r['descr']);
+	if (preg_match('/<img[^>]*src="([^"]+)"/i', $bbcode, $matches)) {
+	  $poster = $matches[1];
+	}
+	else {
+	  $poster = 'pic/imdb_pic/nophoto.gif';
+	}
+      }
+      return $poster;
+    });
+}
