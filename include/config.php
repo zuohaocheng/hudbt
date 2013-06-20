@@ -121,6 +121,7 @@ $showstats_main = $MAIN['showstats'];
 $stickylimit = (int)$MAIN['stickylimit'];
 $wechattoken = $MAIN['wechattoken'];
 $douban_apikey = $MAIN['douban_apikey'];
+$useCronTriggerCleanUp = $MAIN['cron_cleanup'];
 //$showlastxforumposts_main = $MAIN['showlastxforumposts'];
 $showlastxtorrents_main = $MAIN['showlastxtorrents'];
 $showtrackerload = $MAIN['showtrackerload'];
@@ -411,16 +412,15 @@ foreach ($CONFIGURATIONS as $CONFIGURATION) {
 
 //Directory for subs
 $SUBSPATH = "subs";
+
 //Whether clean-up is triggered by cron, instead of the default browser clicks.
-//Set this to true ONLY if you have setup other method to schedule the clean-up process.
+//Set MAIN['cron_cleanup'] to true ONLY if you have setup other method to schedule the clean-up process.
 //e.g. cron on *nix, add the following line (without "") in your crontab file
 //"*/5 * * * * wget -O - -q -t 1 http://www.kmgtp.org/cron.php"
 //NOTE:
 //Make sure you have wget installed on your OS
 //replace "http://www.kmgtp.org/" with your own site address
 
-$useCronTriggerCleanUp = false;
-//$useCronTriggerCleanUp = true;
 //some promotion rules
 //$promotionrules_torrent = array(0 => array("mediumid" => array(1), "promotion" => 5), 1 => array("mediumid" => array(3), "promotion" => 5), 2 => array("catid" => array(402), "standardid" => array(3), "promotion" => 4), 3 => array("catid" => array(403), "standardid" => array(3), "promotion" => 4));
 $promotionrules_torrent = array();

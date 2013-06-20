@@ -11,8 +11,9 @@ dbconn();
 $id = (int)$_GET["id"];
 if (!$id)
 	httperr();
-$passkey = $_GET['passkey'];
-if ($passkey){
+if (isset($_GET['passkey'])){
+  $passkey = $_GET['passkey'];
+
 	$res = sql_query("SELECT * FROM users WHERE passkey=". sqlesc($passkey)." LIMIT 1");
 	$user = _mysql_fetch_array($res);
 	if (!$user)

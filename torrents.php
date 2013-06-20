@@ -611,7 +611,7 @@ if (isset($searchstr)) {
 
 	      if ($minus) {
 		if ($both) {
-		  return '-(' . $single . ' -' . $plural . ')';
+		  return '-' . $single . ' -' . $plural;
 		}
 		else {
 		  return '-(' . $o . ')';
@@ -638,7 +638,11 @@ if (isset($searchstr)) {
 	      }
 	    }, $matches));
 
-	if (!empty($matches)) {
+	$non_minus = array_filter($matches, function($a) {
+	    return ($a[0] != '-');
+	  });
+	
+	if (!empty($matches) && !empty($non_minus)) {
 	  $match = 'MATCH(' . implode(',', $fields) . ') AGAINST (:matches IN BOOLEAN MODE)';
 	  $out[] = $match;
 	  $search_args[':matches'] = implode(' ', $matches);

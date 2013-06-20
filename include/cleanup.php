@@ -15,7 +15,7 @@ function printProgress($msg) {
   ob_flush();
   flush();
 }
-function docleanup($forceAll = 0, $printProgress = false) {
+function docleanup($forceAll = false, $printProgress = false) {
 	global $lang_cleanup_target;
 	global $torrent_dir, $signup_timeout, $max_dead_torrent_time, $autoclean_interval_one, $autoclean_interval_two, $autoclean_interval_three, $autoclean_interval_four, $autoclean_interval_five, $SITENAME,$bonus,$invite_timeout,$offervotetimeout_main,$offeruptimeout_main, $iniupload_main;
 	global $donortimes_bonus, $perseeding_bonus, $maxseeding_bonus, $tzero_bonus, $nzero_bonus, $bzero_bonus, $l_bonus;
@@ -104,8 +104,8 @@ SET dest.seedbonus = dest.seedbonus + src.bonus * IF(dest.donor = "yes", :donort
 
 	//4.update count of seeders, leechers, comments for torrents
 	sql_query('UPDATE LOW_PRIORITY torrents dest, (SELECT torrent, COUNT(1) AS c FROM comments GROUP BY torrent) src SET dest.comments = src.c WHERE dest.id = src.torrent');
-	sql_query('UPDATE LOW_PRIORITY torrents dest, (SELECT torrent, COUNT(1) AS c FROM peers WHERE seeder="yes" GROUP BY torrent) src SET dest.seeders = src.c WHERE dest.id = src.torrent');
-	sql_query('UPDATE LOW_PRIORITY torrents dest, (SELECT torrent, COUNT(1) AS c FROM peers WHERE seeder="no" GROUP BY torrent) src SET dest.leechers = src.c WHERE dest.id = src.torrent');
+	sql_query('UPDATE LOW_PRIORITY torrents dest, (SELECT torrents.id, COUNT(peers.id) AS c FROM torrents LEFT JOIN peers ON torrents.id = peers.torrent AND peers.seeder="yes" GROUP BY torrents.id) src SET dest.seeders = src.c WHERE dest.id = src.id');
+	sql_query('UPDATE LOW_PRIORITY torrents dest, (SELECT torrents.id, COUNT(peers.id) AS c FROM torrents LEFT JOIN peers ON torrents.id = peers.torrent AND peers.seeder="no" GROUP BY torrents.id) src SET dest.leechers = src.c WHERE dest.id = src.id');
 	if ($printProgress) {
 		printProgress("update count of seeders, leechers, comments for torrents");
 	}

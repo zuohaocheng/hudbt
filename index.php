@@ -523,17 +523,15 @@ if ($showstats_main == "yes")
 // ------------- end: stats ------------------//
 // ------------- start: tracker load ------------------//
 if ($showtrackerload == "yes") {
-  $uptimeresult=exec('uptime');
-  if ($uptimeresult){
+  $uptimeresult=date('r') . ', load average: ' . implode(', ', sys_getloadavg());
 ?>
 <h2 class="page-titles"><?php echo $lang_index['text_tracker_load'] ?></h2>
 <div class="text table td center">
   <?php
-    //uptime, work in *nix system
-    print (trim($uptimeresult));
+    //sys_getloadavg not implemented in windows
+    print ($uptimeresult);
     print("</div>");
-  }
-  }
+}
   // ------------- end: tracker load ------------------//
 
   // ------------- start: disclaimer ------------------//

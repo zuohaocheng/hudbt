@@ -170,10 +170,10 @@ function get_load_uri($type, $script_name ="", $absolute = true) {
   $name = ($script_name == "" ? substr(strrchr($_SERVER['SCRIPT_NAME'],'/'),1) : $script_name);
 
   $addition = '';
-  if (array_key_exists('purge', $_GET) && $_GET['purge']) {
+  if (isset($_GET['purge'])) {
     $addition .= '&amp;purge=1';
   }
-  if (array_key_exists('debug', $_GET) && $_GET['debug']) {
+  if (isset($_GET['debug'])) {
     $addition .= '&amp;debug=1';
     $debug = true;
   }
@@ -314,7 +314,7 @@ function checkSubPrivilege($obj, $opts) {
 // deprecated
 $permissionConfig = [
 "keeper" => [
-	"boss" =>["setstoring","edittorrent","viewkeepers"],
+	"boss" =>["storing","setstoring","edittorrent","viewkeepers"],
 	"member" => ["storing","viewkeepers"]
 	],
 "helper" =>[],
@@ -1665,9 +1665,6 @@ function autoclean() {
     return false;
   }
 
-  /* if (php_sapi_name() == 'fpm-fcgi') { */
-  /*   fastcgi_finish_request(); */
-  /* } */
   require_once($rootpath . 'include/cleanup.php');
   return docleanup();
 }
@@ -2298,8 +2295,9 @@ function stdhead($title = "", $msgalert = true, $script = "", $place = "") {
 	{
 	  $new_news = $Cache->get_value('user_'.$CURUSER["id"].'_unread_news_count');
 	  if ($new_news === false){
-	    $new_news = get_row_count("news","WHERE notify = 'yes' AND added > ".sqlesc($CURUSER['last_home']));
-	    $Cache->cache_value('user_'.$CURUSER["id"].'_unread_news_count', $new_news, 300);
+	    $last_home = get_single_value('users', 'last_home', 'WHERE id=?', [$CURUSER['id']]);
+	    $new_news = get_row_count("news","WHERE notify = 'yes' AND added > ?", [$last_home]);
+	    $Cache->cache_value('user_'.$CURUSER["id"].'_unread_news_count', $new_news, 900);
 	  }
 	  if ($new_news > 0) {
 	    $text = $lang_functions['text_there_is'].is_or_are($new_news).$new_news.$lang_functions['text_new_news'];
@@ -2405,6 +2403,10 @@ function stdfoot() {
 		   'cnzz' => $cnzz
 		   ));
   $s->display('stdfoot.tpl');
+
+  if (php_sapi_name() == 'fpm-fcgi') {
+    fastcgi_finish_request();
+  }
 }
 
 function mksecret($len = 20) {
@@ -2509,7 +2511,7 @@ function loggedinorreturn($mainpage = false) {
     header("Location: " . get_protocol_prefix() . "$BASEURL/login.php");
     else {
       $to = $_SERVER["REQUEST_URI"];
-      $to = basename($to);
+#      $to = basename($to);
       header("Location: " . get_protocol_prefix() . "$BASEURL/login.php?returnto=" . rawurlencode($to));
     }
     exit();
@@ -4824,7 +4826,7 @@ function get_fun($id = 0, $pager_count = null) {
       else {
 	$height = '400px';
       }
-      $content .= '<iframe seamless id="funbox-content" style="height:'.$height.'" src="http://' . $BASEURL . '/' . $filename . '?' . $body->cachekey . '" ></iframe>';
+      $content .= '<iframe seamless="seamless" id="funbox-content" style="height:'.$height.'" src="http://' . $BASEURL . '/' . $filename . '?' . $body->cachekey . '" ></iframe>';
       if (!file_exists($filename)) {
 	$h = '<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><link rel="stylesheet" href="../styles/common.css" type="text/css" media="screen" /><link rel="stylesheet" href="../styles/font.css" type="text/css" media="screen" /></head><body style="background-color:transparent;background-image:none">' . $body . '</body></html>';
 	file_put_contents($filename, $h);

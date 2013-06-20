@@ -97,6 +97,7 @@ if (!defined('HB_CAKE')) {
 
 if (!isset($NEXUSPHP)) {
   require_once('../../../include/bittorrent.php');
+  dbconn();
   $dispatch = true;
 
   $s = smarty();

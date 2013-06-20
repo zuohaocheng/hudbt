@@ -35,7 +35,9 @@ class BBCodePreparser {
 
     if (count($this->ids) > 10) {
       $this->ids = [];
-      $this->text .= "\n\n[hr/]\n不要太丧失了，一次最多@十个噢\n    by 蝴蝶娘";
+      if (get_user_class() < UC_ADMINISTRATOR) {
+	$this->text .= "\n\n[hr/]\n不要太丧失了，一次最多@十个噢\n    by 蝴蝶娘";
+      }
     }
   }
 

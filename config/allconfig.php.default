@@ -267,6 +267,7 @@ $MAIN=array(	'site_online' => 'yes',
 	'stickylimit' => '7',
         'wechattoken' => '123456',
 	'douban_apikey' => '',
+	    'cron_cleanup' => false,
 );
 $SECURITY=array(	'securelogin' => 'op-yes',
 	'securetracker' => 'op',

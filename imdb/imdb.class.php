@@ -188,16 +188,13 @@
     case "Taglines": $urlname="/taglines"; break;
    }
    if ($this->usecache) {
-    @$fp = fopen ("$this->cachedir/$this->imdbID.$wt", "r");
-    if ($fp) {
-     $temp="";
-     while (!feof ($fp)) {
-	$temp .= fread ($fp, 1024);
-     }
-	if ($temp) {
-		$this->page[$wt] = $temp;
-     		return;
-	}
+     $file = "$this->cachedir/$this->imdbID.$wt";
+     if (file_exists($file)) {
+       $temp=file_get_contents($file);
+       if ($temp) {
+	 $this->page[$wt] = $temp;
+	 return;
+       }
     }
    } // end cache
 
@@ -1002,7 +999,7 @@ return $this->main_rating;
    */
   function photo_localurl(){
    $path = $this->photodir.$this->imdbid().".jpg";
-   if ( @fopen($path,"r")) return $this->photoroot.$this->imdbid().'.jpg';
+   if ( file_exists($path)) return $this->photoroot.$this->imdbid().'.jpg';
    if ($this->savephoto($path))	return $this->photoroot.$this->imdbid().'.jpg';
    return false;
   }

@@ -527,8 +527,8 @@ else {
 	return $s;
       }
       
-      $files_info = "<li><a href=\"javascript: klappe_news('filelist')\"><img class=\"plus\" src=\"pic/trans.gif\" alt=\"Show/Hide\" id=\"picfilelist\"><b>".$lang_details['text_num_files']."</b>". $row["numfiles"] . $lang_details['text_files'] ;
-      $files_info .= '</a></li>';
+      $files_info = "<dd><a href=\"javascript: klappe_news('filelist')\"><img class=\"plus\" src=\"pic/trans.gif\" alt=\"Show/Hide\" id=\"picfilelist\"><b>".$lang_details['text_num_files']."</b>". $row["numfiles"] . $lang_details['text_files'] ;
+      $files_info .= '</a></dd>';
 
       $files_detail = '<div id="kfilelist" style="display:none;">' . get_torrent_filelist($id) . '</div>';
     }
@@ -542,10 +542,10 @@ else {
     }
     
     if ($enablenfo_main=='yes') {
-      dl_item($lang_details['row_torrent_info'], '<div class="minor-list"><ul>' . $files_info . "<li><b>".$lang_details['row_info_hash'].":</b>".preg_replace_callback('/./s', "hex_esc", hash_pad($row["info_hash"]))."</li>". (get_user_class() >= $torrentstructure_class ? "<li><b>" . $lang_details['text_torrent_structure'] . "</b><a href=\"torrent_info.php?id=".$id."\">".$lang_details['text_torrent_info_note']."</a></li>" : "") . "</ul></div>" . $files_detail, 1);
+      dl_item($lang_details['row_torrent_info'], '<dl class="minor-list properties">' . $files_info . "<dt>".$lang_details['row_info_hash']."</dt><dd>".preg_replace_callback('/./s', "hex_esc", hash_pad($row["info_hash"]))."</dd>". (get_user_class() >= $torrentstructure_class ? "<dt>" . $lang_details['text_torrent_structure'] . "</dt><dd><a href=\"torrent_info.php?id=".$id."\">".$lang_details['text_torrent_info_note']."</a></dd>" : "") . "</dl>" . $files_detail, 1);
     }
     
-    dl_item($lang_details['row_hot_meter'], "<table><tr><td class=\"no_border_wide\"><b>" . $lang_details['text_views']."</b>". $row["views"] . "</td><td class=\"no_border_wide\"><b>" . $lang_details['text_hits']. "</b>" . $row["hits"] . "</td><td class=\"no_border_wide\"><b>" .$lang_details['text_snatched'] . "</b><a href=\"viewsnatches.php?id=".$id."\"><b>" . $row["times_completed"]. $lang_details['text_view_snatches'] . "</td><td class=\"no_border_wide\"><b>" . $lang_details['row_last_seeder']. "</b>" . gettime($row["last_action"]) . "</td></tr></table>",1);
+    dl_item($lang_details['row_hot_meter'], '<dl class="minor-list properties"><dt>' . $lang_details['text_views']."</dt><dd>". $row["views"] . "</dd><dt>" . $lang_details['text_hits']. "</dt><dd>" . $row["hits"] . "</dd><dt>" .$lang_details['text_snatched'] . "<a href=\"viewsnatches.php?id=".$id."\"></dt><dd>" . $row["times_completed"] . $lang_details['text_view_snatches'] . "</dd><dt>" . $lang_details['row_last_seeder']. "</dt><dd>" . gettime($row["last_action"]) . "</dd></dl>",1);
     $bwres = sql_query("SELECT uploadspeed.name AS upname, downloadspeed.name AS downname, isp.name AS ispname FROM users LEFT JOIN uploadspeed ON users.upload = uploadspeed.id LEFT JOIN downloadspeed ON users.download = downloadspeed.id LEFT JOIN isp ON users.isp = isp.id WHERE users.id=".$row['owner']);
     $bwrow = _mysql_fetch_array($bwres);
     if ($bwrow['upname'] && $bwrow['downname']) {

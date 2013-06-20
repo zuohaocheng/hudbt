@@ -22,6 +22,9 @@ if (!isset($ipv6) || strtolower($ipv6[0]) == 'f') {
 }
 else {
   $ipv6 = inet_pton($ipv6); // convert to binary
+  if (!$ipv6) {
+    $ipv6 = null;
+  }
 }
 
 // get integer type port, downloaded, uploaded, left from client

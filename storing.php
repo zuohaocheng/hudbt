@@ -56,7 +56,7 @@ else{
 			}
 		}
 	}
-	elseif($action==checkout){
+	elseif($action=='checkout'){
 		$exist_res = sql_query("SELECT in_seedtime FROM storing_records WHERE torrent_id = $torrentid AND keeper_id = $userid AND checkout = 0") or sqlerr(__FILE__,__LINE__);
 		if(_mysql_num_rows($exist_res)==0){
 			header("Refresh: 5; url=//$BASEURL/details.php?id=$torrentid");
