@@ -12,7 +12,14 @@ echo '<dl class="table longt">';
 $c = 0;
 foreach ($panels as $name => $panel) {
   if (checkPrivilege(['ManagePanels', $name])) {
-    dl_item($panel['name'], '<a href="//' . $BASEURL . '/' . $name . '.php' . '">' . $panel['desc'] . '</a>', true);
+    if (isset($panel['url'])) {
+      $url = $panel['url'];
+    }
+    else {
+      $url = $name . '.php';
+    }
+    
+    dl_item($panel['name'], '<a href="//' . $BASEURL . '/' . $url . '">' . $panel['desc'] . '</a>', true);
     ++$c;
   }
 }

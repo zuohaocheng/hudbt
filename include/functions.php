@@ -100,6 +100,8 @@ $privilegeConfig = ['Maintenance'=>['staticResources' => UC_MODERATOR],
 				       'ssh' => UC_SYSOP,
 				       'staffbox' => UC_UPLOADER,
 				       'settings' => UC_SYSOP,
+				       'wechatreplies' => UC_ADMINISTRATOR,
+				       'wechat-test' => UC_ADMINISTRATOR,
 				       'keepers' => function() {
       global $CURUSER;
       return permissionAuth('viewkeepers',$CURUSER['usergroups'],$CURUSER['class']);

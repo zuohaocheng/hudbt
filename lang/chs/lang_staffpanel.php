@@ -32,5 +32,6 @@ $lang_staffpanel = [
 		    'amountbonus' => ['name' => '发福利', 'desc' => '给一个人或一群人发福利'],
 		    'clearcache' => ['name' => '清空缓存', 'desc' => '清空memcached缓存'],
 		    'hustip' => ['name' => '人肉搜索', 'desc' => '开开门，查水表了'],
+		    'wechatreplies' => ['name' => '微信', 'desc' => '设置微信自动回复内容', 'url' => 'cake/wechatReplies'],
 		    'ssh' => ['name' => 'SSH', 'desc' => '添加允许连接IP'],
 		    ];
