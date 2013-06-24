@@ -111,7 +111,8 @@ class HTML_BBCodeParser_Filter_Extended extends HTML_BBCodeParser_Filter
     }
 
    function _preparse() {
-	$options = PEAR::getStaticProperty('HTML_BBCodeParser','_options');
+       $pear = new PEAR();
+       $options = $pear->getStaticProperty('HTML_BBCodeParser','_options');
 	$o  = $options['open'];
         $c  = $options['close'];
         $oe = $options['open_esc'];
@@ -126,7 +127,8 @@ class HTML_BBCodeParser_Filter_Extended extends HTML_BBCodeParser_Filter
    function removeBr($s) {
      $so = preg_replace('!<br />!', "\n", $s[1]);
      $so = preg_replace('!\[!', '&#91;', $so);
-     $options = PEAR::getStaticProperty('HTML_BBCodeParser','_options');
+     $pear = new PEAR();
+     $options = $pear->getStaticProperty('HTML_BBCodeParser','_options');
      $o  = $options['open'];
      $c  = $options['close'];
      return $o . 'pre' . $c . $so . $o . '/pre' . $c;

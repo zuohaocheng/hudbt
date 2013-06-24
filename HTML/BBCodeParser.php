@@ -167,8 +167,9 @@ class HTML_BBCodeParser
      */
     function HTML_BBCodeParser($options = array())
     {
+        $pear=new PEAR();
         // set the already set options
-        $baseoptions = &PEAR::getStaticProperty('HTML_BBCodeParser', '_options');
+        $baseoptions = &$pear->getStaticProperty('HTML_BBCodeParser', '_options');
         if (is_array($baseoptions)) {
             foreach ($baseoptions as  $k => $v)  {
                 $this->_options[$k] = $v;

@@ -180,8 +180,7 @@ class ErrorHandler {
 		}
 
 		//Edited
-		static $ignores = ['Non-static method PEAR::getStaticProperty()',
-				   'Undefined index'];
+		static $ignores = ['Undefined index'];
 		foreach ($ignores as $ignore) {
 		  if (strstr($description, $ignore)) {
 		    return '';

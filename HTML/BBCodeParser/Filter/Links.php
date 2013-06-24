@@ -81,7 +81,9 @@ class HTML_BBCodeParser_Filter_Links extends HTML_BBCodeParser_Filter
      */
     function _preparse()
     {
-        $options = PEAR::getStaticProperty('HTML_BBCodeParser', '_options');
+	$pear = new PEAR();
+	$options = $pear->getStaticProperty('HTML_BBCodeParser','_options');
+
         $o = $options['open'];
         $c = $options['close'];
         $oe = $options['open_esc'];
@@ -98,7 +100,9 @@ class HTML_BBCodeParser_Filter_Links extends HTML_BBCodeParser_Filter
     }
 
     function removeDupe($s) {
-      $options = PEAR::getStaticProperty('HTML_BBCodeParser', '_options');
+      $pear = new PEAR();
+      $options = $pear->getStaticProperty('HTML_BBCodeParser','_options');
+
       $o = $options['open'];
       $c = $options['close'];
       if ($s[1] == $s[2]) {
@@ -127,8 +131,9 @@ class HTML_BBCodeParser_Filter_Links extends HTML_BBCodeParser_Filter
      */
     function smarterPPLinkExpand($matches)
     {
-        //echo '<hr><pre>';var_dump($matches);echo '</pre><hr>';
-        $options = PEAR::getStaticProperty('HTML_BBCodeParser','_options');
+	$pear = new PEAR();
+	$options = $pear->getStaticProperty('HTML_BBCodeParser','_options');
+
         $o = $options['open'];
         $c = $options['close'];
 
@@ -184,7 +189,9 @@ class HTML_BBCodeParser_Filter_Links extends HTML_BBCodeParser_Filter
      */
     function smarterPPLink($matches)
     {
-        $options = PEAR::getStaticProperty('HTML_BBCodeParser','_options');
+	$pear = new PEAR();
+	$options = $pear->getStaticProperty('HTML_BBCodeParser','_options');
+
         $o = $options['open'];
         $c = $options['close'];
 
@@ -216,7 +223,9 @@ class HTML_BBCodeParser_Filter_Links extends HTML_BBCodeParser_Filter
     }
 
     static function aCallback() {
-      $options = PEAR::getStaticProperty('HTML_BBCodeParser','_options');
+      $pear = new PEAR();
+      $options = $pear->getStaticProperty('HTML_BBCodeParser','_options');
+
       $target = $options['aTarget'];
       if ($target) {
 	return 'a target="' . $target . '"';

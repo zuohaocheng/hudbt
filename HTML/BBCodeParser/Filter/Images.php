@@ -51,7 +51,9 @@ class HTML_BBCodeParser_Filter_Images extends HTML_BBCodeParser_Filter
     );
 
     static function imgCallback() {
-      $options = PEAR::getStaticProperty('HTML_BBCodeParser','_options');
+      $pear = new PEAR();
+      $options = $pear->getStaticProperty('HTML_BBCodeParser','_options');
+
       $h = $options['imgMaxH'];
       $w = $options['imgMaxW'];
       $style = '';
@@ -85,14 +87,16 @@ class HTML_BBCodeParser_Filter_Images extends HTML_BBCodeParser_Filter
     * @author   Stijn de Reede  <sjr@gmx.co.uk>
     */
     function _preparse() {
-        $options = PEAR::getStaticProperty('HTML_BBCodeParser','_options');
-        $o  = $options['open'];
+        $pear = new PEAR();
+	$options = $pear->getStaticProperty('HTML_BBCodeParser','_options');
+
+	$o  = $options['open'];
         $c  = $options['close'];
         $oe = $options['open_esc'];
         $ce = $options['close_esc'];
         $this->_preparsed = preg_replace(
 			"!".$oe."img(\s?.*)".$ce."(.*)".$oe."/img".$ce."!Ui",
-			$o."img=\"\$2\"\$1".$c.$o."/img".$c,
+			$o."img=\"\$2\" alt=\"\"\$1".$c.$o."/img".$c,
 			$this->_text);
 
 	global $possibleUrls;

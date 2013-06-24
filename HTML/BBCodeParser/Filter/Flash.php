@@ -36,7 +36,9 @@ class HTML_BBCodeParser_Filter_Flash extends HTML_BBCodeParser_Filter {
     );
 
   function _preparse() {
-    $options = PEAR::getStaticProperty('HTML_BBCodeParser','_options');
+    $pear = new PEAR();
+    $options = $pear->getStaticProperty('HTML_BBCodeParser','_options');
+
     $o  = $options['open'];
     $c  = $options['close'];
     $oe = $options['open_esc'];
