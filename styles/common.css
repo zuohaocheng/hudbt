@@ -122,6 +122,12 @@ img.ebook {
     width:46px;
     height:46px;
 }
+img.movies_new {
+    background: url(../pic/category/chd/modern/sprite.png) no-repeat top left;
+    background-position: 0 -1551px;
+    width: 46px;
+    height: 46px;
+}
 .category-icon img, .topics .icon img {display:block}
 
 body {
@@ -835,16 +841,23 @@ li.forum-post {
     zoom:1;
     right:2em;
 }
+#searchbox h4 {
+    font-weight: bold;
+    margin: 0;
+    text-align:left;
+}
 #hotbox {
     position:absolute;
-    top:0;
-    right:0;
-    padding:2em 2em 0 2em;
+    top:2em;
+    right:2em;
     width:120px;
-    text-align:left;
+    text-align:right;
 }
 #hotbox div {margin-bottom:1.7em}
 #hotbox li {padding-bottom:0.3em}
+#search-sp {
+    text-align: left;
+}
 .suggestion-count {
     position:absolute;
     zoom:1;

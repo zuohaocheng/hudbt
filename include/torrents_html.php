@@ -202,8 +202,8 @@ function hotmenu(){
   <div id="hotbox" class="minor-list"><ul>
 
 
-<li class="minor-list-vertical"><div class="title" style="margin-bottom:0;">促销:</div><ul>
-<li><input type="radio" name="spstate" value="0" /><?php echo $lang_torrents['select_all'] ?></li>
+<li class="minor-list-vertical"><h4>促销:</h4>
+<ul id="search-sp"><li><input type="radio" name="spstate" value="0" /><?php echo $lang_torrents['select_all'] ?></li>
   <?php foreach ($promotion_text as $idx => $pr){
   $val = $idx + 1;
   echo '<li><input type="radio" name="spstate" value="' . $val . '"';

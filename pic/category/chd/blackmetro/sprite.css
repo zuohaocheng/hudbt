@@ -29,3 +29,15 @@ img.tvshows_eu{background: url(sprite.png) no-repeat top left; background-positi
 img.tvshows_hk{background: url(sprite.png) no-repeat top left; background-position: 0 -1316px; width: 46px; height: 46px; } 
 img.hust{background: url(sprite.png) no-repeat top left; background-position: 0 -1362px; width: 46px; height: 46px; } 
 img.ipad{background: url(sprite.png) no-repeat top left; background-position: 0 -1410px; width: 46px; height: 46px; } 
+img.game_video {
+    background:url(sprite.png) no-repeat top left;
+    background-position:0 -1457px;
+    width:46px;
+    height:46px;
+}
+img.ebook {
+    background:url(sprite.png) no-repeat top left;
+    background-position:0 -1504px;
+    width:46px;
+    height:46px;
+}

@@ -4617,7 +4617,11 @@ function return_category_image($categoryid, $link="") {
   } else {
     $categoryrow = get_category_row($categoryid);
     $catimgurl = get_cat_folder($categoryid);
-    $catImg[$categoryid] = $catimg = "<img".($categoryrow['class_name'] ? " class=\"".$categoryrow['class_name']."\"" : "")." src=\"//$BASEURL/pic/cattrans.gif\" alt=\"" . $categoryrow["name"] . "\" title=\"" .$categoryrow["name"]. "\" />";
+    $class = 'category';
+    if ($categoryrow['class_name']) {
+      $class .= ' ' . $categoryrow['class_name'];
+    }
+    $catImg[$categoryid] = $catimg = "<img class=\"".$class."\" src=\"//$BASEURL/pic/cattrans.gif\" alt=\"" . $categoryrow["name"] . "\" title=\"" .$categoryrow["name"]. "\" />";
   }
   if ($link) {
     $catimg = "<a href=\"".$link."cat=" . $categoryid . "\">".$catimg."</a>";
