@@ -1,10 +1,10 @@
 <?php
 require_once('include/bittorrent.php');
 dbconn();
-require_once(get_langfile_path());
-require(get_langfile_path("",true));
 loggedinorreturn();
 parked();
+require_once(get_langfile_path());
+require(get_langfile_path("",true));
 require_once('include/bonus.php');
 
 if ($bonus_tweak == "disable" || $bonus_tweak == "disablesave")
@@ -235,8 +235,6 @@ if ($offervote_bonus > 0)
 	print("<li>".$lang_mybonus['text_offer_vote'].$offervote_bonus.$lang_mybonus['text_point'].add_s($offervote_bonus)."</li>");
 if ($funboxvote_bonus > 0)
 	print("<li>".$lang_mybonus['text_funbox_vote'].$funboxvote_bonus.$lang_mybonus['text_point'].add_s($funboxvote_bonus)."</li>");
-if ($ratetorrent_bonus > 0)
-	print("<li>".$lang_mybonus['text_rate_torrent'].$ratetorrent_bonus.$lang_mybonus['text_point'].add_s($ratetorrent_bonus)."</li>");
 if ($saythanks_bonus > 0)
 	print("<li>".$lang_mybonus['text_say_thanks'].$saythanks_bonus.$lang_mybonus['text_point'].add_s($saythanks_bonus)."</li>");
 if ($receivethanks_bonus > 0)

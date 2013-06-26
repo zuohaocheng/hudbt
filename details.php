@@ -81,7 +81,7 @@ else {
     }
     echo '</ul></div>';
     
-    echo '<dl class="table">';
+    echo '<dl class="table clear">';
 
     $url = "edit.php?id=" . $row["id"];
     if (isset($_GET["returnto"])) {
@@ -237,7 +237,7 @@ else {
     if (get_user_class() >= $viewnfo_class && $row["nfosz"] > 0){
       $nfo = $Cache->get_value('nfo_block_torrent_id_'.$id);
       if (!$nfo) {
-	$nfo = code($row["nfo"], $view == "magic");
+	$nfo = code($row["nfo"]);
 	$Cache->cache_value('nfo_block_torrent_id_'.$id, $nfo, 604800);
       }
       dl_item("<a href=\"javascript: klappe_news('nfo')\"><img class=\"plus\" src=\"pic/trans.gif\" alt=\"Show/Hide\" id=\"picnfo\" title=\"".$lang_details['title_show_or_hide']."\" /> ".$lang_details['text_nfo']."</a><br /><a href=\"viewnfo.php?id=".$row['id']."\" class=\"sublink\">". $lang_details['text_view_nfo']. "</a>", "<div id='knfo' style=\"display: none;\"><pre style=\"font-size:10pt; font-family: 'Courier New', monospace;\">".$nfo."</pre></div><div style=\"clear:both;\"\n", 1);
@@ -257,10 +257,10 @@ else {
 	    {
 	    case "0" : //cache is not ready, try to
 	      {
-		if($row['cache_stamp']==0 || ($row['cache_stamp'] != 0 && (time()-$row['cache_stamp']) > $auto_obj->timeout))	//not exist or timed out
+		if($row['cache_stamp']==0 || ($row['cache_stamp'] != 0))	//not exist or timed out
 		  dl_item($lang_details['text_imdb'] . $lang_details['row_info'] , $lang_details['text_imdb'] . $lang_details['text_not_ready']."<a href=\"retriver.php?id=". $id ."&amp;type=1&amp;siteid=1\">".$lang_details['text_here_to_retrieve'] . $lang_details['text_imdb'],1);
 		else
-		  dl_item($lang_details['text_imdb'] . $lang_details['row_info'] , "<img src=\"pic/progressbar.gif\" alt=\"\" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" . $lang_details['text_someone_has_requested'] . $lang_details['text_imdb'] . " ".min(max(time()-$row['cache_stamp'],0),$auto_obj->timeout) . $lang_details['text_please_be_patient'],1);
+		  dl_item($lang_details['text_imdb'] . $lang_details['row_info'] , "<img src=\"pic/progressbar.gif\" alt=\"\" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" . $lang_details['text_someone_has_requested'] . $lang_details['text_imdb'] . " ".max(time()-$row['cache_stamp'],0) . $lang_details['text_please_be_patient'],1);
 		break;
 	      }
 	    case "1" :
@@ -426,6 +426,7 @@ else {
     if ($imdb_id && $showextinfo['imdb'] == 'yes') {
       $key = 'douban-info-' . $imdb_id;
       $val = $Cache->get_value($key);
+
       if ($val === false) {
 	$filename = 'cache/douban/' . $imdb_id . '.json';
 	if (file_exists($filename)) {
@@ -450,14 +451,13 @@ else {
 	    $res = $req->send();
 	    if ($res->getStatus() == 200) {
 	      $val = $res->getBody();
-	      $Cache->cache_value($key, $val, 86400 * 7);
 	      file_put_contents($filename, $val);
 	    }
 	  }
-	  else {
-	    $result = false;
-	    $val = false;
-	  }
+	}
+
+	if ($val) {
+	  $Cache->cache_value($key, $val, 86400 * 7);
 	}
       }
 
@@ -477,7 +477,7 @@ else {
 	$title = '豆瓣<div><img src="' . $data['image'] . '" width="105"/></div>';
       }
 
-      if ($result) {
+      if (isset($result)) {
 	dl_item($title, $result, true);
       }
     }

@@ -166,7 +166,7 @@ $lang_functions = array
 	'title_no_new_comment' => "无新评论",
 	'row_external_info' => "外部信息",
 	'row_imdb_url' => "IMDb链接",
-	'text_imdb_url_note' => "(来自<strong><a href=\"http://www.imdb.com\">IMDb</a></strong>的链接。如电影<b>The Dark Knight</b>的链接是<b>http://www.imdb.com/title/tt0468569/</b>)",
+	'text_imdb_url_note' => "(来自<strong><a href=\"http://www.imdb.com\">IMDb</a></strong>的链接，也可以从<a href=\"http://movie.douban.com\">豆瓣电影</a>上粘贴。请尽量填写以检索IMDb、豆瓣评分，以及其它版本。",
 	'text_artist' => "艺术家：",
 	'text_album' => "专辑名：",
 	'title_get_rss' => "获取RSS",

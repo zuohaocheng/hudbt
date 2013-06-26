@@ -11,7 +11,7 @@ if ($userid == $CURUSER['id']) {
   $self = true;
 }
 
-if (!$manager && !$self) {
+if (!isset($manager) && !$self) {
   stderr("Error", "Permission denied.");
 }
 

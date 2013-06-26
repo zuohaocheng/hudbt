@@ -578,7 +578,7 @@ echo '</dl>';
 			echo '<dl class="table">';
 			form ("forum");
 
-			dl_item($lang_usercp['row_forum_signature'], "<textarea name=signature style=\"width:700px\" rows=10>" . $CURUSER[signature] . "</textarea><br />".$lang_usercp['text_signature_note'],1);
+			dl_item($lang_usercp['row_forum_signature'], "<textarea name=signature style=\"width:700px\" rows=10>" . $CURUSER['signature'] . "</textarea><br />".$lang_usercp['text_signature_note'],1);
 			submit();
 			print("</dl>");
 			stdfoot();

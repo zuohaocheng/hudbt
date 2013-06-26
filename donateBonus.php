@@ -159,7 +159,7 @@ MESSAGE;
 	// End send private message. ||
 	
 	// Update memcache sign
-	$Cache->cache_value("sign_update_donate_bonus_{$objectType}_{$objectId}", 'yes', 365 * 24 * 3600);
+	$Cache->delete_value("update_donate_bonus_{$objectType}_{$objectId}");
 }
 //var_dump($query_name);die(); // debug
 $response = array(

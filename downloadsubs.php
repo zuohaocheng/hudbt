@@ -1,11 +1,7 @@
 <?php
 require "include/bittorrent.php";
 dbconn();
-if (!$CURUSER)
-{
-	Header("Location: " . get_protocol_prefix() . "$BASEURL/");
-	die;
-}
+loggedinorreturn();
 
 $filename = $_GET["subid"];
 $dirname = $_GET["torrentid"];
@@ -46,11 +42,11 @@ else if ( str_replace("Opera", "", $_SERVER['HTTP_USER_AGENT']) != $_SERVER['HTT
 }
 else if ( str_replace("IE", "", $_SERVER['HTTP_USER_AGENT']) != $_SERVER['HTTP_USER_AGENT'] )
 {
-	header ("Content-Disposition: attachment; filename=".str_replace("+", "%20", rawurlencode($arr[filename])));
+	header ("Content-Disposition: attachment; filename=".str_replace("+", "%20", rawurlencode($arr['filename'])));
 }
 else
 {
-	header ("Content-Disposition: attachment; filename=".str_replace("+", "%20", rawurlencode($arr[filename])));
+	header ("Content-Disposition: attachment; filename=".str_replace("+", "%20", rawurlencode($arr['filename'])));
 }
 
 do
@@ -60,4 +56,3 @@ print($s);
 } while (!feof($f));
 //closefile($f);
 exit;
-?>

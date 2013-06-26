@@ -15,7 +15,7 @@ if(isset($CURUSER)) {
     global $lang_viewpeerlist,$viewanonymous_class,$userprofile_class,$enablelocation_tweak;
     global $CURUSER;
 
-    $s .= "\n";
+    $s = "\n";
     $s .= "<table width=825 class=main border=1 cellspacing=0 cellpadding=3>\n";
     $s .= '<thead class="center"><tr><th width=1%>'.$lang_viewpeerlist['col_user_ip']."</th>" .
       ($enablelocation_tweak == 'yes' || get_user_class() >= $userprofile_class ? "<th  width=1%>".$lang_viewpeerlist['col_location']."</th>" : "").
@@ -34,7 +34,6 @@ if(isset($CURUSER)) {
     while ($e = _mysql_fetch_array($res)) {
       $count += 1;
       $privacy = get_single_value("users", "privacy","WHERE id=".sqlesc($e['userid']));
-      ++$num;
 
       $highlight = $CURUSER["id"] == $e['userid'] ? " bgcolor=#BBAF9B" : "";
       $s .= "<tr$highlight>\n";
@@ -60,7 +59,7 @@ if(isset($CURUSER)) {
       }
       else $location = "";
 
-      $s .= "<td class=rowfollow align=center width=1%><nobr>" . ($e[connectable] == "yes" ? $lang_viewpeerlist['text_yes'] : "<font color=red>".$lang_viewpeerlist['text_no']."</font>") . "</nobr></td>\n";
+      $s .= "<td class=rowfollow align=center width=1%><nobr>" . ($e['connectable'] == "yes" ? $lang_viewpeerlist['text_yes'] : "<font color=red>".$lang_viewpeerlist['text_no']."</font>") . "</nobr></td>\n";
       $s .= "<td class=rowfollow align=center width=1%><nobr>" . mksize($e["uploaded"]) . "</nobr></td>\n";
 
       $s .= "<td class=rowfollow align=center width=1%><nobr>" . mksize(($e["uploaded"] - $e["uploadoffset"]) / $secs) . "/s</nobr></td>\n";
@@ -69,7 +68,7 @@ if(isset($CURUSER)) {
       if ($e["seeder"] == "no")
 	$s .= "<td class=rowfollow align=center width=1%><nobr>" . mksize(($e["downloaded"] - $e["downloadoffset"]) / $secs) . "/s</nobr></td>\n";
       else
-	$s .= "<td class=rowfollow align=center width=1%><nobr>" . mksize(($e["downloaded"] - $e["downloadoffset"]) / max(1, $e["finishedat"] - $e[st])) .	"/s</nobr></td>\n";
+	$s .= "<td class=rowfollow align=center width=1%><nobr>" . mksize(($e["downloaded"] - $e["downloadoffset"]) / max(1, $e["finishedat"] - $e['st'])) .	"/s</nobr></td>\n";
       if ($e["downloaded"])
 	{
 	  $ratio = floor(($e["uploaded"] / $e["downloaded"]) * 1000) / 1000;
@@ -103,4 +102,4 @@ if(isset($CURUSER)) {
   print(dltable($lang_viewpeerlist['text_seeders'], $seeders_res, $row, 'seeders'));
   print(dltable($lang_viewpeerlist['text_leechers'], $downloaders_res, $row, 'leechers'));
 }
-?>
+

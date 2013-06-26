@@ -122,7 +122,12 @@ $stickylimit = (int)$MAIN['stickylimit'];
 $wechattoken = $MAIN['wechattoken'];
 $douban_apikey = $MAIN['douban_apikey'];
 $useCronTriggerCleanUp = $MAIN['cron_cleanup'];
-//$showlastxforumposts_main = $MAIN['showlastxforumposts'];
+if (isset($showlastxforumposts)) {
+  $showlastxforumposts_main = $MAIN['showlastxforumposts'];
+}
+else {
+  $showlastxforumposts_main = 'no';
+}
 $showlastxtorrents_main = $MAIN['showlastxtorrents'];
 $showtrackerload = $MAIN['showtrackerload'];
 $showshoutbox_main = $MAIN['showshoutbox'];

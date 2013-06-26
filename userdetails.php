@@ -298,6 +298,9 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 		$sr = floor($user["uploaded"] / $user["downloaded"] * 1000) / 1000;
 		$sr = "<tr><td class=\"embedded\"><strong>" . $lang_userdetails['row_share_ratio'] . "</strong>:  <font color=\"" . get_ratio_color($sr) . "\">" . number_format($sr, 3) . "</font></td><td class=\"embedded\">&nbsp;&nbsp;" . get_ratio_img($sr) . "</td></tr>";
 	}
+	else {
+	  $sr = '';
+	}
 
 	$xfer = "<tr><td class=\"embedded\"><strong>" . $lang_userdetails['row_uploaded'] . "</strong>:  ". mksize($user["uploaded"]) . "</td><td class=\"embedded\">&nbsp;&nbsp;<strong>" . $lang_userdetails['row_downloaded'] . "</strong>:  " . mksize($user["downloaded"]) . "</td></tr>";
 
@@ -308,6 +311,9 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 	{
 		$slr = floor($user["seedtime"] / $user["leechtime"] * 1000) / 1000;
 		$slr = "<tr><td class=\"embedded\"><strong>" . $lang_userdetails['text_seeding_leeching_time_ratio'] . "</strong>:  <font color=\"" . get_ratio_color($slr) . "\">" . number_format($slr, 3) . "</font></td><td class=\"embedded\">&nbsp;&nbsp;" . get_ratio_img($slr) . "</td></tr>";
+	}
+	else {
+	  $slr = '';
 	}
 
 	$slt = "<tr><td class=\"embedded\"><strong>" . $lang_userdetails['text_seeding_time'] . "</strong>:  ". mkprettytime($user["seedtime"]) . "</td><td class=\"embedded\">&nbsp;&nbsp;<strong>" . $lang_userdetails['text_leeching_time'] . "</strong>:  " . mkprettytime($user["leechtime"]) . "</td></tr>";
@@ -360,26 +366,27 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 	{
 		print("<tr><td align=\"left\" colspan=\"2\" class=\"text\"><font color=\"blue\">".$lang_userdetails['text_public_access_denied'].$user['username'].$lang_userdetails['text_user_wants_privacy']."</font></td></tr>\n");
 	}
-	if ($CURUSER["id"] != $user["id"])
-	if (get_user_class() >= $staffmem_class)
-	$showpmbutton = 1;
-	elseif ($user["acceptpms"] == "yes")
-	{
-		$r = sql_query("SELECT id FROM blocks WHERE userid=$user[id] AND blockid=$CURUSER[id]") or sqlerr(__FILE__,__LINE__);
-		$showpmbutton = (_mysql_num_rows($r) == 1 ? 0 : 1);
-	}
-	elseif ($user["acceptpms"] == "friends")
-	{
-		$r = sql_query("SELECT id FROM friends WHERE userid=$user[id] AND friendid=$CURUSER[id]") or sqlerr(__FILE__,__LINE__);
-		$showpmbutton = (_mysql_num_rows($r) == 1 ? 1 : 0);
-	}
-	if ($CURUSER["id"] != $user["id"]){
-	print("<tr><td colspan=\"2\" align=\"center\">");
-	if ($showpmbutton)
-	print("<a href=\"sendmessage.php?receiver=".htmlspecialchars($user['id'])."\"><img class=\"f_pm\" src=\"pic/trans.gif\" alt=\"PM\" title=\"".$lang_userdetails['title_send_pm']."\" /></a>");
 
-	print("<a href=\"report.php?user=".htmlspecialchars($user['id'])."\"><img class=\"f_report\" src=\"pic/trans.gif\" alt=\"Report\" title=\"".$lang_userdetails['title_report_user']."\" /></a>");
-	print("</td></tr>");
+	if ($CURUSER["id"] != $user["id"]) {
+	  if (get_user_class() >= $staffmem_class) {
+	    $showpmbutton = true;
+	  }
+	  elseif ($user["acceptpms"] == "yes") {
+	    $showpmbutton = get_row_count("blocks", "WHERE userid=? AND blockid=?", [$user['id'], $CURUSER['id']]) == 0;
+	  }
+	  elseif ($user["acceptpms"] == "friends") {
+	    $showpmbutton = get_row_count("friends", "WHERE userid=? AND friendid=?", [$user['id'], $CURUSER['id']]) == 0;
+	  }
+	  else {
+	    $showpmbutton = false;
+	  }
+
+	  print("<tr><td colspan=\"2\" align=\"center\">");
+	  if ($showpmbutton)
+	    print("<a href=\"sendmessage.php?receiver=".htmlspecialchars($user['id'])."\"><img class=\"f_pm\" src=\"pic/trans.gif\" alt=\"PM\" title=\"".$lang_userdetails['title_send_pm']."\" /></a>");
+
+	  print("<a href=\"report.php?user=".htmlspecialchars($user['id'])."\"><img class=\"f_report\" src=\"pic/trans.gif\" alt=\"Report\" title=\"".$lang_userdetails['title_report_user']."\" /></a>");
+	  print("</td></tr>");
 	}
 	print("</table>\n");
 

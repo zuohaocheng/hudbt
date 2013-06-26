@@ -6,8 +6,7 @@ $key=$_GET['key'];
 $updatekey=$_GET['updatekey'];
 if ($key)
 {
-	if (!$CURUSER)
-	{
+  if (isset($CURUSER)) {
 	if ($prolinkpoint_bonus)
 	{
 		$res=sql_query("SELECT id FROM users WHERE promotion_link=".sqlesc($key)." LIMIT 1");
@@ -28,7 +27,7 @@ if ($key)
 	}
 	header("Location: " . get_protocol_prefix() . $BASEURL);
 }
-elseif(($updatekey || !$CURUSER['promotion_link']) && $CURUSER)
+elseif(isset($CURUSER) && ($updatekey || !$CURUSER['promotion_link']))
 {
 	$promotionkey=md5($CURUSER['email'].date("Y-m-d H:i:s").$CURUSER['passhash']);
 	update_user($CURUSER['id'], 'promotion_link=?', [$promotionkey]);

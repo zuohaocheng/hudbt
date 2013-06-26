@@ -184,8 +184,6 @@ function torrenttable_api($rows, $variant = "torrent", $swap_headings = false) {
   }
   return $torrents;
 }
-?>
-<?php
 
 header('Content-type: application/json');
 
@@ -196,6 +194,5 @@ if ($next_page_href != '') {
 
 $out['pager'] = array('top' => $pagertop, 'bottom' => $pagerbottom);
 
-print(php_json_encode($out));
+print(json_encode($out));
 
-?>

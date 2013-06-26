@@ -1,6 +1,7 @@
 <?php
 require_once("include/bittorrent.php");
 dbconn();
+loggedinorreturn();
 require_once(get_langfile_path());
 registration_check('invitesystem', true, false);
 
@@ -39,7 +40,7 @@ try {
 } catch (Exception $e) {
     bark('通过 SMTP 服务器发送邮件失败，请稍后<form class="a" method="post" action="takeinvite.php?action=resend-mail&id=' . $row['id'] . '"><input class="a" type="submit" value="重新尝试发送" /></form>。');
   }
-  header("Refresh: 0; url=invite.php?id=".htmlspecialchars($id)."&sent=1");
+  header("Refresh: 0; url=invite.php?id=".htmlspecialchars($CURUSER['id'])."&sent=1");
 }
 
 if ($_REQUEST['action'] == 'resend-mail') {

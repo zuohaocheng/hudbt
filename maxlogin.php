@@ -55,8 +55,13 @@ if ($action == 'showlist') {
 stdhead ("Max. Login Attemps - Show List");
 print("<h1>Failed Login Attempts</h1>");
 print("<table border=1 cellspacing=0 cellpadding=5 width=100%>\n");
-if ($update)
-	$msg = "<tr><td colspan=6><b>".htmlspecialchars($update)." Successful!</b></td></tr>\n";
+if ($update) {
+  $msg = "<tr><td colspan=6><b>".htmlspecialchars($update)." Successful!</b></td></tr>\n";
+}
+else {
+  $msg = '';
+}
+
 $res = sql_query("SELECT * FROM  loginattempts ORDER BY $orderby DESC $limit") or sqlerr(__FILE__,__LINE__);
 if (_mysql_num_rows($res) == 0)
 	  print("<tr><td colspan=2><b>Nothing found</b></td></tr>\n");
@@ -67,9 +72,9 @@ else
 
   while ($arr = _mysql_fetch_assoc($res))
   {
-  	$r2 = sql_query("SELECT id,username FROM users WHERE ip=".sqlesc($arr[ip])) or sqlerr(__FILE__,__LINE__);
+  	$r2 = sql_query("SELECT id,username FROM users WHERE ip=".sqlesc($arr['ip'])) or sqlerr(__FILE__,__LINE__);
   	$a2 = _mysql_fetch_assoc($r2);	
- 	  print("<tr><td align=>$arr[id]</td><td align=left>$arr[ip] " . ($a2[id] ? get_username($a2['id']) : "" ) . "</td><td align=left>$arr[added]</td><td align=left>$arr[attempts]</td><td align=left>".($arr[type] == "recover" ? "Recover Password Attempt!" : "Login Attempt!")."</td><td align=left>".($arr[banned] == "yes" ? "<font color=red><b>banned</b></font> <a href=maxlogin.php?action=unban&id=$arr[id]><font color=green>[<b>unban</b>]</font></a>" : "<font color=green><b>not banned</b></font> <a href=maxlogin.php?action=ban&id=$arr[id]><font color=red>[<b>ban</b>]</font></a>")."  <a OnClick=\"return confirm('Are you wish to delete this attempt?');\" href=maxlogin.php?action=delete&id=$arr[id]>[<b>delete</b></a>] <a href=maxlogin.php?action=edit&id=$arr[id]><font color=blue>[<b>edit</b></a>]</font></td></tr>\n");
+ 	  print("<tr><td align=>$arr[id]</td><td align=left>$arr[ip] " . ($a2['id'] ? get_username($a2['id']) : "" ) . "</td><td align=left>$arr[added]</td><td align=left>$arr[attempts]</td><td align=left>".($arr['type'] == "recover" ? "Recover Password Attempt!" : "Login Attempt!")."</td><td align=left>".($arr['banned'] == "yes" ? "<font color=red><b>banned</b></font> <a href=maxlogin.php?action=unban&id=$arr[id]><font color=green>[<b>unban</b>]</font></a>" : "<font color=green><b>not banned</b></font> <a href=maxlogin.php?action=ban&id=$arr[id]><font color=red>[<b>ban</b>]</font></a>")."  <a OnClick=\"return confirm('Are you wish to delete this attempt?');\" href=maxlogin.php?action=delete&id=$arr[id]>[<b>delete</b></a>] <a href=maxlogin.php?action=edit&id=$arr[id]><font color=blue>[<b>edit</b></a>]</font></td></tr>\n");
   }
   
 }

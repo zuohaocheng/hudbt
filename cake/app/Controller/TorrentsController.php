@@ -39,7 +39,10 @@ class TorrentsController extends AppController {
 		if (!$this->Torrent->exists()) {
 			throw new NotFoundException(__('Invalid torrent'));
 		}
-		$torrent = $this->Torrent->read(['id', 'name', 'promotion_time_type', 'promotion_until', 'sp_state', 'pos_state', 'picktype', 'oday', 'pos_state_until'], $id);
+		$torrent = $this->Torrent->find('first', ['fields' => ['id', 'name', 'promotion_time_type', 'promotion_until', 'sp_state', 'pos_state', 'picktype', 'oday', 'pos_state_until'],
+				 'conditions' => ['Torrent.id' => $id],
+				 'recursive' => 0]);
+
 #		echo h(json_encode($torrent));
 		$this->set('torrent', $torrent);
 		$this->set('_serialize', 'torrent');
@@ -144,7 +147,7 @@ class TorrentsController extends AppController {
  * @return void
  */
 	public function delete($id = null) {
-	  global $CURUSER, $self_deletion_before_torrent;
+	  global $CURUSER, $self_deletion_before_torrent, $SITENAME;
 	  include(get_langfile_path('delete.php'));
 	  if (!$this->request->is('delete')) {
 	    throw new MethodNotAllowedException();

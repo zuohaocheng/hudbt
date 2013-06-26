@@ -212,7 +212,8 @@ if($destoring===true){
 			if($outtime['seedtime']){
 				$subject = $lang_takeedit['sbj_storing_canceled'];
 				$msg = $lang_takeedit['txt_your_torrent']."[torrent=$id]".$lang_takeedit['txt_has_been']."[user=$CURUSER[id]]".$lang_takeedit['txt_storing_canceled'];
-				
+
+				$keeper_id = $updateList['keeper_id'];
 				sql_query("UPDATE storing_records SET out_seedtime = $outtime[seedtime], out_date = NOW(), checkout = 1 WHERE torrent_id = $id AND keeper_id = $keeper_id AND checkout = 0") or sqlerr(__FILE__,__LINE__);
 				if(_mysql_affected_rows()){
 					send_pm(0,$keeper_id,$subject,$msg);

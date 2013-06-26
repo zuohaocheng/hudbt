@@ -40,7 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 	
 	if (!check_email($email))
 	failedlogins($lang_confirm_resend['std_invalid_email_address'],true);
-	$res = sql_query("SELECT * FROM users WHERE email=" . sqlesc($email) . " LIMIT 1") or sqlerr(__FILE__, __LINE__);
+	$res = sql_query("SELECT id, username, status FROM users WHERE email=" . sqlesc($email) . " LIMIT 1") or sqlerr(__FILE__, __LINE__);
 	$arr = _mysql_fetch_assoc($res) or failedlogins($lang_confirm_resend['std_email_not_found'],true);
 	if($arr["status"] != "pending") failedlogins($lang_confirm_resend['std_user_already_confirm'],true);
 	
@@ -53,7 +53,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 	if (strlen($wantpassword) > 40)
 		bark($lang_confirm_resend['std_password_too_long']);
 	
-	if ($wantpassword == $wantusername)
+	if ($wantpassword == $arr['username'])
 		bark($lang_confirm_resend['std_password_equals_username']);
 	
 	$secret = mksecret();

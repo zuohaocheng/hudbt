@@ -105,7 +105,7 @@ if ($action == 'delete')
 
 stdhead($lang_friends['head_personal_lists_for']. $user['username']);
 
-print('<h1 id="page-title">' . $lang_friends['text_personallist'] . " ".get_username($user[id])."</h1>\n");
+print('<h1 id="page-title">' . $lang_friends['text_personallist'] . " ".get_username($user['id'])."</h1>\n");
 
 //Start: Friends
 

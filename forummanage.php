@@ -108,7 +108,7 @@ if ($_GET['action'] == "editforum") {
              $name = $arr["name"];
              $i = $arr["id"];
 
-            print("<option value=$i" . ($forid == $i ? " selected" : "") . ">$prefix" . $name . "\n");
+            print("<option value=$i" . ($forid == $i ? " selected" : "") . ">" . $name . "\n");
             }
 
 
@@ -127,7 +127,7 @@ if ($_GET['action'] == "editforum") {
 <?php
              $maxclass = get_user_class();
           for ($i = 0; $i <= $maxclass; ++$i)
-            print("<option value=$i" . ($row["minclassread"] == $i ? " selected" : "") . ">$prefix" . get_user_class_name($i,false,true,true));
+            print("<option value=$i" . ($row["minclassread"] == $i ? " selected" : "") . ">" . get_user_class_name($i,false,true,true));
 ?>
         </select>
     </td>
@@ -138,7 +138,7 @@ if ($_GET['action'] == "editforum") {
 <?php
               $maxclass = get_user_class();
           for ($i = 0; $i <= $maxclass; ++$i)
-            print("<option value=$i" . ($row["minclasswrite"] == $i ? " selected" : "") . ">$prefix" . get_user_class_name($i,false,true,true) . "\n");
+            print("<option value=$i" . ($row["minclasswrite"] == $i ? " selected" : "") . ">" . get_user_class_name($i,false,true,true) . "\n");
 ?>
         </select></td>
   </tr>
@@ -148,7 +148,7 @@ if ($_GET['action'] == "editforum") {
 <?php
             $maxclass = get_user_class();
           for ($i = 0; $i <= $maxclass; ++$i)
-            print("<option value=$i" . ($row["minclasscreate"] == $i ? " selected" : "") . ">$prefix" . get_user_class_name($i,false,true,true) . "\n");
+            print("<option value=$i" . ($row["minclasscreate"] == $i ? " selected" : "") . ">" . get_user_class_name($i,false,true,true) . "\n");
 ?>
         </select></td>
   </tr>
@@ -210,7 +210,7 @@ elseif ($_GET['action'] == "newforum"){
              $name = $arr["name"];
              $i = $arr["id"];
 
-            print("<option value=$i" . ($forid == $i ? " selected" : "") . ">$prefix" . $name . "\n");
+            print("<option value=$i" . ($forid == $i ? " selected" : "") . ">" . $name . "\n");
             }
 ?>
         </select>
@@ -224,7 +224,7 @@ elseif ($_GET['action'] == "newforum"){
 <?php
              $maxclass = get_user_class();
           for ($i = 0; $i <= $maxclass; ++$i)
-            print("<option value=$i" . ($user["class"] == $i ? " selected" : "") . ">$prefix" . get_user_class_name($i,false,true,true) . "\n");
+            print("<option value=$i" . ($user["class"] == $i ? " selected" : "") . ">" . get_user_class_name($i,false,true,true) . "\n");
 ?>
         </select>
     </td>
@@ -235,7 +235,7 @@ elseif ($_GET['action'] == "newforum"){
 <?php
               $maxclass = get_user_class();
           for ($i = 0; $i <= $maxclass; ++$i)
-            print("<option value=$i" . ($user["class"] == $i ? " selected" : "") . ">$prefix" . get_user_class_name($i,false,true,true) . "\n");
+            print("<option value=$i" . ($user["class"] == $i ? " selected" : "") . ">" . get_user_class_name($i,false,true,true) . "\n");
 ?>
         </select></td>
   </tr>
@@ -245,7 +245,7 @@ elseif ($_GET['action'] == "newforum"){
 <?php
             $maxclass = get_user_class();
           for ($i = 0; $i <= $maxclass; ++$i)
-            print("<option value=$i" . ($user["class"] == $i ? " selected" : "") . ">$prefix" . get_user_class_name($i,false,true,true) . "\n");
+            print("<option value=$i" . ($user["class"] == $i ? " selected" : "") . ">" . get_user_class_name($i,false,true,true) . "\n");
 ?>
         </select></td>
   </tr>
@@ -289,7 +289,7 @@ if ($row = _mysql_fetch_array($result)) {
       $moderators = $lang_forummanage['text_not_available'];
     }
     echo "<tr><td><a href=forums.php?action=viewforum&forumid=".$row["id"]."><b>".htmlspecialchars($row["name"])."</b></a><br />".htmlspecialchars($row["description"])."</td>";
-    echo "<td>".htmlspecialchars($name)."</td><td>" . get_user_class_name($row["minclassread"],false,true,true) . "</td><td>" . get_user_class_name($row["minclasswrite"],false,true,true) . "</td><td>" . get_user_class_name($row["minclasscreate"],false,true,true) . "</td><td>".$moderators."</td><td><div class=\"minor-list list-seperator\"><ul><li><a href=\"".$PHP_SELF."?action=editforum&id=".$row["id"]."\">".$lang_forummanage['text_edit']."</a></li><li><a href=\"javascript:confirm_delete('".$row["id"]."', '".$lang_forummanage['js_sure_to_delete_forum']."', '');\"><span class=\"striking\">".$lang_forummanage['text_delete']."</span></a></li></ul></div></td></tr>";
+    echo "<td>".htmlspecialchars($name)."</td><td>" . get_user_class_name($row["minclassread"],false,true,true) . "</td><td>" . get_user_class_name($row["minclasswrite"],false,true,true) . "</td><td>" . get_user_class_name($row["minclasscreate"],false,true,true) . "</td><td>".$moderators."</td><td><div class=\"minor-list list-seperator\"><ul><li><a href=\"?action=editforum&id=".$row["id"]."\">".$lang_forummanage['text_edit']."</a></li><li><a href=\"javascript:confirm_delete('".$row["id"]."', '".$lang_forummanage['js_sure_to_delete_forum']."', '');\"><span class=\"striking\">".$lang_forummanage['text_delete']."</span></a></li></ul></div></td></tr>";
   } while($row = _mysql_fetch_array($result));
 }
 else {

@@ -179,7 +179,7 @@ if($CURUSER['seedbonus'] >= $points) {
       $usernamegift = trim($_REQUEST["username"]);
       $useridgift = get_user_id_from_name($usernamegift);
     }
-    $userseedbonus = $arr['seedbonus'];
+
     if ($points < 25 || $points > 10000) {
       //write_log("User " . $CURUSER["username"] . "," . $CURUSER["ip"] . " is hacking bonus system",'mod');
       error($lang_mybonus['text_error'], $lang_mybonus['bonus_amount_not_allowed']);

@@ -201,7 +201,7 @@ break;
 		$this_donated_cny = $donated_cny - $arr["donated_cny"];
 		$memo = sqlesc(htmlspecialchars($_POST["donation_memo"]));
 		
-		if ($donated != $arr[donated] || $donated_cny != $arr[donated_cny]) {
+		if ($donated != $arr['donated'] || $donated_cny != $arr['donated_cny']) {
 			$added = sqlesc(date("Y-m-d H:i:s"));
 			sql_query("INSERT INTO funds (usd, cny, user, added, memo) VALUES ($this_donated_usd, $this_donated_cny, $userid, $added, $memo)") or sqlerr(__FILE__, __LINE__);
 			$updateset[] = "donated = " . sqlesc($donated);
@@ -211,21 +211,11 @@ break;
 		$updateset[] = "donor = " . sqlesc($donor);
 	}
 	
-	if ($chpassword != "" AND $passagain != "") {
-		unset($passupdate);
-		$passupdate=false;
-		
-		if ($chpassword ==  $username OR strlen($chpassword) > 40 OR strlen($chpassword) < 6 OR $chpassword != $passagain)
-			$passupdate=false;
-		else
-			$passupdate=true;
-	}
-	
-	if ($passupdate) {
-		$sec = mksecret();
-		$passhash = md5($sec . $chpassword . $sec);
-		$updateset[] = "secret = " . sqlesc($sec);
-		$updateset[] = "passhash = " . sqlesc($passhash);
+	if ($chpassword != "" && $chpassword !=  $username && strlen($chpassword) <= 40 && strlen($chpassword) >= 6 AND $chpassword == $passagain) {
+	    $sec = mksecret();
+	    $passhash = md5($sec . $chpassword . $sec);
+	    $updateset[] = "secret = " . sqlesc($sec);
+	    $updateset[] = "passhash = " . sqlesc($passhash);
 	}
 
 	if ($curclass >= get_user_class())

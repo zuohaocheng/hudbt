@@ -177,13 +177,13 @@ class Torrent extends AppModel {
 	  $users_s = $this->Snatched->find('all',
 					  ['conditions' => ['Snatched.torrentid' => $this->id,
 							    'Snatched.finished' => 'no',
-							    'Snatched.userid !=' => $data['Torrent']['owner'],
+							    'Snatched.userid !=' => $this->data['Torrent']['owner'],
 							    'User.accepttdpms' => 'yes'],
 					   'fields' => ['Snatched.userid']]);
 	  $users_p = $this->Peer->find('all',
 				       ['conditions' => ['Peer.torrent' => $this->id,
 							 'Peer.seeder' => 'yes',
-							 'Peer.userid !=' => $data['Torrent']['owner'],
+							 'Peer.userid !=' => $this->data['Torrent']['owner'],
 							 'User.accepttdpms' => 'yes',],
 					'fields' => ['Peer.userid']]);
 	  $this->users = array_unique(array_merge(array_map(getUseridFor('Snatched'), $users_s),  array_map(getUseridFor('Peer'), $users_p)));

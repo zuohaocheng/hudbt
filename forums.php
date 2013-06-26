@@ -748,7 +748,7 @@ SELECT id, rownum FROM (SELECT @x:=@x+1 AS rownum, id, userid FROM (SELECT @x:=0
 		print("<input type=\"hidden\" name=\"authorid\" value=\"".$authorid."\" />\n");}
 		if($page){
 		print("<input type=\"hidden\" name=\"page\" value=\"".$page."\" />\n");}//These ifs are just to make the url cleaner.Feel no guilty to delete them if you don't like them
-		print("<input type=\"hidden\" name=\"showori_body\" value=\"".($showori ? '0' : '1')."\" /><input type=\"submit\" class=\"medium\" value=\"".($showori ? $lang_forums[text_shownow] : $lang_forums['text_showori'])."\" /></form></li>\n");
+		print("<input type=\"hidden\" name=\"showori_body\" value=\"".($showori ? '0' : '1')."\" /><input type=\"submit\" class=\"medium\" value=\"".($showori ? $lang_forums['text_shownow'] : $lang_forums['text_showori'])."\" /></form></li>\n");
 		
 		print("<li><form method=\"post\" id=\"forum-movetopic\" action=\"".htmlspecialchars("?action=movetopic&topicid=".$topicid)."\">\n"."&nbsp;".$lang_forums['text_move_thread_to']."&nbsp;<select class=\"med\" name=\"forumid\">");
 		$forums = get_forum_row();
@@ -1131,7 +1131,7 @@ elseif ($action == "viewforum") {
 	$search = '%' . $search_raw . '%';
 	if ($search_raw){
 		$wherea = " AND subject LIKE ?";
-		$addparam .= "&search=".rawurlencode($search_raw);
+		$addparam = "&search=".rawurlencode($search_raw);
 	}
 	else {
 		$wherea = "";
@@ -1460,7 +1460,7 @@ elseif ($action == "search") {
 
 		while ($post = _mysql_fetch_array($res))
 		{
-			print("<tr><td class=\"rowfollow\" align=\"center\" width=\"1%\">".$post[id]."</td><td class=\"rowfollow\" align=\"left\"><a href=\"".htmlspecialchars("?action=viewtopic&topicid=".$post[topicid]."&highlight=".rawurlencode($keywords)."&page=p".$post[id]."#pid".$post[id])."\">" . highlight_topic(highlight($keywords,htmlspecialchars($post['subject'])), $post['hlcolor']) . "</a></td><td class=\"rowfollow nowrap\" align=\"left\"><a href=\"".htmlspecialchars("?action=viewforum&forumid=".$post['forumid'])."\"><b>" . htmlspecialchars($post["forumname"]) . "</b></a></td><td class=\"rowfollow nowrap\" align=\"left\">" . gettime($post['added'],true,false) . "&nbsp;|&nbsp;". get_username($post['userid']) ."</td></tr>\n");
+			print("<tr><td class=\"rowfollow\" align=\"center\" width=\"1%\">".$post['id']."</td><td class=\"rowfollow\" align=\"left\"><a href=\"".htmlspecialchars("?action=viewtopic&topicid=".$post['topicid']."&highlight=".rawurlencode($keywords)."&page=p".$post['id']."#pid".$post['id'])."\">" . highlight_topic(highlight($keywords,htmlspecialchars($post['subject'])), $post['hlcolor']) . "</a></td><td class=\"rowfollow nowrap\" align=\"left\"><a href=\"".htmlspecialchars("?action=viewforum&forumid=".$post['forumid'])."\"><b>" . htmlspecialchars($post["forumname"]) . "</b></a></td><td class=\"rowfollow nowrap\" align=\"left\">" . gettime($post['added'],true,false) . "&nbsp;|&nbsp;". get_username($post['userid']) ."</td></tr>\n");
 		}
 
 		print("</tbody></table>\n");
@@ -1512,7 +1512,7 @@ foreach ($overforums as $a) {
 		continue;
 	if ($count>=1)
 	if ($Advertisement->enable_ad()){
-		if ($interoverforumsad[$count-1])
+	  if (isset($interoverforumsad[$count-1]))
 			echo "<tr><td colspan=\"5\" align=\"center\" id=\"ad_interoverforums_".($count-1)."\">".$interoverforumsad[$count-1]."</td></tr>";
 	}
 	$forid = $a["id"];

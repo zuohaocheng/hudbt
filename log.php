@@ -114,7 +114,7 @@ else {
     }
 
     logmenu('dailylog');
-    $opt = array (all => $lang_log['text_all'], normal => $lang_log['text_normal'], mod => $lang_log['text_mod']);
+    $opt = array ('all' => $lang_log['text_all'], 'normal' => $lang_log['text_normal'], 'mod' => $lang_log['text_mod']);
     searchtable($lang_log['text_search_log'], 'dailylog',$opt);
 
     $count = get_row_count('sitelog', $wherea, [$query]);
@@ -188,7 +188,7 @@ else {
     }
 
     logmenu('forumlog');
-    $opt = array (all => $lang_log['text_all'], normal => $lang_log['text_normal'], high => $lang_log['text_high']);
+    $opt = array ('all' => $lang_log['text_all'], 'normal' => $lang_log['text_normal'], 'high' => $lang_log['text_high']);
     searchtable($lang_log['text_search_log'], 'forumlog',$opt);
     
     $count = get_row_count('forumlog', $wherea, $args);
@@ -271,7 +271,7 @@ else {
     }
 
     logmenu($action);
-    $opt = array (all => $lang_log['text_all'], normal => $lang_log['text_normal'], mod => $lang_log['text_mod']);
+    $opt = array ('all' => $lang_log['text_all'], 'normal' => $lang_log['text_normal'], 'mod' => $lang_log['text_mod']);
     searchtable($lang_log['text_search_log'], $action, $opt);
     
     //die();

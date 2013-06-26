@@ -29,21 +29,12 @@ if($userid != $arr['userid']) {
 	<div id="donater_list">
 <?php 
 // $topicid = (int) $_GET['topicid'];
-$sqlDonateList = 'SELECT donater, donater_id, amount, message, action_date FROM donate_bonus WHERE object_id='.$topicid.' AND `type`="topic"';
-$result = sql_query($sqlDonateList) or sqlerr();
 
-if($Cache->get_value('sign_update_donate_bonus_topic_'.$topicid) == 'no') {
-	$donaterRecodes = $Cache->get_value('update_donate_bonus_topic_'.$topicid);
-} else {
-	// 'sign_update_donate_bonus_topic_{id}' is 'yes' or empty 
-	$donaterRecodes  = array();
-	while($donateInfo = _mysql_fetch_assoc($result)) {
-		$donaterRecodes[] = $donateInfo;
-		$i++;
-	}
-	$Cache->cache_value('update_donate_bonus_topic_'.$topicid, $donaterRecodes, 365 * 24 * 3600);
-	$Cache->cache_value('sign_update_donate_bonus_topic_'.$topicid, 'no', 365 * 24 * 3600);
-}
+$donaterRecodes = $Cache->get_value('update_donate_bonus_topic_'.$topicid, 365 * 86400, function() use ($topicid) {
+    $sqlDonateList = 'SELECT donater, donater_id, amount, message, action_date FROM donate_bonus WHERE object_id='.$topicid.' AND `type`="topic"';
+    return sql_query($sqlDonateList)->fetchAll();
+    
+  });
 
 $doanterCount = count($donaterRecodes);
 

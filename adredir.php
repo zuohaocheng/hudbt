@@ -13,10 +13,13 @@ if (!$redir)
 $adcount=get_row_count("advertisements", "WHERE id=".sqlesc($id));
 if (!$adcount)
 	stderr($lang_adredir['std_error'], $lang_adredir['std_invalid_ad_id']);
-if ($adclickbonus_advertisement){
-	$clickcount=get_row_count("adclicks", "WHERE adid=".sqlesc($id)." AND userid=".sqlesc($CURUSER['id']));
-	if (!$clickcount)
-		KPS("+",$adclickbonus_advertisement,$CURUSER['id']);
+
+if (isset($CURUSER)) {
+  if ($adclickbonus_advertisement){
+    $clickcount=get_row_count("adclicks", "WHERE adid=".sqlesc($id)." AND userid=".sqlesc($CURUSER['id']));
+    if (!$clickcount)
+      KPS("+",$adclickbonus_advertisement,$CURUSER['id']);
+  }
+  sql_query("INSERT INTO adclicks (adid, userid, added) VALUES (".sqlesc($id).", ".sqlesc($CURUSER['id']).", ".sqlesc(date("Y-m-d H:i:s")).")");
 }
-sql_query("INSERT INTO adclicks (adid, userid, added) VALUES (".sqlesc($id).", ".sqlesc($CURUSER['id']).", ".sqlesc(date("Y-m-d H:i:s")).")");
 header("Location: $redir");

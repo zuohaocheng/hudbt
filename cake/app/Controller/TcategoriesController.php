@@ -40,6 +40,7 @@ class TcategoriesController extends AppController {
 			throw new NotFoundException(__('Invalid tcategory'));
 		}
 
+		$this->Tcategory->recursive = 1;
 		$tcategory = $this->Tcategory->read(null, $id);
 
 		if(!array_key_exists('noredirect', $this->request->params['named']) && $tcategory['Tcategory']['redirect_to_id']) {
@@ -71,8 +72,11 @@ class TcategoriesController extends AppController {
 			    'torrents' => $torrents,
 			    'canEdit' => !$tcategory['Tcategory']['locked'] || checkPrivilege(['Tcategory', 'lock']),
 			    'canDelete' => checkPrivilege(['Tcategory', 'delete']),
+			    'json' => ['Tcategory' => $tcategory['Tcategory']],
 			    ]);
-		$this->set('_serialize', 'tcategory');
+
+		$this->set('_serialize', 'json');
+
 	}
 
 /**
@@ -93,7 +97,12 @@ class TcategoriesController extends AppController {
 		$redirectTos = $this->Tcategory->RedirectTo->find('list');
 		$parents = $this->Tcategory->Parent->find('list');
 		$torrents = $this->Tcategory->Torrent->find('list');
-		$this->set(compact('redirectTos', 'parents', 'torrents'));
+		$canLock = checkPrivilege(['Tcategory', 'lock']);
+
+		$tcategory = ['RedirectTo' => ['id' => null],
+			       'Parent' => []];
+		
+		$this->set(compact('redirectTos', 'parents', 'torrents', 'canLock', 'tcategory'));
 	}
 
 /**
@@ -178,12 +187,17 @@ class TcategoriesController extends AppController {
 	  }
 
 	  if (array_key_exists('exact', $this->request->params['named'])) {
-	    $this->paginate = array('conditions' => array('Tcategory.name LIKE' => $text));
+	    $this->paginate = ['conditions' => array('Tcategory.name LIKE' => $text),
+			       'recursive' => 0,
+			       ];
 	  }
 	  else {
-	    $this->paginate = array('conditions' => array('Tcategory.name LIKE' => '%' . $text . '%'));
+	    $this->paginate = ['conditions' => array('Tcategory.name LIKE' => '%' . $text . '%'),
+			       'recursive' => 0,
+			       ];
 	  }
 	  $tcategories = $this->paginate('Tcategory');
+
 	  $this->set(['tcategories' => $tcategories,
 		      'canLock' => checkPrivilege(['Tcategory', 'lock']),
 		      'canDelete' => checkPrivilege(['Tcategory', 'delete']),

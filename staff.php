@@ -17,6 +17,7 @@ if (!$Cache->get_page()){
 //--------------------- FIRST LINE SUPPORT SECTION ---------------------------//
 	unset($ppl);
 	$res = sql_query("SELECT id,country,last_access,supportlang,supportfor FROM users WHERE users.support='yes' AND users.status='confirmed' ORDER BY users.username");
+	$ppl = '';
 	foreach ($res as $arr) {
 	  $ppl .= "<li>". get_username($arr['id']) ."</li>";
 	}
@@ -130,6 +131,8 @@ end_frame();
 //--------------------- general staff section ---------------------------//
 unset($ppl);
 $res = sql_query("SELECT class,id,country,last_access,stafffor FROM users WHERE class > ".UC_VIP." AND status='confirmed' ORDER BY class DESC, username") or sqlerr();
+$curr_class = null;
+$ppl = '';
 while ($arr = _mysql_fetch_assoc($res))
 {
 	if($curr_class != $arr['class'])

@@ -361,8 +361,8 @@ function torrent_promotion_expire($days, $type = 2, $targettype = 1){
 	{
 		while ($arr = _mysql_fetch_assoc($res))
 		{
-			$subject = ($lang_cleanup_target[get_user_lang($arr[id])]['msg_vip_status_removed']); 
-			$msg = ($lang_cleanup_target[get_user_lang($arr[id])]['msg_vip_status_removed_body']);
+			$subject = ($lang_cleanup_target[get_user_lang($arr['id'])]['msg_vip_status_removed']); 
+			$msg = ($lang_cleanup_target[get_user_lang($arr['id'])]['msg_vip_status_removed_body']);
 			///---AUTOSYSTEM MODCOMMENT---//
 			$modcomment = htmlspecialchars($arr["modcomment"]);
 			$modcomment =  date("Y-m-d") . " - VIP status removed by - AutoSystem.\n". $modcomment;
@@ -423,7 +423,7 @@ function promotion($class, $down_floor_gb, $minratio, $time_week, $addinvite = 0
 			{
 				$subject = ($lang_cleanup_target[get_user_lang($arr['id'])]['msg_promoted_to'].get_user_class_name($class,false,false,false));
 				$msg = ($lang_cleanup_target[get_user_lang($arr['id'])]['msg_now_you_are'].get_user_class_name($class,false,false,false).$lang_cleanup_target[get_user_lang($arr['id'])]['msg_see_faq']);
-				if($class<=$arr[max_class_once])
+				if($class<=$arr['max_class_once'])
 					sql_query("UPDATE users SET class = $class WHERE id = $arr[id]") or sqlerr(__FILE__, __LINE__);
 				else
 					sql_query("UPDATE users SET class = $class, max_class_once=$class, invites=invites+$addinvite WHERE id = $arr[id]") or sqlerr(__FILE__, __LINE__);

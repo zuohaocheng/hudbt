@@ -217,6 +217,10 @@ if ($_GET["off_details"]){
 		$edit = "<a href=\"?id=".$id."&amp;edit_offer=1\"><img class=\"dt_edit\" src=\"pic/trans.gif\" alt=\"edit\" />&nbsp;<b><font class=\"small\">".$lang_offers['text_edit_offer'] . "</font></b></a>&nbsp;|&nbsp;";
 		$delete = "<a href=\"?id=".$id."&amp;del_offer=1&amp;sure=0\"><img class=\"dt_delete\" src=\"pic/trans.gif\" alt=\"delete\" />&nbsp;<b><font class=\"small\">".$lang_offers['text_delete_offer']."</font></b></a>&nbsp;|&nbsp;";
 	}
+	else {
+	  $delete = '';
+	  $edit = '';
+	}
 
 	$freeze = '';
 	if (get_user_class() >= $offermanage_class) {
@@ -423,8 +427,11 @@ if ($_GET["take_off_edit"]){
 		if(!preg_match("/^http:\/\/[^\s'\"<>]+\.(jpg|gif|png)$/i", $picture))
 		stderr($lang_offers['std_error'], $lang_offers['std_wrong_image_format']);
 		$pic = "[img]".$picture."[/img]\n";
+		$descr = $pic;
 	}
-	$descr = "$pic";
+	else {
+	  $descr = '';
+	}
 	$descr .= unesc($_POST["body"]);
 	if (!$name)
 	bark($lang_offers['std_must_enter_name']);
@@ -583,13 +590,15 @@ if ($_GET["del_offer"]){
 	if ($userid != $num["userid"] && get_user_class() < $offermanage_class)
 	stderr($lang_offers['std_error'], $lang_offers['std_cannot_delete_others_offer']);
 
-	if ($_GET["sure"])
-	{
+	if (isset($_GET["sure"])) {
 		$sure = $_GET["sure"];
 		if($sure == '0' || $sure == '1')
 		$sure = 0 + $_GET["sure"];
 		else
 		stderr($lang_offers['std_error'], $lang_offers['std_smell_rat']);
+	}
+	else {
+	  $sure = 0;
 	}
 
 
@@ -638,7 +647,7 @@ if (isset($_REQUEST['freeze'])) {
       $log = 'unfrozen';
     }
     sql_query("UPDATE offers SET allowed='$allowed' WHERE id=".sqlesc($id)) or sqlerr(__FILE__,__LINE__);
-    write_log("Offer: $offerid ($num[name]) was $log by $CURUSER[username]".($reason != "" ? " (".$reason.")" : ""),'normal');
+    write_log("Offer: $offerid ($num[name]) was $log by $CURUSER[username]",'normal');
     header("Refresh: 0; url=offers.php?id=$id&off_details=1");
     die;
   }
@@ -848,7 +857,7 @@ $lastcom_tooltip = [];
 			$title = " title=\"".($hasnewcom ? $lang_offers['title_has_new_comment'] : $lang_offers['title_no_new_comment'])."\"";
 			$onmouseover = "";
 		}
-		$comment = "<b><a".$title." href=\"?id=".$arr[id]."&amp;off_details=1#startcomments\" ".$onmouseover.">".($hasnewcom ? "<font class='new'>" : ""). $comms .($hasnewcom ? "</font>" : "")."</a></b>";
+		$comment = "<b><a".$title." href=\"?id=".$arr['id']."&amp;off_details=1#startcomments\" ".$onmouseover.">".($hasnewcom ? "<font class='new'>" : ""). $comms .($hasnewcom ? "</font>" : "")."</a></b>";
 	}
 
 	//==== if you want allow deny for offers use this next bit
@@ -905,8 +914,10 @@ $lastcom_tooltip = [];
 			$futuretime = strtotime($arr['added']) + $offervotetimeout_main;
 			$timeout = gettime(date("Y-m-d H:i:s",$futuretime), false, true, true, false, true);
 		}
-		if (!$timeout)
+		else {
 			$timeout = "N/A";
+		}
+
 		print("<td class=\"rowfollow nowrap\">".$timeout."</td>");
 	}
 	print("<td class=\"rowfollow\">".$addedby."</td>".(get_user_class() >= $offermanage_class ? "<td class=\"rowfollow\"><a href=\"?id=".$arr['id']."&amp;del_offer=1\"><img class=\"staff_delete\" src=\"pic/trans.gif\" alt=\"D\" title=\"".$lang_offers['title_delete']."\" /></a><br /><a href=\"?id=".$arr['id']."&amp;edit_offer=1\"><img class=\"staff_edit\" src=\"pic/trans.gif\" alt=\"E\" title=\"".$lang_offers['title_edit']."\" /></a></td>" : "")."</tr>");

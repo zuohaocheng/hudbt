@@ -54,6 +54,9 @@ else
 				$kicktimeout = gettime($CURUSER['leechwarnuntil'], false, false, true);
 				$note = $lang_downloadnotice['text_low_ratio_note_one'].$kicktimeout.$lang_downloadnotice['text_low_ratio_note_two'];
 			}
+			else {
+			  $note = '';
+			}
 			$noticenexttime = $lang_downloadnotice['text_notice_always_show'];
 			$showrationotice = true;
 			$showclientnotice = false;

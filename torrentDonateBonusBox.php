@@ -36,20 +36,12 @@ if($CURUSER['id'] == $row['owner']) {
 <div id="donater_list">
 <?php 
 $torrent_id = (int) $_GET['id'];
-$sqlDonateList = 'SELECT donater, donater_id, amount, message, action_date FROM donate_bonus WHERE object_id='.$torrent_id.' AND `type`="torrent"';
-$result = sql_query($sqlDonateList);
 
-if($Cache->get_value('sign_update_donate_bonus_torrent_'.$torrent_id) == 'no') {
-	$donaterRecodes = $Cache->get_value('update_donate_bonus_torrent_'.$torrent_id);
-} else {
-	// 'sign_update_donate_bonus_torrent_{id}' is 'yes' or empty 
-	$donaterRecodes  = array();
-	while($donateInfo = _mysql_fetch_assoc($result)) {
-		$donaterRecodes[] = $donateInfo;
-	}
-	$Cache->cache_value('update_donate_bonus_torrent_'.$torrent_id, $donaterRecodes, 365 * 24 * 3600);
-	$Cache->cache_value('sign_update_donate_bonus_torrent_'.$torrent_id, 'no', 365 * 24 * 3600);
-}
+$donaterRecodes = $Cache->get_value('update_donate_bonus_torrent_'.$torrent_id, 365*86400, function() use ($torrent_id) {
+
+    $sqlDonateList = 'SELECT donater, donater_id, amount, message, action_date FROM donate_bonus WHERE object_id='.$torrent_id.' AND `type`="torrent"';
+  return sql_query($sqlDonateList)->fetchAll();
+  });
 
 $doanterCount = count($donaterRecodes);
 

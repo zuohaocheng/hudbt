@@ -12,7 +12,7 @@ class PmApplication extends Application {
 
   public function onConnect($client) {
     global $pdo;
-    $cookie = $client->cookie;
+      
     try {
       $pdo->query('SELECT 1');
     } catch (PDOException $e) {
@@ -27,17 +27,28 @@ class PmApplication extends Application {
       }
       echo "Reconnected\n";
     }
-    
-    try {
-      $row = userlogin_core($this->parseCookie($cookie));
-    } catch (Exception $e) {
+
+
+    if (isset($client->cookie)) {
+      try {
+	$row = userlogin_core($this->parseCookie($client->cookie));
+      } catch (Exception $e) {
+	$row = null;
+      }
+    }
+    else {
       $row = null;
     }
+    
     if (!is_null($row)) {
       $this->users[$row['id']] = $client;
       $client->userid = $row['id'];
     }
-    echo date('H:i:s '), ' connected ', $client->userid, "\n";
+    echo date('H:i:s '), ' connected ';
+    if (isset($client->userid)) {
+      echo $client->userid;
+    }
+    echo "\n";
   }
   
   public function onDisconnect($client) {
@@ -66,7 +77,9 @@ class PmApplication extends Application {
     $cookie = [];
     foreach ($pieces as $p) {
       $ps = explode('=', $p);
-      $cookie[trim($ps[0])] = rawurldecode($ps[1]);
+      if (isset($ps[1])) {
+	$cookie[trim($ps[0])] = rawurldecode($ps[1]);
+      }
     }
     return $cookie;
   }

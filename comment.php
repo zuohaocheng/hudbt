@@ -132,7 +132,7 @@ if ($action == "add") {
 		    $notifs = $lang_comment_target[get_user_lang($arr["owner"])]['msg_torrent_receive_comment'] .  " [url=" . href() . "] " . $arr['name'] . "[/url].";
 		  }
 
-		  if ($quoteduser['user'] != $arr['owner']) {
+		  if (isset($quoteduser) && $quoteduser['user'] != $arr['owner']) {
 		    send_pm($CURUSER['id'], $arr['owner'], $subject, $notifs);
 		  }
 		}
@@ -267,7 +267,7 @@ elseif ($action == "edit")
 		$editnotseen=$arr['editnotseen'];
 		$owner =$arr['user'];
   	if(CheckPrivilege(["Posts","editnotseen"]) && ($CURUSER['id']==$owner)){
-  		echo "<tr><td class='center' colspan='2'><label><input type=\"checkbox\" name=\"editnotseen\" value=\"1\"".($editnotseen?"checked=\"checked\"":"").">".$lang_comment[text_editnotseen]."</label></td></tr>";
+  		echo "<tr><td class='center' colspan='2'><label><input type=\"checkbox\" name=\"editnotseen\" value=\"1\"".($editnotseen?"checked=\"checked\"":"").">".$lang_comment['text_editnotseen']."</label></td></tr>";
  		}
 		end_compose();
 		print("</form>");

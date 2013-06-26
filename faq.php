@@ -21,33 +21,33 @@ if (!$is_rulelang){
 }
 $res = sql_query("SELECT `id`, `link_id`, `question`, `flag` FROM `faq` WHERE `type`='categ' AND `lang_id` = ".sqlesc($lang_id)." ORDER BY `order` ASC");
 while ($arr = _mysql_fetch_array($res)) {
-	$faq_categ[$arr[link_id]][title] = $arr[question];
-	$faq_categ[$arr[link_id]][flag] = $arr[flag];
-	$faq_categ[$arr[link_id]][link_id] = $arr[link_id];
+	$faq_categ[$arr['link_id']]['title'] = $arr['question'];
+	$faq_categ[$arr['link_id']]['flag'] = $arr['flag'];
+	$faq_categ[$arr['link_id']]['link_id'] = $arr['link_id'];
 }
 
 $res = sql_query("SELECT `id`, `link_id`, `question`, `answer`, `flag`, `categ` FROM `faq` WHERE `type`='item' AND `lang_id` = ".sqlesc($lang_id)." ORDER BY `order` ASC");
-while ($arr = _mysql_fetch_array($res, MYSQL_BOTH)) {
-	$faq_categ[$arr[categ]][items][$arr[id]][question] = $arr[question];
-	$faq_categ[$arr[categ]][items][$arr[id]][answer] = $arr[answer];
-	$faq_categ[$arr[categ]][items][$arr[id]][flag] = $arr[flag];
-	$faq_categ[$arr[categ]][items][$arr[id]][link_id] = $arr[link_id];
+while ($arr = _mysql_fetch_assoc($res)) {
+	$faq_categ[$arr['categ']]['items'][$arr['id']]['question'] = $arr['question'];
+	$faq_categ[$arr['categ']]['items'][$arr['id']]['answer'] = $arr['answer'];
+	$faq_categ[$arr['categ']]['items'][$arr['id']]['flag'] = $arr['flag'];
+	$faq_categ[$arr['categ']]['items'][$arr['id']]['link_id'] = $arr['link_id'];
 }
 
 if (isset($faq_categ)) {
   begin_frame("<span id=\"top\">".$lang_faq['text_contents'] . "</span>", '', '', '', '', true);
 	foreach ($faq_categ as $id => $temp)
 	{
-		if ($temp[flag] == "1")
+		if ($temp['flag'] == "1")
 		{
-			print("<ul><li><a href=\"#id". $id ."\"><b>". $temp[title] ."</b></a><ul>\n");
+			print("<ul><li><a href=\"#id". $id ."\"><b>". $temp['title'] ."</b></a><ul>\n");
    			if (array_key_exists("items", $temp)) 
 			{
-    				foreach ($temp[items] as $id2 => $temp2)
+    				foreach ($temp['items'] as $id2 => $temp2)
 				{
-	 				if ($temp2[flag] == "1") print("<li><a href=\"#id". $id2 ."\" class=\"faqlink\">". $temp2[question] ."</a></li>\n");
-	 				elseif ($temp2[flag] == "2") print("<li><a href=\"#id". $id2 ."\" class=\"faqlink\">". $temp2[question] ."</a> <img class=\"faq_updated\" src=\"pic/trans.gif\" alt=\"Updated\" /></li>\n");
-	 				elseif ($temp2[flag] == "3") print("<li><a href=\"#id". $id2 ."\" class=\"faqlink\">". $temp2[question] ."</a> <img class=\"faq_new\" src=\"pic/trans.gif\" alt=\"New\" /></li>\n");
+	 				if ($temp2['flag'] == "1") print("<li><a href=\"#id". $id2 ."\" class=\"faqlink\">". $temp2['question'] ."</a></li>\n");
+	 				elseif ($temp2['flag'] == "2") print("<li><a href=\"#id". $id2 ."\" class=\"faqlink\">". $temp2['question'] ."</a> <img class=\"faq_updated\" src=\"pic/trans.gif\" alt=\"Updated\" /></li>\n");
+	 				elseif ($temp2['flag'] == "3") print("<li><a href=\"#id". $id2 ."\" class=\"faqlink\">". $temp2['question'] ."</a> <img class=\"faq_new\" src=\"pic/trans.gif\" alt=\"New\" /></li>\n");
     				}
 			}
 			print("</ul></li></ul><br />");
@@ -56,19 +56,19 @@ if (isset($faq_categ)) {
 	end_frame();
 
 	foreach ($faq_categ as $id => $temp) {
-		if ($temp[flag] == "1")
+		if ($temp['flag'] == "1")
 		{
-			$frame = $temp[title] ." - <a href=\"#top\"><img class=\"top\" src=\"pic/trans.gif\" alt=\"Top\" title=\"Top\" /></a>";
+			$frame = $temp['title'] ." - <a href=\"#top\"><img class=\"top\" src=\"pic/trans.gif\" alt=\"Top\" title=\"Top\" /></a>";
 			begin_frame($frame, '', '', '', '', true);
 			print("<span id=\"id". $id ."\"></span>");
 			if (array_key_exists("items", $temp))
 			{
-				foreach ($temp[items] as $id2 => $temp2)
+				foreach ($temp['items'] as $id2 => $temp2)
 				{
-					if ($temp2[flag] != "0")
+					if ($temp2['flag'] != "0")
 					{
-						print("<br /><span id=\"id".$id2."\"><b>". $temp2[question] ."</b></span><br />\n");
-						print("<br />". $temp2[answer] ."\n<br /><br />\n");
+						print("<br /><span id=\"id".$id2."\"><b>". $temp2['question'] ."</b></span><br />\n");
+						print("<br />". $temp2['answer'] ."\n<br /><br />\n");
 					}
 				}
 			}

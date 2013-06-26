@@ -83,7 +83,7 @@ else {
 		if($keyword){
 			$sender_id=get_user_id_from_name($keyword);
 			if ($sender_id === false) {
-			  stderr($lang_messages['std_error'],$lang_messages['std_no_user_named']."'".$username."'");
+			  stderr($lang_messages['std_error'],$lang_messages['std_no_user_named']."'".$keyword."'");
 			}
 			if($keyword==$lang_messages['text_system']){
 				$sender_id=0;

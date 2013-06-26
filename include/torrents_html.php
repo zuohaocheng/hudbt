@@ -188,9 +188,12 @@ else {
 <div id="loader" style="display: none; "></div>
 <?php
 
+if (!isset($next_page_href)) {
+  $next_page_href = '';
+}
 echo '<script type="text/javascript">hb.nextpage = "'. $next_page_href .'";';
-echo 'hb.config.torrents_query = (' . php_json_encode($_SERVER['QUERY_STRING']) . ');';
-echo 'hb.constant.maincats = ' . php_json_encode($mainCats) . ';</script>';
+echo 'hb.config.torrents_query = (' . json_encode($_SERVER['QUERY_STRING']) . ');';
+echo 'hb.constant.maincats = ' . json_encode($mainCats) . ';</script>';
 
 
 stdfoot();

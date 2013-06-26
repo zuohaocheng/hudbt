@@ -86,8 +86,12 @@ else
 	while ($arr = _mysql_fetch_assoc($res))
 	{
 		if (get_user_class() >= $sbmanage_class) {
-			$del="[<a href=\"shoutbox.php?del=".$arr[id]."\">".$lang_shoutbox['text_del']."</a>]";
+			$del="[<a href=\"shoutbox.php?del=".$arr['id']."\">".$lang_shoutbox['text_del']."</a>]";
 		}
+                else {
+                  $del = '';
+                }
+
 		if ($arr["userid"]) {
 			$username = get_username($arr["userid"],false,true,true,true,false,false,"",true);
 			if ($_GET["type"] != 'helpbox' && $arr["type"] == 'hb')

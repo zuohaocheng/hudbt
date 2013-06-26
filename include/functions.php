@@ -380,7 +380,7 @@ function checkPrivilege($item, $opts = null) {
     $config = $privilegeConfig;
     for($i = 0; $i < count($item) - 1; $i += 1) {
       $key = $item[$i];
-      if (array_key_exists($key, $config)) {
+      if (isset($config[$key])) {
 	$config = $config[$key];
       }
       else {
@@ -390,14 +390,14 @@ function checkPrivilege($item, $opts = null) {
     }
 
     $last_key = array_pop($item);
-    if ($config && array_key_exists($last_key, $config)) {
+    if ($config && isset($config[$last_key])) {
       $obj = $config[$last_key];
 
       return checkSubPrivilege($obj, $opts);
     }
   }
   elseif (is_string($item)) {
-    if (array_key_exists($item, $privilegeConfig)) {
+    if (isset($privilegeConfig[$item])) {
       return checkSubPrivilege($privilegeConfig[$item], $opts);
     }
   }
@@ -878,31 +878,12 @@ function get_external_tr($imdb_url = "", $dl = false) {
       $imdbNumber = parse_imdb_id($imdb_url);
       if ($showextinfo['imdb'] == 'yes') {
 	if ($dl) {
-	  dl_item($lang_functions['row_imdb_url'],  "<input type=\"text\" style=\"width: 650px;\" name=\"url\" value=\"".($imdbNumber ? "http://www.imdb.com/title/tt".parse_imdb_id($imdb_url) : "")."\" /><br /><font class=\"medium\">".$lang_functions['text_imdb_url_note']."</font>", 1);
+	  dl_item($lang_functions['row_imdb_url'],  "<input type=\"text\" style=\"width: 650px;\" name=\"url\" placeholder=\"格式为 http://www.imdb.com/title/tt0123456/ 或 tt0123456\" value=\"".($imdbNumber ? "http://www.imdb.com/title/tt".parse_imdb_id($imdb_url) : "")."\" /><br /><font class=\"medium\">".$lang_functions['text_imdb_url_note']."</font>", 1);
 	}
 	else {
-	  tr($lang_functions['row_imdb_url'],  "<input type=\"text\" style=\"width: 650px;\" name=\"url\" value=\"".($imdbNumber ? "http://www.imdb.com/title/tt".parse_imdb_id($imdb_url) : "")."\" /><br /><font class=\"medium\">".$lang_functions['text_imdb_url_note']."</font>", 1);
+	  tr($lang_functions['row_imdb_url'],  "<input type=\"text\" style=\"width: 650px;\" name=\"url\" placeholder=\"格式为 http://www.imdb.com/title/tt0123456/ 或 tt0123456\" value=\"".($imdbNumber ? "http://www.imdb.com/title/tt".parse_imdb_id($imdb_url) : "")."\" /><br /><font class=\"medium\">".$lang_functions['text_imdb_url_note']."</font>", 1);
 	}
       }
-}
-
-function get_torrent_extinfo_identifier($torrentid) {
-  $torrentid = 0 + $torrentid;
-
-  $result = array('imdb_id');
-  unset($result);
-
-  if($torrentid) {
-    $res = sql_query("SELECT url FROM torrents WHERE id=" . $torrentid) or sqlerr(__FILE__,__LINE__);
-    if(_mysql_num_rows($res) == 1)
-      {
-	$arr = _mysql_fetch_array($res) or sqlerr(__FILE__,__LINE__);
-
-	$imdb_id = parse_imdb_id($arr["url"]);
-	$result['imdb_id'] = $imdb_id;
-      }
-  }
-  return $result;
 }
 
 function parse_imdb_id($url) {
@@ -1639,7 +1620,7 @@ function userlogin() {
     write_file_log('access', implode(' ', [$key, $i]));
   }
 
-  if (array_key_exists('purge', $_GET) && $_GET['purge'] && get_user_class() >= UC_MODERATOR) {
+  if (isset($_GET['purge']) && get_user_class() >= UC_MODERATOR) {
     $Cache->setClearCache(1);
   }
   if ($enablesqldebug_tweak == 'yes' && get_user_class() >= $sqldebug_tweak) {
@@ -1998,7 +1979,7 @@ function jqui_css_name($theme = -1) {
 
 function get_cat_folder($cat = 401, $caticon = -1) {
   static $catPath = array();
-  if (!array_key_exists($cat, $catPath)) {
+  if (!isset($catPath[$cat])) {
     global $CURUSER, $CURLANGDIR;
     $catrow = get_category_row($cat);
     $catmode = $catrow['catmodename'];
@@ -2601,11 +2582,11 @@ function pager($rpp, $count, $href, $opts = array(), $pagename = "page") {
   $next_page_href = '';
   $pages = ceil($count / $rpp);
 
-  if (array_key_exists('page', $opts)) {
+  if ($opts['page']) {
     $page = $opts['page'];
   }
   else {
-    if (!array_key_exists("lastpagedefault", $opts))
+    if (!isset($opts["lastpagedefault"]))
       $pagedefault = 0;
     else {
       $pagedefault = floor(($count - 1) / $rpp);
@@ -2758,7 +2739,7 @@ function post_format_author_info($id, $stat = false) {
   global $CURUSER;
   static $users = [];
   //---- Get poster details
-  if (!array_key_exists($id, $users)) {
+  if (!isset($users[$id])) {
     $users[$id] = true;
     $first = true;
   }
@@ -2952,7 +2933,7 @@ function post_body_container($postid, $body, $highlight, $edit, $signature, $pri
 
 function post_format($args, $privilege, $extra = '') {
   $post = '<li class="forum-post td table">';
-  if (array_key_exists('last', $args) && $args['last']) {
+  if (isset($args['last']) && $args['last']) {
     $post .= '<a id="last"></a>';
   }
   $type = $args['type'];
@@ -3011,7 +2992,7 @@ function get_forum_id($query_id = 0,$query_type = "topic") {
 	}
 }
 
-function single_post($arr, $maypost, $maymodify, $locked, $highlight = '', $last = false, $floor = -1, $extra) {
+function single_post($arr, $maypost, $maymodify, $locked, $highlight = '', $last = false, $floor = -1, $extra = '') {
   global $CURUSER;
   $editor = $arr['editedby'];
   if (!is_valid_id($editor)) {
@@ -3038,7 +3019,7 @@ function single_comment($row, $parent_id, $type, $floor = -1) {
   }
 
   $post_f = ['type' => $type, 'posterid' => $row['user'], 'topicid' => $parent_id, 'postid' => $row['id'], 'added' => $row['added'], 'floor' => $floor, 'body' => $row['text'], 'highlight' => false, 'edit' => $edit, 'postname' => null, 'authorid' => null];
-  if (array_key_exists('postname', $row)) {
+  if (isset($row['postname'])) {
     $post_f['postname'] = $row['postname'];
   }
   $maymodify = (get_user_class() >= $commanage_class);
@@ -3172,7 +3153,7 @@ function torrentTableCake($torrents) {
   }
   $query = 'SELECT torrents.id, torrents.sp_state, torrents.promotion_time_type, torrents.promotion_until, torrents.banned, torrents.picktype, torrents.pos_state, torrents.category, torrents.source, torrents.medium, torrents.codec, torrents.standard, torrents.processing, torrents.team, torrents.audiocodec, torrents.leechers, torrents.seeders, torrents.name, torrents.small_descr, torrents.times_completed, torrents.size, torrents.added, torrents.comments,torrents.anonymous,torrents.owner,torrents.url,torrents.oday FROM torrents WHERE id IN (' . implode(',', $ids) . ') ORDER BY pos_state DESC, torrents.id DESC';
   $rows = sql_query($query)->fetchAll();
-  torrenttable($rows);
+  torrenttable($rows, []);
 }
 
 function torrenttable($rows, $var) {
@@ -3245,14 +3226,14 @@ if ($oldlink > 0) {
 }
 
 
-if (array_key_exists('sort', $_REQUEST)) {
+if (isset($_REQUEST['sort'])) {
   $sort = $_REQUEST['sort'];
 }
 else {
   $sort = 0;
 }
 
-if (array_key_exists('type', $_REQUEST)) {
+if (isset($_REQUEST['type'])) {
   $sorttype = $_REQUEST['type'];
   if ($sorttype == 'desc') {
     $sorttype = 'asc';
@@ -3669,7 +3650,7 @@ function get_username($id, $big = false, $link = true, $bold = true, $target = f
 
   $id = 0+$id;
 
-  if (func_num_args() == 1 && array_key_exists($id, $usernameArray)) {  //One argument=is default display of username. Get it directly from static array if available
+  if (func_num_args() == 1 && isset($usernameArray[$id])) {  //One argument=is default display of username. Get it directly from static array if available
     return $usernameArray[$id];
   }
   $arr = get_user_row($id);
@@ -4304,15 +4285,21 @@ function get_plain_username($id){
 function get_searchbox_value($mode = 1, $item = 'showsubcat'){
   global $Cache;
   static $rows;
-  if (!$rows && !$rows = $Cache->get_value('searchbox_content')){
-    $rows = array();
-    $res = sql_query("SELECT * FROM searchbox ORDER BY id ASC");
-    while ($row = _mysql_fetch_array($res)) {
-      $rows[$row['id']] = $row;
-    }
-    $Cache->cache_value('searchbox_content', $rows, 100500);
+  $rows = $Cache->get_value('searchbox_content', 100500, function() {
+      $rows = array();
+      $res = sql_query("SELECT * FROM searchbox ORDER BY id ASC");
+      while ($row = _mysql_fetch_array($res)) {
+	$rows[$row['id']] = $row;
+      }
+      return $rows;
+    });
+
+  if (isset($rows[$mode])) {
+    return $rows[$mode][$item];
   }
-  return $rows[$mode][$item];
+  else {
+    return null;
+  }
 }
 
 function get_ratio($userid, $html = true){
@@ -4480,6 +4467,10 @@ function get_forum_moderators($forumid, $plaintext = true)
     }
     $Cache->cache_value('forum_moderator_array', $moderatorsArray, 86200);
   }
+
+  if (!isset($moderatorsArray[$forumid])) {
+    return [];
+  }
   $ret = (array)$moderatorsArray[$forumid];
 
   $moderators = "";
@@ -4616,7 +4607,7 @@ function return_category_image($categoryid, $link="") {
   global $BASEURL;
 
   static $catImg = array();
-  if (array_key_exists($categoryid, $catImg)) {
+  if (isset($catImg[$categoryid])) {
     $catimg = $catImg[$categoryid];
   } else {
     $categoryrow = get_category_row($categoryid);
@@ -4755,15 +4746,15 @@ function votes($poll, $uservote = 255) {
   while ($poll_itm = _mysql_fetch_row($pollanswers_count)) {
     $idx = $poll_itm[0];
     $count = $poll_itm[1];
-    if (array_key_exists($idx, $os)) {
+    if (isset($os[$idx])) {
       $os[$idx][0] = $count;
     }
     $tvotes += $count;
   }
 
   $out = '<div class="poll-opts minor-list-vertical"><ul>';
-  $i = 0;
-  while ($a = $os[$i]) {
+
+  foreach ($os as $a) {
     if ($tvotes > 0) {
       $p = round($a[0] / $tvotes * 100);
     }
@@ -4779,7 +4770,6 @@ function votes($poll, $uservote = 255) {
     }
     
     $out .= ('<li><span class="opt-text">' . $a[1] . '</span><span class="opt-percent nowrap">' . "<img class=\"bar_end\" src=\"//$BASEURL/pic/trans.gif\" alt=\"\" /><img class=\"" . $class . "\" src=\"//$BASEURL/pic/trans.gif\" style=\"width: " . ($p * 3) . "px\" /><img class=\"bar_end\" src=\"//$BASEURL/pic/trans.gif\" alt=\"\" /> $p%</span></li>\n");
-    ++$i;
   }
   $out .= ("</ul></div>\n");
   $tvotes = number_format($tvotes);
@@ -4901,6 +4891,9 @@ function get_fun($id = 0, $pager_count = null) {
 
       if (checkPrivilege(['Misc', 'fun'])) {
 	$del=' <form class="a" action="fun.php" method="post"><input type="hidden" name="action" value="delcomment" /><input type="hidden" name="commentid" value="'. $subrow['id'] . '" /><input type="submit" value="删除" class="a" /></form>';
+      }
+      else {
+	$del = '';
       }
       dl_item(get_username($subrow['userid'],false,true,true,true,false,false,"",false).$del, format_comment($subrow['text'],true,false,true,true,600,false,false), true);
     }

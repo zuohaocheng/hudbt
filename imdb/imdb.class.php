@@ -110,7 +110,12 @@
 				}
 			}
 		}
-		return $this->similiar_movies;
+
+		if (!isset($this->similiar_movies))
+		  return false;
+		else {
+		  return $this->similiar_movies;
+		}
 	}
   
   
@@ -922,7 +927,7 @@ return $this->main_rating;
    * @return array composer (array[0..n] of strings)
    */
   function composer () {
-   if ($this->credits_composer == "") {
+   if (!isset($this->credits_composer)) {
     if ($this->page["Credits"] == "") $this->openpage ("Credits");
    }
    $this->credits_composer = array();
@@ -1257,4 +1262,4 @@ return $this->main_rating;
   }
 } // end class imdbsearch
 
-?>
+

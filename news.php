@@ -101,7 +101,9 @@ if ($action == 'edit') {
 		$subject = htmlspecialchars($arr['title']);
 		$title = $lang_news['text_edit_site_news'];
 		print("<form id=\"compose\" name=\"compose\" method=\"post\" action=\"".htmlspecialchars("?action=edit&newsid=".$newsid)."\">");
-		print("<input type=\"hidden\" name=\"returnto\" value=\"".$returnto."\" />");
+		if (isset($returnto)) {
+		  print("<input type=\"hidden\" name=\"returnto\" value=\"".$returnto."\" />");
+		}
 		begin_compose($title, "edit", $body, true, $subject);
 		print("<tr><td class=\"toolbox\" align=\"center\" colspan=\"2\"><input type=\"checkbox\" name=\"notify\" value=\"yes\" ".($arr['notify'] == 'yes' ? " checked=\"checked\"" : "")." />".$lang_news['text_notify_users_of_this']."</td></tr>\n");
 		end_compose();

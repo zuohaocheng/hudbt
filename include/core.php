@@ -84,7 +84,8 @@ function _mysql_query($q, $args=[]) {
     }
   }
   catch (PDOException $e) {
-    if ($e->errorInfo[1] != 2006) { // 2006: MySQL server has gone away
+    if ($e->errorInfo[1] != 2006 && // 2006: MySQL server has gone away
+	$e->errorInfo[1] != 1062) { // 1062: Duplicate entry
       ob_start();
       echo date('d M Y H:i:s'), "\n";
       var_dump($q);

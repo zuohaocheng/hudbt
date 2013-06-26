@@ -39,11 +39,11 @@ else if ( str_replace("Opera", "", $_SERVER['HTTP_USER_AGENT']) != $_SERVER['HTT
 }
 else if ( str_replace("IE", "", $_SERVER['HTTP_USER_AGENT']) != $_SERVER['HTTP_USER_AGENT'] )
 {
-	header ("Content-Disposition: attachment; filename=".str_replace("+", "%20", rawurlencode($row[filename])));
+	header ("Content-Disposition: attachment; filename=".str_replace("+", "%20", rawurlencode($row['filename'])));
 }
 else
 {
-	header ("Content-Disposition: attachment; filename=".str_replace("+", "%20", rawurlencode($row[filename])));
+	header ("Content-Disposition: attachment; filename=".str_replace("+", "%20", rawurlencode($row['filename'])));
 }
 
 do
@@ -54,4 +54,4 @@ print($s);
 sql_query("UPDATE attachments SET downloads = downloads + 1 WHERE id = ".sqlesc($id)) or sqlerr(__FILE__, __LINE__);
 $Cache->delete_value('attachment_'.$dlkey.'_content');
 exit;
-?>
+

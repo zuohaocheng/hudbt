@@ -1,12 +1,9 @@
 <?php
 require "include/bittorrent.php";
 dbconn();
+loggedinorreturn();
 require_once(get_langfile_path());
 require_once(get_langfile_path("",true));
-loggedinorreturn();
-
-if (!isset($CURUSER))
-  stderr($lang_subtitles['std_error'],$lang_subtitles['std_must_login_to_upload']);
 
 stdhead($lang_subtitles['head_subtitles']);
 
@@ -30,6 +27,7 @@ if (!is_valid_id($lang_id))
   $lang_id = '';
 
 $query = "";
+$q = '';
 if ($search != '') {
   $query = "subs.title LIKE " . sqlesc("%$search%") . "";
   if ($search)
@@ -258,6 +256,11 @@ if (get_user_class() >= UC_PEASANT) {
       $rows[] = $arr;
     }
   }
+  else {
+    $pagertop = '';
+    $pagerbottom = '';
+    $limit = '';
+  }
 }
 
 $s = smarty(0);
@@ -280,11 +283,14 @@ if ($detail_torrent_id) {
   if ($row) {
     $torrentname = $row[0];
     $s->assign(array(
-		     'detail_torrent_id' => $detail_torrent_id,
-		     'torrent_name' => $torrentname
+		     'torrent_name' => $torrentname,
 		     ));
   }
 }
+$s->assign(array(
+		 'detail_torrent_id' => $detail_torrent_id,
+		 ));
+
 
 $s->display('subtitles.tpl', json_encode(array('userid' => $CURUSER['id'],
 						   'torrent' => $detail_torrent_id,
