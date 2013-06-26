@@ -46,6 +46,9 @@ else {
 }
 
 $url = parse_imdb_id($_POST['url']);
+if (!$url) {
+  $url = null;
+}
 
 $nfo = '';
 if ($enablenfo_main=='yes'){
@@ -92,7 +95,9 @@ if (!is_valid_id($catid)) {
 $torrent = unesc($_POST["name"]);
 
 if (isset($_FILES["file"])) {
+  $start = time();
   include('include/upload.php');
+  $parse_time = time() - $start;
   $write_torrent = function($id) use ($torrent_dir) {
     global $dict;
     $fp = fopen("$torrent_dir/$id.torrent", "w");
@@ -256,8 +261,6 @@ $id = _mysql_insert_id();
 
 $Cache->cache_value('torrent_max_id', $id, 86400);
 
-$write_torrent($id);
-
 sql_query("DELETE FROM files WHERE torrent = ?", [$id]);
 
 $sql = "INSERT INTO files (torrent, filename, size) VALUES (?,?,?)";
@@ -293,6 +296,30 @@ if ($Torrent->exists()) {
 }
 
 //End of tcategory
+
+$location = "//$BASEURL/details.php?id=".htmlspecialchars($id)."&uploaded=1";
+
+if ($parse_time > 3) { // Slow, large torrent
+  $time = ceil($parse_time / 5) * 5;
+#  header('HTTP/1.1 202 Accepted');
+  header('Refresh: ' . $time . '; url=' . $location, true, 202);
+  stdhead('上传');
+  stdmsg('蝴蝶娘正在努力处理中', '种子太大了嘛~~~~(>_<)~~~~ ' . $time . '秒后自动定向到<a href="' . $location . '">详情页面</a>');
+  stdfoot();
+
+  $write_torrent($id);
+
+}
+else {
+  $write_torrent($id);
+
+  if ($format == 'json') {
+    echo json_ecnode(['success' => true, 'uri' => $location]);
+  }
+  else {
+    header("Location: $location");
+  }
+}
 
 
 write_log("Torrent $id ($torrent) was uploaded by $anon");
@@ -365,11 +392,4 @@ while($arr = _mysql_fetch_array($res)) {
 }
 }
 
-$location = "//$BASEURL/details.php?id=".htmlspecialchars($id)."&uploaded=1";
-if ($format == 'json') {
-  echo json_ecnode(['success' => true, 'uri' => $location]);
-}
-else {
-  header("Location: $location");
-}
 

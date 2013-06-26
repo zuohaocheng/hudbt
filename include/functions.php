@@ -2409,6 +2409,10 @@ function stdfoot() {
   if (php_sapi_name() == 'fpm-fcgi') {
     fastcgi_finish_request();
   }
+  else {
+    ob_flush();
+    flush();
+  }
 }
 
 function mksecret($len = 20) {
