@@ -29,7 +29,7 @@ function wechat_text_response($content, $req) {
       $response = '发送成功';
     }
     else {
-      $response('限额用完啦~请下个小时再来骚扰蝴蝶娘吧~');
+      $response = '限额用完啦~请下个小时再来骚扰蝴蝶娘吧~';
     }
   }
   else if ($content == '热门') {
@@ -107,11 +107,26 @@ function wechat_text_response($content, $req) {
     $regexps = $Cache->get_value('wechat_autoreply', 86400 * 7, function() {
 	return sql_query('SELECT `regexp`, `content` FROM wechat_replies')->fetchAll();
       });
-    $response = '咦? 蝴蝶娘不知道你在说什么呢~';
+    $oid = $req['fromusername'];
+    $key = 'wechat_autoreply_other_' . $oid;
+    $matched = false;
+
     foreach ($regexps as $pair) {
       if (preg_match($pair['regexp'], $content)) {
 	$response = $pair['content'];
+	$Cache->delete_value($key);
+	$matched = true;
 	break;
+      }
+    }
+
+    if (!$matched) {
+      if (!$Cache->get_value($key)) {
+	$response = '咦? 蝴蝶娘不知道你在说什么呢~';
+	$Cache->cache_value($key, true, 86400);
+      }
+      else {
+	$response = null;
       }
     }
   }

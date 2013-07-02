@@ -38,7 +38,7 @@ require('lib/Wechat.php');
       if (is_string($response)) {
 	$this->responseText($response);
       }
-      else {
+      else if (is_array($response)) {
 	$this->responseNews($response);
       }
     }
