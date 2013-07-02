@@ -5031,3 +5031,12 @@ function torrent_get_poster($id) {
       return $poster;
     });
 }
+
+function header_download_file($filename) {
+  if ( strpos($_SERVER['HTTP_USER_AGENT'], "IE") !== false) { 
+    header ("Content-Disposition: attachment; filename=".str_replace("+", "%20", rawurlencode($filename)));
+  }
+  else {
+    header ("Content-Disposition: attachment; filename=\"" . $filename . "\" ; charset=utf-8");
+  }
+}

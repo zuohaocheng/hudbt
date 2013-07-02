@@ -23,36 +23,17 @@ $file = "$SUBSPATH/$dirname/$filename.$arr[ext]";
 if (!is_file($file))
 die("File not found\n");
 $f = fopen($file, "rb");
-if (!$f)
-die("Cannot open file\n");
+if (!$f) {
+  die("Cannot open file\n");
+}
 header("Content-Length: " . filesize($file));
 header("Content-Type: application/octet-stream");
-
-if ( str_replace("Gecko", "", $_SERVER['HTTP_USER_AGENT']) != $_SERVER['HTTP_USER_AGENT'])
-{
-	header ("Content-Disposition: attachment; filename=\"$arr[filename]\" ; charset=utf-8");
-}
-else if ( str_replace("Firefox", "", $_SERVER['HTTP_USER_AGENT']) != $_SERVER['HTTP_USER_AGENT'] )
-{
-	header ("Content-Disposition: attachment; filename=\"$arr[filename]\" ; charset=utf-8");
-}
-else if ( str_replace("Opera", "", $_SERVER['HTTP_USER_AGENT']) != $_SERVER['HTTP_USER_AGENT'] )
-{
-	header ("Content-Disposition: attachment; filename=\"$arr[filename]\" ; charset=utf-8");
-}
-else if ( str_replace("IE", "", $_SERVER['HTTP_USER_AGENT']) != $_SERVER['HTTP_USER_AGENT'] )
-{
-	header ("Content-Disposition: attachment; filename=".str_replace("+", "%20", rawurlencode($arr['filename'])));
-}
-else
-{
-	header ("Content-Disposition: attachment; filename=".str_replace("+", "%20", rawurlencode($arr['filename'])));
-}
+header_download_file($arr['filename']);
 
 do
 {
 $s = fread($f, 4096);
 print($s);
 } while (!feof($f));
-//closefile($f);
+fclose($f);
 exit;
