@@ -1115,3 +1115,17 @@ div.attach .contents strong {
 .invites .confirmed {
     color: #1f7309;
 }
+
+.clients {
+    padding: 0;
+}
+
+.clients li {
+    float: left;
+    margin: 0 5%;
+    width: 40%;
+}
+
+.clients img {
+    width: 100%;
+}
