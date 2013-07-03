@@ -49,6 +49,9 @@ if (!$my_img = unserialize($Cache->get_value('userbar_'.$_SERVER['REQUEST_URI'])
   }
 
   $fsaa = 4;
+  if (!file_exists("pic/userbar/".$bgpic.".png")) {
+    die;
+  }
   $my_img=imagecreatefrompng("pic/userbar/".$bgpic.".png");
   imagealphablending($my_img, true);
 #  imageantialias($my_img, true);

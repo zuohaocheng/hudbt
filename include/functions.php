@@ -1949,8 +1949,8 @@ function get_css_row($cssid = -1) {
       $cssid = get_css_id();
     }
     return get_css_rows()[$cssid];
-  }
-  
+}
+
 function get_css_uri($file = "", $theme = -1) {
   global $defcss;
   $cssRow = get_css_row($theme);

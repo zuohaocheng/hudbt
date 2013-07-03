@@ -73,6 +73,10 @@ class PmApplication extends Application {
   }
 
   protected function parseCookie($cookieString) {
+    if (!is_string($cookieString)) {
+      return [];
+    }
+    
     $pieces = explode(';', $cookieString);
     $cookie = [];
     foreach ($pieces as $p) {

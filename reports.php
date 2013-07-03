@@ -65,7 +65,7 @@ while ($row = _mysql_fetch_array($reportres))
 			else
 			{
 				$arr = _mysql_fetch_array($res);
-				$reporting = "<a href=\"offers.php?id=".$arr[id]."&off_details=1\">".htmlspecialchars($arr['name'])."</a>";
+				$reporting = "<a href=\"offers.php?id=".$arr['id']."&off_details=1\">".htmlspecialchars($arr['name'])."</a>";
 			}
 			break;
 		}
@@ -79,7 +79,7 @@ while ($row = _mysql_fetch_array($reportres))
 			else
 			{
 				$arr = _mysql_fetch_array($res);
-				$reporting = "<a href=\"viewrequests.php?id=".$arr[id]."&req_details=1\">".htmlspecialchars($arr['request'])."</a>";
+				$reporting = "<a href=\"viewrequests.php?id=".$arr['id']."&req_details=1\">".htmlspecialchars($arr['request'])."</a>";
 			}
 			break;
 		}

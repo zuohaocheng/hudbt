@@ -211,7 +211,7 @@ break;
 		$updateset[] = "donor = " . sqlesc($donor);
 	}
 	
-	if ($chpassword != "" && $chpassword !=  $username && strlen($chpassword) <= 40 && strlen($chpassword) >= 6 AND $chpassword == $passagain) {
+	if ($chpassword != "" && $chpassword !=  $arr['username'] && strlen($chpassword) <= 40 && strlen($chpassword) >= 6 AND $chpassword == $passagain) {
 	    $sec = mksecret();
 	    $passhash = md5($sec . $chpassword . $sec);
 	    $updateset[] = "secret = " . sqlesc($sec);
@@ -225,7 +225,7 @@ break;
 	{
 		$what = ($class > $curclass ? $lang_modtask_target[get_user_lang($userid)]['msg_promoted'] : $lang_modtask_target[get_user_lang($userid)]['msg_demoted']);
 		$subject = ($lang_modtask_target[get_user_lang($userid)]['msg_class_change']);
-		$msg = ($lang_modtask_target[get_user_lang($userid)]['msg_you_have_been'].$what.$lang_modtask_target[get_user_lang($userid)]['msg_to'] . get_user_class_name($class) .$lang_modtask_target[get_user_lang($userid)]['msg_by'].$CURUSER[username]);
+		$msg = ($lang_modtask_target[get_user_lang($userid)]['msg_you_have_been'].$what.$lang_modtask_target[get_user_lang($userid)]['msg_to'] . get_user_class_name($class) .$lang_modtask_target[get_user_lang($userid)]['msg_by'].$CURUSER['username']);
 		send_pm(0, $userid, $subject, $msg);
 		$updateset[] = "class = $class";
 		$what = ($class > $curclass ? "Promoted" : "Demoted");
@@ -237,7 +237,7 @@ break;
 		if ($vip_added == 'yes')
 			$updateset[] = "vip_until = ".sqlesc($vip_until);
 		$subject = ($lang_modtask_target[get_user_lang($userid)]['msg_your_vip_status_changed']);
-		$msg = ($lang_modtask_target[get_user_lang($userid)]['msg_vip_status_changed_by'].$CURUSER[username]);
+		$msg = ($lang_modtask_target[get_user_lang($userid)]['msg_vip_status_changed_by'].$CURUSER['username']);
 		send_pm(0, $userid, $subject, $msg);
 		$modcomment = date("Y-m-d") . " - VIP status changed by $CURUSER[username]. VIP added: ".$vip_added.($vip_added == 'yes' ? "; VIP until: ".$vip_until : "").".\n". $modcomment;
 	}

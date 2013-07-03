@@ -27,6 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     $modcomment = date("Y-m-d") . " - 自挂东南枝.\n". $CURUSER['modcomment'];
     update_user($CURUSER['id'], "enabled = 'no', modcomment = ?", [$modcomment]);
+    $name = $CURUSER['username'];
   }
   else if ($manager) {
     $res = sql_query("SELECT * FROM users WHERE id=" . sqlesc($userid)) or sqlerr();

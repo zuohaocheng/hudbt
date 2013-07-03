@@ -923,6 +923,10 @@ if ($forumposts)
 	if($days > 1) {
 		$dayposts  = round(($forumposts / $days), 1);
 	}
+	else {
+	  $dayposts = '';
+	}
+	
 	if (!$postcount = $Cache->get_value('total_posts_count')){
 		$postcount = get_row_count("posts");
 		$Cache->cache_value('total_posts_count', $postcount, 96400);

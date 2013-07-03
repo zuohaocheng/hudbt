@@ -523,9 +523,11 @@ return $this->main_rating;
 //    $vote_s = strpos ($this->page["Title"], "<a", $vote_s);
 //    $vote_e = strpos ($this->page["Title"], "votes", $vote_s);
 //    $this->main_votes = substr ($this->page["Title"], $vote_s, $vote_e - $vote_s);
-    preg_match('/\"ratingCount\".*>([0-9][0-9,]*)/', $this->page["Title"], $matches);
-    $this->main_votes = $matches[1];
-    $this->main_votes = "<a href=\"http://".$this->imdbsite."/title/tt".$this->imdbID."/ratings\">" . $this->main_votes . "</a>";
+
+    if (preg_match('/\"ratingCount\".*>([0-9][0-9,]*)/', $this->page["Title"], $matches)) {
+      $this->main_votes = $matches[1];
+      $this->main_votes = "<a href=\"http://".$this->imdbsite."/title/tt".$this->imdbID."/ratings\">" . $this->main_votes . "</a>";
+    }
    }
    return $this->main_votes;
   }

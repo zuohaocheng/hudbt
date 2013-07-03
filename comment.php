@@ -132,7 +132,7 @@ if ($action == "add") {
 		    $notifs = $lang_comment_target[get_user_lang($arr["owner"])]['msg_torrent_receive_comment'] .  " [url=" . href() . "] " . $arr['name'] . "[/url].";
 		  }
 
-		  if (isset($quoteduser) && $quoteduser['user'] != $arr['owner']) {
+		  if (!isset($quoteduser) || $quoteduser['user'] != $arr['owner']) {
 		    send_pm($CURUSER['id'], $arr['owner'], $subject, $notifs);
 		  }
 		}
