@@ -166,6 +166,8 @@ foreach ($filelist as $file) {
 
 //$torrent = str_replace("_", " ", $torrent);
 
+$sp_until = '0000-00-00 00:00:00';
+$sp_time_type = 0;
 if ($largesize_torrent && $totallen > ($largesize_torrent * 1073741824)) //Large Torrent Promotion
 {
 	switch($largepro_torrent)
@@ -223,6 +225,16 @@ else{ //ramdom torrent promotion
 		$sp_state = 7;
 	else
 		$sp_state = 1; //normal
+
+	if ($sp_state != 1) {
+	  if ($randomtimelimit_torrent != 0) {
+	    $sp_until = date("Y-m-d H:i:s", TIMENOW + 7200);
+	    $sp_time_type = 2;
+	  }
+	  else {
+	    $sp_time_type = 1;
+	  }
+	}
 }
 
 if ($altname_main == 'yes'){
@@ -255,7 +267,7 @@ foreach ($promotionrules_torrent as $rule)
 
 $torrent = add_space_between_words($torrent);
 
-sql_query("INSERT INTO torrents (filename, owner, visible, anonymous, name, size, numfiles, type, url, small_descr, descr, ori_descr, category, source, medium, codec, audiocodec, standard, processing, team, save_as, sp_state, added, last_action, nfo, info_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [$fname, $CURUSER["id"], 'yes', $anonymous, $torrent, $totallen, count($filelist), $type, $url, $small_descr, $descr, $descr, $catid, $sourceid, $mediumid, $codecid, $audiocodecid, $standardid, $processingid, $teamid, $dname, $sp_state, date("Y-m-d H:i:s"), date("Y-m-d H:i:s"), $nfo, $infohash]);
+sql_query("INSERT INTO torrents (filename, owner, visible, anonymous, name, size, numfiles, type, url, small_descr, descr, ori_descr, category, source, medium, codec, audiocodec, standard, processing, team, save_as, sp_state, promotion_time_type, promotion_until, added, last_action, nfo, info_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), ?, ?)", [$fname, $CURUSER["id"], 'yes', $anonymous, $torrent, $totallen, count($filelist), $type, $url, $small_descr, $descr, $descr, $catid, $sourceid, $mediumid, $codecid, $audiocodecid, $standardid, $processingid, $teamid, $dname, $sp_state, $sp_time_type, $sp_until, $nfo, $infohash]);
 
 $id = _mysql_insert_id();
 

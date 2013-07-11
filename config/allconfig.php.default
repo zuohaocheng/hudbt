@@ -307,6 +307,7 @@ $TORRENT=array(
 	'randomtwoup' => '0',
 	'randomtwoupfree' => '0',
 	'randomtwouphalfdown' => '0',
+        'randomtimelimit' => 0,
 	'largesize' => '20',
 	'largepro' => '5',
 	'expirehalfleech' => '0',

@@ -383,6 +383,7 @@ $randomtwoup_torrent = $TORRENT['randomtwoup'];
 $randomtwoupfree_torrent = $TORRENT['randomtwoupfree'];
 $randomtwouphalfdown_torrent = $TORRENT['randomtwouphalfdown'];
 $randomthirtypercentdown_torrent = $TORRENT['randomthirtypercentdown'];
+$randomtimelimit_torrent = $TORRENT['randomtimelimit'];
 $largesize_torrent = $TORRENT['largesize'];
 $largepro_torrent = $TORRENT['largepro'];
 $expirehalfleech_torrent = $TORRENT['expirehalfleech'];
