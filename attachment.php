@@ -14,34 +14,41 @@ $allowed_exts = $Attach->get_allowed_ext();
 $css_uri = get_css_uri();
 $altsize = $_POST['altsize'];
 ?>
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <?php echo get_load_uri('css'); ?>
+<script type="text/javascript">if ( window.self === window.top ) {
+    location.href = '/index.php';
+}
+</script>
+<?php echo get_load_uri('css'); ?>
 </head>
 <body class="inframe">
   <form enctype="multipart/form-data" name="attachment" method="post" action="attachment.php">
 <div class="table minor-list"><ul>
 <?php
 if ($Attach->enable_attachment()) {
-  $warning = "";
   
-	if ($_SERVER["REQUEST_METHOD"] == "POST")
-	{
-		$file = $_FILES['file'];
-		$filesize = $file["size"];
-		$filetype = $file["type"];
-		$origfilename = $file['name'];
+  if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files'])) {
+    $warnings = [];
+    $dlkeys = [];
+
+    $file = $_FILES['files'];
+    for ($i=0; $i < count($file['size']); $i += 1) {
+		$filesize = $file["size"][$i];
+		$filetype = $file["type"][$i];
+		$origfilename = $file['name'][$i];
+		$tmpname = $file['tmp_name'][$i];
 		$ext_l = strrpos($origfilename, ".");
 		$ext = strtolower(substr($origfilename, $ext_l+1, strlen($origfilename)-($ext_l+1)));
 		$banned_ext = array('exe', 'com', 'bat', 'msi');
 		$img_ext = array('jpeg', 'jpg', 'png', 'gif');
-		if (!$file || $filesize == 0 || $file["name"] == "") // nothing received
+		if ($filesize == 0 || $origfilename == "") // nothing received
 		{
 			$warning = $lang_attachment['text_nothing_received'];
 		}
-		elseif (!$count_left) //user cannot upload more files
+		elseif ($count_left <= 0) //user cannot upload more files
 		{
 			$warning = $lang_attachment['text_file_number_limit_reached'];
 		}
@@ -64,7 +71,14 @@ if ($Attach->enable_attachment()) {
 				$savepath = date("Ym")."/";
 			elseif ($savedirectorytype_attachment == 'daydir')
 				$savepath = date("Ymd")."/";
-			$filemd5 = md5_file($file['tmp_name']);
+			$filemd5 = md5_file($tmpname);
+
+			$dlkey = get_single_value('attachments', 'dlkey', 'WHERE hash=UNHEX(?)', [$filemd5]);
+			if ($dlkey) {
+			  $dlkeys[] = $dlkey;
+			  continue;
+			}
+			
 			$filename = date("YmdHis").$filemd5;
 			$file_location = make_folder($savedirectory_attachment."/", $savepath)  . $filename;
 			$db_file_location = $savepath.$filename;
@@ -75,18 +89,30 @@ if ($Attach->enable_attachment()) {
 			{
 				$maycreatethumb = false;
 				$stop = false;
-				$imagesize = getimagesize($file['tmp_name']);
+				$imagesize = getimagesize($tmpname);
 			if ($imagesize){
 				$height = $imagesize[1];
 				$width = $imagesize[0];
 				$it = $imagesize[2];
-				if ($it != 1 || !$Attach->is_gif_ani($file['tmp_name'])){ //if it is an animation GIF, stop creating thumbnail and adding watermark
+				if ($it != 1 || !$Attach->is_gif_ani($tmpname)){ //if it is an animation GIF, stop creating thumbnail and adding watermark
 				if ($thumbnailtype_attachment != 'no') //create thumbnail for big image
 				{
 					//determine the size of thumbnail
 					if ($altsize == 'yes'){
-						$targetwidth = $altthumbwidth_attachment;
-						$targetheight = $altthumbheight_attachment;
+					  if (isset($_REQUEST['altsize-num'])) {
+					    $targetwidth = 0 + $_REQUEST['altsize-num'];
+					    if ($targetwidth < 120) {
+					      $targetwidth = 120;
+					    }
+					    else if ($targetwidth > $thumbwidth_attachment) {
+					      $targetwidth = $thumbwidth_attachment;
+					    }
+					    $targetheight = 800;
+					  }
+					  else {
+					    $targetwidth = $altthumbwidth_attachment;
+					    $targetheight = $altthumbheight_attachment;
+					  }
 					}
 					else
 					{
@@ -95,16 +121,18 @@ if ($Attach->enable_attachment()) {
 					}
 					$hscale=$height/$targetheight;
 					$wscale=$width/$targetwidth;
-					$scale=($hscale < 1 && $wscale < 1) ? 1 : (( $hscale > $wscale) ? $hscale : $wscale);
+					$scale=max(1, $hscale, $wscale);
+
 					$newwidth=floor($width/$scale);
 					$newheight=floor($height/$scale);
+
 					if ($scale != 1){ //thumbnail is needed
 						if ($it==1)
-							$orig=@imagecreatefromgif($file["tmp_name"]);
+							$orig=@imagecreatefromgif($tmpname);
 						elseif ($it == 2)
-							$orig=@imagecreatefromjpeg($file["tmp_name"]);
+							$orig=@imagecreatefromjpeg($tmpname);
 						else
-							$orig=@imagecreatefrompng($file["tmp_name"]);
+							$orig=@imagecreatefrompng($tmpname);
 						if ($orig && !$stop)
 						{
 							$thumb = imagecreatetruecolor($newwidth, $newheight);
@@ -138,11 +166,11 @@ if ($Attach->enable_attachment()) {
 						{
 							$resource=imagecreatetruecolor($width,$height);
 							if ($it==1)
-								$resource_p=@imagecreatefromgif($file["tmp_name"]);
+								$resource_p=@imagecreatefromgif($tmpname);
 							elseif ($it==2)
-								$resource_p=@imagecreatefromjpeg($file["tmp_name"]);
+								$resource_p=@imagecreatefromjpeg($tmpname);
 							else
-								$resource_p=@imagecreatefrompng($file["tmp_name"]);
+								$resource_p=@imagecreatefrompng($tmpname);
 							imagecopy($resource, $resource_p, 0, 0, 0, 0, $width, $height);
 						}
 						$watermark = imagecreatefrompng('pic/watermark.png');
@@ -221,37 +249,62 @@ if ($Attach->enable_attachment()) {
 			else $warning = $lang_attachment['text_invalid_image_file'];
 			}
 			if (!$abandonorig){
-				if(!move_uploaded_file($file["tmp_name"], $file_location.".".$ext))
+				if(!move_uploaded_file($tmpname, $file_location.".".$ext))
 					$warning = $lang_attachment['text_cannot_move_file'];
 			}
-			if (!$warning) //insert into database and add code to editor
-			{
+			if (isset($warning)) {
+			  $warnings[] = $warning;
+			  unset($warning);
+			}
+			else {//insert into database and add code to editor
 				$dlkey = md5($db_file_location.".".$ext);
-				sql_query("INSERT INTO attachments (userid, width, added, filename, filetype, filesize, location, dlkey, isimage, thumb) VALUES (".$CURUSER['id'].", ".$width.", ".sqlesc(date("Y-m-d H:i:s")).", ".sqlesc($origfilename).", ".sqlesc($filetype).", ".$filesize.", ".sqlesc($db_file_location.".".$ext).", ".sqlesc($dlkey).", ".($isimage ? 1 : 0).", ".($hasthumb ? 1 : 0).")") or sqlerr(__FILE__, __LINE__);
+				sql_query("INSERT INTO attachments (userid, width, added, filename, filetype, filesize, location, dlkey, isimage, thumb, hash) VALUES (".$CURUSER['id'].", ".$width.", ".sqlesc(date("Y-m-d H:i:s")).", ".sqlesc($origfilename).", ".sqlesc($filetype).", ".$filesize.", ".sqlesc($db_file_location.".".$ext).", ".sqlesc($dlkey).", ".($isimage ? 1 : 0).", ".($hasthumb ? 1 : 0).", UNHEX(?))", [$filemd5]);
 				$count_left--;
-				echo("<script type=\"text/javascript\">parent.tag_extimage('". "[attach]" . $dlkey . "[/attach]" . "');</script>");
+				$dlkeys[] = $dlkey;
 			}
 		}
 	}
 
+	    if (!empty($dlkeys)) {
+	      echo "<script type=\"text/javascript\">parent.tag_extimage('".
+		implode('\n', array_map(function($dlkey) {
+		      return "[attach]" . $dlkey . "[/attach]";
+		    }, $dlkeys)) . "');</script>";
+	    }
+  }
 
-	print("<li><input type=\"file\" name=\"file\"".($count_left ? "" : " disabled=\"disabled\"")." /></li>");
+
+
+	print("<li><input type=\"file\" name=\"files[]\" multiple=\"multiple\" required=\"required\" style=\"width:150px;\"".($count_left ? "" : " disabled=\"disabled\"")." /></li>");
 	print('<li><input type="checkbox" name="altsize" value="yes" id="altsize"'.($altsize == 'yes' ? ' checked="checked"' : "").' /><label for="altsize">'.$lang_attachment['text_small_thumbnail']."</label></li>");
 	print('<li><input type="submit" name="submit" value="'.$lang_attachment['submit_upload'].'"'.($count_left ? "" : ' disabled="disabled"').' /></li>');
-	if ($warning) {
-	  print('<li><span class="striking">'.$warning.'</span></li>');
-	}
-	else {
-	  print("<li>".$lang_attachment['text_left'].'<span class="striking">'.$count_left."</span>".$lang_attachment['text_of'].$count_limit.'</li><li>'.$lang_attachment['text_size_limit'] . mksize($size_limit)."</li><li>".$lang_attachment['text_file_extensions']);
-	  $allowedextsblock = implode(', ', $allowed_exts);
-	  if (!$allowedextsblock) {
-	    $allowedextsblock = 'N/A';
-	  }
-	  print('<a onclick="parent.allowedtypes(event, this)" onmouseout="parent.allowedtypes(event, this)" onmouseover="parent.allowedtypes(event, this)" title="'.htmlspecialchars($allowedextsblock).'" href="#">'.$lang_attachment['text_mouse_over_here'].'</a></li>');
-	}
+  
+  if (!empty($warnings)) {
+    echo implode('', array_map(function($warning) {
+	return ('<li><span class="striking">'.$warning.'</span></li>');
+	}, $warnings));
+  }
+  else {
+    print("<li>".$lang_attachment['text_left'].'<span class="striking">'.$count_left."</span>".$lang_attachment['text_of'].$count_limit.'</li><li>'.$lang_attachment['text_size_limit'] . mksize($size_limit)."</li><li>".$lang_attachment['text_file_extensions']);
+    $allowedextsblock = implode(', ', $allowed_exts);
+    if (!$allowedextsblock) {
+      $allowedextsblock = 'N/A';
+    }
+    print('<a onclick="parent.allowedtypes(event, this)" onmouseout="parent.allowedtypes(event, this)" onmouseover="parent.allowedtypes(event, this)" title="'.htmlspecialchars($allowedextsblock).'" href="#">'.$lang_attachment['text_mouse_over_here'].'</a></li>');
+  }
 }
 ?>
 </ul></div>
 </form>
+<script type="text/javascript">
+(function($) {
+    var altsize = $('#altsize', document),
+    altsize_num = $('<li><label>缩略图宽度<input name="altsize-num" type="number" value="<?=$altthumbwidth_attachment ?>" min="120" max="800" step="10" style="height:90%" />px</label></li>').hide();
+    altsize.parent().after(altsize_num);
+    altsize.click(function() {
+	altsize_num.toggle(this.checked);
+    }).triggerHandler('click');
+})(window.top.$);
+</script>
 </body>
 </html>
