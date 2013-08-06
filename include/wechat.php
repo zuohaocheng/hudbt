@@ -64,31 +64,36 @@ function wechat_text_response($content, $req) {
   
   /* } */
   else if (preg_match('/(?:bind|绑定) ([^ ]+)/i', $content, $matches)) {
-    $userid = get_user_id_from_name(trim($matches[1]));
-    if (!$userid && is_numeric($matches[1])) {
-      $userid = 0 + $matches[1];
-    }
-    if (isset($userid)) {
-      $r = sql_query('SELECT id, passhash, wechat FROM users WHERE id = ?', [$userid])->fetch();
+    if (isset($CURUSER)) {
+      $response = '你已经绑定了账号';
     }
     else {
-      $r = false;
-    }
-    
-    if (!$r) {
-      $response = '无效的用户id';
-    }
-    else if (!is_null($r['wechat'])) {
-      $response = '已经绑定微信账号，请到 https://www.kmgtp.org/usercp.php?action=personal 解除绑定后再试';
-    }
-    else {
-      $sec = mksecret();
-      $oid = $req['fromusername'];
-      $hash = md5($sec . $r['passhash'] . $oid . $sec);
-      sql_query('INSERT INTO user_properties (user_id, wechat_bind_id, wechat_bind, wechat_bind_time) VALUES (?, ?, ?, NOW()) ON DUPLICATE KEY UPDATE wechat_bind = VALUES(wechat_bind), wechat_bind_id = VALUES(wechat_bind_id), wechat_bind_time = NOW()', [$userid, $oid, $hash]);
+      $userid = get_user_id_from_name(trim($matches[1]));
+      if (!$userid && is_numeric($matches[1])) {
+	$userid = 0 + $matches[1];
+      }
+      if (isset($userid)) {
+	$r = sql_query('SELECT id, passhash, wechat FROM users WHERE id = ?', [$userid])->fetch();
+      }
+      else {
+	$r = false;
+      }
+      
+      if (!$r) {
+	$response = '无效的用户id';
+      }
+      else if (!is_null($r['wechat'])) {
+	$response = '已经绑定微信账号，请到 https://www.kmgtp.org/usercp.php?action=personal 解除绑定后再试';
+      }
+      else {
+	$sec = mksecret();
+	$oid = $req['fromusername'];
+	$hash = md5($sec . $r['passhash'] . $oid . $sec);
+	sql_query('INSERT INTO user_properties (user_id, wechat_bind_id, wechat_bind, wechat_bind_time) VALUES (?, ?, ?, NOW()) ON DUPLICATE KEY UPDATE wechat_bind = VALUES(wechat_bind), wechat_bind_id = VALUES(wechat_bind_id), wechat_bind_time = NOW()', [$userid, $oid, $hash]);
 
-      $url = 'https://www.kmgtp.org/oauth.php?hash=' . $hash;
-      $response = '请点击网址确认 ' . $url;
+	$url = 'https://www.kmgtp.org/oauth.php?hash=' . $hash;
+	$response = '请点击网址确认 ' . $url;
+      }
     }
   }
   else if ($content == 'unbind' || $content == '取消绑定') {

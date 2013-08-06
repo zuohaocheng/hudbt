@@ -28,8 +28,8 @@ checkPrivilegePanel();
 //stdhead("FAQ Management");
 
 // ACTION: reorder - reorder sections and items
-if ($_GET[action] == "reorder") {
-  foreach($_POST[order] as $id => $position) {
+if ($_GET['action'] == "reorder") {
+  foreach($_POST['order'] as $id => $position) {
     sql_query("UPDATE `faq` SET `order`=".sqlesc($position)." WHERE id=".sqlesc($id)) or sqlerr();
   }
   
@@ -44,38 +44,38 @@ if ($_GET[action] == "reorder") {
 }
 
 // ACTION: edit - edit a section or item
-elseif ($_GET[action] == "edit" && isset($_GET[id])) {
+elseif ($_GET['action'] == "edit" && isset($_GET['id'])) {
 	stdhead("FAQ Management");
 	begin_main_frame();
 	print("<h1 align=\"center\">Edit Section or Item</h1>");
 
-	$res = sql_query("SELECT * FROM faq WHERE id=".sqlesc($_GET[id])." LIMIT 1");
-	while ($arr = _mysql_fetch_array($res, MYSQL_BOTH)) {
-		$arr[question] = htmlspecialchars($arr[question]);
-		$arr[answer] = htmlspecialchars($arr[answer]);
-		if ($arr[type] == "item") {
+	$res = sql_query("SELECT * FROM faq WHERE id=".sqlesc($_GET['id'])." LIMIT 1");
+	while ($arr = _mysql_fetch_array($res)) {
+		$arr['question'] = htmlspecialchars($arr['question']);
+		$arr['answer'] = htmlspecialchars($arr['answer']);
+		if ($arr['type'] == "item") {
 			$lang_id = $arr['lang_id'];
 			print("<form method=\"post\" action=\"faqactions.php?action=edititem\">");
 			print("<table border=\"1\" cellspacing=\"0\" cellpadding=\"10\" align=\"center\">\n");
 			print("<tr><td>ID:</td><td>$arr[id] <input type=\"hidden\" name=\"id\" value=\"$arr[id]\" /></td></tr>\n");
 			print("<tr><td>Question:</td><td><input style=\"width: 600px;\" type=\"text\" name=\"question\" value=\"$arr[question]\" /></td></tr>\n");
 			print("<tr><td style=\"vertical-align: top;\">Answer:</td><td><textarea rows=20 style=\"width: 600px; height=600px;\" name=\"answer\">$arr[answer]</textarea></td></tr>\n");
-			if ($arr[flag] == "0") print("<tr><td>Status:</td><td><select name=\"flag\" style=\"width: 110px;\"><option value=\"0\" style=\"color: #FF0000;\" selected=\"selected\">Hidden</option><option value=\"1\" style=\"color: #000000;\">Normal</option><option value=\"2\" style=\"color: #0000FF;\">Updated</option><option value=\"3\" style=\"color: #008000;\">New</option></select></td></tr>");
-			elseif ($arr[flag] == "2") print("<tr><td>Status:</td><td><select name=\"flag\" style=\"width: 110px;\"><option value=\"0\" style=\"color: #FF0000;\">Hidden</option><option value=\"1\" style=\"color: #000000;\">Normal</option><option value=\"2\" style=\"color: #0000FF;\" selected=\"selected\">Updated</option><option value=\"3\" style=\"color: #008000;\">New</option></select></td></tr>");
-			elseif ($arr[flag] == "3") print("<tr><td>Status:</td><td><select name=\"flag\" style=\"width: 110px;\"><option value=\"0\" style=\"color: #FF0000;\">Hidden</option><option value=\"1\" style=\"color: #000000;\">Normal</option><option value=\"2\" style=\"color: #0000FF;\">Updated</option><option value=\"3\" style=\"color: #008000;\" selected=\"selected\">New</option></select></td></tr>");
+			if ($arr['flag'] == "0") print("<tr><td>Status:</td><td><select name=\"flag\" style=\"width: 110px;\"><option value=\"0\" style=\"color: #FF0000;\" selected=\"selected\">Hidden</option><option value=\"1\" style=\"color: #000000;\">Normal</option><option value=\"2\" style=\"color: #0000FF;\">Updated</option><option value=\"3\" style=\"color: #008000;\">New</option></select></td></tr>");
+			elseif ($arr['flag'] == "2") print("<tr><td>Status:</td><td><select name=\"flag\" style=\"width: 110px;\"><option value=\"0\" style=\"color: #FF0000;\">Hidden</option><option value=\"1\" style=\"color: #000000;\">Normal</option><option value=\"2\" style=\"color: #0000FF;\" selected=\"selected\">Updated</option><option value=\"3\" style=\"color: #008000;\">New</option></select></td></tr>");
+			elseif ($arr['flag'] == "3") print("<tr><td>Status:</td><td><select name=\"flag\" style=\"width: 110px;\"><option value=\"0\" style=\"color: #FF0000;\">Hidden</option><option value=\"1\" style=\"color: #000000;\">Normal</option><option value=\"2\" style=\"color: #0000FF;\">Updated</option><option value=\"3\" style=\"color: #008000;\" selected=\"selected\">New</option></select></td></tr>");
 			else print("<tr><td>Status:</td><td><select name=\"flag\" style=\"width: 110px;\"><option value=\"0\" style=\"color: #FF0000;\">Hidden</option><option value=\"1\" style=\"color: #000000;\" selected=\"selected\">Normal</option><option value=\"2\" style=\"color: #0000FF;\">Updated</option><option value=\"3\" style=\"color: #008000;\">New</option></select></td></tr>");
 			print("<tr><td>Category:</td><td><select style=\"width: 400px;\" name=\"categ\" />");
 			$res2 = sql_query("SELECT `id`, `question`, `link_id` FROM `faq` WHERE `type`='categ' AND `lang_id` = ".sqlesc($lang_id)." ORDER BY `order` ASC");
-			while ($arr2 = _mysql_fetch_array($res2, MYSQL_BOTH)) {
-				$selected = ($arr2[link_id] == $arr[categ]) ? " selected=\"selected\"" : "";
+			while ($arr2 = _mysql_fetch_array($res2)) {
+				$selected = ($arr2['link_id'] == $arr['categ']) ? " selected=\"selected\"" : "";
 				print("<option value=\"$arr2[link_id]\"". $selected .">$arr2[question]</option>");
 			}
 			print("</td></tr>\n");
 			print("<tr><td colspan=\"2\" align=\"center\"><input type=\"submit\" name=\"edit\" value=\"Edit\" style=\"width: 60px;\"></td></tr>\n");
 			print("</table>");
 		}
-		elseif ($arr[type] == "categ") {
-			$lang_res = sql_query("SELECT lang_name FROM language WHERE id=".sqlesc($arr[lang_id])." LIMIT 1");
+		elseif ($arr['type'] == "categ") {
+			$lang_res = sql_query("SELECT lang_name FROM language WHERE id=".sqlesc($arr['lang_id'])." LIMIT 1");
 			if ($lang_arr = _mysql_fetch_array($lang_res))
 				$lang_name = $lang_arr['lang_name'];
 			print("<form method=\"post\" action=\"faqactions.php?action=editsect\">");
@@ -83,7 +83,7 @@ elseif ($_GET[action] == "edit" && isset($_GET[id])) {
 			print("<tr><td>ID:</td><td>$arr[id] <input type=\"hidden\" name=\"id\" value=\"$arr[id]\" /></td></tr>\n");
 			print("<tr><td>Language:</td><td>$lang_name</td></tr>\n");
 			print("<tr><td>Title:</td><td><input style=\"width: 300px;\" type=\"text\" name=\"title\" value=\"$arr[question]\" /></td></tr>\n");
-			if ($arr[flag] == "0") print("<tr><td>Status:</td><td><select name=\"flag\" style=\"width: 110px;\"><option value=\"0\" style=\"color: #FF0000;\" selected=\"selected\">Hidden</option><option value=\"1\" style=\"color: #000000;\">Normal</option></select></td></tr>");
+			if ($arr['flag'] == "0") print("<tr><td>Status:</td><td><select name=\"flag\" style=\"width: 110px;\"><option value=\"0\" style=\"color: #FF0000;\" selected=\"selected\">Hidden</option><option value=\"1\" style=\"color: #000000;\">Normal</option></select></td></tr>");
 			else print("<tr><td>Status:</td><td><select name=\"flag\" style=\"width: 110px;\"><option value=\"0\" style=\"color: #FF0000;\">Hidden</option><option value=\"1\" style=\"color: #000000;\" selected=\"selected\">Normal</option></select></td></tr>");
 			print("<tr><td colspan=\"2\" align=\"center\"><input type=\"submit\" name=\"edit\" value=\"Edit\" style=\"width: 60px;\"></td></tr>\n");
 			print("</table>");
@@ -95,7 +95,7 @@ elseif ($_GET[action] == "edit" && isset($_GET[id])) {
 }
 
 // subACTION: edititem - edit an item
-elseif ($_GET[action] == "edititem" && $_POST[id] != NULL && (isset($_POST[question]) || isset($_POST[answer]) || isset($_POST[flag]) || isset($_POST[categ]))) {
+elseif ($_GET['action'] == "edititem" && $_POST['id'] != NULL && (isset($_POST['question']) || isset($_POST['answer']) || isset($_POST['flag']) || isset($_POST['categ']))) {
   $fields = ['question', 'answer', 'flag', 'categ'];
   $ret = '';
   $a = [];
@@ -118,13 +118,13 @@ elseif ($_GET[action] == "edititem" && $_POST[id] != NULL && (isset($_POST[quest
 }
 
 // subACTION: editsect - edit a section
-elseif ($_GET[action] == "editsect" && $_POST[id] != NULL && $_POST[title] != NULL) {
-	$title = $_POST[title];
+elseif ($_GET['action'] == "editsect" && $_POST['id'] != NULL && $_POST['title'] != NULL) {
+	$title = $_POST['title'];
 	$sql = "UPDATE `faq` SET `question`=".sqlesc($title).", `answer`=''";
 	if (isset($_REQUEST['flag'])) {
 	  $sql .=  ', `flag`=' . (0 + $_REQUEST['flag']);
 	}
-	$sql .= ", `categ`='0' WHERE id=".sqlesc($_POST[id]);
+	$sql .= ", `categ`='0' WHERE id=".sqlesc($_POST['id']);
 	sql_query($sql) or sqlerr();
 	if ($_REQUEST['format'] == 'json') {
 	  echo $title;
@@ -136,10 +136,10 @@ elseif ($_GET[action] == "editsect" && $_POST[id] != NULL && $_POST[title] != NU
 }
 
 // ACTION: delete - delete a section or item
-elseif ($_GET[action] == "delete" && isset($_GET[id])) {
-	if ($_REQUEST[confirm] == "yes") {
+elseif ($_GET['action'] == "delete" && isset($_GET['id'])) {
+	if ($_REQUEST['confirm'] == "yes") {
 	  checkHTTPMethod('POST');
-		sql_query("DELETE FROM `faq` WHERE `id`=".sqlesc(0+$_GET[id])." LIMIT 1") or sqlerr();
+		sql_query("DELETE FROM `faq` WHERE `id`=".sqlesc(0+$_GET['id'])." LIMIT 1") or sqlerr();
 		header("Location: " . get_protocol_prefix() . "$BASEURL/faqmanage.php");
 		die;
 	}
@@ -154,7 +154,7 @@ elseif ($_GET[action] == "delete" && isset($_GET[id])) {
 }
 
 // ACTION: additem - add a new item
-elseif ($_GET[action] == "additem" && $_GET[inid] && $_GET[langid]) {
+elseif ($_GET['action'] == "additem" && $_GET['inid'] && $_GET['langid']) {
 	stdhead("FAQ Management");
 	begin_main_frame();
 	print("<h1 align=\"center\">Add Item</h1>");
@@ -163,8 +163,8 @@ elseif ($_GET[action] == "additem" && $_GET[inid] && $_GET[langid]) {
 	print("<tr><td>Question:</td><td><input style=\"width: 600px;\" type=\"text\" name=\"question\" value=\"\" /></td></tr>\n");
 	print("<tr><td style=\"vertical-align: top;\">Answer:</td><td><textarea rows=20 style=\"width: 600px; height=600px;\" name=\"answer\"></textarea></td></tr>\n");
 	print("<tr><td>Status:</td><td><select name=\"flag\" style=\"width: 110px;\"><option value=\"0\" style=\"color: #FF0000;\">Hidden</option><option value=\"1\" style=\"color: #000000;\">Normal</option><option value=\"2\" style=\"color: #0000FF;\">Updated</option><option value=\"3\" style=\"color: #008000;\" selected=\"selected\">New</option></select></td></tr>");
-	print("<input type=hidden name=categ value=\"".(0+$_GET[inid])."\">");
-	print("<input type=hidden name=langid value=\"".(0+$_GET[langid])."\">");
+	print("<input type=hidden name=categ value=\"".(0+$_GET['inid'])."\">");
+	print("<input type=hidden name=langid value=\"".(0+$_GET['langid'])."\">");
 	print("<tr><td colspan=\"2\" align=\"center\"><input type=\"submit\" value=\"Add\" style=\"width: 60px;\"></td></tr>\n");
 	print("</table></form>");
 	end_main_frame();
@@ -172,7 +172,7 @@ elseif ($_GET[action] == "additem" && $_GET[inid] && $_GET[langid]) {
 }
 
 // ACTION: addsection - add a new section
-elseif ($_GET[action] == "addsection") {
+elseif ($_GET['action'] == "addsection") {
 	stdhead("FAQ Management");
 	begin_main_frame();
 	print("<h1 align=\"center\">Add Section</h1>");
@@ -196,33 +196,35 @@ elseif ($_GET[action] == "addsection") {
 }
 
 // subACTION: addnewitem - add a new item to the db
-elseif ($_GET[action] == "addnewitem" && $_POST[question] != NULL && $_POST[answer] != NULL) {
-	$question = $_POST[question];
-	$answer = $_POST[answer];
-	$categ = 0+$_POST[categ];
-	$langid = 0+$_POST[langid];
+elseif ($_GET['action'] == "addnewitem" && $_POST['question'] != NULL && $_POST['answer'] != NULL) {
+	$question = $_POST['question'];
+	$answer = $_POST['answer'];
+	$categ = 0+$_POST['categ'];
+	$langid = 0+$_POST['langid'];
 	$res = sql_query("SELECT MAX(`order`) AS maxorder, MAX(`link_id`) AS maxlinkid FROM `faq` WHERE `type`='item' AND `categ`=".sqlesc($categ)." AND lang_id=".sqlesc($langid));
-	while ($arr = _mysql_fetch_array($res, MYSQL_BOTH)) 
+	while ($arr = _mysql_fetch_array($res)) 
 	{
 		$order = $arr['maxorder'] + 1;
 		$link_id = $arr['maxlinkid']+1;
 	}
-	sql_query("INSERT INTO `faq` (`link_id`, `type`, `lang_id`, `question`, `answer`, `flag`, `categ`, `order`) VALUES ('$link_id', 'item', ".sqlesc($langid).", ".sqlesc($question).", ".sqlesc($answer).", " . sqlesc(0+$_POST[flag]) . ", ".sqlesc($categ).", ".sqlesc($order).")") or sqlerr();
+	sql_query("INSERT INTO `faq` (`link_id`, `type`, `lang_id`, `question`, `answer`, `flag`, `categ`, `order`) VALUES ('$link_id', 'item', ".sqlesc($langid).", ".sqlesc($question).", ".sqlesc($answer).", " . sqlesc(0+$_POST['flag']) . ", ".sqlesc($categ).", ".sqlesc($order).")") or sqlerr();
 	header("Location: " . get_protocol_prefix() . "$BASEURL/faqmanage.php");
 	die;
 }
 
 // subACTION: addnewsect - add a new section to the db
-elseif ($_GET[action] == "addnewsect" && $_POST[title] != NULL && $_POST[flag] != NULL) {
-	$title = $_POST[title];
+elseif ($_GET['action'] == "addnewsect" && $_POST['title'] != NULL && $_POST['flag'] != NULL) {
+	$title = $_POST['title'];
 	$language = 0+$_POST['language'];
 	$res = sql_query("SELECT MAX(`order`) AS maxorder, MAX(`link_id`) AS maxlinkid FROM `faq` WHERE `type`='categ' AND `lang_id` = ".sqlesc($language));
-	while ($arr = _mysql_fetch_array($res, MYSQL_BOTH)) {$order = $arr['maxorder'] + 1;$link_id = $arr['maxlinkid']+1;}
-	sql_query("INSERT INTO `faq` (`link_id`,`type`,`lang_id`, `question`, `answer`, `flag`, `categ`, `order`) VALUES (".sqlesc($link_id).",'categ', ".sqlesc($language).", ".sqlesc($title).", '', ".sqlesc($_POST[flag]).", '0', ".sqlesc($order).")") or sqlerr();
+	while ($arr = _mysql_fetch_array($res)) {$order = $arr['maxorder'] + 1;$link_id = $arr['maxlinkid']+1;}
+	sql_query("INSERT INTO `faq` (`link_id`,`type`,`lang_id`, `question`, `answer`, `flag`, `categ`, `order`) VALUES (".sqlesc($link_id).",'categ', ".sqlesc($language).", ".sqlesc($title).", '', ".sqlesc($_POST['flag']).", '0', ".sqlesc($order).")") or sqlerr();
 	header("Location: " . get_protocol_prefix() . "$BASEURL/faqmanage.php");
 	die;
 } else {
 	header("Location: " . get_protocol_prefix() . "$BASEURL/faqmanage.php");
 	die;
 }
-?>
+
+
+

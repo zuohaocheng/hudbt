@@ -34,10 +34,12 @@ $(function() {
 	    return;
 	}
 	errCount += 1;
-	if (errCount > 5 && (('onLine' in navigator) && navigator.onLine)) {
-	    jqui_confirm('哎呀','好像有点问题，刷新看看?', function() {
-		location.search = '?'+$.param(args); //reload
-	    });
+	if (errCount > 5) {
+	    if (!('onLine' in navigator) || navigator.onLine) {
+		jqui_confirm('哎呀','好像有点问题，刷新看看?', function() {
+		    location.search = '?'+$.param(args); //reload
+		});
+	    }
 	}
 	else {
 	    $.ajax(settings);

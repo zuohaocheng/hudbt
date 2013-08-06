@@ -34,6 +34,7 @@ function navbar_json() {
 		 'viewquotedposts',
 		 'viewcomments',
 		 'viewquotedcomments');
+  $selected = 0;
   for ($i=0; $i < count($actions); $i+=1) {
     if ($action == $actions[$i]) {
       $selected = $i;

@@ -11,12 +11,12 @@ class HTML_BBCodeParser_Filter_Attachments extends HTML_BBCodeParser_Filter {
     $ce = $options['close_esc'];
     $this->_preparsed =
       preg_replace_callback(
-		   "!".$oe."attach".$ce."([0-9a-f]{32})".$oe."/attach".$ce."!Ui",
+		   "!".$oe."attach(?: thumbwidth=['\"]?([0-9]+)['\"]?)?".$ce."([0-9a-f]{32})".$oe."/attach".$ce."!Ui",
 		   array($this, 'attachmentCallback'),
 		   $this->_text);
   }
 
-  public function attachmentFromId($dlkey) {
+  public function attachmentFromId($dlkey, $thumbwidth) {
     global $Cache, $httpdirectory_attachment, $savedirectory_attachment;
     global $lang_functions;
     $enableimage = true;
@@ -33,7 +33,7 @@ class HTML_BBCodeParser_Filter_Attachments extends HTML_BBCodeParser_Filter {
 
     $id = $row['id'];
     if ($row['isimage'] == 1) {
-	if ($enableimage){
+	if ($enableimage) {
 	  $fullurl = '';
 	  if ($row['thumb'] == 1){
 	    $filename = $row['location'].".thumb.jpg";
@@ -46,17 +46,35 @@ class HTML_BBCodeParser_Filter_Attachments extends HTML_BBCodeParser_Filter {
 	    $fullurl = '';
 	  }
 
+	  unset($return);
 	  $file = $savedirectory_attachment . '/' . $filename;
-	  $size = getimagesize($file);
-	  if ($size) {
-	    $height = $size[1];
-	    if ($height > 800) {
-	      $height = 800;
+	  if (!file_exists($file)) {
+	    if ($row['thumb']) {
+	      $filename = $row['location'];
+	      $url = $httpdirectory_attachment."/".$row['location'];
+	      $fullurl = '';
+	      $file = $savedirectory_attachment . '/' . $filename;
+	      if (!file_exists($file)) {
+		$return = '找不到图片:(';
+	      }
 	    }
-	    $return = '[img h=' . $height . $fullurl . ']' . $url . '[/img]';
+	    else {
+	      $return = '找不到图片:(';
+	    }
 	  }
-	  else {
-	    $return = '找不到图片:(';
+
+	  if (!isset($return)) {
+	    $size = getimagesize($file);
+	    if ($size) {
+	      $height = $size[1];
+	      if ($height > 800) {
+		$height = 800;
+	      }
+	      $return = '[img h=' . $height . $fullurl . ']' . $url . '[/img]';
+	    }
+	    else {
+	      $return = '找不到图片:(';
+	    }
 	  }
 	}
 	else $return = "";
@@ -104,7 +122,7 @@ class HTML_BBCodeParser_Filter_Attachments extends HTML_BBCodeParser_Filter {
   }
   
   public function attachmentCallback($m) {
-    return $this->attachmentFromId($m[1]);
+    return $this->attachmentFromId($m[2], $m[1]);
   }
 }
 

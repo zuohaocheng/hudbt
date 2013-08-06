@@ -18,12 +18,12 @@ function get_global_sp_state() {
 
 function get_pr_state($promotion, $added = '', $promotionTimeType = 0, $promotionUntil = '') {
   //PRCONFIG
-  static $sp_global_table = array(array(1,2,3,4,5,6,7),
-             array(2,2,4,4,2,4,2),
-             array(3,4,3,4,6,6,3),
-             array(4,4,4,4,4,4,4),
-             array(5,2,6,4,6,6,7),
-             array(6,4,6,4,6,6,6));
+  static $sp_global_table = [[1,2,3,4,5,6,7],
+			     [2,2,4,4,2,4,2],
+			     [3,4,3,4,6,6,3],
+			     [4,4,4,4,4,4,4],
+			     [5,2,6,4,5,6,7],
+			     [6,4,6,4,6,6,6]];
 
   $gstate = get_global_sp_state();
   if (!$gstate) {

@@ -447,11 +447,16 @@ else {
 	    if ($douban_apikey) {
 	      $url .= '?apikey=' . $douban_apikey;
 	    }
-	    $req = new HTTP_Request2($url);
-	    $res = $req->send();
-	    if ($res->getStatus() == 200) {
-	      $val = $res->getBody();
-	      file_put_contents($filename, $val);
+
+	    try {
+	      $req = new HTTP_Request2($url);
+	      $res = $req->send();
+	      if ($res->getStatus() == 200) {
+		$val = $res->getBody();
+		file_put_contents($filename, $val);
+	      }
+	    }
+	    catch (HTTP_Request2_ConnectionException $e) {
 	    }
 	  }
 	}

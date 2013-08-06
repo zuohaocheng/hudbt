@@ -3,7 +3,7 @@
 
 
 function torrentInfoForRow($row) {
-  global $torrentmanage_class;
+  global $torrentmanage_class, $enabletooltip_tweak;
   global $CURUSER;
   $info = array();
   

@@ -4995,7 +4995,8 @@ function make_stat_url($url, $type, $args=[]) {
 }
 
 function write_file_log($name, $content) {
-  $h = fopen('log/' . $name . '.log', 'a');
+  global $rootpath;
+  $h = fopen($rootpath . 'log/' . $name . '.log', 'a');
   if ($h) {
     fwrite($h, $content . "\n");
     fclose($h);

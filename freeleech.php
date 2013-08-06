@@ -9,12 +9,18 @@ if (php_sapi_name() == 'cli') {
     echo 'No action!', "\n";
     die;
   }
+  $name = 'sysop';
 }
 else {
   loggedinorreturn();
   checkPrivilegePanel();
 
   $action = (isset($_POST['status']) ? $_POST['status'] : 'main');
+  $name = $CURUSER['username'];
+}
+
+if ($action != 'main') {
+  write_log('Global sp state set to ' . $action . ' by ' . $name , 'mod');
 }
 
 if ($action == 'Free') {

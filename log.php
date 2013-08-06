@@ -51,7 +51,7 @@ function additem($title, $action) {
   print("<table border=1 cellspacing=0 width=940 cellpadding=5>\n");
   print("<tr><td class=colhead align=left>".$title."</td></tr>\n");
   print("<tr><td class=toolbox align=left><form method=\"post\" action='" . $_SERVER['PHP_SELF'] . "'>\n");
-  print("<textarea name=\"txt\" style=\"width:500px\" rows=\"3\" >".$row["txt"]."</textarea>\n");
+  print("<textarea name=\"txt\" style=\"width:500px\" rows=\"3\" ></textarea>\n");
   print("<input type=\"hidden\" name=\"action\" value=".$action.">");
   print("<input type=\"hidden\" name=\"do\" value=\"add\">");
   print("<input type=submit value=" . $lang_log['submit_add'] . "></form>\n");
@@ -355,7 +355,7 @@ else {
 	while ($arr = _mysql_fetch_assoc($res))
 	  {
 	    $date = gettime($arr['added'],true,false);
-	    print("<tr><td class=rowfollow align=center><nobr>$date</nobr></td><td class=rowfollow align=left>".format_comment($arr["txt"],true,false,true)."</td>".(get_user_class() >= $chrmanage_class ? "<td align=center nowrap><b><a href=\"".$PHP_SELF."?action=chronicle&do=edit&id=".$arr["id"]."\">".$lang_log['text_edit']."</a>&nbsp;|&nbsp;<a href=\"".$PHP_SELF."?action=chronicle&do=del&id=".$arr["id"]."\"><font color=red>".$lang_log['text_delete']."</font></a></b></td>" : "")."</tr>\n");
+	    print("<tr><td class=rowfollow align=center><nobr>$date</nobr></td><td class=rowfollow align=left>".format_comment($arr["txt"],true,false,true)."</td>".(get_user_class() >= $chrmanage_class ? "<td align=center nowrap><b><a href=\"?action=chronicle&do=edit&id=".$arr["id"]."\">".$lang_log['text_edit']."</a>&nbsp;|&nbsp;<a href=\"?action=chronicle&do=del&id=".$arr["id"]."\"><font color=red>".$lang_log['text_delete']."</font></a></b></td>" : "")."</tr>\n");
 	  }
 	print("</table>");
 	echo $pagerbottom;

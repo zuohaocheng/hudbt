@@ -7,7 +7,6 @@ parked();
 if ($enablebitbucket_main != 'yes')
 	permissiondenied();
 $maxfilesize = 256 * 1024;
-$imgtypes = array (null,'gif','jpg','png');
 $scaleh = 200; // set our height size desired
 $scalew = 150; // set our width size desired
 
@@ -29,16 +28,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 	$height = $size[1];
 	$width = $size[0];
 	$it = $size[2];
-	if($imgtypes[$it] == null || $imgtypes[$it] != strtolower($pp['extension']))
-	stderr($lang_bitbucketupload['std_error'], $lang_bitbucketupload['std_invalid_image_format'],false);
-
-	// Scale image to appropriate avatar dimensions
-	$hscale=$height/$scaleh;
-	$wscale=$width/$scalew;
-	$scale=($hscale < 1 && $wscale < 1) ? 1 : (( $hscale > $wscale) ? $hscale : $wscale);
-	$newwidth=floor($width/$scale);
-	$newheight=floor($height/$scale);
-
 
 	switch ($it) {
 	case IMAGETYPE_GIF:
@@ -51,11 +40,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 	  $orig=@imagecreatefrompng($file["tmp_name"]);
 	  break;
 	default:
+	  stderr($lang_bitbucketupload['std_error'], $lang_bitbucketupload['std_invalid_image_format'],false);
 	  die;
 	}
 
+	// Scale image to appropriate avatar dimensions
+	$hscale=$height/$scaleh;
+	$wscale=$width/$scalew;
+	$scale=($hscale < 1 && $wscale < 1) ? 1 : (( $hscale > $wscale) ? $hscale : $wscale);
+	$newwidth=floor($width/$scale);
+	$newheight=floor($height/$scale);
+
 	if(!$orig) {
-	  stderr($lang_bitbucketupload['std_image_processing_failed'],$lang_bitbucketupload['std_sorry_the_uploaded']."$imgtypes[$it]".$lang_bitbucketupload['std_failed_processing']);
+	  stderr($lang_bitbucketupload['std_image_processing_failed'],$lang_bitbucketupload['std_sorry_the_uploaded']. image_type_to_extension($it) .$lang_bitbucketupload['std_failed_processing']);
 	}
 	
 	$thumb = imagecreatetruecolor($newwidth, $newheight);

@@ -19,7 +19,7 @@ stdhead("FAQ Management");
 <?php
 // make the array that has all the faq in a nice structured
 $res = sql_query("SELECT faq.id, faq.link_id, faq.lang_id, lang_name, faq.question, faq.flag, faq.order FROM faq LEFT JOIN language on faq.lang_id = language.id WHERE type='categ' ORDER BY lang_name, `order` ASC");
-while ($arr = _mysql_fetch_array($res, MYSQL_BOTH)) {
+while ($arr = _mysql_fetch_array($res)) {
 	$faq_categ[$arr['lang_id']][$arr['link_id']]['title'] = $arr['question'];
 	$faq_categ[$arr['lang_id']][$arr['link_id']]['flag'] = $arr['flag'];
 	$faq_categ[$arr['lang_id']][$arr['link_id']]['order'] = $arr['order'];
@@ -54,7 +54,7 @@ if (isset($faq_categ)) {
 
 	// print the faq table
 #	print("<form method=\"post\" action=\"faqactions.php?action=reorder\">");
-	$lis = [''];
+	$lis = [];
 	foreach ($faq_categ as $lang => $temp2)	{
 	  foreach ($temp2 as $id => $temp) {
 	    $contents = '<div class="accordion">';
