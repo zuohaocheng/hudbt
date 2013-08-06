@@ -1607,6 +1607,12 @@ function userlogin() {
   //noted by bluemonster 20111107
   $GLOBALS["CURUSER"] = $row;
 
+
+  if ($Cache->get_value('user_access_deny_' . $row['id'])) {
+    header('HTTP/1.0 403 Forbidden');
+    stderr('你好', '蝴蝶娘拿着黑名单看着你');
+  }
+
   $key = 'user_access_' . floor(time() / 10) . '_' . $row['id'];
   $i = $Cache->get_value($key);
   if ($i === false) {
@@ -1617,7 +1623,13 @@ function userlogin() {
   }
   $Cache->cache_value($key, $i, 30);
   if ($i > 10) {
-    write_file_log('access', implode(' ', [$key, $i]));
+    write_file_log('access', implode(' ', [$key, $i, $ip, $_SERVER['REQUEST_URI']]));
+    if ($i > 100) {
+      header('HTTP/1.0 403 Forbidden');
+      stderr('你好', '蝴蝶娘拿着黑名单看着你');
+      $Cache->cache_value('user_access_deny_' . $row['id'], true, 300);
+      write_log('access_deny', implode(' ', [date('r'), $row['id']]));
+    }
   }
 
   if (isset($_GET['purge']) && get_user_class() >= UC_MODERATOR) {
