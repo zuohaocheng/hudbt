@@ -46,7 +46,7 @@ if ($_GET["sent"] == 1) {
 </ul></div></td>
 </tr>
 <tr><td>Subject <input type="text" name="subject" size="75"></tr></td>
-<tr><td><textarea name="msg" cols="80" rows="15"><?php echo $body?></textarea></td></tr>
+<tr><td><textarea name="msg" cols="80" rows="15"></textarea></td></tr>
 <tr>
 <td colspan="1"><div align="center"><b>Sender:&nbsp;&nbsp;</b>
 <?php echo $CURUSER['username']?>
@@ -56,7 +56,6 @@ if ($_GET["sent"] == 1) {
 </div></td></tr>
 <tr><td colspan="1" align=center><input type=submit value="Send!" class=btn></td></tr>
 </table>
-<input type="hidden" name="receiver" value="<?php echo $receiver?>">
 </form>
 
 NOTE: Do not user BB codes. (NO HTML)

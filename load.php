@@ -31,8 +31,24 @@ if ($type == 'js') {
 }
 elseif ($type == 'css') {
   header('Content-type: text/css; charset=utf-8');
-  $theme = 0 + $_REQUEST['theme'];
-  $caticon = 0 + $_REQUEST['caticon'];
+  if (isset($_REQUEST['theme'])) {
+    $theme = 0 + $_REQUEST['theme'];
+  }
+  else {
+    $theme = get_css_id();
+  }
+
+  if (isset($_REQUEST['caticon'])) {
+    $caticon = 0 + $_REQUEST['caticon'];
+  }
+  else {
+    if (isset($CURUSER)) {
+      $caticon = $CURUSER['caticon'];
+    }
+    else {
+      $caticon = 0;
+    }
+  }
 }
 else {
   die('Invalid format');

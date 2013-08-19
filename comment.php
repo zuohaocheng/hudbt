@@ -167,7 +167,7 @@ if ($action == "add") {
 		$res2 = sql_query("SELECT comments.text, user FROM comments WHERE comments.id=$commentid") or sqlerr(__FILE__, __LINE__);
 
 		if (_mysql_num_rows($res2) != 1)
-			stderr($lang_forums['std_error'], $lang_forums['std_no_comment_id']);
+			stderr($lang_comment['std_error'], $lang_comment['std_no_comment_id']);
 
 		$arr2 = _mysql_fetch_assoc($res2);
 		$quote_input = '<input type="hidden" name="quote" value="' . $commentid . '" />';

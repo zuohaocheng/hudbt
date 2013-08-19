@@ -180,8 +180,8 @@ elseif ($returnto) {
 }
 
 stdhead();
-stdmsg($lang_takemessage['std_succeeded'], (($n_pms > 1) ? "$n".$lang_takemessage['std_messages_out_of']."$n_pms".$lang_takemessage['std_were'] : $lang_takemessage['std_message_was']).
-       $lang_takemessage['std_successfully_sent'] . ($l ? " $l profile comment" . (($l>1) ? $lang_takemessage['std_s_were'] : $lang_takemessage['std_was']) . $lang_takemessage['std_updated'] : ""));
+stdmsg($lang_takemessage['std_succeeded'], $lang_takemessage['std_message_was'].
+       $lang_takemessage['std_successfully_sent']);
 stdfoot();
 exit;
 

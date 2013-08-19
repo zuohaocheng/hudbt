@@ -142,7 +142,7 @@ echo "<thead><tr><th>".$lang_linksmanage['text_site_name']."</th><th>".$lang_lin
 $result = sql_query ("SELECT * FROM links ORDER BY id ASC");
 if ($row = _mysql_fetch_array($result)) {
   do {
-    echo "<tr><td>".htmlspecialchars($row["name"])."</td><td>".$row["url"]."</td><td>".$row["title"]. "</td><td align=center nowrap><b><a href=\"".$PHP_SELF."?action=edit&id=".$row["id"]."\">".$lang_linksmanage['text_edit']."</a>&nbsp;|&nbsp;<a href=\"javascript:confirm_delete('".$row["id"]."', '".$lang_linksmanage['js_sure_to_delete_link']."', '');\"><font color=red>".$lang_linksmanage['text_delete']."</font></a></b></td></tr>";
+    echo "<tr><td>".htmlspecialchars($row["name"])."</td><td>".$row["url"]."</td><td>".$row["title"]. "</td><td align=center nowrap><b><a href=\"?action=edit&id=".$row["id"]."\">".$lang_linksmanage['text_edit']."</a>&nbsp;|&nbsp;<a href=\"javascript:confirm_delete('".$row["id"]."', '".$lang_linksmanage['js_sure_to_delete_link']."', '');\"><font color=red>".$lang_linksmanage['text_delete']."</font></a></b></td></tr>";
   } while($row = _mysql_fetch_array($result));
 }
 else {

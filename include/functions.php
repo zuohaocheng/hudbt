@@ -1020,7 +1020,7 @@ function EmailAllowed($newEmail) {
     $newEmail = trim(strtolower($newEmail));
     $sql = sql_query("SELECT * FROM allowedemails") or sqlerr(__FILE__, __LINE__);
     $list = _mysql_fetch_array($sql);
-    $addresses = explode(' ', preg_replace("/[[:space:]]+/", " ", trim($list[value])) );
+    $addresses = explode(' ', preg_replace("/[[:space:]]+/", " ", trim($list['value'])) );
 
     if (count($addresses) > 0) {
       foreach ( $addresses as $email ) {
@@ -1625,10 +1625,10 @@ function userlogin() {
   if ($i > 10) {
     write_file_log('access', implode(' ', [$key, $i, $ip, $_SERVER['REQUEST_URI']]));
     if ($i > 100) {
-      header('HTTP/1.0 403 Forbidden');
-      stderr('你好', '蝴蝶娘拿着黑名单看着你');
       $Cache->cache_value('user_access_deny_' . $row['id'], true, 300);
       write_log('access_deny', implode(' ', [date('r'), $row['id']]));
+      header('HTTP/1.0 403 Forbidden');
+      stderr('你好', '蝴蝶娘拿着黑名单看着你');
     }
   }
 

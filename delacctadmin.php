@@ -6,10 +6,7 @@ if (get_user_class() >= $cruprfmanage_class) {
 }
 
 $userid = 0 + trim($_POST["userid"]);
-
-if ($userid == $CURUSER['id']) {
-  $self = true;
-}
+$self = ($userid == $CURUSER['id']);
 
 if (!isset($manager) && !$self) {
   stderr("Error", "Permission denied.");

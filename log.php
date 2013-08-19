@@ -235,7 +235,9 @@ else {
 	  $topicid = substr($topic_left,6,(strpos($topic_left,' ')===false?strpos($topic_left,'.'):strpos($topic_left,' ')) -6);
 	}
 	//replace name, topicid with proper bbcode
-	$txt_bb = str_replace($topicid, '[topic='.$topicid.']', $txt_bb);
+	if (isset($topicid)) {
+	  $txt_bb = str_replace($topicid, '[topic='.$topicid.']', $txt_bb);
+	}
 	$name = substr($txt, strrpos($txt, ' ')+1, -1);
 	$txt_bb = str_replace($name, '[name='.$name.']', $txt_bb);
 	$txt_parsed = format_comment($txt_bb);

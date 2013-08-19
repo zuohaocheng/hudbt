@@ -35,10 +35,12 @@ $notice = "<h1 align=\"center\"><a class=\"faqlink\" href=\"settings.php\">".$la
 if ($action == 'savesettings_main')	// save main
 {
 	stdhead($lang_settings['head_save_main_settings']);
-	$validConfig = array('site_online','max_torrent_size','announce_interval', 'annintertwoage', 'annintertwo', 'anninterthreeage', 'anninterthree', 'signup_timeout','minoffervotes','offervotetimeout','offeruptimeout','maxsubsize','postsperpage', 'topicsperpage', 'torrentsperpage', 'maxnewsnum','stickylimit','max_dead_torrent_time','maxusers','torrent_dir', 'iniupload','SITEEMAIL', 'ACCOUNTANTID', 'ALIPAYACCOUNT', 'PAYPALACCOUNT', 'SLOGAN', 'icplicense', 'autoclean_interval_one', 'autoclean_interval_two', 'autoclean_interval_three','autoclean_interval_four', 'autoclean_interval_five','reportemail','invitesystem','registration','showhotmovies','showclassicmovies','showimdbinfo', 'enablenfo', 'enableschool','restrictemail','showpolls','showstats','showlastxtorrents', 'showtrackerload','showshoutbox','showfunbox','showoffer','sptime','showhelpbox','enablebitbucket', 'smalldescription','altname','extforum','extforumurl','defaultlang','defstylesheet', 'donation','spsct','browsecat','specialcat','waitsystem','maxdlsystem','bitbucket','torrentnameprefix', 'showforumstats','verification','invite_count','invite_timeout', 'seeding_leeching_time_calc_start','startsubid', 'logo');
+	$validConfig = array('site_online','max_torrent_size','announce_interval', 'annintertwoage', 'annintertwo', 'anninterthreeage', 'anninterthree', 'signup_timeout','minoffervotes','offervotetimeout','offeruptimeout','maxsubsize','postsperpage', 'topicsperpage', 'torrentsperpage', 'maxnewsnum','stickylimit','max_dead_torrent_time','maxusers','torrent_dir', 'iniupload','SITEEMAIL', 'ACCOUNTANTID', 'ALIPAYACCOUNT', 'PAYPALACCOUNT', 'SLOGAN', 'icplicense', 'autoclean_interval_one', 'autoclean_interval_two', 'autoclean_interval_three','autoclean_interval_four', 'autoclean_interval_five','reportemail','invitesystem','registration','showhotmovies','showclassicmovies','showimdbinfo', 'enablenfo', 'enableschool','restrictemail','showpolls','showstats','showlastxtorrents', 'showtrackerload','showshoutbox','showfunbox','showoffer','sptime','showhelpbox','enablebitbucket', 'smalldescription','extforum','extforumurl','defaultlang','defstylesheet', 'donation','spsct','browsecat','specialcat','waitsystem','maxdlsystem','bitbucket','torrentnameprefix', 'showforumstats','verification','invite_count','invite_timeout', 'seeding_leeching_time_calc_start','startsubid', 'logo');
 	GetVar($validConfig);
 	foreach($validConfig as $config) {
-		$MAIN[$config] = $$config;
+	  if (isset($$config)) {
+	    $MAIN[$config] = $$config;
+	  }
 	}
 
 	WriteConfig('MAIN', $MAIN);

@@ -1,9 +1,9 @@
 <?php
 require_once('include/bittorrent.php');
 dbconn();
+loggedinorreturn();
 require_once(get_langfile_path('mybonus.php'));
 require(get_langfile_path('mybonus.php',true));
-loggedinorreturn();
 parked();
 require_once('include/bonus.php');
 

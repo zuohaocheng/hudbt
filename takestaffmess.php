@@ -4,9 +4,7 @@ if ($_SERVER["REQUEST_METHOD"] != "POST")
 	stderr("Error", "Permission denied!");
 dbconn();
 loggedinorreturn();                                                    
-
-if (get_user_class() < UC_ADMINISTRATOR)
-	stderr("Sorry", "Permission denied.");
+checkPrivilegePanel('staffmess');
 
 $sender_id = ($_POST['sender'] == 'system' ? 0 : (int)$CURUSER['id']);
 $msg = trim($_POST['msg']);
@@ -19,9 +17,9 @@ if (is_array($updateset)) {
 			stderr("Error","Invalid Class");
 	}
 }else{
-	if (!is_valid_id($updateset) && $updateset != 0)
-		stderr("Error","Invalid Class");
+  stderr("Error","Invalid Class");
 }
+
 $subject = trim($_POST['subject']);
 $query = sql_query("SELECT id FROM users WHERE class IN (".implode(",", $updateset).")");
 while($dat=_mysql_fetch_assoc($query)) {
