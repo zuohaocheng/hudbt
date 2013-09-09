@@ -878,10 +878,10 @@ function get_external_tr($imdb_url = "", $dl = false) {
       $imdbNumber = parse_imdb_id($imdb_url);
       if ($showextinfo['imdb'] == 'yes') {
 	if ($dl) {
-	  dl_item($lang_functions['row_imdb_url'],  "<input type=\"text\" style=\"width: 650px;\" name=\"url\" placeholder=\"格式为 http://www.imdb.com/title/tt0123456/ 或 tt0123456\" value=\"".($imdbNumber ? "http://www.imdb.com/title/tt".parse_imdb_id($imdb_url) : "")."\" /><br /><font class=\"medium\">".$lang_functions['text_imdb_url_note']."</font>", 1);
+	  dl_item($lang_functions['row_imdb_url'],  "<input type=\"text\" class=\"colspan\" name=\"url\" placeholder=\"格式为 http://www.imdb.com/title/tt0123456/ 或 tt0123456\" value=\"".($imdbNumber ? "http://www.imdb.com/title/tt".parse_imdb_id($imdb_url) : "")."\" /><br /><font class=\"medium\">".$lang_functions['text_imdb_url_note']."</font>", 1);
 	}
 	else {
-	  tr($lang_functions['row_imdb_url'],  "<input type=\"text\" style=\"width: 650px;\" name=\"url\" placeholder=\"格式为 http://www.imdb.com/title/tt0123456/ 或 tt0123456\" value=\"".($imdbNumber ? "http://www.imdb.com/title/tt".parse_imdb_id($imdb_url) : "")."\" /><br /><font class=\"medium\">".$lang_functions['text_imdb_url_note']."</font>", 1);
+	  tr($lang_functions['row_imdb_url'],  "<input type=\"text\" class=\"colspan\" name=\"url\" placeholder=\"格式为 http://www.imdb.com/title/tt0123456/ 或 tt0123456\" value=\"".($imdbNumber ? "http://www.imdb.com/title/tt".parse_imdb_id($imdb_url) : "")."\" /><br /><font class=\"medium\">".$lang_functions['text_imdb_url_note']."</font>", 1);
 	}
       }
 }
@@ -3472,6 +3472,10 @@ foreach($rows as $row)
       $is_new = true;
     }
 
+    if ($row['dl_url']) {
+      echo '<li>[网盘]</li>';
+    }
+
     $banned_torrent = ($row["banned"] == 'yes' ? " <li>(<span class=\"striking\">".$lang_functions['text_banned']."</span>)</li>" : "");
     print($banned_torrent.$picked_torrent.$sp_torrent .'</ul></div><div class="torrent-title">' );
     if ($displaysmalldescr){
@@ -3482,8 +3486,15 @@ foreach($rows as $row)
     echo '</div>';
     
       $act = "";
-      if ($CURUSER["downloadpos"] != "no")
-      $act .= "<li><a href=\"//$BASEURL/download.php?id=".$id."\"><img class=\"download\" src=\"//$BASEURL/pic/trans.gif\" style='padding-bottom: 2px;' alt=\"download\" title=\"".$lang_functions['title_download_torrent']."\" /></a></li>" ;
+      if ($CURUSER["downloadpos"] != "no") {
+	if ($row['info_hash']) {
+	  $url = "//$BASEURL/download.php?id=".$id;
+	}
+	else {
+	  $url = $row['dl_url'];
+	}
+	  $act .= "<li><a href=\"" . $url ."\"><img class=\"download\" src=\"//$BASEURL/pic/trans.gif\" style='padding-bottom: 2px;' alt=\"download\" title=\"".$lang_functions['title_download_torrent']."\" /></a></li>" ;
+      }
         $act .= "<li><a class=\"bookmark\" torrent=\"$id\" href=\"#\">".get_torrent_bookmark_state($CURUSER['id'], $id)."</a></li>";
       
 

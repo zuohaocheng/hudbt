@@ -39,6 +39,12 @@ $args = [];
 //$shortfname = $matches[1];
 //$dname = $row["save_as"];
 
+$dl_url = trim($_POST['dl-url']);
+if($dl_url && !filter_var($dl_url, FILTER_VALIDATE_URL)) {
+  bark('无效的下载链接');
+}
+$updateset[] = 'dl_url = ' . sqlesc($dl_url);
+
 $url = parse_imdb_id($_POST['url']);
 
 if ($enablenfo_main=='yes'){

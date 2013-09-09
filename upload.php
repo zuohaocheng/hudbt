@@ -49,14 +49,16 @@ stdhead($lang_upload['head_upload']);
   <dl class="table">
     <?php
 	dl_item($lang_upload['row_torrent_file'], "<input type=\"file\" class=\"file\" id=\"torrent\" name=\"file\" data-url=\"torrentupload.php\" required=\"required\" />\n", 1, 'required');
+	dl_item('下载链接', '<input type="url" name="dl-url" class="colspan" placeholder="可填网盘链接、在线视频地址等" />', true);
+	# 若填了此项可以不上传种子"><br/>文件大小: <input type="number" min="0" name="filesize" placeholder="若无上传种子，建议填写" style="width: 200px" /> MiB', true);
 	if ($altname_main == 'yes'){
 	  dl_item($lang_upload['row_torrent_name'], "<b>".$lang_upload['text_english_title']."</b>&nbsp;<input type=\"text\" style=\"width: 250px;\" name=\"name\" />&nbsp;&nbsp;&nbsp;
 	  <b>".$lang_upload['text_chinese_title']."</b>&nbsp;<input type=\"text\" style=\"width: 250px\" name=\"cnname\" ><br /><span class=\"medium\">".$lang_upload['text_titles_note']."</span>", 1);
 	}
 	else
-	  dl_item($lang_upload['row_torrent_name'], "<input type=\"text\" style=\"width: 650px;\" id=\"name\" name=\"name\" required=\"required\" /><div class=\"medium\">".$lang_upload['text_torrent_name_note']."</div>", 1, 'required');
+	  dl_item($lang_upload['row_torrent_name'], "<input type=\"text\" class=\"colspan\" id=\"name\" name=\"name\" required=\"required\" /><div class=\"medium\">".$lang_upload['text_torrent_name_note']."</div>", 1, 'required');
 	if ($smalldescription_main == 'yes')
-	  dl_item($lang_upload['row_small_description'], "<input type=\"text\" style=\"width: 650px;\" name=\"small_descr\" /><div class=\"medium\">".$lang_upload['text_small_description_note']."</div>", 1);
+	  dl_item($lang_upload['row_small_description'], "<input type=\"text\" class=\"colspan\" name=\"small_descr\" /><div class=\"medium\">".$lang_upload['text_small_description_note']."</div>", 1);
 	
 	get_external_tr('', true);
 	if ($enablenfo_main=='yes')

@@ -54,9 +54,10 @@ if (isset($_GET["returnto"]))
   print("<input type=\"hidden\" name=\"returnto\" value=\"" . htmlspecialchars($_GET["returnto"]) . "\" />");
 print('<h1 id="page-title">'.htmlspecialchars($row["name"])."</h1>");
 echo '<dl class="table">';
-dl_item('<span class="required">' . $lang_edit['row_torrent_name']."</span>", "<input type=\"text\" style=\"width: 650px;\" name=\"name\" value=\"" . htmlspecialchars($row["name"]) . "\" />", 1);
+dl_item('下载链接', '<input type="url" name="dl-url" class="colspan" value="' . $row['dl_url'] . '" placeholder="可填网盘链接、在线视频地址等">', true);
+dl_item('<span class="required">' . $lang_edit['row_torrent_name']."</span>", "<input type=\"text\" class=\"colspan\" name=\"name\" value=\"" . htmlspecialchars($row["name"]) . "\" />", 1);
 if ($smalldescription_main == 'yes') {
-  dl_item($lang_edit['row_small_description'], "<input type=\"text\" style=\"width: 650px;\" name=\"small_descr\" value=\"" . htmlspecialchars($row["small_descr"]) . "\" />", 1);
+  dl_item($lang_edit['row_small_description'], "<input type=\"text\" class=\"colspan\" name=\"small_descr\" value=\"" . htmlspecialchars($row["small_descr"]) . "\" />", 1);
 }
 
 get_external_tr($row["url"], true);

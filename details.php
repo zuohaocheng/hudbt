@@ -27,7 +27,7 @@ if ($id > $max_id) {
   stderr($lang_details['std_error'], $lang_details['std_no_torrent_id']);  
 }
 
-$row = sql_query("SELECT torrents.cache_stamp, torrents.storing, torrents.sp_state, torrents.url, torrents.small_descr, torrents.seeders, torrents.banned, torrents.leechers, torrents.info_hash, torrents.filename, nfo, LENGTH(torrents.nfo) AS nfosz, torrents.last_action, torrents.name, torrents.owner, torrents.save_as, torrents.descr, torrents.visible, torrents.size, torrents.added, torrents.promotion_time_type, torrents.promotion_until, torrents.views, torrents.hits, torrents.times_completed, torrents.id, torrents.type, torrents.numfiles, torrents.anonymous, torrents.startseed, torrents.category, categories.name AS cat_name, sources.name AS source_name, medium, media.name AS medium_name, codec, codecs.name AS codec_name, standard, standards.name AS standard_name, processings.name AS processing_name, team, teams.name AS team_name, audiocodecs.name AS audiocodec_name FROM torrents LEFT JOIN categories ON torrents.category = categories.id LEFT JOIN sources ON torrents.source = sources.id LEFT JOIN media ON torrents.medium = media.id LEFT JOIN codecs ON torrents.codec = codecs.id LEFT JOIN standards ON torrents.standard = standards.id LEFT JOIN processings ON torrents.processing = processings.id LEFT JOIN teams ON torrents.team = teams.id LEFT JOIN audiocodecs ON torrents.audiocodec = audiocodecs.id WHERE torrents.id = ? LIMIT 1", [$id])->fetch();
+$row = sql_query("SELECT torrents.cache_stamp, torrents.storing, torrents.sp_state, torrents.url, torrents.small_descr, torrents.seeders, torrents.banned, torrents.leechers, torrents.info_hash, torrents.filename, nfo, LENGTH(torrents.nfo) AS nfosz, torrents.last_action, torrents.name, torrents.owner, torrents.save_as, torrents.descr, torrents.visible, torrents.size, torrents.added, torrents.promotion_time_type, torrents.promotion_until, torrents.views, torrents.hits, torrents.times_completed, torrents.id, torrents.dl_url, torrents.type, torrents.numfiles, torrents.anonymous, torrents.startseed, torrents.category, categories.name AS cat_name, sources.name AS source_name, medium, media.name AS medium_name, codec, codecs.name AS codec_name, standard, standards.name AS standard_name, processings.name AS processing_name, team, teams.name AS team_name, audiocodecs.name AS audiocodec_name FROM torrents LEFT JOIN categories ON torrents.category = categories.id LEFT JOIN sources ON torrents.source = sources.id LEFT JOIN media ON torrents.medium = media.id LEFT JOIN codecs ON torrents.codec = codecs.id LEFT JOIN standards ON torrents.standard = standards.id LEFT JOIN processings ON torrents.processing = processings.id LEFT JOIN teams ON torrents.team = teams.id LEFT JOIN audiocodecs ON torrents.audiocodec = audiocodecs.id WHERE torrents.id = ? LIMIT 1", [$id])->fetch();
 
 if (!$row) {
   header("HTTP/1.1 410 Gone");  
@@ -63,7 +63,7 @@ else {
     $sp_torrent = get_torrent_promotion_append($row['sp_state'],"",true,$row["added"], $row['promotion_time_type'], $row['promotion_until']);
 
     $s=htmlspecialchars($row["name"]);
-    print('<h1 id="page-title">'.$s.'</h1><a id="top"></a>');
+    print('<h1 id="page-title">'.$s. "<a class=\"bookmark\" torrent=\"" . $row['id'] . "\" href=\"#\">".get_torrent_bookmark_state($CURUSER['id'], $row['id'], false)."</a>" . '</h1><a id="top"></a>');
     echo '<div class="minor-list" style="text-align:center;font-size:120%;"><ul>';
 
     if ($sp_torrent) {
@@ -108,12 +108,36 @@ else {
     
     if ($CURUSER["downloadpos"] != "no") {
 
-	  $uploadtime = $lang_details['text_at'].$row['added'];
-	
-	$dt= $lang_details['row_download'];
-	$dd = ("<a class=\"index\" href=\"download.php?id=$id\">" . htmlspecialchars($torrentnameprefix ."." .$row["save_as"]) . ".torrent</a>&nbsp;&nbsp;<a class=\"bookmark\" torrent=\"" . $row['id'] . "\" href=\"#\">".get_torrent_bookmark_state($CURUSER['id'], $row['id'], false)."</a><br />".$lang_details['row_upped_by']."&nbsp;".$uprow.$uploadtime);
-	dl_item($dt, $dd, true);
+      $dt= $lang_details['row_download'];
+      $uploadtime = $lang_details['text_at'].$row['added'];
+      if ($row['info_hash']) {
+	$dd = "<a class=\"index\" href=\"download.php?id=$id\">" . htmlspecialchars($torrentnameprefix ."." .$row["save_as"]) . ".torrent</a><br />";
+      }
+      else {
+	$dd = '';
+      }
+      $dd .= $lang_details['row_upped_by']."&nbsp;".$uprow.$uploadtime;
+      dl_item($dt, $dd, true);
 
+	if ($row['dl_url']) {
+	  $dl_sites = ['pan.baidu.com' => '百度网盘',
+		       'kuai.xunlei.com' => '迅雷快传',
+		       '115.com' => '115网盘',
+		       'yunpan.360.cn' => '360云盘',
+		       'www.weiyun.com' => '腾讯云盘',
+		       'dbank.com' => '华为网盘'];
+	  foreach ($dl_sites as $url => $name) {
+	    if (strpos($row['dl_url'], $url) !== false) {
+	      $title = $name;
+	      break;
+	    }
+	  }
+	  if (!isset($title)) {
+	    $title = $row['dl_url'];
+	  }
+	  
+	  dl_item('直接下载', '<a href="' . $row['dl_url'] . '">' . $title . '</a>', true);
+	}	
       }
     else {
       dl_item($lang_details['row_download'], $lang_details['text_downloading_not_allowed']);
@@ -546,7 +570,7 @@ else {
       return sprintf("%02x", ord($matches[0]));
     }
     
-    if ($enablenfo_main=='yes') {
+    if ($enablenfo_main=='yes' && $row['info_hash']) {
       dl_item($lang_details['row_torrent_info'], '<dl class="minor-list properties">' . $files_info . "<dt>".$lang_details['row_info_hash']."</dt><dd>".preg_replace_callback('/./s', "hex_esc", hash_pad($row["info_hash"]))."</dd>". (get_user_class() >= $torrentstructure_class ? "<dt>" . $lang_details['text_torrent_structure'] . "</dt><dd><a href=\"torrent_info.php?id=".$id."\">".$lang_details['text_torrent_info_note']."</a></dd>" : "") . "</dl>" . $files_detail, 1);
     }
     
@@ -619,8 +643,10 @@ else {
       }
     }
 
+    if ($row['info_hash']) {
     dl_item($lang_details['row_peers'] . '<br /><a class="sublink" id="showpeer" href="viewpeerlist.php?id='. $id . '">' . $lang_details['text_see_full_list'] . '</a><a class="sublink" id="hidepeer" style="display: none;" href="#">' . $lang_details['text_hide_list'] . '</a>',
        '<div id="peercount" class="minor-list list-seperator"><ul><li><span class="seeders">' . $row['seeders'] . '</span>' . $lang_details['text_seeders'] . add_s($row['seeders']) . '</li><li><span class="leechers">' . $row['leechers'] . '</span>' . $lang_details['text_leechers'] . add_s($row['leechers']) . "</li>" . $startseed . '</ul></div><div id="peerlist" style="display:none;"></div>' , true);
+    }
 /**************************Keepers*************************/
 	if($row['storing']==1){
 		echo "<dt>$lang_details[text_storing_keepers]</dt><dd>";

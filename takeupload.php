@@ -45,6 +45,11 @@ else {
 	$anon = $CURUSER["username"];
 }
 
+$dl_url = trim($_POST['dl-url']);
+if($dl_url && !filter_var($dl_url, FILTER_VALIDATE_URL)) {
+  bark('无效的下载链接');
+}
+
 $url = parse_imdb_id($_POST['url']);
 if (!$url) {
   $url = null;
@@ -95,17 +100,42 @@ if (!is_valid_id($catid)) {
 $torrent = unesc($_POST["name"]);
 
 if (isset($_FILES["file"])) {
-  $start = time();
-  include('include/upload.php');
-  $parse_time = time() - $start;
-  $write_torrent = function($id) use ($torrent_dir) {
-    global $dict;
-    $fp = fopen("$torrent_dir/$id.torrent", "w");
-    if ($fp) {
-      fwrite($fp, benc($dict), strlen(benc($dict)));
-      fclose($fp);
-    }
-  };
+  /* if ($_FILES['file']['error'] == UPLOAD_ERR_NO_FILE) { */
+  /*   if (!$dl_url) { */
+  /*     bark('必须上传种子或填写下载链接'); */
+  /*   } */
+  /*   else { */
+  /*     $id = get_single_value('torrents', 'id', 'WHERE dl_url=?', [$dl_url]); */
+  /*     if ($id) { */
+  /* 	bark('已经存在相同的种子了, <a href="//' . $BASEURL .'/details.php?id=' . $id . '">点击这里</a>', false); */
+  /*     } */
+  /*     $no_torrent = true; */
+      
+  /*     $filelist = []; */
+  /*     $totallen = 0 + $_POST['filesize'] * 1024 * 1024; */
+  /*     $fname = ''; */
+  /*     $type = 'single'; */
+  /*     $dname = ''; */
+  /*     $infohash = null; */
+  /*     $write_torrent = function($id) { */
+  /*     }; */
+  /*     $parse_time = 0; */
+  /*   } */
+  /* } */
+  /* else */ {
+    $no_torrent = false;
+    $start = time();
+    include('include/upload.php');
+    $parse_time = time() - $start;
+    $write_torrent = function($id) use ($torrent_dir) {
+      global $dict;
+      $fp = fopen("$torrent_dir/$id.torrent", "w");
+      if ($fp) {
+	fwrite($fp, benc($dict), strlen(benc($dict)));
+	fclose($fp);
+      }
+    };
+  }
 }
 /* else if (isset($_REQUEST['torrenthash'])) { */
 /*   $infohash = $_REQUEST['torrenthash']; */
@@ -209,7 +239,7 @@ if ($largesize_torrent && $totallen > ($largesize_torrent * 1073741824)) //Large
 		}
 	}
 }
-else{ //ramdom torrent promotion
+elseif (!$no_torrent) { //ramdom torrent promotion
 	$sp_id = mt_rand(1,100);
 	if($sp_id <= ($probability = $randomtwoupfree_torrent)) //2X Free
 		$sp_state = 4;
@@ -267,7 +297,14 @@ foreach ($promotionrules_torrent as $rule)
 
 $torrent = add_space_between_words($torrent);
 
-sql_query("INSERT INTO torrents (filename, owner, visible, anonymous, name, size, numfiles, type, url, small_descr, descr, ori_descr, category, source, medium, codec, audiocodec, standard, processing, team, save_as, sp_state, promotion_time_type, promotion_until, added, last_action, nfo, info_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), ?, ?)", [$fname, $CURUSER["id"], 'yes', $anonymous, $torrent, $totallen, count($filelist), $type, $url, $small_descr, $descr, $descr, $catid, $sourceid, $mediumid, $codecid, $audiocodecid, $standardid, $processingid, $teamid, $dname, $sp_state, $sp_time_type, $sp_until, $nfo, $infohash]);
+if ($no_torrent) {
+  $startseed = 'yes';
+}
+else {
+  $startseed = 'no';
+}
+
+sql_query("INSERT INTO torrents (filename, owner, visible, anonymous, name, size, numfiles, type, url, small_descr, descr, ori_descr, category, source, medium, codec, audiocodec, standard, processing, team, save_as, sp_state, promotion_time_type, promotion_until, added, last_action, nfo, info_hash, dl_url, startseed) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), ?, ?, ?, ?)", [$fname, $CURUSER["id"], 'yes', $anonymous, $torrent, $totallen, count($filelist), $type, $url, $small_descr, $descr, $descr, $catid, $sourceid, $mediumid, $codecid, $audiocodecid, $standardid, $processingid, $teamid, $dname, $sp_state, $sp_time_type, $sp_until, $nfo, $infohash, $dl_url, $startseed]);
 
 $id = _mysql_insert_id();
 
@@ -275,20 +312,22 @@ $Cache->cache_value('torrent_max_id', $id, 86400);
 
 sql_query("DELETE FROM files WHERE torrent = ?", [$id]);
 
-$sql = "INSERT INTO files (torrent, filename, size) VALUES (?,?,?)";
-$first = true;
-$args = [];
-foreach ($filelist as $file) {
-  if ($first) {
-    $first = false;
+if (!empty($filelist)) {
+  $sql = "INSERT INTO files (torrent, filename, size) VALUES (?,?,?)";
+  $first = true;
+  $args = [];
+  foreach ($filelist as $file) {
+    if ($first) {
+      $first = false;
+    }
+    else {
+      $sql .= ',(?,?,?)';
+    }
+    array_push($args, $id, $file[0], $file[1]);
   }
-  else {
-    $sql .= ',(?,?,?)';
-  }
-  array_push($args, $id, $file[0], $file[1]);
-}
 
-sql_query($sql, $args);
+  sql_query($sql, $args);
+}
 
 //===add karma
 KPS("+",$uploadtorrent_bonus,$CURUSER["id"]);
@@ -309,7 +348,11 @@ if ($Torrent->exists()) {
 
 //End of tcategory
 
-$location = "//$BASEURL/details.php?id=".htmlspecialchars($id)."&uploaded=1";
+
+$location = "//$BASEURL/details.php?id=".htmlspecialchars($id);
+if (!$no_torrent) {
+  $location .= "&uploaded=1";
+}
 
 if ($parse_time > 3) { // Slow, large torrent
   $time = ceil($parse_time / 5) * 5;

@@ -84,7 +84,7 @@ SET dest.seedbonus = dest.seedbonus + src.bonus * IF(dest.donor = "yes", :donort
 
 	//2.5.update torrents' visibility
 	$deadtime = deadtime() - $max_dead_torrent_time;
-	sql_query("UPDATE torrents SET visible='no' WHERE visible='yes' AND last_action < FROM_UNIXTIME($deadtime) AND seeders=0") or sqlerr(__FILE__, __LINE__);
+	sql_query("UPDATE torrents SET visible='no' WHERE visible='yes' AND last_action < FROM_UNIXTIME($deadtime) AND seeders=0 AND dl_url != ''") or sqlerr(__FILE__, __LINE__);
 	if ($printProgress) {
 		printProgress("update torrents' visibility");
 	}

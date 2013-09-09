@@ -855,7 +855,7 @@ if ($count) {
 
   $sql_extra_order_md5 = md5($sql_args . $orderby . $start);
   
-  $fields = 'torrents.id, torrents.sp_state, torrents.promotion_time_type, torrents.promotion_until, torrents.banned, torrents.picktype, torrents.pos_state, torrents.category, torrents.source, torrents.medium, torrents.codec, torrents.standard, torrents.processing, torrents.team, torrents.audiocodec, torrents.leechers, torrents.seeders, torrents.name, torrents.small_descr, torrents.times_completed, torrents.size, torrents.added, torrents.comments,torrents.anonymous,torrents.owner,torrents.url,torrents.oday, torrents.storing, torrents.pos_state_until';
+  $fields = 'torrents.id, torrents.sp_state, torrents.promotion_time_type, torrents.promotion_until, torrents.banned, torrents.picktype, torrents.pos_state, torrents.category, torrents.source, torrents.medium, torrents.codec, torrents.standard, torrents.processing, torrents.team, torrents.audiocodec, torrents.leechers, torrents.seeders, torrents.name, torrents.small_descr, torrents.times_completed, torrents.size, torrents.added, torrents.comments,torrents.anonymous,torrents.owner,torrents.url,torrents.oday, torrents.storing, torrents.pos_state_until, torrents.dl_url, torrents.info_hash';
 
     //Modified by bluemonster 20111026 & by Eggsorer 20120517
   function extraByState($state, $eq = true) {

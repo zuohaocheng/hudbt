@@ -642,6 +642,9 @@ pre, code {font-family:Menlo, Monaco, 'DejaVu Sans Mono', 'Bitstream Vera Sans M
     font-size:11px;
     margin-right:3px;
 }
+input.colspan {
+width: 650px;
+}
 input.text {
     margin-bottom:12px;
     width:95%;
