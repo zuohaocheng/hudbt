@@ -171,13 +171,14 @@ $psecret = md5($row['secret']);
 $ip = getip();
 $usern = htmlspecialchars($wantusername);
 $title = $SITENAME.$lang_takesignup['mail_title'];
+$link = "http://$BASEURL/confirm.php?id=$id&secret=$psecret";
 $body = <<<EOD
 {$lang_takesignup['mail_one']}$usern{$lang_takesignup['mail_two']}($email){$lang_takesignup['mail_three']}$ip{$lang_takesignup['mail_four']}
-<b><a href="javascript:void(null)" onclick="window.open('http://$BASEURL/confirm.php?id=$id&secret=$psecret')">
+<b><a href="$link" target="_blank" onclick="window.open('$link')">
 {$lang_takesignup['mail_this_link']} </a></b><br />
-http://$BASEURL/confirm.php?id=$id&secret=$psecret
+$link
 {$lang_takesignup['mail_four_1']}
-<b><a href="javascript:void(null)" onclick="window.open('http://$BASEURL/confirm_resend.php')">{$lang_takesignup['mail_here']}</a></b><br />
+<b><a href="http://$BASEURL/confirm_resend.php" target="_blank" onclick="window.open('http://$BASEURL/confirm_resend.php')">{$lang_takesignup['mail_here']}</a></b><br />
 http://$BASEURL/confirm_resend.php
 <br />
 {$lang_takesignup['mail_five']}

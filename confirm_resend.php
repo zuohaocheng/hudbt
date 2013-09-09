@@ -70,13 +70,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 	$id = $arr["id"];
 	$title = $SITENAME.$lang_confirm_resend['mail_title'];
 
+	$link = "http://$BASEURL/confirm.php?id=$id&secret=$psecret";
 $body = <<<EOD
 {$lang_confirm_resend['mail_one']}$usern{$lang_confirm_resend['mail_two']}($email){$lang_confirm_resend['mail_three']}$ip{$lang_confirm_resend['mail_four']}
-<b><a href="javascript:void(null)" onclick="window.open('http://$BASEURL/confirm.php?id=$id&secret=$psecret')">
+<b><a href="$link" target="_blank" onclick="window.open('$link')">
 {$lang_confirm_resend['mail_this_link']} </a></b><br />
-http://$BASEURL/confirm.php?id=$id&secret=$psecret
+$link
 {$lang_confirm_resend['mail_four_1']}
-<b><a href="javascript:void(null)" onclick="window.open('http://$BASEURL/confirm_resend.php')">{$lang_confirm_resend['mail_here']}</a></b><br />
+<b><a href="http://$BASEURL/confirm_resend.php" target="_blank" onclick="window.open('http://$BASEURL/confirm_resend.php')">{$lang_confirm_resend['mail_here']}</a></b><br />
 http://$BASEURL/confirm_resend.php
 <br />
 {$lang_confirm_resend['mail_five']}
