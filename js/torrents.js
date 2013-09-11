@@ -246,10 +246,13 @@ $(function() {
     //Handling quick delete
     if (isManager) {
 	target.on('click', '.staff-quick-delete', function(e) {
-	    var id = argsFromUri(this.href).id;
+	    var self = this,
+	    id = argsFromUri(this.href).id;
 	    if (id) {
 		e.preventDefault();
-		deleteTorrent(id);
+		deleteTorrent(id, function() {
+		    target.find('tr').has(self).fadeOut();
+		});
 	    }
 	}).on('click', '.staff-quick-edit', function (e) {
 	    var id = argsFromUri(this.href).id;
