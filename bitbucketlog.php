@@ -41,7 +41,7 @@ else {
     $url = str_replace(" ", "%20", htmlspecialchars("$bitbucket/$name"));
     print("<tr>");
     print("<td><center><a href=$url><img src=\"".$url."\" border=0 onLoad='SetSize(this, 400)'></a></center>");			
-    print("Uploaded by:  " . get_username($arr[owner]). "<br />");
+    print("Uploaded by:  " . get_username($arr['owner']). "<br />");
     print("(#$arr[id]) Filename: $name ($width&nbsp;x&nbsp;$height)");			
     if (get_user_class() >= UC_MODERATOR) {				
       print(" <b><a href=?delete=$arr[id]>[Delete]</a></b><br />");

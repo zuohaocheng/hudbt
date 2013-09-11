@@ -9,7 +9,7 @@ if (get_user_class() < $staffmem_class)
 	permissiondenied();
 
 
-if ($_POST['setdealt']){
+if ($_POST['setdealt'] && count($_POST['delcheater']) > 0){
 	$res = sql_query ("SELECT id FROM cheaters WHERE dealtwith=0 AND id IN (" . implode(", ", $_POST['delcheater']) . ")");
 	while ($arr = _mysql_fetch_assoc($res))
 		sql_query ("UPDATE cheaters SET dealtwith=1, dealtby = $CURUSER[id] WHERE id = $arr[id]") or sqlerr();

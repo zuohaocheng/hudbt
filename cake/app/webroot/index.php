@@ -99,6 +99,7 @@ if (!isset($NEXUSPHP)) {
   require_once('../../../include/bittorrent.php');
   dbconn();
   $dispatch = true;
+  define('HB_CAKE_DISPATCH', true);
 
   $s = smarty();
   $s->addTemplateDir('../../../templates');

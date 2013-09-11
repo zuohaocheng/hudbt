@@ -104,8 +104,8 @@ stdfoot();
 	$result = sql_query('SELECT * FROM loginattempts WHERE id =', [$id]);
 	$a = _mysql_fetch_array($result);
 	print("<table border=1 cellspacing=0 cellpadding=5 width=100%>\n");
-	print("<tr><td><p>IP Address: <b>".htmlspecialchars($a[ip])."</b></p>");
-	print("<p>Action Time: <b>".htmlspecialchars($a[added])."</b></p></tr></td>");
+	print("<tr><td><p>IP Address: <b>".htmlspecialchars($a['ip'])."</b></p>");
+	print("<p>Action Time: <b>".htmlspecialchars($a['added'])."</b></p></tr></td>");
 	print("<form method='post' action='maxlogin.php'>");
 	print("<input type='hidden' name='action' value='save'>");
 	print("<input type='hidden' name='id' value='$a[id]'>");
@@ -149,9 +149,9 @@ stdfoot();
 
 			while ($arr = _mysql_fetch_assoc($search))
 				  {
-				  	$r2 = sql_query("SELECT id,username FROM users WHERE ip=".sqlesc($arr[ip])) or sqlerr(__FILE__,__LINE__);
+				  	$r2 = sql_query("SELECT id,username FROM users WHERE ip=".sqlesc($arr['ip'])) or sqlerr(__FILE__,__LINE__);
 				  	$a2 = _mysql_fetch_assoc($r2);	
-				 	print("<tr><td align=>$arr[id]</td><td align=left>$arr[ip] " . ($a2[id] ? get_username($a2[id]) : "" ) . "</td><td align=left>$arr[added]</td><td align=left>$arr[attempts]</td><td align=left>".($arr[type] == "recover" ? "Recover Password Attempt!" : "Login Attempt!")."</td><td align=left>".($arr[banned] == "yes" ? "<font color=red><b>banned</b></font> <a href=maxlogin.php?action=unban&id=$arr[id]><font color=green>[<b>unban</b>]</font></a>" : "<font color=green><b>not banned</b></font> <a href=maxlogin.php?action=ban&id=$arr[id]><font color=red>[<b>ban</b>]</font></a>")."  <a OnClick=\"return confirm('Are you wish to delete this attempt?');\" href=maxlogin.php?action=delete&id=$arr[id]>[<b>delete</b></a>] <a href=maxlogin.php?action=edit&id=$arr[id]><font color=blue>[<b>edit</b></a>]</font></td></tr>\n");
+				 	print("<tr><td align=>$arr[id]</td><td align=left>$arr[ip] " . ($a2['id'] ? get_username($a2['id']) : "" ) . "</td><td align=left>$arr[added]</td><td align=left>$arr[attempts]</td><td align=left>".($arr['type'] == "recover" ? "Recover Password Attempt!" : "Login Attempt!")."</td><td align=left>".($arr['banned'] == "yes" ? "<font color=red><b>banned</b></font> <a href=maxlogin.php?action=unban&id=$arr[id]><font color=green>[<b>unban</b>]</font></a>" : "<font color=green><b>not banned</b></font> <a href=maxlogin.php?action=ban&id=$arr[id]><font color=red>[<b>ban</b>]</font></a>")."  <a OnClick=\"return confirm('Are you wish to delete this attempt?');\" href=maxlogin.php?action=delete&id=$arr[id]>[<b>delete</b></a>] <a href=maxlogin.php?action=edit&id=$arr[id]><font color=blue>[<b>edit</b></a>]</font></td></tr>\n");
 				  }
 	}
 	print("</table>\n");

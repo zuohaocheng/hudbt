@@ -10,7 +10,7 @@ $(function() {
 	else {
 	    wsUrl = 'ws://' + wsUrl;
 	}
-	var worker = new SharedWorker("js/wsworker.js", wsUrl);
+	var worker = new SharedWorker('//' + hb.constant.url.base + "/js/wsworker.js", wsUrl);
 	worker.port.addEventListener("message", function(e) {
 	    // New message pushed
 	    checkMsg();

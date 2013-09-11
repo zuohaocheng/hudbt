@@ -155,31 +155,25 @@ if ($action == "answermessage") {
         //        TAKE ANSWER        //
        //////////////////////////
 if ($action == "takeanswer") {
-  if ($_SERVER["REQUEST_METHOD"] != "POST")
-    die();
+  checkHTTPMethod('post');
 
-     $receiver = 0 + $_POST["receiver"];
-   $answeringto = $_POST["answeringto"];
+  $receiver = 0 + $_POST["receiver"];
+  $answeringto = $_POST["answeringto"];
 
-   int_check($receiver,true);
+  int_check($receiver,true);
 
-          $userid = $CURUSER["id"];
+  $userid = $CURUSER["id"];
+  $msg = trim($_POST["body"]);
 
-   			$msg = trim($_POST["body"]);
+  if (!$msg)
+    stderr($lang_staffbox['std_error'], $lang_staffbox['std_body_is_empty']);
 
-          $message = sqlesc($msg);
+  send_pm($userid, $receiver, '管理组信息回复', $msg);
 
-          $added = "'" . date("Y-m-d H:i:s") . "'";
-
-   if (!$msg)
-     stderr($lang_staffbox['std_error'], $lang_staffbox['std_body_is_empty']);
-
-send_pm($userid, $receiver, '管理组信息回复', $message);
-
-sql_query("UPDATE staffmessages SET answer=$message, answered='1', answeredby='$userid' WHERE id=$answeringto") or sqlerr(__FILE__, __LINE__);
-$Cache->delete_value('staff_new_message_count');
-        header("Location: staffbox.php?action=viewpm&pmid=$answeringto");
-        die;
+  sql_query("UPDATE staffmessages SET answer=?, answered='1', answeredby=? WHERE id=?", [$msg, $userid, $answeringto]);
+  $Cache->delete_value('staff_new_message_count');
+  header("Location: staffbox.php?action=viewpm&pmid=$answeringto");
+  die;
 }
          //////////////////////////
         // DELETE STAFF MESSAGE        //

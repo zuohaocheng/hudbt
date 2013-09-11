@@ -8,13 +8,15 @@ checkPrivilegePanel();
 $action = $_GET["action"];
 $pollid = $_GET["pollid"];
 
-if ($action == "edit")
-{
+if ($action == "edit") {
 	int_check($pollid,true);
 	$res = sql_query("SELECT * FROM polls WHERE id = $pollid") or sqlerr(__FILE__, __LINE__);
 	if (_mysql_num_rows($res) == 0)
 		stderr($lang_makepoll['std_error'], $lang_makepoll['std_no_poll_id']);
 	$poll = _mysql_fetch_array($res);
+}
+else {
+  $poll = [];
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST")

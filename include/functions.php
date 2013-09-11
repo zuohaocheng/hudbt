@@ -1626,7 +1626,7 @@ function userlogin() {
     write_file_log('access', implode(' ', [$key, $i, $ip, $_SERVER['REQUEST_URI']]));
     if ($i > 100) {
       $Cache->cache_value('user_access_deny_' . $row['id'], true, 300);
-      write_log('access_deny', implode(' ', [date('r'), $row['id']]));
+      write_file_log('access_deny', implode(' ', [date('r'), $row['id']]));
       header('HTTP/1.0 403 Forbidden');
       stderr('你好', '蝴蝶娘拿着黑名单看着你');
     }
@@ -2400,7 +2400,11 @@ function stdfoot() {
   $s->display('stdfoot.tpl');
 
   if (php_sapi_name() == 'fpm-fcgi') {
-    fastcgi_finish_request();
+    if (!defined('HB_CAKE_DISPATCH')) {
+      // "[CakeException] Blocks can only contain strings" will be raised
+      // if execute this function under some cases in Cake View
+      fastcgi_finish_request();
+    }
   }
   else {
     ob_flush();
@@ -2980,7 +2984,10 @@ function get_forum_row($forumid = 0) {
   }
   if (!$forumid)
     return $forums;
-  else return $forums[$forumid];
+  elseif (isset($forums[$forumid]))
+    return $forums[$forumid];
+  else
+    return null;
 }
 
 function get_forum_id($query_id = 0,$query_type = "topic") {
@@ -4492,7 +4499,7 @@ function get_forum_moderators($forumid, $plaintext = true)
   }
 
   if (!isset($moderatorsArray[$forumid])) {
-    return [];
+    return '';
   }
   $ret = (array)$moderatorsArray[$forumid];
 

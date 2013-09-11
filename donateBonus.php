@@ -11,6 +11,8 @@ if(empty($_POST)) {
 ob_start(); //Do not delete this line
 require_once("include/bittorrent.php");
 dbconn();
+loggedinorreturn();
+
 $amount = (int) $_POST['amount'];
 $now    = date('Y-m-d H:i:s');
 

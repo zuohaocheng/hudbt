@@ -175,10 +175,10 @@ if ($_GET["off_details"]){
 	$status="<span class=\"offer-denied\">".$lang_offers['text_denied']."</span>";
 	tr($lang_offers['row_status'], $status, 1);
 //=== if you want to have a pending thing for uploaders use this next bit
-	if (get_user_class() >= $offermanage_class && $num["allowed"] == "pending")
-	tr($lang_offers['row_allow'], "<table><tr><td class=\"embedded\"><form method=\"post\" action=\"?allow_offer=1\"><input type=\"hidden\" value=\"".$id."\" name=\"offerid\" />".
-	"<input class=\"btn\" type=\"submit\" value=\"".$lang_offers['submit_allow']."\" />&nbsp;&nbsp;</form></td><td class=\"embedded\"><form method=\"post\" action=\"?id=".$id."&amp;finish_offer=1\">".
-	"<input type=\"hidden\" value=\"".$id."\" name=\"finish\" /><input class=\"btn\" type=\"submit\" value=\"".$lang_offers['submit_let_votes_decide']."\" /></form></td></tr></table>", 1);
+	/* if (get_user_class() >= $offermanage_class && $num["allowed"] == "pending") */
+	/* tr($lang_offers['row_allow'], "<table><tr><td class=\"embedded\"><form method=\"post\" action=\"?allow_offer=1\"><input type=\"hidden\" value=\"".$id."\" name=\"offerid\" />". */
+	/* "<input class=\"btn\" type=\"submit\" value=\"".$lang_offers['submit_allow']."\" />&nbsp;&nbsp;</form></td><td class=\"embedded\"><form method=\"post\" action=\"?id=".$id."&amp;finish_offer=1\">". */
+	/* "<input type=\"hidden\" value=\"".$id."\" name=\"finish\" /><input class=\"btn\" type=\"submit\" value=\"".$lang_offers['submit_let_votes_decide']."\" /></form></td></tr></table>", 1); */
 
 	$za = get_row_count('offervotes', "where vote='yeah' and offerid=$id");
 	$protiv = get_row_count('offervotes', "where vote='against' and offerid=$id");
@@ -309,6 +309,7 @@ if ($_GET["allow_offer"]) {
 //=== end allow the offer
 
 //=== allow offer by vote
+/*
 if ($_GET["finish_offer"]) {
 
 	if (get_user_class() < $offermanage_class)
@@ -348,7 +349,7 @@ if ($_GET["finish_offer"]) {
 		$msg = $lang_offers_target[get_user_lang($arr["userid"])]['msg_offer_voted_off']."[b][url=". get_protocol_prefix() . $BASEURL."/offers.php?id=$offid&off_details=1]" . $arr['name'] . "[/url][/b].".$lang_offers_target[get_user_lang($arr["userid"])]['msg_offer_deleted'] ;
 		sql_query ("UPDATE offers SET allowed = 'denied' WHERE id = $offid") or sqlerr(__FILE__,__LINE__);
 	}
-			//===use this line if you DO HAVE subject in your PM system
+
 	$subject = $lang_offers_target[get_user_lang($arr['userid'])]['msg_your_offer'].$arr['name'].$lang_offers_target[get_user_lang($arr['userid'])]['msg_voted_on'];
 	send_pm(0, $arr['userid'], $subject, $msg);
 	write_log("$CURUSER[username] closed poll $arr[name]",'normal');
@@ -356,6 +357,7 @@ if ($_GET["finish_offer"]) {
 	header("Refresh: 0; url=" . get_protocol_prefix() . "$BASEURL/offers.php");
 	die;
 }
+*/
 //===end allow offer by vote
 
 //=== edit offer

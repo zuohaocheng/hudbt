@@ -1,5 +1,5 @@
 <?php
-if (function_exists('sqlerr')) {
+if (function_exists('stdhead')) {
   stdhead($title_for_layout);
 }
 echo $content_for_layout;

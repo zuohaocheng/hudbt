@@ -784,7 +784,7 @@ EOD;
 					     ])) {
 		$hints = $lang_usercp['text_saved'];
 		$file = 'cache/users/' . $CURUSER['id'] . '.js';
-		if ($js_result == '') {
+		if ($js_result == '' && file_exists($file)) {
 		  unlink($file);
 		}
 		else {
@@ -845,7 +845,7 @@ EOD;
 				       ])) {
 	      $hints = $lang_usercp['text_saved'];
 	      $file = 'cache/users/' . $CURUSER['id'] . '.css';
-	      if ($css_result == '') {
+	      if ($css_result == '' && file_exists($file)) {
 		unlink($file);
 	      }
 	      else {

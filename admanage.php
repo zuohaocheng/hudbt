@@ -66,7 +66,7 @@ function get_type_name($type)
 }
 function print_ad_editor($position, $row = "")
 {
-	global $lang_admanage;
+  global $lang_admanage, $allowxhtmlclass;
 	switch ($position)
 	{
 		case 'header': 
@@ -109,6 +109,7 @@ function print_ad_editor($position, $row = "")
 	}
 	else
 	{
+	  $pararow = [];
 		$name = "";
 		$starttime = "";
 		$endtime = "";
