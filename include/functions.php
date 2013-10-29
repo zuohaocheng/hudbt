@@ -3175,12 +3175,195 @@ function torrentTableCake($torrents) {
   torrenttable($rows, []);
 }
 
+function torrent_td($row, $progress=[], $last_browse = TIMENOW) {
+  global $CURUSER;
+  global $BASEURL, $lang_functions, $smalldescription_main;
+  $displaysmalldescr = ($smalldescription_main != 'no');
+  $id = $row["id"];
+  $forcemode = 0;
+
+  //torrent name
+  $dispname = trim($row["name"]);
+  $short_torrent_name_alt = "title=\"".htmlspecialchars($dispname)."\"";
+
+  $count_dispname=mb_strlen($dispname,"UTF-8");
+  if (!$displaysmalldescr || $row["small_descr"] == "")// maximum length of torrent name
+    $max_length_of_torrent_name = 120;
+  else $max_length_of_torrent_name = 70;
+
+  if($count_dispname > $max_length_of_torrent_name) {
+    $dispname=mb_substr($dispname, 0, $max_length_of_torrent_name-2,"UTF-8") . "..";
+  }
+  
+  if ($row['pos_state'] =='sticky' ||  (($row['pos_state']=='random')&&($row['lucky']=="true"))) {
+    $stickyicon = "<img class=\"sticky\" src=\"//$BASEURL/pic/trans.gif\" alt=\"Sticky\" title=\"".$lang_functions['title_sticky'].$lang_functions['text_until'].$row['pos_state_until']."\" />";
+  }
+  else $stickyicon = "";
+  
+  if ($displaysmalldescr) {
+    $dissmall_descr = trim($row["small_descr"]);
+    $count_dissmall_descr=mb_strlen($dissmall_descr,"UTF-8");
+    $max_lenght_of_small_descr=$max_length_of_torrent_name; // maximum length
+    if($count_dissmall_descr > $max_lenght_of_small_descr) {
+      $dissmall_descr=mb_substr($dissmall_descr, 0, $max_lenght_of_small_descr-2,"UTF-8") . "..";
+    }
+  }
+  echo '<td class="torrent"><div>';
+
+  $color = '';
+  $title = '';
+  if ($row['owner'] == $CURUSER['id']) {
+    $color = 'uploaded';
+    $width = 125;
+    $title = '由我上传';
+    if (isset($progress[$row['id']])) {
+      $p = $progress[$row['id']];
+      if ($p['peer_id'] && $p['to_go'] == 0) {
+	$color .= ' seeding';
+	$title .= ', 正在做种';
+      }
+    }
+  }
+  else if (isset($progress[$row['id']])) {
+    $p = $progress[$row['id']];
+    if ($p['finished'] == 'yes') {
+      $width = 125;
+      if ($p['peer_id']) {
+	$color = 'seeding';
+	$title = '正在做种';
+      }
+      else {
+	$color = 'finished';
+	$title = '已完成';
+      }
+    }
+    else if ($p['to_go'] == 0) {
+      // 未下载，只做种
+      $width = 125;
+      if ($p['peer_id']) {
+	$color = 'seeding';
+	$title = '正在做种';
+      }
+      else {
+	$color = 'seeded';
+	$title = '曾做种';
+      }
+    }
+    else {
+      if ($p['peer_id']) {
+	$color = 'downloading';
+	$title = '正在下载';
+      }
+      else {
+	$color = 'downloaded';
+	$title = '已下载';
+      }
+      $percentage = round($p['to_go'] * 100 / $row['size']);
+      $title .= ', 进度约为' . (100 - $percentage) . '%';
+      $width = 95 - $percentage;
+    }
+  }
+
+  if ($title) {
+    echo '<div class="progress '.$color.'" title="' . $title . '" style="width:' . $width . '%"></div>';
+  }
+  
+  echo '<div class="limit-width minor-list"';
+  if ($title) {
+    echo ' title="' . $title . '"';
+  }
+  echo '><div class="torrent-title">'.$stickyicon."<h2 class='transparentbg'><a $short_torrent_name_alt href=\"//$BASEURL/details.php?id=".$id."&amp;hit=1\">".htmlspecialchars($dispname).'</a></h2><ul class="prs">';
+  $sp_torrent = get_torrent_promotion_append($row['sp_state'],"",true,$row["added"], $row['promotion_time_type'], $row['promotion_until']);
+  if ($sp_torrent != '') {
+    $sp_torrent = '<li>' . $sp_torrent . '</li>';
+  }
+
+  $picked_torrent = "";
+
+  if($row['picktype']=="hot")
+    $picked_torrent = "<li>[<span class='hot'>".$lang_functions['text_hot']."</span>]</li>";
+  elseif($row['picktype']=="classic")
+    $picked_torrent = "<li>[<span class='classic'>".$lang_functions['text_classic']."</span>]</li>";
+  elseif($row['picktype']=="recommended")
+    $picked_torrent = "<li>[<span class='recommended'>".$lang_functions['text_recommended']."</span>]</li>";
+  //Added by bluemonster 20111026
+  if($row['oday']=="yes") {
+      if ($forcemode == "" || $forcemode == 'icon'){  
+	//$picked_torrent = " <b>[<font class='recommended'>".$lang_functions['text_oday']."</font>]</b>";
+	$sp_torrent.="<li><img class=\"oday\" src=\"pic/trans.gif\" border=0 alt=\"0day\" title=\"".$lang_functions['text_oday']."\" /></li>";
+      }
+      else if ($forcemode == 'word'){
+	-     $sp_torrent.= "<li>[<span class='oday' ".$onmouseover.">".$lang_functions['text_oday']."</span>]</li>";
+      }
+    }
+
+  if ($row['storing'] == 1) {
+      if ( $forcemode == "" || $forcemode == 'icon'){  
+	$sp_torrent.="<li><img class=\"storing\" src=\"pic/trans.gif\" alt=\"storing\" title=\"".$lang_functions['text_storing']."\" /></li>";
+      }
+      else if ($forcemode == 'word'){
+	$sp_torrent.= "<li>[<span class='storing' ".$onmouseover.">".$lang_functions['text_storing']."</span>]</li>";
+      }
+    }
+  
+  if (strtotime($row["added"]) >= $last_browse) {
+    print("<li>(<span class='new'>".$lang_functions['text_new_uppercase']."</span>)</li>");
+    $is_new = true;
+  }
+
+  if ($row['dl_url']) {
+    echo '<li>[网盘]</li>';
+  }
+
+  $banned_torrent = ($row["banned"] == 'yes' ? " <li>(<span class=\"striking\">".$lang_functions['text_banned']."</span>)</li>" : "");
+  print($banned_torrent.$picked_torrent.$sp_torrent .'</ul></div><div class="torrent-title">' );
+  if ($displaysmalldescr){
+    //small descr
+    $escape_desc = htmlspecialchars($dissmall_descr);
+    print($dissmall_descr == "" ? "<h3 class='placeholder'></h3>" : '<h3 title="' . $escape_desc . '">'. $escape_desc . '</h3>');
+  }
+  echo '</div>';
+  
+  $act = "";
+  if ($CURUSER["downloadpos"] != "no") {
+    if ($row['info_hash']) {
+      $url = "//$BASEURL/download.php?id=".$id;
+    }
+    else {
+      $url = $row['dl_url'];
+    }
+    $act .= "<li><a href=\"" . $url ."\"><img class=\"download\" src=\"//$BASEURL/pic/trans.gif\" style='padding-bottom: 2px;' alt=\"download\" title=\"".$lang_functions['title_download_torrent']."\" /></a></li>" ;
+  }
+  $act .= "<li><a class=\"bookmark\" torrent=\"$id\" href=\"#\">".get_torrent_bookmark_state($CURUSER['id'], $id)."</a></li>";
+  
+
+  print('<div class="torrent-utilty-icons minor-list-vertical"><ul>'.$act."</ul></div>\n");
+
+  print('</td>');
+
+}
+
+function torrenttable_progress($torrents) {
+  global $CURUSER;
+  $progress = [];
+  if (!empty($torrents)) {
+    $sql = 'SELECT torrentid, snatched.to_go, finished, peers.id AS peer_id FROM snatched LEFT JOIN peers ON peers.torrent = snatched.torrentid AND peers.userid = snatched.userid WHERE torrentid IN (' . implode(',', $torrents) . ') AND snatched.userid=' . $CURUSER['id'];
+    $res = sql_query($sql);
+
+    foreach ($res as $row) {
+      $progress[$row['torrentid']] = $row;
+    }
+  }
+
+  return $progress;
+}
+
 function torrenttable($rows, $var) {
   global $Cache;
   global $lang_functions;
   global $CURUSER, $waitsystem;
   global $showextinfo;
-  global $torrentmanage_class, $smalldescription_main, $enabletooltip_tweak;
+  global $torrentmanage_class, $enabletooltip_tweak;
   global $CURLANGDIR, $browsecatmode;
   // Added Br BruceWolf. 2011-04-24
   // Filter banned torrents
@@ -3188,7 +3371,6 @@ function torrenttable($rows, $var) {
   global $torrent_tooltip, $BASEURL;
   global $USERUPDATESET;
 
-  $forcemode = 0;
   $variant = "torrent";
   $swap_headings = false;
   $onlyhead=false;
@@ -3304,9 +3486,6 @@ if ($caticonrow['secondicon'] == 'yes')
 $has_secondicon = true;
 else $has_secondicon = false;
 
-if ($smalldescription_main == 'no')
-  $displaysmalldescr = false;
-else $displaysmalldescr = true;
 GLOBAL $stickylimit;//置顶种子总数限制
 foreach($rows as $row)
 {
@@ -3329,185 +3508,9 @@ foreach($rows as $row)
       print("-");
     print("</td>\n");
 
-    //torrent name
-    $dispname = trim($row["name"]);
-    $short_torrent_name_alt = "";
-    $mouseovertorrent = "";
-    $tooltipblock = "";
-    $has_tooltip = false;
-
-    if (!$has_tooltip)
-      $short_torrent_name_alt = "title=\"".htmlspecialchars($dispname)."\"";
-    /* else{ */
-    /* $torrent_tooltip[$counter]['id'] = "torrent_" . $counter; */
-    /* $torrent_tooltip[$counter]['content'] = ""; */
-    /* $mouseovertorrent = "onmouseover=\"get_ext_info_ajax('".$torrent_tooltip[$counter]['id']."','".$url."','".$cache."','".$type."'); domTT_activate(this, event, 'content', document.getElementById('" . $torrent_tooltip[$counter]['id'] . "'), 'trail', false, 'delay',600,'lifetime',6000,'fade','both','styleClass','niceTitle', 'fadeMax',87, 'maxWidth', 500);\""; */
-    /* } */
-    $count_dispname=mb_strlen($dispname,"UTF-8");
-    if (!$displaysmalldescr || $row["small_descr"] == "")// maximum length of torrent name
-      $max_length_of_torrent_name = 120;
-    elseif ($CURUSER['fontsize'] == 'large')
-      $max_length_of_torrent_name = 60;
-    elseif ($CURUSER['fontsize'] == 'small')
-      $max_length_of_torrent_name = 80;
-    else $max_length_of_torrent_name = 70;
-
-    if($count_dispname > $max_length_of_torrent_name)
-      $dispname=mb_substr($dispname, 0, $max_length_of_torrent_name-2,"UTF-8") . "..";
-    if ($row['pos_state'] =='sticky' ||  (($row['pos_state']=='random')&&($row['lucky']=="true"))){
-      $stickyicon = "<img class=\"sticky\" src=\"//$BASEURL/pic/trans.gif\" alt=\"Sticky\" title=\"".$lang_functions['title_sticky'].$lang_functions['text_until'].$row['pos_state_until']."\" />";
-    }
-    else $stickyicon = "";
+    //TODO
+    torrent_td($row, $progress, $last_browse);
     
-    if ($displaysmalldescr) {
-      $dissmall_descr = trim($row["small_descr"]);
-      $count_dissmall_descr=mb_strlen($dissmall_descr,"UTF-8");
-      $max_lenght_of_small_descr=$max_length_of_torrent_name; // maximum length
-      if($count_dissmall_descr > $max_lenght_of_small_descr)
-      {
-        $dissmall_descr=mb_substr($dissmall_descr, 0, $max_lenght_of_small_descr-2,"UTF-8") . "..";
-      }
-
-    if ($swap_headings && $dissmall_descr != '') {
-       $buf = $dispname;
-       $dispname = $dissmall_descr;
-       $dissmall_descr = $buf;
-    }
-    }
-    echo '<td class="torrent"><div>';
-
-    $color = '';
-    $title = '';
-    if ($row['owner'] == $CURUSER['id']) {
-      $color = 'uploaded';
-      $width = 125;
-      $title = '由我上传';
-      if (isset($progress[$row['id']])) {
-	$p = $progress[$row['id']];
-	if ($p['peer_id'] && $p['to_go'] == 0) {
-	  $color .= ' seeding';
-	  $title .= ', 正在做种';
-	}
-      }
-    }
-    else if (isset($progress[$row['id']])) {
-      $p = $progress[$row['id']];
-      if ($p['finished'] == 'yes') {
-	$width = 125;
-	if ($p['peer_id']) {
-	  $color = 'seeding';
-	  $title = '正在做种';
-	}
-	else {
-	  $color = 'finished';
-	  $title = '已完成';
-	}
-      }
-      else if ($p['to_go'] == 0) {
-	// 未下载，只做种
-	$width = 125;
-	if ($p['peer_id']) {
-	  $color = 'seeding';
-	  $title = '正在做种';
-	}
-	else {
-	  $color = 'seeded';
-	  $title = '曾做种';
-	}
-      }
-      else {
-	if ($p['peer_id']) {
-	  $color = 'downloading';
-	  $title = '正在下载';
-	}
-	else {
-	  $color = 'downloaded';
-	  $title = '已下载';
-	}
-	$percentage = round($p['to_go'] * 100 / $row['size']);
-	$title .= ', 进度约为' . (100 - $percentage) . '%';
-	$width = 95 - $percentage;
-      }
-    }
-
-    if ($title) {
-      echo '<div class="progress '.$color.'" title="' . $title . '" style="width:' . $width . '%"></div>';
-    }
-    
-    echo '<div class="limit-width minor-list"';
-    if ($title) {
-      echo ' title="' . $title . '"';
-    }
-    echo '><div class="torrent-title">'.$stickyicon."<h2 class='transparentbg'><a $short_torrent_name_alt $mouseovertorrent href=\"//$BASEURL/details.php?id=".$id."&amp;hit=1\">".htmlspecialchars($dispname).'</a></h2><ul class="prs">';
-    $sp_torrent = get_torrent_promotion_append($row['sp_state'],"",true,$row["added"], $row['promotion_time_type'], $row['promotion_until']);
-    if ($sp_torrent != '') {
-      $sp_torrent = '<li>' . $sp_torrent . '</li>';
-    }
-
-    $picked_torrent = "";
-
-    if($row['picktype']=="hot")
-    $picked_torrent = "<li>[<span class='hot'>".$lang_functions['text_hot']."</span>]</li>";
-    elseif($row['picktype']=="classic")
-    $picked_torrent = "<li>[<span class='classic'>".$lang_functions['text_classic']."</span>]</li>";
-    elseif($row['picktype']=="recommended")
-    $picked_torrent = "<li>[<span class='recommended'>".$lang_functions['text_recommended']."</span>]</li>";
-    //Added by bluemonster 20111026
-    if($row['oday']=="yes")
-    {
-      if ($forcemode == "" || $forcemode == 'icon'){  
-      //$picked_torrent = " <b>[<font class='recommended'>".$lang_functions['text_oday']."</font>]</b>";
-      $sp_torrent.="<li><img class=\"oday\" src=\"pic/trans.gif\" border=0 alt=\"0day\" title=\"".$lang_functions['text_oday']."\" /></li>";
-      }
-      else if ($forcemode == 'word'){
--     $sp_torrent.= "<li>[<span class='oday' ".$onmouseover.">".$lang_functions['text_oday']."</span>]</li>";
-      }
-    }
-
-    if($row['storing']==1)
-    {
-      if ( $forcemode == "" || $forcemode == 'icon'){  
-      $sp_torrent.="<li><img class=\"storing\" src=\"pic/trans.gif\" alt=\"storing\" title=\"".$lang_functions['text_storing']."\" /></li>";
-      }
-      else if ($forcemode == 'word'){
--     $sp_torrent.= "<li>[<span class='storing' ".$onmouseover.">".$lang_functions['text_storing']."</span>]</li>";
-			}
-    }
-    
-    if (strtotime($row["added"]) >= $last_browse) {
-      print("<li>(<span class='new'>".$lang_functions['text_new_uppercase']."</span>)</li>");
-      $is_new = true;
-    }
-
-    if ($row['dl_url']) {
-      echo '<li>[网盘]</li>';
-    }
-
-    $banned_torrent = ($row["banned"] == 'yes' ? " <li>(<span class=\"striking\">".$lang_functions['text_banned']."</span>)</li>" : "");
-    print($banned_torrent.$picked_torrent.$sp_torrent .'</ul></div><div class="torrent-title">' );
-    if ($displaysmalldescr){
-      //small descr
-      $escape_desc = htmlspecialchars($dissmall_descr);
-      print($dissmall_descr == "" ? "<h3 class='placeholder'></h3>" : '<h3 title="' . $escape_desc . '">'. $escape_desc . '</h3>');
-    }
-    echo '</div>';
-    
-      $act = "";
-      if ($CURUSER["downloadpos"] != "no") {
-	if ($row['info_hash']) {
-	  $url = "//$BASEURL/download.php?id=".$id;
-	}
-	else {
-	  $url = $row['dl_url'];
-	}
-	  $act .= "<li><a href=\"" . $url ."\"><img class=\"download\" src=\"//$BASEURL/pic/trans.gif\" style='padding-bottom: 2px;' alt=\"download\" title=\"".$lang_functions['title_download_torrent']."\" /></a></li>" ;
-      }
-        $act .= "<li><a class=\"bookmark\" torrent=\"$id\" href=\"#\">".get_torrent_bookmark_state($CURUSER['id'], $id)."</a></li>";
-      
-
-    print('<div class="torrent-utilty-icons minor-list-vertical"><ul>'.$act."</ul></div>\n");
-
-    print('</td>');
     if (isset($wait) && $wait) {
       $elapsed = floor((TIMENOW - strtotime($row["added"])) / 3600);
       if ($elapsed < $wait)

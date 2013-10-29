@@ -982,19 +982,14 @@ else {
 #$timer_3_end = microtime(true); // debug
 #$timer_4_start = microtime(true); // debug
 
-$progress = [];
-if (isset($rows)) {
-  $ids = array_map(function($r) {
-      return $r['id'];
-    }, $rows);
-  if (!empty($ids)) {
-    $sql = 'SELECT torrentid, snatched.to_go, finished, peers.id AS peer_id FROM snatched LEFT JOIN peers ON peers.torrent = snatched.torrentid AND peers.userid = snatched.userid WHERE torrentid IN (' . implode(',', $ids) . ') AND snatched.userid=' . $CURUSER['id'];
-    $res = sql_query($sql) or sqlerr(__FILE__, __LINE__);
 
-    while ($row = _mysql_fetch_assoc($res)) {
-      $progress[$row['torrentid']] = $row;
-    }
-  }
+if (isset($rows)) {
+  $progress = torrenttable_progress(array_map(function($r) {
+      return $r['id'];
+      }, $rows));
+}
+else {
+  $progress = [];
 }
 
 if ($_REQUEST['format'] == 'json') {
