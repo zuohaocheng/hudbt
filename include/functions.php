@@ -5067,7 +5067,8 @@ function torrent_get_poster($id) {
 }
 
 function header_download_file($filename) {
-  if ( strpos($_SERVER['HTTP_USER_AGENT'], "IE") !== false) { 
+  if ( strpos($_SERVER['HTTP_USER_AGENT'], "IE") !== false ||
+       strpos($_SERVER['HTTP_USER_AGENT'], "Trident") !== false) { # There's no IE in IE 11 UA
     header ("Content-Disposition: attachment; filename=".str_replace("+", "%20", rawurlencode($filename)));
   }
   else {
