@@ -167,7 +167,7 @@ echo("</form>");
 print("<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />");
 
 
-unset($wherea);
+$wherea = '';
 
 $check_range = $_GET['check_range'];
 if($check_range == 'true') {

@@ -3,32 +3,20 @@ require_once("include/bittorrent.php");
 dbconn();
 require_once(get_langfile_path());
 loggedinorreturn();
-if ($_SERVER["REQUEST_METHOD"] == "POST")
-{
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	$torrentid = 0+$_POST['id'];
 	$type = $_POST['type'];
 	$hidenotice = $_POST['hidenotice'];
-	if (!$torrentid || !in_array($type,array('firsttime', 'client', 'ratio')))
-		die("error");
-	elseif ($type == 'firsttime')
-	{
+	if (!$torrentid || !in_array($type,array('firsttime', 'client', 'ratio'))) {
+	  die("error");
+	}
+	elseif ($type == 'client') {
+	  if ($hidenotice){
+	    update_user($CURUSER['id'], "showclienterror='no'");
+	  }
+	}
 
-		header("Location: " . get_protocol_prefix() . "$BASEURL/download.php?id=".$torrentid."&letdown=1");
-		die;
-	}
-	elseif ($type == 'client')
-	{
-		if ($hidenotice){
-			update_user($CURUSER['id'], "showclienterror='no'");
-		}
-		header("Location: " . get_protocol_prefix() . "$BASEURL/download.php?id=".$torrentid."&letdown=1");
-		die;
-	}
-	else
-	{
-		header("Location: " . get_protocol_prefix() . "$BASEURL/download.php?id=".$torrentid."&letdown=1");
-		die;
-	}
+	header("Location: " . get_protocol_prefix() . "$BASEURL/download.php?id=".$torrentid."&letdown=1");
 }
 else
 {
@@ -133,15 +121,13 @@ if ($torrentid)
 <form action="?" method="post"><p><?php echo $lang_downloadnotice['text_for_more_information_read']?><a class="faqlink" href="rules.php" target="_blank"><?php echo $lang_downloadnotice['text_rules']?></a><?php echo $lang_downloadnotice['text_and']?><a class="faqlink" href="faq.php" target="_blank"><?php echo $lang_downloadnotice['text_faq']?></a><br />
 <input type="hidden" name="id" value="<?php echo $torrentid?>" />
 <input type="hidden" name="type" value="<?php echo htmlspecialchars($type)?>" />
-<input type="checkbox" name="hidenotice" id="hidenotice" value="1"<?php echo $forcecheck ? " disabled=\"disabled\"" : " checked=\"checked\""?> /><label for="hidenotice"><?php echo $noticenexttime?></label>
-<?php
-if ($forcecheck)
-{
-?>
-<br /><input type="checkbox" name="letmedown" id="letmedown" value="<?php echo htmlspecialchars($type)?>" onclick="if (this.checked) {document.getElementById('continuedownload').disabled = false;}else{document.getElementById('continuedownload').disabled = true;}" /><label for="letmedown"><span class="big"><?php echo $lang_downloadnotice['text_let_me_download']?></span></label>
-<?php
-}
-?>
+<?php if (!$forcecheck) : ?>
+<input type="checkbox" name="hidenotice" id="hidenotice" value="1" checked="checked" />
+<?php endif ?>
+<label for="hidenotice"><?php echo $noticenexttime?></label>
+<?php if ($forcecheck) : ?>
+<br /><input type="checkbox" id="letmedown" onclick="void(document.getElementById('continuedownload').disabled = !this.checked)" /><label for="letmedown"><span class="big"><?php echo $lang_downloadnotice['text_let_me_download']?></span></label>
+<?php endif; ?>
 </p>
 <div><input type="submit" name="submit" id="continuedownload" style="font-size: 20pt; height: 40px;" value="<?php echo $lang_downloadnotice['submit_download_the_torrent']?>"<?php echo $forcecheck ? " disabled=\"disabled\"" : ""?> /></div>
 </form>

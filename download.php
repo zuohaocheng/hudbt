@@ -1,13 +1,7 @@
 <?php
 require_once("include/bittorrent.php");
 dbconn();
-// Commented by BruceWolf. 2011-03-11
-// loggedinorreturn();
-// global  $CURUSER;
-// if($CURUSER['username']=="guest"){
-//   stderr("错误", "联盟用户请到论坛联盟专区发帖申请注册下载帐号");
-//    die();
-// }
+
 $id = (int)$_GET["id"];
 if (!$id)
 	httperr();
@@ -27,28 +21,25 @@ if (isset($_GET['passkey'])){
 else
 {
 	loggedinorreturn();
+	parked();
 	// Added by BruceWolf. 2011-03-11
 	if($CURUSER['username']=="guest"){
 	   stderr("错误", "联盟用户请到论坛联盟专区发帖申请注册下载帐号");
 		die();
 	}
 	// End ||
-	parked();
+	
 	$letdown = $_GET['letdown'];
-	$noticequery = sprintf("SELECT COUNT(userid) FROM snatched where userid = %d",$CURUSER['id']);
-	$noticeres = sql_query($noticequery) or sqlerr(__FILE__, __LINE__);
-	$noticearr = _mysql_fetch_array($noticeres);
-	if (!$letdown && (!$noticearr[0]))
-	{
-		header("Location: " . get_protocol_prefix() . "$BASEURL/downloadnotice.php?torrentid=".$id."&type=firsttime");
-	}
-	elseif (!$letdown && $CURUSER['showclienterror'] == 'yes')
-	{
-		header("Location: " . get_protocol_prefix() . "$BASEURL/downloadnotice.php?torrentid=".$id."&type=client");
-	}
-	elseif (!$letdown && $CURUSER['leechwarn'] == 'yes')
-	{
-		header("Location: " . get_protocol_prefix() . "$BASEURL/downloadnotice.php?torrentid=".$id."&type=ratio");
+	if (!$letdown) {
+	  if ($CURUSER['showclienterror'] == 'yes') {
+	    header("Location: " . get_protocol_prefix() . "$BASEURL/downloadnotice.php?torrentid=".$id."&type=client");
+	  }
+	  elseif ($CURUSER['leechwarn'] == 'yes') {
+	    header("Location: " . get_protocol_prefix() . "$BASEURL/downloadnotice.php?torrentid=".$id."&type=ratio");
+	  }
+	  elseif (get_row_count('snatched', 'WHERE userid = ?', [$CURUSER['id']]) == 0) {
+	    header("Location: " . get_protocol_prefix() . "$BASEURL/downloadnotice.php?torrentid=".$id."&type=firsttime");
+	  }
 	}
 }
 //User may choose to download torrent from RSS. So log ip changes when downloading torrents.
@@ -69,11 +60,10 @@ if (@ini_get('output_handler') == 'ob_gzhandler' AND @ob_get_length() !== false)
 	header('Content-Encoding:');
 }
 */
-if ($_COOKIE["c_secure_tracker_ssl"] == base64("yeah"))
-$tracker_ssl = true;
-else
-$tracker_ssl = false;
-if ($tracker_ssl == true){
+
+$tracker_ssl = ($_COOKIE["c_secure_tracker_ssl"] == base64("yeah"));
+
+if ($tracker_ssl){
 	$ssl_torrent = "https://";
 	if ($https_announce_urls[0] != "")
 		$base_announce_url = $https_announce_urls[0];
@@ -105,13 +95,12 @@ if (strlen($CURUSER['passkey']) != 32) {
 	update_user($CURUSER['id'], 'passkey = ?', [$CURUSER['passkey']]);
 }
 
-/*
-*/
 $tracker = $ssl_torrent . $base_announce_url . "?passkey=$CURUSER[passkey]";
 $trackerlen = strlen($tracker);
 
 $torrent = file_get_contents($fn);
 
+// Replace announce string in torrent w/o parsing whole torrent, faster
 $announce_header = '8:announce';
 $ap = strpos($torrent, $announce_header);
 if ($ap !== false) {
@@ -119,11 +108,11 @@ if ($ap !== false) {
   $otorrent = substr($torrent, 0, $ap);
 
   $slen = '';
-  while (true) {
+  while (true) { // Get length of original tracker string
     $ch = $torrent[$ap];
     $ap += 1;
     $slen .= $ch;
-    if (!is_numeric($ch)) {
+    if (!is_numeric($ch)) { // The char here should be ':'
       break;
     }
   }

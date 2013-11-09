@@ -101,7 +101,7 @@ stdfoot();
 }elseif ($action == 'edit') {
 	check($id);	
 	stdhead ("Max. Login Attemps - EDIT (".htmlspecialchars($id).")");	
-	$result = sql_query('SELECT * FROM loginattempts WHERE id =', [$id]);
+	$result = sql_query('SELECT * FROM loginattempts WHERE id = ?', [$id]);
 	$a = _mysql_fetch_array($result);
 	print("<table border=1 cellspacing=0 cellpadding=5 width=100%>\n");
 	print("<tr><td><p>IP Address: <b>".htmlspecialchars($a['ip'])."</b></p>");
