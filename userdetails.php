@@ -546,7 +546,7 @@ stdhead($lang_userdetails['head_details_for']. $user["username"]);
 	  print('<div class="table td text center">');
 	  print("<form id=\"del-user\" method=\"post\" action=\"delacctadmin.php\"><input name=\"userid\" size=\"10\" type=\"hidden\" value=\"". $user["id"] ."\" />");
 	  if ($user['id'] == $CURUSER['id']) {
-	    echo '<label>用户密码<input type="password" name="password" /></label>';
+	    echo '<label>用户密码<input type="password" name="password" autocomplete="off" /></label>';
 	  }
 	  else {
 	    echo "<label><input id=\"delenable\" type=\"checkbox\" />". $lang_userdetails['text_delete_user'] ."</label>";
