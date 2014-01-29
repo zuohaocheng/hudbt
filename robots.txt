@@ -1,0 +1,6 @@
+# Prevent crawler get passkey
+User-agent: *
+Disallow: /announce.php*
+Disallow: /cron.php
+
+Host: www.kmgtp.org 

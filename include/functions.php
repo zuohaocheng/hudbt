@@ -285,6 +285,8 @@ function get_single_value($table, $field, $suffix = "", $args = []) {
 }
 
 function checkPrivilegePanel($item = '') {
+  header('X-Robots-Tag: noindex');
+
   if ($item == '') {
     $file = substr(strrchr($_SERVER['SCRIPT_NAME'],'/'),1);
     $item = str_replace('.php', '', $file);

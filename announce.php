@@ -2,6 +2,8 @@
 require_once('include/bittorrent_announce.php');
 require_once('include/benc.php');
 
+header('X-Robots-Tag: noindex');
+
 //detect server supports ipv6
 $server_ipv6 = (strpos($_SERVER['SERVER_ADDR'], ':') !== false);
 
