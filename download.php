@@ -5,11 +5,13 @@ dbconn();
 $id = (int)$_GET["id"];
 if (!$id)
 	httperr();
-if (isset($_GET['passkey'])){
-  $passkey = $_GET['passkey'];
 
-	$res = sql_query("SELECT * FROM users WHERE passkey=". sqlesc($passkey)." LIMIT 1");
+if (isset($_GET['passkey']) && preg_match('/[a-f0-9]{1,32}/', $_GET['passkey'])){
+$passkey = $_GET['passkey'];
+
+$res = sql_query("SELECT * FROM users WHERE passkey=? LIMIT 1", [$passkey]);
 	$user = _mysql_fetch_array($res);
+
 	if (!$user)
 		die("invalid passkey");
 	elseif ($user['enabled'] == 'no' || $user['parked'] == 'yes')
