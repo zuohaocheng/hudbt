@@ -33,5 +33,6 @@ $lang_staffpanel = [
 		    'clearcache' => ['name' => '清空缓存', 'desc' => '清空memcached缓存'],
 		    'hustip' => ['name' => '人肉搜索', 'desc' => '开开门，查水表了'],
 		    'wechatreplies' => ['name' => '微信', 'desc' => '设置微信自动回复内容', 'url' => 'cake/wechatReplies'],
+		    'schools' => ['name' => '学校', 'desc' => '设置学校', 'url' => 'cake/Schools'],
 		    'ssh' => ['name' => 'SSH', 'desc' => '添加允许连接IP'],
 		    ];
