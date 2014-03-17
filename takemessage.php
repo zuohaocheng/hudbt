@@ -94,6 +94,10 @@ if ($_SERVER["REQUEST_METHOD"] != "POST")
 	}
 
 	$subject = trim($_REQUEST['subject']);
+        if (!$subject) {
+		stderr($lang_takemessage['std_refused'], $lang_takemessage['std_please_enter_something']);
+	}
+
         send_pm($CURUSER["id"], $receiver, $subject, $msg, $save);
 	$Cache->delete_value('user_'.$CURUSER["id"].'_outbox_count');
 	
