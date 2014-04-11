@@ -20,7 +20,7 @@ if ($_GET["returnto"] || $_SERVER["HTTP_REFERER"]) {
 <?php
 if ($_GET["sent"] == 1) {
 ?>
-<tr><td colspan="2"><span class="striking">The message has ben sent.</span></tr></td>
+<tr><td colspan="2"><span class="striking">The message has been sent.</span></tr></td>
 <?php
 }
 ?>
@@ -49,12 +49,15 @@ if ($_GET["sent"] == 1) {
 <tr><td><textarea name="msg" cols="80" rows="15"></textarea></td></tr>
 <tr>
 <td colspan="1"><div align="center"><b>Sender:&nbsp;&nbsp;</b>
-<?php echo $CURUSER['username']?>
+<label>
 <input name="sender" type="radio" value="self" checked="checked" />
-&nbsp; System
-<input name="sender" type="radio" value="system">
+<?php echo $CURUSER['username']?>
+</label>
+<label>
+<input name="sender" type="radio" value="system" />System
+</label>
 </div></td></tr>
-<tr><td colspan="1" align=center><input type=submit value="Send!" class=btn></td></tr>
+<tr><td colspan="1" align="center"><input type="submit" value="Send!" class="btn"></td></tr>
 </table>
 </form>
 

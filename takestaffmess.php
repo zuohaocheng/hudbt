@@ -21,10 +21,8 @@ if (is_array($updateset)) {
 }
 
 $subject = trim($_POST['subject']);
-$query = sql_query("SELECT id FROM users WHERE class IN (".implode(",", $updateset).")");
-while($dat=_mysql_fetch_assoc($query)) {
-	send_pm($sender_id, $dat['id'], $subject, $msg);
-}
+sql_query("INSERT INTO messages (sender, receiver, added, subject, msg) SELECT ?, id, NOW(), ?, ? FROM users WHERE class IN (".implode(",", $updateset).")",
+	  [$sender_id, $subject, $msg]);
 
 header("Refresh: 0; url=staffmess.php?sent=1");
 
