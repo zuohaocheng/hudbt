@@ -362,7 +362,7 @@ function get_user_group($userid){
   $user_groups = $Cache->get_value($key);
   if ($user_groups === false) {
     $user_groups = sql_query("SELECT gp.group_name,u_gp.role,u_gp.removed_by,u_gp.removed_date FROM users_usergroups AS u_gp JOIN usergroups AS gp ON u_gp.usergroup_id = gp.group_id WHERE u_gp.user_id = ?", [$userid])->fetchAll();
-    $Cache->cache_value($key, $user_groups, 120);
+    $Cache->cache_value($key, $user_groups, 3600);
   }
 
   foreach ($user_groups as $row) {

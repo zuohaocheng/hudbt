@@ -103,7 +103,8 @@ if ($action == "edituser")
 		$bonus = $_POST["bonus"];
 		$ori_bonus = $_POST["ori_bonus"];
 		$invites = $_POST["invites"];
-		if (($keeper_role!='none' && !isset($curgroups['keeper'])) || ($keeper_role != $curgroups['keeper']['role']) && isset($curgroups['keeper'])) {
+		if (($keeper_role!='none' && (!isset($curgroups['keeper']) || isset($curgroups['keeper']['removed'])))
+		    || ($keeper_role != $curgroups['keeper']['role']) && isset($curgroups['keeper'])) {
 		  switch($keeper_role){
 		  case 'none':
 		    $modcomment = date("Y-m-d") . " - Keeper role was removed by $CURUSER[username].\n". $modcomment;
@@ -142,6 +143,7 @@ if ($action == "edituser")
 		    $msg = $lang_modtask_target[get_user_lang($userid)]['msg_you_were_promoted_to'].$lang_modtask_target[get_user_lang($userid)]['keeper_boss'] .$lang_modtask_target[get_user_lang($userid)]['msg_by'].$CURUSER['username'];
 break;
 		  }
+		  $Cache->delete_value('user_groups_' . $userid);
 		  $subject = $lang_modtask_target[get_user_lang($userid)]['msg_usergroup_change'];
 		  send_pm(0, $userid, $subject, $msg);
 		  sql_query($keeperRoleUpdate) or sqlerr(__FILE__, __LINE__);
