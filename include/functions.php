@@ -2115,6 +2115,7 @@ function stdhead($title = "", $msgalert = true, $script = "", $place = "") {
   $title .= $showversion;
   if ($SITE_ONLINE == "no") {
     if (get_user_class() < UC_ADMINISTRATOR) {
+      header('HTTP/1.0 503 Service Unavailable');
       echo '<h1>' . $lang_functions['std_site_down_for_maintenance'] . '</h1>';
 
       echo '<div id="sns"><h2 class="page-titles">社交网站</h2><div class="minor-list text table td center"><ul>';

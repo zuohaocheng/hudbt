@@ -42,9 +42,7 @@ else {
 }
 ?>
 <form method="post" action="takelogin.php">
-<h2 class="page-titles"><a href="https://sp-pt.hust.edu.cn:444/Shibboleth.sso/DS?target=http://sp-pt.hust.edu.cn:81">联盟用户在此登录</a></h2>
-<h3 class="page-titles">（本校用户可使用南六楼网络中心申请的锐捷账号通过联盟认证登录）</h3>
-<div class="hints center"><ul><li><?php echo $lang_login['p_need_cookies_enables']?></li>
+<div class="hints center"><ul>
 <li>[<b><?php echo $maxloginattempts;?></b>] <?php echo $lang_login['p_fail_ban']?></li>
 <li><?php echo $lang_login['p_you_have']?> <b><?php echo $remaining;?></b> <?php echo $lang_login['p_remaining_tries']?></li></ul></div>
 <?php

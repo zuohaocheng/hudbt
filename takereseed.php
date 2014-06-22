@@ -15,7 +15,7 @@ if ($row['seeders'] > 0)
 elseif (strtotime($row['last_reseed']) > (TIMENOW - 86400))
   stderr($lang_takereseed['std_error'], $lang_takereseed['std_reseed_sent_recently']);
 else{
-  $res = sql_query("SELECT snatched.userid, snatched.torrentid, torrents.name as torrent_name, users.id FROM snatched inner join users on snatched.userid = users.id inner join torrents on snatched.torrentid = torrents.id  where snatched.finished = 'Yes' AND snatched.torrentid = $reseedid") or sqlerr();
+  $res = sql_query("SELECT snatched.userid, snatched.torrentid, torrents.name as torrent_name, users.id FROM snatched inner join users on snatched.userid = users.id inner join torrents on snatched.torrentid = torrents.id WHERE snatched.finished = 'Yes' AND snatched.torrentid = $reseedid") or sqlerr();
   while($row = _mysql_fetch_assoc($res)) {
     $rs_subject = $lang_takereseed_target[get_user_lang($row["userid"])]['msg_reseed_request'];
     $pn_msg = $lang_takereseed_target[get_user_lang($row["userid"])]['msg_user'].$CURUSER["username"].$lang_takereseed_target[get_user_lang($row["userid"])]['msg_ask_reseed']."[url=" . get_protocol_prefix() . "$BASEURL/details.php?id=".$reseedid."]".$row["torrent_name"]."[/url]".$lang_takereseed_target[get_user_lang($row["userid"])]['msg_thank_you'];

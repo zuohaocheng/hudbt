@@ -49,7 +49,7 @@ $lang_functions = array
 	'text_rules' => "&nbsp;规&nbsp;&nbsp;则&nbsp;",
 	'text_faq' => "&nbsp;常见问题&nbsp;",
 	'text_staff' => "工作人员",
-	'std_site_down_for_maintenance' => "蝴蝶娘还没有睡醒，请稍后再来...谢谢",
+	'std_site_down_for_maintenance' => "蝴蝶娘还没有睡醒，可能是鹳狸猿正在维护呢，请稍后再来...可以关注<a href='http://weibo.com/hudbter'>蝴蝶娘微博</a>呢",
 	'text_click_view_full_image' => "点击这里查看完整图像",
 	'text_image_resized' => "图像被缩小，点击这里查看完整图像",
 	'text_click_view_small_image' => "点击查看缩小图像",
