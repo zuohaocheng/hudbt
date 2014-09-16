@@ -2,6 +2,7 @@
 require "include/bittorrent.php";
 dbconn();
 require_once(get_langfile_path());
+require_once(get_langfile_path('forummanage.php'));
 loggedinorreturn();
 if (get_user_class() < $forummanage_class) 
 	permissiondenied();
@@ -19,11 +20,11 @@ if ($act == "del") {
 if (get_user_class() < $forummanage_class)
 	permissiondenied();
 
-if (!$id) { header("Location: $PHP_SELF?action=forum"); die();}
+if (!$id) { header("Location: ?action=forum"); die();}
 
 sql_query ("DELETE FROM overforums WHERE id = ".sqlesc($id)) or sqlerr(__FILE__, __LINE__);
 $Cache->delete_value('overforums_list');
-header("Location: $PHP_SELF?action=forum");
+header("Location: ?action=forum");
 die();
 }
 
@@ -35,11 +36,11 @@ if (get_user_class() < $forummanage_class)
 $name = $_POST['name'];
 $desc = $_POST['desc'];
 
-if (!$name && !$desc && !$id) { header("Location: $PHP_SELF?action=forum"); die();}
+if (!$name && !$desc && !$id) { header("Location: ?action=forum"); die();}
 
 sql_query("UPDATE overforums SET sort = " . sqlesc($_POST['sort']) . ", name = " . sqlesc($_POST['name']). ", description = " . sqlesc($_POST['desc']). ", minclassview = " . sqlesc($_POST['viewclass']) . " WHERE id = ".sqlesc($_POST['id'])) or sqlerr(__FILE__, __LINE__);
 $Cache->delete_value('overforums_list');
-header("Location: $PHP_SELF?action=forum");
+header("Location: ?action=forum");
 die();
 }
 
@@ -53,14 +54,14 @@ $desc = trim($_POST['desc']);
 
 if (!$name && !$desc)
 {
-	header("Location: $PHP_SELF?action=forum");
+	header("Location: ?action=forum");
     die();
 }
 
 sql_query("INSERT INTO overforums (sort, name,  description,  minclassview) VALUES(" . sqlesc($_POST['sort']) . ", " . sqlesc($_POST['name']). ", " . sqlesc($_POST['desc']). ", " . sqlesc($_POST['viewclass']) . ")") or sqlerr(__FILE__, __LINE__);
 $Cache->delete_value('overforums_list');
 
-header("Location: $PHP_SELF?action=forum");
+header("Location: ?action=forum");
 die();
 }
 
@@ -75,7 +76,7 @@ if ($act == "forum")
 // SHOW FORUMS WITH FORUM MANAGMENT TOOLS
 
 ?>
-<h2 class=transparentbg align=center><a class=faqlink href=forummanage.php><?php echo $lang_moforums['text_forum_management']?></a><b>--></b><?php echo $lang_moforums['text_overforum_management']?></h2>
+<h2 class="transparentbg" align=center><a class="faqlink" href="forummanage.php"><?php echo $lang_moforums['text_forum_management']?></a><b>--></b><?php echo $lang_moforums['text_overforum_management']?></h2>
 <br />
 <?php
 echo '<table width="100%"  border="0" align="center" cellpadding="2" cellspacing="0">';
@@ -86,7 +87,7 @@ do {
 
 
 echo "<tr><td><a href=forums.php?action=forumview&forid=".$row["id"]."><b>".htmlspecialchars($row["name"])."</b></a><br />".$row["description"]."</td>";
-echo "<td>" . get_user_class_name($row["minclassview"],false,true,true) . "</td><td><b><a href=\"".$PHP_SELF."?action=editforum&id=".$row["id"]."\">".$lang_moforums['text_edit']."</a>&nbsp;|&nbsp;<a href=\"javascript:confirm_delete('".$row["id"]."', '".$lang_moforums['js_sure_to_delete_overforum']."', '');\"><font color=red>".$lang_moforums['text_delete']."</font></a></b></td></tr>";
+echo "<td>" . get_user_class_name($row["minclassview"],false,true,true) . "</td><td><b><a href=\"?action=editforum&id=".$row["id"]."\">".$lang_moforums['text_edit']."</a>&nbsp;|&nbsp;<a href=\"javascript:confirm_delete('".$row["id"]."', '".$lang_moforums['js_sure_to_delete_overforum']."', '');\"><font color=red>".$lang_moforums['text_delete']."</font></a></b></td></tr>";
 
 
 } while($row = _mysql_fetch_array($result));
@@ -94,10 +95,10 @@ echo "<td>" . get_user_class_name($row["minclassview"],false,true,true) . "</td>
 echo "</table>";
 ?>
 <br /><br />
-<form method=post action="<?php echo $PHP_SELF;?>">
+<form method="post" action="?">
 <table width="100%"  border="0" cellspacing="0" cellpadding="3" align="center">
 <tr align="center">
-    <td colspan="2" class=colhead><?php echo $lang_moforums['text_new_overforum']?></td>
+    <td colspan="2" class="colhead"><?php echo $lang_moforums['text_new_overforum']?></td>
   </tr>
   <tr>
     <td><b><?php echo $lang_moforums['text_overforum_name']?></td>
@@ -111,11 +112,11 @@ echo "</table>";
     <tr>
     <td><b><?php echo $lang_moforums['text_minimum_view_permission']?></td>
     <td>
-    <select name=viewclass>\n
+    <select name="viewclass">
 <?php
 	     $maxclass = get_user_class();
 	  for ($i = 0; $i <= $maxclass; ++$i)
-	    print("<option value=$i" . ($user["class"] == $i ? " selected" : "") . ">$prefix" . get_user_class_name($i,false,true,true) . "\n");
+	    print("<option value=$i" . ($CURUSER["class"] == $i ? " selected" : "") . ">" . get_user_class_name($i,false,true,true) . "\n");
 ?>
 	</select>
     </td>
@@ -124,7 +125,7 @@ echo "</table>";
     <tr>
     <td><b><?php echo $lang_moforums['text_overforum_order']?></td>
     <td>
-    <select name=sort>
+    <select name="sort">
 <?php
 $res = sql_query ("SELECT sort FROM overforums");
 $nr = _mysql_num_rows($res);
@@ -157,11 +158,11 @@ if ($row = _mysql_fetch_array($result)) {
 
 do {
 ?>
-<h2 class=transparentbg align=center><a class=faqlink href=forummanage.php><?php echo $lang_moforums['text_forum_management']?></a><b>--></b><a class=faqlink href=moforums.php><?php echo $lang_moforums['text_overforum_management']?></a><b>--></b><?php echo $lang_moforums['text_edit_overforum']?></h2><br />
-<form method=post action="<?php echo $PHP_SELF;?>">
+<h2 class="transparentbg" align=center><a class="faqlink" href="forummanage.php"><?php echo $lang_moforums['text_forum_management']?></a><b>--></b><a class=faqlink href=moforums.php><?php echo $lang_moforums['text_overforum_management']?></a><b>--></b><?php echo $lang_moforums['text_edit_overforum']?></h2><br />
+<form method="post" action="?">
 <table width="100%"  border="0" cellspacing="0" cellpadding="3" align="center">
 <tr align="center">
-    <td colspan="2" class=colhead><?php echo $lang_moforums['text_edit_overforum']?> -- <?php echo htmlspecialchars($row["name"]);?></td>
+    <td colspan="2" class="colhead"><?php echo $lang_moforums['text_edit_overforum']?> -- <?php echo htmlspecialchars($row["name"]);?></td>
   </tr>
 
     <td><b><?php echo $lang_moforums['text_overforum_name']?></td>
@@ -176,7 +177,7 @@ do {
     <tr>
     <td><b><?php echo $lang_moforums['text_minimum_view_permission']?></td>
     <td>
-    <select name=viewclass>
+    <select name="viewclass">
 <?php
 	     $maxclass = get_user_class();
 	  for ($i = 0; $i <= $maxclass; ++$i)
@@ -190,7 +191,7 @@ do {
     <tr>
     <td><b><?php echo $lang_moforums['text_overforum_order']?></td>
     <td>
-    <select name=sort>
+    <select name="sort">
 <?php
 $res = sql_query ("SELECT sort FROM overforums");
 $nr = _mysql_num_rows($res);

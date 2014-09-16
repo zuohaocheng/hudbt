@@ -5,16 +5,16 @@ loggedinorreturn();
 checkPrivilegePanel();
 stdhead("Add Upload", false);
 ?>
-<table class=main width=737 border=0 cellspacing=0 cellpadding=0><tr><td class=embedded>
+<table class="main" width=737 border=0 cellspacing=0 cellpadding=0><tr><td class="embedded">
 <div align=center>
 <h1>Add upload to all staff members and users:</a></h1>
-<form method=post action=takeamountupload.php>
+<form method="post" action="takeamountupload.php">
 <?php
 
 if ($_GET["returnto"] || $_SERVER["HTTP_REFERER"])
 {
 ?>
-<input type=hidden name=returnto value="<?php echo htmlspecialchars($_GET["returnto"]) ? htmlspecialchars($_GET["returnto"]) : htmlspecialchars($_SERVER["HTTP_REFERER"])?>">
+<input type="hidden" name="returnto" value="<?php echo htmlspecialchars($_GET["returnto"]) ? htmlspecialchars($_GET["returnto"]) : htmlspecialchars($_SERVER["HTTP_REFERER"])?>">
 <?php
 }
 ?>
@@ -26,7 +26,7 @@ if ($_GET["sent"] == 1) {
 <?php
 }
 ?>
-<tr><td class="rowhead" valign="top">Amount </td><td class="rowfollow"><input type=text name=amount size=10>&nbsp;(in GB)</td></tr>
+<tr><td class="rowhead" valign="top">Amount </td><td class="rowfollow"><input type="text" name="amount" size=10>&nbsp;(in GB)</td></tr>
 <tr>
 <td class="rowhead" valign="top">Add to</td><td class="rowfollow">
   <table style="border: 0" width="100%" cellpadding="0" cellspacing="0">
@@ -106,18 +106,17 @@ if ($_GET["sent"] == 1) {
     </table>
   </td>
 </tr>
-<tr><td class="rowhead" valign="top">Subject </td><td class="rowfollow"><input type=text name=subject size=82></td></tr>
-<tr><td class="rowhead" valign="top">Reason </td><td class="rowfollow"><textarea name=msg cols=80 rows=5><?php echo $body?></textarea></td></tr>
+<tr><td class="rowhead" valign="top">Subject </td><td class="rowfollow"><input type="text" name="subject" size=82></td></tr>
+<tr><td class="rowhead" valign="top">Reason </td><td class="rowfollow"><textarea name="msg" cols=80 rows=5></textarea></td></tr>
 <tr>
 <td class="rowfollow" colspan=2><div align="center"><b>Operator:&nbsp;&nbsp;</b>
 <?php echo $CURUSER['username']?>
-<input name="sender" type="radio" value="self" checked>
+<input name="sender" type="radio" value="self" checked="checked">
 &nbsp; System
 <input name="sender" type="radio" value="system">
 </div></td></tr>
-<tr><td class="rowfollow" colspan=2 align=center><input type=submit value="Do It!" class=btn></td></tr>
+<tr><td class="rowfollow" colspan=2 align=center><input type="submit" value="Do It!" class="btn"></td></tr>
 </table>
-<input type=hidden name=receiver value=<?php echo $receiver?>>
 </form>
 
  </div></td></tr></table>

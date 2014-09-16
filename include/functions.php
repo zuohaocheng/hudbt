@@ -1554,6 +1554,7 @@ function userlogin() {
   global $Cache;
   global $oldip, $iplog1, $USERUPDATESET;
   global $enablesqldebug_tweak, $sqldebug_tweak;
+  global $lang_functions;
   unset($GLOBALS["CURUSER"]);
 
   $ip = getip();
@@ -3438,13 +3439,11 @@ else {
   $sort = 0;
 }
 
+$sorttype = 'desc';
 if (isset($_REQUEST['type'])) {
   $sorttype = $_REQUEST['type'];
   if ($sorttype == 'desc') {
     $sorttype = 'asc';
-  }
-  else {
-    $sorttype = 'desc';
   }
 }
 

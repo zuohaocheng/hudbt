@@ -524,6 +524,7 @@ var jqui_confirm = function(title, html, onOK, onCancel) {
     return dialog;
 };
 
+// Parameter1 form has to be jQuery object
 var jqui_form = function(form, title, callback, buttons, width) {
     form.submit(function(e) {
 	e.preventDefault();

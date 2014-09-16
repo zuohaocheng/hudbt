@@ -27,7 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && get_user_class() >= UC_ADMINISTRATOR
 	sql_query('INSERT INTO bans (added, addedby, first, last, comment) VALUES(?, ?, ?, ?, ?)', [$added, $CURUSER['id'], $firstlong, $lastlong, $comment]);
 	for ($i = $firstlong; $i <= $lastlong; $i += 1) {
 	  $key = 'banned_ip_' . $i;
-	  $Cahce->delete_value($key);
+	  $Cache->delete_value($key);
 	}
 	header("Location: $_SERVER[REQUEST_URI]");
 	die;
@@ -51,7 +51,7 @@ else
 
   while ($arr = _mysql_fetch_assoc($res))
   {
- 	  print("<tr><td>".gettime($arr[added])."</td><td align=left>".long2ip($arr[first])."</td><td align=left>".long2ip($arr[last])."</td><td align=left>". get_username($arr['addedby']) .
+ 	  print("<tr><td>".gettime($arr['added'])."</td><td align=left>".long2ip($arr['first'])."</td><td align=left>".long2ip($arr['last'])."</td><td align=left>". get_username($arr['addedby']) .
  	    "</td><td align=left>$arr[comment]</td><td><a href=bans.php?remove=$arr[id]>Remove</a></td></tr>\n");
   }
   print("</table>\n");

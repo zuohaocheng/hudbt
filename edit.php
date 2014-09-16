@@ -169,6 +169,9 @@ if (get_user_class()>= $torrentsticky_class || (get_user_class() >= $torrentmana
       $odaycheckbox = "<input type=\"checkbox\" id=sel_oday name=\"sel_oday\" checked=\"yes\" value=\"oday\"/>".$lang_edit['oday'];
     elseif($row['oday']=='no')
       $odaycheckbox = "<input type=\"checkbox\" id=sel_oday name=\"sel_oday\" value=\"oday\"/>".$lang_edit['oday'];
+    else
+      $odaycheckbox = '';
+    
     $pickcontent.= '<label>' . $odaycheckbox . '</label>';
   }
   //Added by Eggsorer 20120328

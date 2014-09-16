@@ -27,7 +27,7 @@ if ($id > $max_id) {
   stderr($lang_details['std_error'], $lang_details['std_no_torrent_id']);  
 }
 
-$row = sql_query("SELECT torrents.cache_stamp, torrents.storing, torrents.sp_state, torrents.url, torrents.small_descr, torrents.seeders, torrents.banned, torrents.leechers, torrents.info_hash, torrents.filename, nfo, LENGTH(torrents.nfo) AS nfosz, torrents.last_action, torrents.name, torrents.owner, torrents.save_as, torrents.descr, torrents.visible, torrents.size, torrents.added, torrents.promotion_time_type, torrents.promotion_until, torrents.views, torrents.hits, torrents.times_completed, torrents.id, torrents.dl_url, torrents.type, torrents.numfiles, torrents.anonymous, torrents.startseed, torrents.category, categories.name AS cat_name, sources.name AS source_name, medium, media.name AS medium_name, codec, codecs.name AS codec_name, standard, standards.name AS standard_name, processings.name AS processing_name, team, teams.name AS team_name, audiocodecs.name AS audiocodec_name FROM torrents LEFT JOIN categories ON torrents.category = categories.id LEFT JOIN sources ON torrents.source = sources.id LEFT JOIN media ON torrents.medium = media.id LEFT JOIN codecs ON torrents.codec = codecs.id LEFT JOIN standards ON torrents.standard = standards.id LEFT JOIN processings ON torrents.processing = processings.id LEFT JOIN teams ON torrents.team = teams.id LEFT JOIN audiocodecs ON torrents.audiocodec = audiocodecs.id WHERE torrents.id = ? LIMIT 1", [$id])->fetch();
+$row = sql_query("SELECT torrents.cache_stamp, torrents.storing, torrents.sp_state, torrents.url, torrents.small_descr, torrents.seeders, torrents.banned, torrents.leechers, torrents.info_hash, torrents.filename, nfo, LENGTH(torrents.nfo) AS nfosz, torrents.last_action, torrents.last_reseed, torrents.name, torrents.owner, torrents.save_as, torrents.descr, torrents.visible, torrents.size, torrents.added, torrents.promotion_time_type, torrents.promotion_until, torrents.views, torrents.hits, torrents.times_completed, torrents.id, torrents.dl_url, torrents.type, torrents.numfiles, torrents.anonymous, torrents.startseed, torrents.category, categories.name AS cat_name, sources.name AS source_name, medium, media.name AS medium_name, codec, codecs.name AS codec_name, standard, standards.name AS standard_name, processings.name AS processing_name, team, teams.name AS team_name, audiocodecs.name AS audiocodec_name FROM torrents LEFT JOIN categories ON torrents.category = categories.id LEFT JOIN sources ON torrents.source = sources.id LEFT JOIN media ON torrents.medium = media.id LEFT JOIN codecs ON torrents.codec = codecs.id LEFT JOIN standards ON torrents.standard = standards.id LEFT JOIN processings ON torrents.processing = processings.id LEFT JOIN teams ON torrents.team = teams.id LEFT JOIN audiocodecs ON torrents.audiocodec = audiocodecs.id WHERE torrents.id = ? LIMIT 1", [$id])->fetch();
 
 if (!$row) {
   header("HTTP/1.1 410 Gone");  
@@ -179,7 +179,7 @@ else {
       $actions .= '<li><' . $deletelink . '>' . $lang_details['text_delete_torrent'] . '</a></li>';
     }
 
-    if (get_user_class() >= $askreseed_class && $row['seeders'] == 0) {
+    if (get_user_class() >= $askreseed_class && $row['seeders'] == 0 && strtotime($row['last_reseed']) < (TIMENOW - 86400)) {
       $actions .= "<li><a title=\"".$lang_details['title_ask_for_reseed']."\" href=\"takereseed.php?reseedid=$id\"><img class=\"dt_reseed\" src=\"pic/trans.gif\" alt=\"reseed\">&nbsp;<span class=\"small\">".$lang_details['text_ask_for_reseed'] ."</span></a></li>";
     }
 

@@ -79,9 +79,9 @@ if ($_GET['action'] == "editforum") {
 	if ($row = _mysql_fetch_array($result)) {
 		do {
 ?>
-<h1 align=center><a class=faqlink href=forummanage.php><?php echo $lang_forummanage['text_forum_management']?></a><b>--></b><?php echo $lang_forummanage['text_edit_forum']?></h2>
+<h1 align=center><a class="faqlink" href="?"><?php echo $lang_forummanage['text_forum_management']?></a><b>--></b><?php echo $lang_forummanage['text_edit_forum']?></h2>
 <br />
-<form method=post action="<?php echo $_SERVER["PHP_SELF"];?>">
+<form method="post" action="?">
 <table width="100%"  border="0" cellspacing="0" cellpadding="3" align="center">
 <tr align="center">
     <td colspan="2" class=colhead><?php echo $lang_forummanage['text_edit_forum']?> -- <?php echo htmlspecialchars($row["name"]);?></td>
@@ -99,7 +99,7 @@ if ($_GET['action'] == "editforum") {
     <tr>
     <td><b><?php echo $lang_forummanage['row_overforum']?></td>
     <td>
-    <select name=overforums>
+    <select name="overforums">
     <?php
             $forid = $row["forid"];
             $res = sql_query("SELECT * FROM overforums");
@@ -123,7 +123,7 @@ if ($_GET['action'] == "editforum") {
     <tr>
     <td><b><?php echo $lang_forummanage['row_minimum_read_permission']?></td>
     <td>
-    <select name=readclass>
+    <select name="readclass">
 <?php
              $maxclass = get_user_class();
           for ($i = 0; $i <= $maxclass; ++$i)
@@ -134,7 +134,7 @@ if ($_GET['action'] == "editforum") {
   </tr>
   <tr>
     <td><b><?php echo $lang_forummanage['row_minimum_write_permission']?></td>
-    <td><select name=writeclass>
+    <td><select name="writeclass">
 <?php
               $maxclass = get_user_class();
           for ($i = 0; $i <= $maxclass; ++$i)
@@ -144,7 +144,7 @@ if ($_GET['action'] == "editforum") {
   </tr>
   <tr>
     <td><b><?php echo $lang_forummanage['row_minimum_create_topic_permission']?></td>
-    <td><select name=createclass>
+    <td><select name="createclass">
 <?php
             $maxclass = get_user_class();
           for ($i = 0; $i <= $maxclass; ++$i)
@@ -183,9 +183,9 @@ $nr = _mysql_num_rows($res);
 //
 elseif ($_GET['action'] == "newforum"){
 ?>
-<h2 class=transparentbg align=center><a class=faqlink href=forummanage.php><?php echo $lang_forummanage['text_forum_management']?></a><b>--></b><?php echo $lang_forummanage['text_add_forum']?></h2>
+<h2 class="transparentbg" align=center><a class="faqlink" href="?"><?php echo $lang_forummanage['text_forum_management']?></a><b>--></b><?php echo $lang_forummanage['text_add_forum']?></h2>
 <br />
-<form method=post action="<?php echo $_SERVER["PHP_SELF"];?>">
+<form method="post" action="?">
 <table width="100%"  border="0" cellspacing="0" cellpadding="3" align="center">
 <tr align="center">
     <td colspan="2" class=colhead><?php echo $lang_forummanage['text_make_new_forum']?></td>
@@ -201,16 +201,15 @@ elseif ($_GET['action'] == "newforum"){
   <tr>
     <td><b><?php echo $lang_forummanage['row_overforum']?></td>
     <td>
-    <select name=overforums>
+    <select name="overforums">
 <?php
-            $forid = $row["forid"];
-            $res = sql_query("SELECT * FROM overforums");
+            $res = sql_query("SELECT id, name FROM overforums");
              while ($arr = _mysql_fetch_array($res)) {
 
              $name = $arr["name"];
              $i = $arr["id"];
 
-            print("<option value=$i" . ($forid == $i ? " selected" : "") . ">" . $name . "\n");
+            print("<option value=$i>" . $name . "\n");
             }
 ?>
         </select>
@@ -220,39 +219,39 @@ elseif ($_GET['action'] == "newforum"){
     <tr>
     <td><b><?php echo $lang_forummanage['row_minimum_read_permission']?></td>
     <td>
-    <select name=readclass>
+    <select name="readclass">
 <?php
              $maxclass = get_user_class();
           for ($i = 0; $i <= $maxclass; ++$i)
-            print("<option value=$i" . ($user["class"] == $i ? " selected" : "") . ">" . get_user_class_name($i,false,true,true) . "\n");
+            print("<option value=$i" . ($CURUSER["class"] == $i ? " selected" : "") . ">" . get_user_class_name($i,false,true,true) . "\n");
 ?>
         </select>
     </td>
   </tr>
   <tr>
     <td><b><?php echo $lang_forummanage['row_minimum_write_permission']?></td>
-    <td><select name=writeclass>
+    <td><select name="writeclass">
 <?php
               $maxclass = get_user_class();
           for ($i = 0; $i <= $maxclass; ++$i)
-            print("<option value=$i" . ($user["class"] == $i ? " selected" : "") . ">" . get_user_class_name($i,false,true,true) . "\n");
+            print("<option value=$i" . ($CURUSER["class"] == $i ? " selected" : "") . ">" . get_user_class_name($i,false,true,true) . "\n");
 ?>
         </select></td>
   </tr>
   <tr>
     <td><b><?php echo $lang_forummanage['row_minimum_create_topic_permission']?></td>
-    <td><select name=createclass>
+    <td><select name="createclass">
 <?php
             $maxclass = get_user_class();
           for ($i = 0; $i <= $maxclass; ++$i)
-            print("<option value=$i" . ($user["class"] == $i ? " selected" : "") . ">" . get_user_class_name($i,false,true,true) . "\n");
+            print("<option value=$i" . ($CURUSER["class"] == $i ? " selected" : "") . ">" . get_user_class_name($i,false,true,true) . "\n");
 ?>
         </select></td>
   </tr>
     <tr>
     <td><b><?php echo $lang_forummanage['row_forum_order']?></td>
     <td>
-    <select name=sort>
+    <select name="sort">
 <?php
 $res = sql_query ("SELECT sort FROM forums");
 $nr = _mysql_num_rows($res);

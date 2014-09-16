@@ -23,7 +23,12 @@ class HTML_BBCodeParser_Filter_Template extends HTML_BBCodeParser_Filter {
     $a = _mysql_fetch_row($r);
     if ($a) {
       $body = $a[0];
-      $sargs = $keys[2] . '  ';
+      if (isset($keys[2])) {
+	$sargs = $keys[2] . '  ';
+      }
+      else {
+	$sargs = '';
+      }
       $args = [];
       $k_buf = '';
       $v_buf = '';
